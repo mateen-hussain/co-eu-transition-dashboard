@@ -1,0 +1,61 @@
+{% extends "govuk/template.njk" %}
+
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/skip-link/macro.njk" import govukSkipLink %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+
+{% set index = "All project data" %}
+
+{% block head %}
+  <!--[if !IE 8]><!-->
+    <link href="assets/main.css" media="screen" rel="stylesheet" />
+  <!--<![endif]-->
+
+  {# For Internet Explorer 8, you need to compile specific stylesheet #}
+  {# see https://github.com/alphagov/govuk-frontend/blob/master/docs/installation/supporting-internet-explorer-8.md #}
+  <!--[if IE 8]>
+    <link href="./css/govuk-ie8.css" rel="stylesheet">
+  <![endif]-->
+
+  {# For older browsers to allow them to recognise HTML5 elements such as `<header>` #}
+  <!--[if lt IE 9]>
+    <script src="./js/html5shiv/html5shiv.js"></script>
+  <![endif]-->
+{% endblock %}
+
+{% block bodyStart %}
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    homepageUrl: "https://www.gov.uk/",
+    serviceName: "Cabinet Office",
+    serviceUrl: "/",
+     navigation: [
+      {
+        href: "#1",
+        text: "Priority projects"
+      },
+      {
+        href: "#2",
+        text: "Barriers to delivery"
+      },
+      {
+        href: "/",
+        text: index,
+        active: true
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block main %}
+  {{ super() }}
+{% endblock %}
+
+{% block bodyEnd %}
+  {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
+  <script type="text/javascript" src="assets/main.js"></script>
+
+{% endblock %}

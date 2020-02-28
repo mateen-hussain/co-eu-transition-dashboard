@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  # dev:
+  #   image: node:12
+  #   build: .
+  #   volumes:
+  #     - .:/home/node/app
+  #   command: npm run dev
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - "3000:3000"
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_URL: postgres://postgres:postgres@postgres:5432/postgres
+  #     NODE_ENV: development
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: dashboard
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    restart: always
+    ports:
+      - "3306:3306"
+    expose:
+      - '3306'
+    volumes:
+      - ./resources/database/setup.sql:/docker-entrypoint-initdb.d/init.sql

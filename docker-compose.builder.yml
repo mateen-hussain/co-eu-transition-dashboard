@@ -1,0 +1,15 @@
+version: '2'
+services:
+  base:
+    image: node:12
+    volumes:
+      - nodemodules:/home/app/node_modules
+      - .:/home/app/
+    working_dir: /home/app/
+  install:
+    extends:
+      service: base
+    command: npm i
+volumes:
+  nodemodules:
+    external: true
