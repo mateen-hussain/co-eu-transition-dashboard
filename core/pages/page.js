@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const path = require('path');
+const jwt = require('services/jwt');
 
 const notLocals = [
   '_router',
@@ -52,15 +53,13 @@ class Page {
   }
 
   getRequest(req, res) {
-    const { session } = req;
-    res.locals.session = session;
+    res.locals.form = jwt.restoreData(req);
+
     res.render(this.template, this.locals);
   }
 
   async postRequest(req, res) {
-    const { body, session } = req;
-
-    Object.assign(session, body);
+    jwt.saveData(res, req.body);
 
     res.redirect(this.url);
   }

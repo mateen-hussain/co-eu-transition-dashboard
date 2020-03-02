@@ -1,13 +1,17 @@
 {
   "env": "development",
   "port": "3000",
+  "cookie": {
+    "expires": 100,
+    "secret": "some secrent..."
+  },
   "services": {
     "mysql": {
       "host": "127.0.0.1",
       "user": "root",
       "password": "password",
       "database": "dashboard",
-      "port": "3306"
+      "port": 3306
     }
   },
   "paths": {
