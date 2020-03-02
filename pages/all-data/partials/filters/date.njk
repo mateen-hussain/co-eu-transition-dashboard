@@ -1,0 +1,24 @@
+{{ govukInput({
+  label: {
+    text: "From"
+  },
+  classes: "govuk-input--width-10",
+  hint: {
+    html: "For example, " + currentYear
+  },
+    id: "fromDate",
+    name: "fromDate",
+    value: fromDate
+}) }}
+{{ govukInput({
+  label: {
+    text: "To"
+  },
+  classes: "govuk-input--width-10",
+  hint: {
+    text: "For example, " + nextYear
+  },
+    id: "toDate",
+    name: "toDate",
+    value: toDate
+}) }}

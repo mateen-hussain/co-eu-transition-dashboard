@@ -1,0 +1,47 @@
+#accordion-table .govuk-accordion__section-header {
+    border-top: none;
+}
+
+.js-enabled .govuk-accordion {
+    border-bottom: none;
+}
+
+#accordion-table .govuk-accordion__controls {
+    margin-top: 40px;
+    top: -80px;
+    position: relative;
+}
+
+#accordion-table .govuk-accordion__section {
+    margin-top: -70px;
+    margin-bottom: 30px;
+}
+
+#accordion-table .govuk-accordion__section--expanded .govuk-accordion__section-content {
+    margin-bottom: -30px;
+    margin-top: -30px;
+}
+
+#filterPanel, #hideFilter  {
+    display: none;
+}
+
+#show:target #filterPanel {
+    display: block;
+}
+
+#show:target #showFilter {
+    display: none;
+}
+
+#show:target #hideFilter {
+    display: block;
+}
+
+#show:target #dataTable {
+    width: 75%;
+}
+
+.govuk-table {
+    font-size: 1.100rem;
+}

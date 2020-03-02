@@ -1,0 +1,77 @@
+{{ govukAccordion({
+  id: "accordion-default",
+  items: [
+    {
+      heading: {
+        text: "Date"
+      },
+      content: {
+        html: dateHtml
+      }
+    },
+    {
+      heading: {
+        text: "Impact"
+      },
+      content: {
+        html: impactLevelHtml
+      }
+    },
+      {
+      heading: {
+        text: "HMG delivery confidence"
+      },
+      content: {
+        html: deliveryConfidenceHtml
+      }
+    },
+      {
+      heading: {
+        text: "Citizen readiness"
+      },
+      content: {
+        html: citizenReadinessHtml
+      }
+    },
+      {
+      heading: {
+        text: "Business readiness"
+      },
+      content: {
+        html: businessReadinessHtml
+      }
+    },
+    {
+      heading: {
+        text: "EU state confidence"
+      },
+      content: {
+        html: stateConfidenceHtml
+      }
+    },
+    {
+      heading: {
+        text: "Department"
+      },
+      content: {
+        html: "<p class='govuk-body'>This is the content for How people read.</p>"
+      }
+    },
+    {
+      heading: {
+        text: "Project name"
+      },
+      content: {
+        html: "<p class='govuk-body'>This is the content for How people read.</p>"
+      }
+    },
+    {
+      heading: {
+        text: "Status"
+      },
+      content: {
+        html: statusHtml
+      }
+    }
+  ]
+}) }}
