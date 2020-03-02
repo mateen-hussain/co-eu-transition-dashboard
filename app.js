@@ -4,9 +4,12 @@ const webpack = require('middleware/webpack');
 const pages = require('./pages');
 const bodyParser = require('body-parser');
 const logger = require('middleware/logger');
+const helmet = require('middleware/helmet');
 const cookieParser = require('cookie-parser');
 
 const app = module.exports = express();
+
+helmet.attach(app);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
