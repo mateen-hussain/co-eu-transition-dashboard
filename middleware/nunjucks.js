@@ -12,17 +12,14 @@ const nunjucksDefaults = {
   loader: nunjucks.FileSystemLoader
 };
 
-const configureViews = app => {
+const attach = app => {
   app.set('views', [
     path.join(__dirname, '..', 'node_modules', 'govuk-frontend'),
     path.join(__dirname, '..', 'common', 'views'),
     path.join(__dirname, '..', 'common', 'views'),
     path.join(__dirname, '..', 'pages')
   ]);
-  return app;
-};
 
-const configureNunjucks = app => {
   const environment = expressNunjucks(
     app,
     nunjucksDefaults
@@ -30,7 +27,4 @@ const configureNunjucks = app => {
   awaitFilter(environment.env);
 };
 
-module.exports = {
-  configureViews,
-  configureNunjucks
-};
+module.exports = { attach };

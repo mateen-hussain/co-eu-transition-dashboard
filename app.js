@@ -14,13 +14,9 @@ helmet.attach(app);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-nunjucks.configureViews(app);
-nunjucks.configureNunjucks(app);
-
+nunjucks.attach(app);
 webpack.configure(app);
 
 logger.attachRouteLogger(app);
-
 pages.attach(app);
-
 logger.attachErrorLogger(app);

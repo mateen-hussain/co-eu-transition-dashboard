@@ -79,6 +79,7 @@ class Page {
 
   get router() {
     this._router = Router();
+    this._router.page = this;
 
     this.middleware.forEach(middleware => {
       this._router.use(this.url, middleware.bind(this));

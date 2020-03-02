@@ -7,7 +7,11 @@ const saveData = (res, data) => {
 };
 
 const restoreData = req => {
-  return jwt.verify(req.cookies['jwt'], config.cookie.secret);
+  if (req.cookies['jwt']) {
+    return jwt.verify(req.cookies['jwt'], config.cookie.secret);
+  } else {
+    return {};
+  }
 };
 
 module.exports = {
