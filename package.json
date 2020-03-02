@@ -62,18 +62,28 @@
     "assign-deep": ">=1.0.1"
   },
   "nyc": {
-    "all": true,
+    "report-dir": "coverage",
+    "temp-directory": "./coverage/.nyc_output",
     "check-coverage": true,
+    "per-file": true,
+    "lines": 60,
+    "statements": 60,
+    "functions": 60,
     "reporter": [
-      "cobertura",
       "lcov",
       "text"
     ],
+    "sourceMap": true,
+    "instrument": true,
     "include": [
       "middleware/**/*.js",
       "pages/**/*.js",
       "core/**/*.js",
       "services/**/*.js"
+    ],
+    "exclude": [
+      "services/logger.js",
+      "middleware/logger.js"
     ]
   }
 }

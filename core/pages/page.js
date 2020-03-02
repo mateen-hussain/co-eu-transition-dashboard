@@ -55,7 +55,7 @@ class Page {
   getRequest(req, res) {
     res.locals.form = jwt.restoreData(req);
 
-    res.render(this.template, this.locals);
+    res.render(this.template, res.locals);
   }
 
   async postRequest(req, res) {
