@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - 12
+install:
+  - npm install
+jobs:
+  include:
+    - stage: Audit dependancies
+      script: npm audit
+    - stage: Lint
+      script: npm run test:lint
+    - stage: Unit Tests
+      script: npm run test:unit
