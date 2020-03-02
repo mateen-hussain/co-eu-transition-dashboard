@@ -2,8 +2,12 @@
   "env": "development",
   "port": "3000",
   "services": {
-    "postgres": {
-      "url": ""
+    "mysql": {
+      "host": "127.0.0.1",
+      "user": "root",
+      "password": "password",
+      "database": "dashboard",
+      "port": "3306"
     }
   },
   "paths": {

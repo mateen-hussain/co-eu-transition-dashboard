@@ -1,12 +1,12 @@
-const config = require('config');
+const { services } = require('config');
 const mysql = require("mysql");
 
 const connection = mysql.createConnection({
-  host: process.env.DATABASE_HOST || '127.0.0.1',
-  user: 'root',
-  password: 'password',
-  database: 'dashboard',
-  port: 3306
+  host: services.mysql.host,
+  user: services.mysql.user,
+  password: services.mysql.password,
+  database: services.mysql.database,
+  port: parseInt(services.mysql.port)
 });
 
 connection.connect(function (err) {

@@ -23,6 +23,9 @@ services:
       MYSQL_DATABASE: dashboard
       MYSQL_USER: user
       MYSQL_PASSWORD: password
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: dashboard
     restart: always
     ports:
       - "3306:3306"
