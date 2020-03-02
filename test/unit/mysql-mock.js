@@ -1,4 +1,3 @@
-const config = require('config');
 const sinon = require('sinon');
 const mysql = require("mysql");
 

@@ -1,5 +1,3 @@
-const { Router } = require('express');
-const path = require('path');
 const Page = require('../../core/pages/page');
 const { paths } = require('config');
 const database = require('../../services/database');

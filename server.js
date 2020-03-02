@@ -1,12 +1,7 @@
 const config = require('config');
 const app = require('./app');
+const logger = require('services/logger');
 
 app.listen(config.port, function(){
-  console.log(`App available at http://localhost:${config.port}`);
-});
-
-process.on('SIGTERM', () => {
-  http.close(() => {
-    process.exit(0);
-  });
+  logger.info(`App available at http://localhost:${config.port}`);
 });

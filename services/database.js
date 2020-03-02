@@ -1,5 +1,6 @@
 const { services } = require('config');
 const mysql = require("mysql");
+const logger = require('services/logger');
 
 const connection = mysql.createConnection({
   host: services.mysql.host,
@@ -9,17 +10,15 @@ const connection = mysql.createConnection({
   port: parseInt(services.mysql.port)
 });
 
-connection.connect(function (err) {
+connection.connect(err => {
   if (err) {
-    console.error("error connecting " + err.stack);
-    return null;
+    return logger.error(err);
   }
-  console.log("connected as id " + this.threadId);
 });
 
-const getProjects = filters => {
+const getProjects = () => {
   return new Promise((resolve, reject) => {
-    connection.query('select * from projects inner join milestones on projects.id = milestones.project_id', function (error, results, fields) {
+    connection.query('select * from projects inner join milestones on projects.id = milestones.project_id', function (error, results) {
       if (error) reject(error);
       resolve(results);
     });

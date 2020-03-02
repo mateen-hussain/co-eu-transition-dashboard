@@ -52,7 +52,7 @@ class Page {
   }
 
   getRequest(req, res) {
-    const { session, body } = req;
+    const { session } = req;
     res.locals.session = session;
     res.render(this.template, this.locals);
   }
@@ -99,7 +99,6 @@ class Page {
         } else if (defined(descriptor.value)) {
           obj[key] = this[key];
         } else if (defined(descriptor.get) && key !== '__proto__') {
-          const step = this;
           Object.assign(obj, {
             [key]: this[key]
           });
