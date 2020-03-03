@@ -1,6 +1,7 @@
 const { services } = require('config');
 const mysql = require("mysql");
 const logger = require('services/logger');
+const filterColumns = ['department', 'project_name', 'impact', 'hmg_confidence', 'citizen_readiness', 'business_readiness', 'eu_state_confidence'];
 
 const connection = mysql.createConnection({
   host: services.mysql.host,
@@ -16,15 +17,39 @@ connection.connect(err => {
   }
 });
 
-const getProjects = () => {
+const executeQuery = query => {
   return new Promise((resolve, reject) => {
-    connection.query('select * from projects inner join milestones on projects.id = milestones.project_id', function (error, results) {
+    connection.query(query, function (error, results) {
       if (error) reject(error);
       resolve(results);
     });
   });
 };
 
+const getProjects = async () => {
+  return await executeQuery('select * from projects inner join milestones on projects.id = milestones.project_id');
+};
+
+const getFilters = async () => {
+  const filters = [];
+
+  for(const column of filterColumns) {
+    const options = await executeQuery(`SELECT ${column} as value, COUNT(${column}) as count FROM projects GROUP BY ${column}`);
+
+    if(options && options.length) {
+      filters.push({
+        name: column,
+        options
+      });
+    }
+  }
+
+  return filters;
+};
+
 module.exports = {
-  getProjects
+  executeQuery,
+  getProjects,
+  getFilters,
+  connection
 };

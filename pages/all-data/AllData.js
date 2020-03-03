@@ -10,6 +10,10 @@ class AllData extends Page {
   async projects() {
     return await database.getProjects();
   }
+
+  async getFilters() {
+    return await database.getFilters();
+  }
 }
 
 module.exports = AllData;
