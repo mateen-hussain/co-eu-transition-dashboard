@@ -11,7 +11,7 @@ const app = module.exports = express();
 
 helmet.attach(app);
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 nunjucks.attach(app);

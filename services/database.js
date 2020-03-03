@@ -26,8 +26,21 @@ const executeQuery = query => {
   });
 };
 
-const getProjects = async () => {
-  return await executeQuery('select * from projects inner join milestones on projects.id = milestones.project_id');
+const getProjects = async (filters = {}) => {
+  let query = 'select * from projects';
+
+  Object.keys(filters).forEach((filter, index) => {
+    if (index === 0) {
+      query += ` WHERE `;
+    } else {
+      query += ` AND `;
+    }
+
+    const options = filters[filter].map(filter => `'${filter}'`);
+    query += `${filter} IN (${options.join(',')})`;
+  });
+
+  return await executeQuery(query);
 };
 
 const getFilters = async () => {

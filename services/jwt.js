@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-const saveData = (res, data) => {
-  const token = jwt.sign(JSON.stringify(data), config.cookie.secret);
+const saveData = (req, res, data) => {
+  const existingData = restoreData(req);
+  const dataToSave = Object.assign({}, existingData, data);
+  const token = jwt.sign(JSON.stringify(dataToSave), config.cookie.secret);
   res.cookie('jwt', token);
 };
 

@@ -52,19 +52,43 @@ class Page {
     return path.join(this.path, `${this.constructor.name}.html`);
   }
 
-  getRequest(req, res) {
-    res.locals.form = jwt.restoreData(req);
+  get data() {
+    const data = jwt.restoreData(this.req) || {};
+    return data[this.constructor.name] || {};
+  }
 
-    res.render(this.template, res.locals);
+  getRequest(req, res) {
+    res.render(this.template, this.locals);
   }
 
   async postRequest(req, res) {
-    jwt.saveData(res, req.body);
+    const data = { [this.constructor.name]: removeNulls(req.body) };
+
+    function removeNulls(obj){
+      var isArray = obj instanceof Array;
+      for (var k in obj){
+        if (obj[k] === null || (typeof obj[k] === "string" && !obj[k].length)) {
+          if(isArray) {
+            obj.splice(k,1);
+          } else {
+            delete obj[k];
+          }
+        } else if (typeof obj[k] === "object") {
+          return removeNulls(obj[k]);
+        }
+      }
+      return obj;
+    }
+
+    jwt.saveData(req, res, data);
 
     res.redirect(this.url);
   }
 
   async handler(req, res) {
+    this.req = req;
+    this.res = res;
+
     const method = req.method.toLowerCase();
 
     switch (method) {

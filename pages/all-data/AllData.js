@@ -8,7 +8,7 @@ class AllData extends Page {
   }
 
   async projects() {
-    return await database.getProjects();
+    return await database.getProjects(this.data.filters);
   }
 
   async getFilters() {
