@@ -1,22 +1,36 @@
+{% if form.citizenReadiness %} 
+{% set citizenReadiness = form.citizenReadiness %}
+{% else %} 
+{% set citizenReadiness = [] %}
+{% endif %}
+
 {{ govukCheckboxes({
   idPrefix: "citizen-readiness",
-  name: "citizenReadiness[]",
+  name: "citizenReadiness",
   items: [
     {
       value: "0",
-      text: "0 - Very low confidence"
+      text: "0 - Very low confidence",
+      checked: citizenReadiness == '0',
+      checked: '0' in citizenReadiness
     },
     {
       value: "1",
-      text: "1 - Low confidence"
+      text: "1 - Low confidence",
+      checked: citizenReadiness == '1',
+      checked: '1' in citizenReadiness
     },
     {
       value: "2",
-      text: "2 - Medium confidence"
+      text: "2 - Medium confidence",
+      checked: citizenReadiness == '2',
+      checked: '2' in citizenReadiness
     },
     {
       value: "3",
-      text: "3 - High confidence"
+      text: "3 - High confidence",
+      checked: citizenReadiness == '3',
+      checked: '3' in citizenReadiness
     }
   ]
 }) }}

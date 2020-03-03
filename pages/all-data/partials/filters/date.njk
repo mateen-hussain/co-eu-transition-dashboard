@@ -1,3 +1,23 @@
+{% set currentYear %}
+01/01/2020 {# year will be year dynamic / todo #}
+{% endset -%}
+
+{% set nextYear %}
+01/01/2021 {# year will be year dynamic / todo #}
+{% endset -%}
+
+{% if form.fromDate %} 
+{% set fromDate = form.fromDate %}
+{% else %} 
+{% set fromDate = currentYear %}
+{% endif %}
+
+{% if form.toDate %} 
+{% set toDate = form.toDate %}
+{% else %} 
+{% set toDate = nextYear %}
+{% endif %}
+
 {{ govukInput({
   label: {
     text: "From"

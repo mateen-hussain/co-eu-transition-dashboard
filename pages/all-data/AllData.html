@@ -12,8 +12,8 @@
 {% include "all-data/partials/filters/date.njk" %}
 {% endset -%}
 
-{% set impactLevelHtml %}
-{% include "all-data/partials/filters/impact-level.njk" %}
+{% set impactHtml %}
+{% include "all-data/partials/filters/impact.njk" %}
 {% endset -%}
 
 {% set deliveryConfidenceHtml %}
@@ -53,10 +53,12 @@
 {% block content %}
 <h1 class="govuk-heading-xl">{{ index }}</h1>
 
+<p>LOOOOK {{ form.impact }} THERE <p>
+
 <div class="govuk-grid-row" id="show">
 
   <div class="govuk-grid-column-one-quarter" id="filterPanel">
-  <form action="/filter-project-data" method="POST">
+  <form action="{{ url }}" method="POST">
 
     {% include "all-data/partials/filters/all-filters.njk" %}
     {% include "all-data/partials/filters/filter-button.njk" %}
