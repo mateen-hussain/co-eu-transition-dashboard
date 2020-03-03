@@ -24,6 +24,7 @@ describe('middleware/helmet', () => {
           fontSrc: ['\'self\' data:'],
           scriptSrc: [
             '\'self\'',
+            '\'unsafe-eval\'',
             '\'unsafe-inline\'',
             'www.google-analytics.com'
           ],
