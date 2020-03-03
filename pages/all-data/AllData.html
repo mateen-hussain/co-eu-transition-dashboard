@@ -6,7 +6,160 @@
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
+{% set headerHtml %}
+{% include "all-data/partials/data-table/header.njk" %}
+{% endset -%}
+
+{% set contentHtml %}
+{% include "all-data/partials/data-table/content.njk" %}
+{% endset -%}
+
+{% set sectionHtml %}
+{% include "all-data/partials/data-table/section.njk" %}
+{% endset -%}
+
+{% set items = [] %}
+{% set rows = [] %}
+{% set sections = [] %}
+
+{% block pageTitle %}{{ index }}{% endblock %} 
+
+{% block content %}
+
 {{ projects() | await | dump }}
+
+<br><br><br>
+
+{{ data.filters | dump }}
+
+<h1 class="govuk-heading-xl">{{ index }}</h1>
+
+<div class="govuk-grid-row" id="show">
+
+<div class="govuk-grid-column-one-quarter" id="filterPanel">
+
+  {% for filter in getFilters() | await %}
+    {% set filterCheckboxesß  %}
+      {% for option in filter.options %}
+          {{ govukCheckboxes({
+              name: "filters[" + filter.name + "][]",
+              items: [
+                {
+                  value: option.value,
+                  text: option.value + "(" + option.count + ")",
+                  checked: option.value in data.filters[filter.name] | default([])
+                }
+              ]
+            }) }}
+      {% endfor %}
+    {% endset -%}
+
+       {{ items.push ({
+          heading: {
+            text: filter.name
+          },
+          content: {
+            html: filterCheckboxesß
+          }
+        })
+      }}
+  {% endfor %}
+
+  <form action="{{ url }}" method="post">
+
+    {{ govukAccordion({
+      id: "accordion-default",
+      items: items
+    }) }}
+
+    {% include "all-data/partials/filters/filter-button.njk" %}
+
+  </form>
+
+</div>
+
+  
+
+<div class="govuk-grid-column-full" id="dataTable">
+
+  <div id="showFilter">
+  {% include "all-data/partials/filters/show-filter.njk" %}
+  </div>
+
+  <div id="hideFilter">
+  {% include "all-data/partials/filters/hide-filter.njk" %}
+  </div>
+
+  <h2 class="govuk-heading-m">Projects displayed</h2>
+  <hr>
+
+
+ {% for data in projects() | await %}
+
+      {{ sections.push ({
+          summary: {
+            html: "<table class='govuk-table'><tbody class='govuk-table__body'><tr class='govuk-table__row'><td class='govuk-table__cell'>" + data.project_name + "</td><td class='govuk-table__cell'>" + data.department + "</td><td class='govuk-table__cell'>" + data.impact + "</td><td class='govuk-table__cell'>" + data.hmg_confidence + "</td><td class='govuk-table__cell'>" + data.hmg_confidence + "</td><td class='govuk-table__cell'>" + data.citizen_readiness + "</td><td class='govuk-table__cell'>" + data.business_readiness + "</td><td class='govuk-table__cell'>" + data.eu_state_confidence + "</td></tr></tbody></table>"
+          },
+          content: {
+            html: contentHtml
+          }
+        })
+      }}
+
+    {% endfor %}
+
+{{ govukTable({
+  head: [
+    {
+      text: "Project name"
+    },
+    {
+      text: "Department"
+    },
+    {
+      text: "Impact"
+    },
+    {
+      text: "HMG confidence"
+    },
+    {
+      text: "Citizen readiness"
+    },
+    {
+      text: "Business readiness"
+    },
+    {
+      text: "EU state confidence"
+    }
+  ]
+}) }}
+
+    {{ govukAccordion({
+  id: "accordion-table",
+  items: sections
+}) }}
+
+
+  </div> 
+
+</div>
+
+{% endblock %}
+
+
+
+{#
+
+
+  {% include "all-data/partials/data-table/table.njk" %}
+
+
+<form action="{{ url }}" method="post">
+  <label for="department">Project Name:</label>
+  <input type="text" id="department" name="filters[department][]" value="{{ data.filters.department }}"><br><br>
+  <input type="text" id="department" name="filters[department][]" value="{{ data.filters.department }}"><br><br>
+  <input type="submit" value="Submit">
+</form>
 
 {% set dateHtml %}
 {% include "all-data/partials/filters/date.njk" %}
@@ -36,61 +189,11 @@
 {% include "all-data/partials/filters/status.njk" %}
 {% endset -%}
 
-{% set headerHtml %}
-{% include "all-data/partials/data-table/header.njk" %}
-{% endset -%}
-
-{% set contentHtml %}
-{% include "all-data/partials/data-table/content.njk" %}
-{% endset -%}
-
-{% set sectionHtml %}
-{% include "all-data/partials/data-table/section.njk" %}
-{% endset -%}
-
-{% block pageTitle %}{{ index }}{% endblock %} 
-
-{% block content %}
-<h1 class="govuk-heading-xl">{{ index }}</h1>
-
-<div class="govuk-grid-row" id="show">
-
-  <div class="govuk-grid-column-one-quarter" id="filterPanel">
-
   <form action="{{ url }}" method="POST">
 
     {% include "all-data/partials/filters/all-filters.njk" %}
     {% include "all-data/partials/filters/filter-button.njk" %}
 
   </form>
-  </div>
-
-  <div class="govuk-grid-column-full" id="dataTable">
-
-  <div id="showFilter">
-  {% include "all-data/partials/filters/show-filter.njk" %}
-  </div>
-
-  <div id="hideFilter">
-  {% include "all-data/partials/filters/hide-filter.njk" %}
-  </div>
-
-  <h2 class="govuk-heading-m">309 Projects displayed</h2>
-  <hr>
-
-  {% include "all-data/partials/data-table/table.njk" %}
-
-  </div> 
-
-</div>
-
-{% endblock %}
-
-{#
-<form action="{{ url }}" method="post">
-  <label for="department">Project Name:</label>
-  <input type="text" id="department" name="filters[department][]" value="{{ data.filters.department }}"><br><br>
-  <input type="text" id="department" name="filters[department][]" value="{{ data.filters.department }}"><br><br>
-  <input type="submit" value="Submit">
-</form>
 #}
+

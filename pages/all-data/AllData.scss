@@ -8,7 +8,7 @@
 
 #accordion-table .govuk-accordion__controls {
     margin-top: 40px;
-    top: -80px;
+    top: -180px;
     position: relative;
 }
 
@@ -44,4 +44,8 @@
 
 .govuk-table {
     font-size: 1.100rem;
+}
+
+.govuk-table__header, .govuk-table__cell {
+    width: 10%;
 }
