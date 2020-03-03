@@ -15,6 +15,7 @@
     }
   },
   "paths": {
-    "allData": "/"
+    "allData": "/all-data",
+    "filterExample": "/filter-example"
   }
 }

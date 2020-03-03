@@ -83,7 +83,8 @@
     ],
     "exclude": [
       "services/logger.js",
-      "middleware/logger.js"
+      "middleware/logger.js",
+      "pages/filters-example/**/*.js"
     ]
   }
 }

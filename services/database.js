@@ -26,28 +26,56 @@ const executeQuery = query => {
   });
 };
 
-const getProjects = async (filters = {}) => {
-  let query = 'select * from projects';
+const getFilterQuery = (queryData = {}) => {
+  let query = '';
 
-  Object.keys(filters).forEach((filter, index) => {
+  Object.keys(queryData).forEach((filter, index) => {
     if (index === 0) {
-      query += ` WHERE `;
+      query += `WHERE `;
     } else {
       query += ` AND `;
     }
 
-    const options = filters[filter].map(filter => `'${filter}'`);
-    query += `${filter} IN (${options.join(',')})`;
+    const options = queryData[filter].map(filter => `'${filter}'`);
+    query += `CAST(${filter} as CHAR) IN (${options.join(',')})`;
   });
+
+  return query;
+};
+
+const getProjects = async (queryData = {}) => {
+  const query = `
+    SELECT *
+    FROM projects
+    ${getFilterQuery(queryData)}
+  `;
 
   return await executeQuery(query);
 };
 
-const getFilters = async () => {
+const getFilters = async (queryData = {}) => {
   const filters = [];
 
   for(const column of filterColumns) {
-    const options = await executeQuery(`SELECT ${column} as value, COUNT(${column}) as count FROM projects GROUP BY ${column}`);
+    const queryDataFiltered = Object.keys(queryData)
+      .filter(query => query !== column)
+      .reduce((obj, key) => {
+        obj[key] = queryData[key];
+        return obj;
+      }, {});
+
+    const query = `
+      SELECT DISTINCT(projects.${column}) as value, COALESCE(projects_count.count, 0) as count
+      FROM projects
+      LEFT JOIN (
+        SELECT ${column}, COUNT(*) as count
+        FROM projects
+        ${getFilterQuery(queryDataFiltered)}
+        GROUP BY projects.${column}
+      ) as projects_count ON projects_count.${column} = projects.${column}
+    `;
+
+    const options = await executeQuery(query);
 
     if(options && options.length) {
       filters.push({

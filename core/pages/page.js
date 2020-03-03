@@ -74,7 +74,9 @@ class Page {
             delete obj[k];
           }
         } else if (typeof obj[k] === "object") {
-          return removeNulls(obj[k]);
+          obj[k] = removeNulls(obj[k]);
+        } else if (!isNaN(obj[k])) {
+          obj[k] = parseInt(obj[k]);
         }
       }
       return obj;

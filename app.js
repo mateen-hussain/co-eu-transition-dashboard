@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const logger = require('middleware/logger');
 const helmet = require('middleware/helmet');
 const cookieParser = require('cookie-parser');
+const config = require('config');
 
 const app = module.exports = express();
 
@@ -18,5 +19,8 @@ nunjucks.attach(app);
 webpack.configure(app);
 
 logger.attachRouteLogger(app);
+
 pages.attach(app);
+app.get('/', (req, res) => res.redirect(config.paths.allData));
+
 logger.attachErrorLogger(app);
