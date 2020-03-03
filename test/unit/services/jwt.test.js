@@ -9,10 +9,11 @@ describe('services/jwt', () => {
       const res = {
         cookie: sinon.stub()
       };
+      const req = { cookies: [] };
       const sampleData = { somedata: 'somedata' };
       const shouldBeToken = jsonwebtoken.sign(JSON.stringify(sampleData), config.cookie.secret);
 
-      jwt.saveData(res, sampleData);
+      jwt.saveData(req, res, sampleData);
 
       sinon.assert.calledWith(res.cookie, 'jwt', shouldBeToken);
     });

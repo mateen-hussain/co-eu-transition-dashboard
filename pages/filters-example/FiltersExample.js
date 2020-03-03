@@ -1,6 +1,6 @@
-const Page = require('../../core/pages/page');
+const Page = require('core/pages/page');
 const { paths } = require('config');
-const database = require('../../services/database');
+const projects = require('models/projects');
 
 class FiltersExample extends Page {
   get url() {
@@ -8,11 +8,11 @@ class FiltersExample extends Page {
   }
 
   async projects() {
-    return await database.getProjects(this.data.filters);
+    return await projects.getProjects(this.data.filters);
   }
 
   async getFilters() {
-    return await database.getFilters(this.data.filters);
+    return await projects.getFilters(this.data.filters);
   }
 }
 

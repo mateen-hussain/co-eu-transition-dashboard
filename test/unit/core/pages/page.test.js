@@ -41,9 +41,8 @@ describe('core/pages/page', () => {
     page.getRequest({}, res);
 
     expect(jwt.restoreData.calledOnce).to.eql(true);
-    expect(res.locals.form).to.eql(sampleData);
 
-    sinon.assert.calledWith(res.render, page.template, res.locals);
+    sinon.assert.calledWith(res.render, page.template);
   });
 
   it('#postRequest', async () => {

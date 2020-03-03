@@ -79,7 +79,8 @@
       "middleware/**/*.js",
       "pages/**/*.js",
       "core/**/*.js",
-      "services/**/*.js"
+      "services/**/*.js",
+      "models/**/*.js"
     ],
     "exclude": [
       "services/logger.js",

@@ -36,8 +36,10 @@ const allProperties = (obj, arr = []) => {
 };
 
 class Page {
-  constructor(path) {
+  constructor(path, req, res) {
     this.path = path;
+    this.req = req;
+    this.res = res;
   }
 
   get url() {

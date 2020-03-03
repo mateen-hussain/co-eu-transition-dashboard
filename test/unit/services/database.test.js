@@ -1,47 +1,47 @@
-const database = require('services/database');
 const { expect, sinon } = require('test/unit/util/chai');
+const proxyquire = require('proxyquire').noPreserveCache();
+
+let mysqlStub = {};
+let connectStub = {};
+let createConnectionStub = {};
 
 describe('services/database', () => {
   beforeEach(() => {
-    database.connection.query = sinon.stub()
+    createConnectionStub = sinon.stub();
+    connectStub = sinon.stub().callsArgWith(0);
+    mysqlStub = {
+      createConnection: createConnectionStub.returns({
+        connect: connectStub
+      })
+    };
   });
 
-  describe('#executeQuery', () => {
-    it('executes a query', () => {
-      const result = { test: 'result' };
-      database.connection.query.callsArgWith(1, null, result);
-      return expect(database.executeQuery()).to.eventually.eql(result);
+  it('connects without error', () => {
+    proxyquire('services/database', {
+      'mysql': mysqlStub
     });
+
+    expect(createConnectionStub.calledOnce).to.eql(true);
+    expect(connectStub.calledOnce).to.eql(true);
   });
 
-  describe('#getProjects', () => {
-    it('gets projects', () => {
-      const result = { test: 'result' };
-      database.connection.query.callsArgWith(1, null, result);
-      return expect(database.getProjects()).to.eventually.eql(result);
+  it('throws error', () => {
+    const error = new Error('some error');
+    connectStub.callsArgWith(0, error);
+
+    const loggerStub = {
+      error: sinon.stub()
+    };
+
+    proxyquire('services/database', {
+      'mysql': mysqlStub,
+      'services/logger': loggerStub
     });
-  });
 
-  describe('#getFilters', () => {
-    it('gets filters', async () => {
-      const result = [{ name: 'some department', count: 22 }];
-      database.connection.query.callsArgWith(1, null, []);
+    expect(createConnectionStub.calledOnce).to.eql(true);
+    expect(connectStub.calledOnce).to.eql(true);
+    expect(loggerStub.error.calledOnce).to.eql(true);
 
-      database.connection.query
-        .withArgs(`SELECT department as value, COUNT(department) as count FROM projects GROUP BY department`)
-        .callsArgWith(1, null, result);
-
-      const filters = await database.getFilters();
-
-      return expect(filters).to.eql([{
-        name: "department",
-        options: [
-          {
-            count: 22,
-            name: "some department"
-          }
-        ]
-      }]);
-    });
+    sinon.assert.calledWith(loggerStub.error, error);
   });
 });

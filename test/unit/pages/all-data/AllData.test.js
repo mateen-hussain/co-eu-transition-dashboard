@@ -1,7 +1,7 @@
 const AllData = require('pages/all-data/AllData');
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
-const database = require('services/database');
+const projects = require('models/projects');
 
 const projectsSample = [{
   name: 'name'
@@ -10,12 +10,14 @@ const projectsSample = [{
 let page = {};
 describe('pages/all-data/AllData', () => {
   beforeEach(() => {
-    page = new AllData();
-    sinon.stub(database, 'getProjects').resolves(projectsSample);
+    const res = { cookies: sinon.stub() };
+    const req = { cookies: [] };
+    page = new AllData('some path', req, res);
+    sinon.stub(projects, 'getProjects').resolves(projectsSample);
   })
 
   afterEach(() => {
-    database.getProjects.restore();
+    projects.getProjects.restore();
   })
 
   it('returns correct url', () => {
