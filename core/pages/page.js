@@ -54,15 +54,10 @@ class Page {
     return path.join(this.path, `${this.constructor.name}.html`);
   }
 
-<<<<<<< HEAD
   get data() {
     const data = jwt.restoreData(this.req) || {};
     return data[this.constructor.name] || {};
   }
-=======
-  getRequest(req, res) {
-    // res.locals.form = jwt.restoreData(req);
->>>>>>> static all data page
 
   getRequest(req, res) {
     res.render(this.template, this.locals);
