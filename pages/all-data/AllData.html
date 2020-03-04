@@ -6,21 +6,41 @@
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set headerHtml %}
-{% include "all-data/partials/data-table/header.njk" %}
+{% set cellBlock = "cell-color-"  %}
+
+{% set dates  %}
+{% include "all-data/partials/filters/dates.njk" %}
+{% endset %}
+
+{% set tableHeaderHtml %}
+{% include "all-data/partials/data-table/table-header.njk" %}
 {% endset -%}
 
 {% set contentHtml %}
 {% include "all-data/partials/data-table/content.njk" %}
 {% endset -%}
 
-{% set sectionHtml %}
-{% include "all-data/partials/data-table/section.njk" %}
-{% endset -%}
-
+{% set count = 0 %}
 {% set items = [] %}
 {% set rows = [] %}
 {% set sections = [] %}
+
+{{ sections.push ({
+    heading: {
+      html: tableHeaderHtml
+    }
+  })
+}}
+
+ {{ items.push ({
+    heading: {
+      text: "Date"
+    },
+    content: {
+      html: dates
+    }
+  })
+}}
 
 {% block pageTitle %}{{ index }}{% endblock %} 
 
@@ -39,18 +59,9 @@
 <div class="govuk-grid-column-one-quarter" id="filterPanel">
 
   {% for filter in getFilters() | await %}
-    {% set filterCheckboxesß  %}
+    {% set filterCheckboxes  %}
       {% for option in filter.options %}
-          {{ govukCheckboxes({
-              name: "filters[" + filter.name + "][]",
-              items: [
-                {
-                  value: option.value,
-                  text: option.value + "(" + option.count + ")",
-                  checked: option.value in data.filters[filter.name] | default([])
-                }
-              ]
-            }) }}
+          {% include "all-data/partials/filters/checkboxes.njk" %}
       {% endfor %}
     {% endset -%}
 
@@ -59,73 +70,37 @@
             text: filter.name
           },
           content: {
-            html: filterCheckboxesß
+            html: filterCheckboxes
           }
         })
       }}
+      
   {% endfor %}
 
   <form action="{{ url }}" method="post">
 
-    {{ govukAccordion({
-      id: "accordion-default",
-      items: items
-    }) }}
-
-    {% include "all-data/partials/filters/filter-button.njk" %}
+    {% include "all-data/partials/filters/all-filters.njk" %}
+    {% include "all-data/partials/filters/filter-btn.njk" %}
 
   </form>
 
 </div>
 
-  
-
 <div class="govuk-grid-column-full" id="dataTable">
 
   <div id="showFilter">
-  {% include "all-data/partials/filters/show-filter.njk" %}
+  {% include "all-data/partials/filters/show-filter-btn.njk" %}
   </div>
 
   <div id="hideFilter">
-  {% include "all-data/partials/filters/hide-filter.njk" %}
+  {% include "all-data/partials/filters/hide-filter-btn.njk" %}
   </div>
-
-  <h2 class="govuk-heading-m">Projects displayed</h2>
-  <hr>
-
 
  {% for data in projects() | await %}
 
-
-{% set dataRowsHtml  %}
-{{ govukTable({
-  rows: [
-    [
-      {
-        text: data.project_name
-      },
-      {
-        text: data.department
-      },
-      {
-        text: data.impact
-      },
-      {
-        text: data.hmg_confidence
-      },
-      {
-        text: data.citizen_readiness
-      },
-      {
-        text: data.business_readiness
-      },
-      {
-        text: data.eu_state_confidence
-      }
-    ]
-  ]
-}) }}
-{% endset  %}
+  {% set dataRowsHtml  %}
+    {% include "all-data/partials/data-table/data-rows.njk" %}
+  {% endset  %}
 
       {{ sections.push ({
           summary: {
@@ -137,39 +112,14 @@
         })
       }}
 
-    {% endfor %}
+   {% set count = loop.index %}
 
-{{ govukTable({
-  head: [
-    {
-      text: "Project name"
-    },
-    {
-      text: "Department"
-    },
-    {
-      text: "Impact"
-    },
-    {
-      text: "HMG confidence"
-    },
-    {
-      text: "Citizen readiness"
-    },
-    {
-      text: "Business readiness"
-    },
-    {
-      text: "EU state confidence"
-    }
-  ]
-}) }}
+  {% endfor %}
+  
+    <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
+  <hr>
 
-    {{ govukAccordion({
-  id: "accordion-table",
-  items: sections
-}) }}
-
+  {% include "all-data/partials/data-table/table.njk" %}
 
   </div> 
 
@@ -177,13 +127,7 @@
 
 {% endblock %}
 
-
-
 {#
-
-
-  {% include "all-data/partials/data-table/table.njk" %}
-
 
 <form action="{{ url }}" method="post">
   <label for="department">Project Name:</label>
@@ -192,39 +136,5 @@
   <input type="submit" value="Submit">
 </form>
 
-{% set dateHtml %}
-{% include "all-data/partials/filters/date.njk" %}
-{% endset -%}
-
-{% set impactHtml %}
-{% include "all-data/partials/filters/impact.njk" %}
-{% endset -%}
-
-{% set deliveryConfidenceHtml %}
-{% include "all-data/partials/filters/delivery-confidence.njk" %}
-{% endset -%}
-
-{% set citizenReadinessHtml %}
-{% include "all-data/partials/filters/citizen-readiness.njk" %}
-{% endset -%}
-
-{% set businessReadinessHtml %}
-{% include "all-data/partials/filters/business-readiness.njk" %}
-{% endset -%}
-
-{% set stateConfidenceHtml %}
-{% include "all-data/partials/filters/state-confidence.njk" %}
-{% endset -%}
-
-{% set statusHtml %}
-{% include "all-data/partials/filters/status.njk" %}
-{% endset -%}
-
-  <form action="{{ url }}" method="POST">
-
-    {% include "all-data/partials/filters/all-filters.njk" %}
-    {% include "all-data/partials/filters/filter-button.njk" %}
-
-  </form>
 #}
 

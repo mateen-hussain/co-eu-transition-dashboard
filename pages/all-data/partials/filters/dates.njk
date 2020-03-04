@@ -1,19 +1,19 @@
 {% set currentYear %}
-01/01/2020 {# year will be year dynamic / todo #}
+01/01/2020
 {% endset -%}
 
 {% set nextYear %}
-01/01/2021 {# year will be year dynamic / todo #}
+01/01/2021
 {% endset -%}
 
-{% if form.fromDate %} 
-{% set fromDate = form.fromDate %}
+{% if filter.fromDate %} 
+{% set fromDate = filter.fromDate %}
 {% else %} 
 {% set fromDate = currentYear %}
 {% endif %}
 
-{% if form.toDate %} 
-{% set toDate = form.toDate %}
+{% if filter.toDate %} 
+{% set toDate = filter.toDate %}
 {% else %} 
 {% set toDate = nextYear %}
 {% endif %}
