@@ -96,9 +96,40 @@
 
  {% for data in projects() | await %}
 
+
+{% set dataRowsHtml  %}
+{{ govukTable({
+  rows: [
+    [
+      {
+        text: data.project_name
+      },
+      {
+        text: data.department
+      },
+      {
+        text: data.impact
+      },
+      {
+        text: data.hmg_confidence
+      },
+      {
+        text: data.citizen_readiness
+      },
+      {
+        text: data.business_readiness
+      },
+      {
+        text: data.eu_state_confidence
+      }
+    ]
+  ]
+}) }}
+{% endset  %}
+
       {{ sections.push ({
           summary: {
-            html: "<table class='govuk-table'><tbody class='govuk-table__body'><tr class='govuk-table__row'><td class='govuk-table__cell'>" + data.project_name + "</td><td class='govuk-table__cell'>" + data.department + "</td><td class='govuk-table__cell'>" + data.impact + "</td><td class='govuk-table__cell'>" + data.hmg_confidence + "</td><td class='govuk-table__cell'>" + data.hmg_confidence + "</td><td class='govuk-table__cell'>" + data.citizen_readiness + "</td><td class='govuk-table__cell'>" + data.business_readiness + "</td><td class='govuk-table__cell'>" + data.eu_state_confidence + "</td></tr></tbody></table>"
+            html: dataRowsHtml
           },
           content: {
             html: contentHtml
