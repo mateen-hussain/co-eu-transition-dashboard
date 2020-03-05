@@ -5,6 +5,9 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set summary = [] %}
 
 {% set cellBlock = "cell-color-"  %}
 
@@ -22,7 +25,7 @@
 
 {% set count = 0 %}
 {% set items = [] %}
-{% set rows = [] %}
+{% set content = [] %}
 {% set sections = [] %}
 
 {{ sections.push ({
@@ -102,6 +105,25 @@
     {% include "all-data/partials/data-table/data-rows.njk" %}
   {% endset  %}
 
+    {{ content.push ([      
+      {
+        text: data.milestones.milestone_uid
+      },
+      {
+        text: data.milestones.description
+      },
+      {
+        text: data.milestones.due_date | date("D MMM YYYY") 
+      },
+      {
+        text: data.milestones.last_comment
+      }])
+    }}
+
+  {% set contentHtml  %}
+    {% include "all-data/partials/data-table/content.njk" %}
+  {% endset  %}
+
       {{ sections.push ({
           summary: {
             html: dataRowsHtml
@@ -116,14 +138,7 @@
 
   {% endfor %}
 
-    <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
-
-  <div id="filterSection">
-
-
-  </div>
-
-
+  <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
 
   <hr>
 
