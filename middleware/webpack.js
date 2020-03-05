@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const middleware = require('webpack-dev-middleware');
 const WebpackHotMiddleware = require("webpack-hot-middleware");
-const GlobImporter = require('node-sass-glob-importer');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const webpackSettings = () => {
   const govUkPath = 'node_modules/govuk-frontend/govuk';
@@ -12,6 +12,10 @@ const webpackSettings = () => {
   return {
     mode: 'development',
     plugins: [
+      new HardSourceWebpackPlugin({ info: { level: 'error' } }),
+      new HardSourceWebpackPlugin.ExcludeModulePlugin([{
+        test: /mini-css-extract-plugin[\\/]dist[\\/]loader/,
+      }]),
       new CopyWebpackPlugin([
         { from: path.resolve(govUkPath, 'assets/images'), to: 'images' },
         { from: path.resolve(govUkPath, 'assets/fonts'), to: 'fonts' }
@@ -45,8 +49,8 @@ const webpackSettings = () => {
           use: [
             'css-hot-loader',
             MiniCssExtractPlugin.loader,
-            { loader: 'css-loader', options: { sourceMap: true, importLoaders: 1 } },
-            { loader: 'sass-loader', options: { sourceMap: true, sassOptions: { importer: GlobImporter() } } },
+            { loader: 'css-loader' },
+            { loader: 'sass-loader', options: { sourceMap: true } },
           ]
         }
       ]

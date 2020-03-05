@@ -1,30 +1,60 @@
-const AllData = require('pages/all-data/AllData');
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
-const projects = require('models/projects');
-
-const projectsSample = [{
-  name: 'name'
-}];
+const jwt = require('services/jwt');
+const sequelize = require('sequelize');
+const proxyquire = require('proxyquire');
+const Projects = require('models/projects');
+const Milestone = require('models/milestones');
 
 let page = {};
+let filtersStub = {};
+
 describe('pages/all-data/AllData', () => {
   beforeEach(() => {
+    filtersStub = sinon.stub();
+    const AllData = proxyquire('pages/all-data/AllData', {
+      'helpers': {
+        filters: filtersStub
+      }
+    });
+
     const res = { cookies: sinon.stub() };
     const req = { cookies: [] };
+
     page = new AllData('some path', req, res);
-    sinon.stub(projects, 'getProjects').resolves(projectsSample);
-  })
+
+    sinon.stub(jwt, 'restoreData');
+  });
 
   afterEach(() => {
-    projects.getProjects.restore();
-  })
+    jwt.restoreData.restore();
+  });
 
   it('returns correct url', () => {
     expect(page.url).to.eql(paths.allData);
   });
 
+  it('returns the search criteria formatted for database', () => {
+    const data = { AllData: { filters: {'test': ['test1', 'test2'] } } };
+    jwt.restoreData.returns(data);
+
+    const shouldEql = { test: { [sequelize.Op.or]: [ 'test1', 'test2' ] } };
+    expect(page.search).to.eql(shouldEql);
+  });
+
   it('returns projects from database', async () => {
-    return expect(page.projects()).to.eventually.eql(projectsSample);
+    await page.projects();
+
+    return sinon.assert.calledWith(Projects.findAll, {
+      where: page.search,
+      include: [{ model: Milestone }],
+      raw: true,
+      nest: true
+    });
+  });
+
+  it('should call the filters helper function', async () => {
+    await page.filters();
+    return sinon.assert.calledWith(filtersStub, page.search);
   });
 });

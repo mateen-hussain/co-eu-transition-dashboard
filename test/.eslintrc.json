@@ -5,6 +5,7 @@
     "describe": true,
     "beforeEach": true,
     "afterEach": true,
-    "it": true
+    "it": true,
+    "context": true
   }
 }

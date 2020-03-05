@@ -17,15 +17,15 @@
 {{ data.filters | dump }}
 
 <form action="{{ url }}" method="post">
-  {% for filter in getFilters() | await %}
+  {% for filter in filters() | await %}
     <label for="{{ filter.name }}">{{ filter.name }} :</label><br>
     {% for option in filter.options %}
-      {% if option.value in data.filters[filter.name] | default([]) %}
-        <input type="checkbox" name="filters[{{ filter.name }}][]" value="{{ option.value }}" checked>
+      {% if option.value in data.filters[filter.id] | default([]) %}
+        <input type="checkbox" name="filters[{{ filter.id }}][]" value="{{ option.value }}" checked>
       {% else %}
-        <input type="checkbox" name="filters[{{ filter.name }}][]" value="{{ option.value }}">
+        <input type="checkbox" name="filters[{{ filter.id }}][]" value="{{ option.value }}">
       {% endif %}
-      <label for="{{ option.name }}">{{ option.value }} ({{option.count}}):</label><br>
+      <label for="{{ filter.name }}">{{ option.value }} ({{option.count}}):</label><br>
     {% endfor %}
     <br><br>
   {% endfor %}
