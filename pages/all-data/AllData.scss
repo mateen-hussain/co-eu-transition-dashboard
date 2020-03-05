@@ -40,6 +40,10 @@ button#accordion-table-heading-1 {
     padding-bottom: 40px;
 }
 
+.govuk-accordion__section-button {
+    font-size: 18px;
+}
+
 #filterPanel, #hideFilter  {
     display: none;
 }
@@ -69,26 +73,29 @@ button#accordion-table-heading-1 {
 }
 
 .cell-color-0, .cell-color-1, .cell-color-2, .cell-color-3 {
-    padding: 5px;
     color: white;
 }
 
 .cell-color-0 {
-    border: 1px solid red;
-    background-color: red;
+    border: 1px solid #d4351c;
+    background-color: #d4351c;
+    padding: 4px 9px 3px 9px;
 }
 
 .cell-color-1 {
-    border: 1px solid orange;
-    background-color: orange;
+    border: 1px solid #f47738;
+    background-color: #f47738;
+    padding: 4px 12px 4px 12px;
 }
 
 .cell-color-2 {
-    border: 1px solid yellow;
-    background-color: yellow;
+    border: 1px solid #b58840;
+    background-color: #b58840;
+    padding: 4px 10px 4px 10px;
 }
 
 .cell-color-3 {
-    border: 1px solid green;
-    background-color: green;
+    border: 1px solid #85994b;
+    background-color: #85994b;
+    padding: 4px 10px 4px 10px;
 }
