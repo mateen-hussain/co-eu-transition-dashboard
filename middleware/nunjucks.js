@@ -26,7 +26,7 @@ const attach = app => {
     nunjucksDefaults
   );
   awaitFilter(environment.env);
-  environment.env.addFilter('date', dateFilter);
+  dateFilter(environment.env.addFilter('date', dateFilter));
 };
 
 module.exports = { attach };
