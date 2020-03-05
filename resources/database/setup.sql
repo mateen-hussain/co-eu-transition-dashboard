@@ -34,6 +34,8 @@ CREATE TABLE `projects` (
   `citizen_readiness` int(11) DEFAULT NULL,
   `business_readiness` int(11) DEFAULT NULL,
   `eu_state_confidence` int(11) DEFAULT NULL,
+  `createdAt` date DEFAULT NULL,
+  `updatedAt` date DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -69,14 +71,16 @@ CREATE TABLE `milestones` (
   `description` text,
   `due_date` date DEFAULT NULL,
   `last_comment` text,
-  `project_id` int(11) DEFAULT NULL,
+  `projectId` int(11) DEFAULT NULL,
+  `createdAt` date DEFAULT NULL,
+  `updatedAt` date DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `milestones` WRITE;
 /*!40000 ALTER TABLE `milestones` DISABLE KEYS */;
 
-INSERT INTO `milestones` (`milestone_uid`, `description`, `due_date`, `last_comment`, `project_id`)
+INSERT INTO `milestones` (`milestone_uid`, `description`, `due_date`, `last_comment`, `projectId`)
 VALUES
   ('BEIS-37-M01','BEIS to publish government response to consultation on Future of UK carbon pricing to set out what carbon pricing policy framework the UK intends to implement to help achieve our carbon emissions reduction targets','2019-01-31','Latest comment about the status of this milestone and the activities that have been completed should go in this text area.',1),
   ('BEIS-37-M02','BEIS to publish government response to consultation on Future of UK carbon pricing to set out what carbon pricing policy framework the UK intends to implement to help achieve our carbon emissions reduction targets','2019-02-28','Latest comment about the status of this milestone and the activities that have been completed should go in this text area.',1),
