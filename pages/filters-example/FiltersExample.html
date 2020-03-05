@@ -35,16 +35,16 @@
 <form action="{{ url }}" method="post">
 
 
-  {% for filter in getFilters() | await %}
+  {% for filter in filters() | await %}
     <label for="{{ filter.name }}">{{ filter.name }} :</label><br>
 
     {% set test  %}
       {% for option in filter.options %}
 
-        {% if option.value in data.filters[filter.name] | default([]) %}
+        {% if option.value in data.filters[filter.id] | default([]) %}
 
           {{ govukCheckboxes({
-              name: "filters[" + filter.name + "][]",
+              name: "filters[" + filter.id + "][]",
               items: [
                 {
                   value: option.value,

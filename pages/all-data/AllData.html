@@ -42,7 +42,7 @@
   })
 }}
 
-{% block pageTitle %}{{ index }}{% endblock %} 
+{% block pageTitle %}{{ index }}{% endblock %}
 
 {% block content %}
 
@@ -58,7 +58,7 @@
 
 <div class="govuk-grid-column-one-quarter" id="filterPanel">
 
-  {% for filter in getFilters() | await %}
+  {% for filter in filters() | await %}
     {% set filterCheckboxes  %}
       {% for option in filter.options %}
           {% include "all-data/partials/filters/checkboxes.njk" %}
@@ -74,7 +74,7 @@
           }
         })
       }}
-      
+
   {% endfor %}
 
   <form action="{{ url }}" method="post">
@@ -115,13 +115,13 @@
    {% set count = loop.index %}
 
   {% endfor %}
-  
+
     <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
   <hr>
 
   {% include "all-data/partials/data-table/table.njk" %}
 
-  </div> 
+  </div>
 
 </div>
 

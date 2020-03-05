@@ -1,10 +1,10 @@
           {{ govukCheckboxes({
-              name: "filters[" + filter.name + "][]",
+              name: "filters[" + filter.id + "][]",
               items: [
                 {
                   value: option.value,
                   text: option.value + "(" + option.count + ")",
-                  checked: option.value in data.filters[filter.name] | default([])
+                  checked: option.value in data.filters[filter.id] | default([])
                 }
               ]
             }) }}
