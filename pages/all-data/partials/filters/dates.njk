@@ -1,0 +1,44 @@
+{% set currentYear %}
+01/01/2020
+{% endset -%}
+
+{% set nextYear %}
+01/01/2021
+{% endset -%}
+
+{% if filter.fromDate %} 
+{% set fromDate = filter.fromDate %}
+{% else %} 
+{% set fromDate = currentYear %}
+{% endif %}
+
+{% if filter.toDate %} 
+{% set toDate = filter.toDate %}
+{% else %} 
+{% set toDate = nextYear %}
+{% endif %}
+
+{{ govukInput({
+  label: {
+    text: "From"
+  },
+  classes: "govuk-input--width-10",
+  hint: {
+    html: "For example, " + currentYear
+  },
+    id: "fromDate",
+    name: "fromDate",
+    value: fromDate
+}) }}
+{{ govukInput({
+  label: {
+    text: "To"
+  },
+  classes: "govuk-input--width-10",
+  hint: {
+    text: "For example, " + nextYear
+  },
+    id: "toDate",
+    name: "toDate",
+    value: toDate
+}) }}

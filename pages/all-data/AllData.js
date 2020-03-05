@@ -1,4 +1,4 @@
-const Page = require('../../core/pages/page');
+const Page = require('core/pages/page');
 const { paths } = require('config');
 const projects = require('models/projects');
 
@@ -12,7 +12,7 @@ class AllData extends Page {
   }
 
   async getFilters() {
-    return await projects.getFilters();
+    return await projects.getFilters(this.data.filters);
   }
 }
 

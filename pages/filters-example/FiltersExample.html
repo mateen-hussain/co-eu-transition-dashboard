@@ -32,4 +32,64 @@
   <input type="submit" value="Submit">
 </form>
 
+<form action="{{ url }}" method="post">
+
+
+  {% for filter in getFilters() | await %}
+    <label for="{{ filter.name }}">{{ filter.name }} :</label><br>
+
+    {% set test  %}
+      {% for option in filter.options %}
+
+        {% if option.value in data.filters[filter.name] | default([]) %}
+
+          {{ govukCheckboxes({
+              name: "filters[" + filter.name + "][]",
+              items: [
+                {
+                  value: option.value,
+                  text: option.value + option.count,
+                  checked: true
+                }
+              ]
+            }) }}
+
+        {% else %}
+
+          {{ govukCheckboxes({
+              name: "filters[" + filter.name + "][]",
+              items: [
+                {
+                  value: option.value,
+                  text: option.value + "(" + option.count + ")"
+                }
+              ]
+            }) }}
+
+        {% endif %}
+
+      {% endfor %}
+
+    {% endset -%}
+
+    {{ govukAccordion({
+      id: "accordion-default",
+      items: [
+        {
+          heading: {
+            text: filter.name
+          },
+          content: {
+            html: test
+          }
+        }
+      ]
+    }) }}
+
+    <br><br>
+  {% endfor %}
+
+  <input type="submit" value="Submit">
+</form>
+
 {% endblock %}

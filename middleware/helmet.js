@@ -7,7 +7,7 @@ const attach = app => {
   app.use(helmet.contentSecurityPolicy({
     directives: {
       fontSrc: ['\'self\' data:'],
-      scriptSrc: ['\'self\'', '\'unsafe-inline\'', 'www.google-analytics.com'],
+      scriptSrc: ['\'self\'', '\'unsafe-eval\'', '\'unsafe-inline\'', 'www.google-analytics.com'],
       connectSrc: ['\'self\''],
       mediaSrc: ['\'self\''],
       frameSrc: ['\'none\''],

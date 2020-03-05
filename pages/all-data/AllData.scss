@@ -1,0 +1,94 @@
+#accordion-table {
+    border-bottom: none;
+    pointer-events: none;
+}
+
+table.govuk-table.table-header {
+    font-weight: bold;
+}
+
+span.govuk-accordion__icon {
+    pointer-events: all;
+}
+
+button#accordion-table-heading-1 ~ .govuk-accordion__icon {
+    display: none;
+}
+
+#accordion-table .govuk-accordion__section-header {
+    border-top: none;
+}
+
+#accordion-table .govuk-accordion__controls {
+    margin-top: 40px;
+    top: -80px;
+    position: relative;
+    pointer-events: all;
+}
+
+button#accordion-table-heading-1 {
+    padding-top: 20px;
+}
+
+#accordion-table .govuk-accordion__section {
+    margin-top: -90px;
+}
+
+#accordion-table .govuk-accordion__section--expanded .govuk-accordion__section-content {
+    margin-top: -40px;
+    margin-bottom: 20px;
+    padding-bottom: 40px;
+}
+
+#filterPanel, #hideFilter  {
+    display: none;
+}
+
+#show:target #filterPanel {
+    display: block;
+}
+
+#show:target #showFilter {
+    display: none;
+}
+
+#show:target #hideFilter {
+    display: block;
+}
+
+#show:target #dataTable {
+    width: 75%;
+}
+
+.govuk-table {
+    font-size: 1.100rem;
+}
+
+.govuk-table__header, .govuk-table__cell {
+    width: 15%;
+}
+
+.cell-color-0, .cell-color-1, .cell-color-2, .cell-color-3 {
+    padding: 5px;
+    color: white;
+}
+
+.cell-color-0 {
+    border: 1px solid red;
+    background-color: red;
+}
+
+.cell-color-1 {
+    border: 1px solid orange;
+    background-color: orange;
+}
+
+.cell-color-2 {
+    border: 1px solid yellow;
+    background-color: yellow;
+}
+
+.cell-color-3 {
+    border: 1px solid green;
+    background-color: green;
+}

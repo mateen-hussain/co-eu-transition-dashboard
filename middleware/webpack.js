@@ -54,8 +54,7 @@ const webpackSettings = () => {
     entry: [
       'webpack-hot-middleware/client',
       path.resolve(__dirname, '..', 'common/javascript/main.js'),
-      path.resolve(__dirname, '..', 'common/scss/main.scss'),
-      path.resolve(govUkPath, 'all.js')
+      path.resolve(__dirname, '..', 'common/scss/main.scss')
     ]
   };
 };
