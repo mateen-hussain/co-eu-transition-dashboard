@@ -5,6 +5,7 @@ const sequelize = require('sequelize');
 const proxyquire = require('proxyquire');
 const Projects = require('models/projects');
 const Milestone = require('models/milestones');
+const moment = require('moment');
 
 let page = {};
 let filtersStub = {};
@@ -59,6 +60,6 @@ describe('pages/all-data/AllData', () => {
   });
 
   it('should return the current date', () => {
-    expect(page.currentDate()).to.eql(new Date);
+    expect(page.currentDate()).to.eql(moment().format());
   });
 });

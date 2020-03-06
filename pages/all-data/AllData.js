@@ -4,6 +4,7 @@ const sequelize = require('sequelize');
 const Projects = require('models/projects');
 const Milestones = require('models/milestones');
 const { filters } = require('helpers');
+const moment = require('moment');
 
 class AllData extends Page {
   get url() {
@@ -31,7 +32,7 @@ class AllData extends Page {
   }
 
   currentDate() {
-    return new Date()
+    return moment().format()
   }
 }
 
