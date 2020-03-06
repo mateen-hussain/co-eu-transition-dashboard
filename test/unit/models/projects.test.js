@@ -38,6 +38,11 @@ describe('models/projects', () => {
         type: ENUM(0,1,2,3),
         allowNull: true,
         displayName: 'EU State Readiness'
+      },
+      status: {
+        type: STRING,
+        allowNull: true,
+        displayName: 'Status'
       }
     });
   });

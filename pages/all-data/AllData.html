@@ -7,9 +7,8 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set summary = [] %}
-
 {% set cellBlock = "cell-color-"  %}
+{% set flag = '' %}
 
 {% set dates  %}
 {% include "all-data/partials/filters/dates.njk" %}
@@ -27,6 +26,7 @@
 {% set items = [] %}
 {% set content = [] %}
 {% set sections = [] %}
+{% set summary = [] %}
 
 {{ sections.push ({
     heading: {
@@ -64,7 +64,9 @@
   {% for filter in filters() | await %}
     {% set filterCheckboxes  %}
       {% for option in filter.options %}
+        {% if option.value !== null %}
           {% include "all-data/partials/filters/checkboxes.njk" %}
+        {% endif %}
       {% endfor %}
     {% endset -%}
 
@@ -105,6 +107,10 @@
     {% include "all-data/partials/data-table/data-rows.njk" %}
   {% endset  %}
 
+  {% if data.milestones.due_date < currentDate %}
+    {% set flag = 'red-date' %}
+  {% endif %}
+
     {{ content.push ([      
       {
         text: data.milestones.milestone_uid
@@ -113,7 +119,7 @@
         text: data.milestones.description
       },
       {
-        text: data.milestones.due_date | date("D MMM YYYY") 
+        html: "<span class=" + flag + ">" + data.milestones.due_date | date("D MMM YYYY") + "</span>"
       },
       {
         text: data.milestones.last_comment

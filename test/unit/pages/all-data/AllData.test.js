@@ -57,4 +57,8 @@ describe('pages/all-data/AllData', () => {
     await page.filters();
     return sinon.assert.calledWith(filtersStub, page.search);
   });
+
+  it('should return the current date', () => {
+    expect(page.currentDate()).to.eql(new Date);
+  });
 });

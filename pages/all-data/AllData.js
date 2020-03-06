@@ -29,6 +29,10 @@ class AllData extends Page {
   async filters() {
     return await filters(this.search);
   }
+
+  currentDate() {
+    return new Date()
+  }
 }
 
 module.exports = AllData;
