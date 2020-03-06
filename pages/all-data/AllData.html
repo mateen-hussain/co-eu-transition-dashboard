@@ -9,6 +9,7 @@
 
 {% set cellBlock = "cell-color-"  %}
 {% set flag = '' %}
+{% set filtersExist = 'false' %}
 
 {% set dates  %}
 {% include "all-data/partials/filters/dates.njk" %}
@@ -143,6 +144,37 @@
    {% set count = loop.index %}
 
   {% endfor %}
+
+  <div>
+
+  {% for filter in filters() | await %}
+
+    {% set filterSummary  %}
+      {% for option in filter.options %}
+      {% if option.value in data.filters[filter.id] | default([]) %}
+         {% set filtersExist = 'true' %}
+          {% include "all-data/partials/filters/filter-list.njk" %}
+      {% endif %}
+      {% endfor %}
+    {% endset  %}
+
+    {{ summary.push ({
+        key: {
+          text: filter.name
+        },
+        value: {
+          html: filterSummary
+        }
+      })
+    }}
+
+  {% endfor %}
+
+  {% if filtersExist == 'true' %}
+      {% include "all-data/partials/filters/filter-summary.njk" %}
+  {% endif %}
+
+  </div>
 
   <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
 
