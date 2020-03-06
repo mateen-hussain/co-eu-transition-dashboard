@@ -6,7 +6,8 @@ const { STRING, DATE, ENUM, Op, literal } = require('sequelize');
 class Model {}
 Model.init = sinon.stub();
 Model.hasMany = sinon.stub();
-Model.findAll = sinon.stub();
+Model.findOne = sinon.stub().resolves({});
+Model.findAll = sinon.stub().resolves([]);
 Model.rawAttributes = {};
 
 const s = sinon.stub().returns(Sequelize);

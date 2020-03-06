@@ -15,6 +15,7 @@
     ]
   },
   "dependencies": {
+    "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
     "config": "^3.2.6",
     "cookie-parser": "^1.4.4",
@@ -31,6 +32,9 @@
     "nunjucks-await-filter": "0.0.1",
     "nunjucks-date-filter": "^0.1.1",
     "nyc": "^15.0.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
     "pg-promise": "^10.4.4",
     "sequelize": "^5.21.5",
     "winston": "^3.2.1"
@@ -80,6 +84,7 @@
     "sourceMap": true,
     "instrument": true,
     "exclude": [
+      "test/**/*",
       "services/logger.js",
       "middleware/logger.js",
       "pages/filters-example/**/*.js"

@@ -16,6 +16,7 @@
   },
   "paths": {
     "allData": "/all-data",
-    "filterExample": "/filter-example"
+    "filterExample": "/filter-example",
+    "authentication": "/login"
   }
 }

@@ -1,15 +1,22 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-const saveData = (req, res, data) => {
+const saveData = (req, res, data = {}) => {
   const existingData = restoreData(req);
   const dataToSave = Object.assign({}, existingData, data);
-  const token = jwt.sign(JSON.stringify(dataToSave), config.cookie.secret);
+  const token = jwt.sign(dataToSave, config.cookie.secret);
   res.cookie('jwt', token);
 };
 
+const token = req => {
+  if (req && req.cookies) {
+    return req.cookies['jwt'];
+  }
+  return null;
+};
+
 const restoreData = req => {
-  if (req.cookies['jwt']) {
+  if (req && req.cookies['jwt']) {
     return jwt.verify(req.cookies['jwt'], config.cookie.secret);
   } else {
     return {};
@@ -18,5 +25,6 @@ const restoreData = req => {
 
 module.exports = {
   saveData,
-  restoreData
+  restoreData,
+  token
 };

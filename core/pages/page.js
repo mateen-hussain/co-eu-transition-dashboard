@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const path = require('path');
 const jwt = require('services/jwt');
+const { protect } = require('services/authentication');
 
 const notLocals = [
   '_router',
@@ -46,8 +47,18 @@ class Page {
     return '/';
   }
 
+  get requireAuth() {
+    return true;
+  }
+
   get middleware() {
-    return [];
+    const middleware = [];
+
+    if (this.requireAuth) {
+      middleware.push(protect);
+    }
+
+    return middleware;
   }
 
   get template() {

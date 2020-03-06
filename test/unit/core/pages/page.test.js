@@ -1,6 +1,7 @@
 const Page = require('core/pages/page');
 const jwt = require('services/jwt');
 const { expect, sinon } = require('test/unit/util/chai');
+const { protect } = require('services/authentication');
 
 let page = {};
 const sampleData = {some: 'data'};
@@ -17,6 +18,10 @@ describe('core/pages/page', () => {
     jwt.saveData.restore();
   });
 
+  it('#requireAuth', () => {
+    expect(page.requireAuth).to.eql(true);
+  });
+
   it('#router', () => {
     expect(page.router.constructor.name).to.eql('Function');
   });
@@ -26,7 +31,7 @@ describe('core/pages/page', () => {
   });
 
   it('#middleware', () => {
-    expect(page.middleware).to.eql([]);
+    expect(page.middleware).to.eql([ protect ]);
   });
 
   it('#template', () => {

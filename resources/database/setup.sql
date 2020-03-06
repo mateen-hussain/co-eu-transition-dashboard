@@ -97,7 +97,30 @@ VALUES
 /*!40000 ALTER TABLE `milestones` ENABLE KEYS */;
 UNLOCK TABLES;
 
+# Dump of table users
+# ------------------------------------------------------------
 
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` text,
+  `email` text,
+  `password` text,
+  `createdAt` date DEFAULT NULL,
+  `updatedAt` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `createdAt`, `updatedAt`)
+VALUES
+  (1,'Some name','email@email.com','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.',NULL,NULL);
+
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
