@@ -60,12 +60,12 @@ button#accordion-table-heading-1 {
     display: block;
 }
 
-#show:target #dataTable {
-    width: 75%;
+.govuk-checkboxes__label, .govuk-label, .govuk-hint, .govuk-summary-list__key, .govuk-table, ul.govuk-list.govuk-list--bullet.filter-list li {
+    font-size: 1.100rem;
 }
 
-.govuk-table {
-    font-size: 1.100rem;
+#show:target #dataTable {
+    width: 75%;
 }
 
 .govuk-table__header, .govuk-table__cell {
@@ -104,3 +104,31 @@ button#accordion-table-heading-1 {
     color: #d4351c;
     font-weight: bold;
 }
+
+.govuk-summary-list__row:nth-child(even) {
+    background-color: #f3f2f1;
+  }
+
+.filter-block {
+    border: 1px solid #000000;
+    background-color: #ffffff;
+    padding: 4px 10px 4px 10px;
+}
+
+.govuk-summary-list__key, .govuk-summary-list__value, .govuk-summary-list__actions {
+    border-bottom: none;
+}
+
+ul.govuk-list.govuk-list--bullet.filter-list li {
+    list-style-type: none;
+    line-height: 1.8;
+}
+
+.govuk-summary-list__key {
+    width: 20%;
+}
+
+.govuk-list--bullet {
+    padding-left: 0;
+}
+
