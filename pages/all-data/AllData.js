@@ -31,7 +31,7 @@ class AllData extends Page {
     return await filters(this.search);
   }
 
-  currentDate() {
+  get currentDate() {
     return moment().format()
   }
 }

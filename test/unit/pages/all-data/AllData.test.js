@@ -60,6 +60,6 @@ describe('pages/all-data/AllData', () => {
   });
 
   it('should return the current date', () => {
-    expect(page.currentDate()).to.eql(moment().format());
+    expect(page.currentDate).to.eql(moment().format());
   });
 });

@@ -1,5 +1,5 @@
-{% set currentYear = "01/01/" + currentDate() | date("YYYY") %}
-{% set nextYear = "01/01/" + currentDate() | date("add", 1, "year") | date("YYYY") %}
+{% set currentYear = "01/01/" + currentDate | date("YYYY") %}
+{% set nextYear = "01/01/" + currentDate | date("add", 1, "year") | date("YYYY") %}
 
 {{ govukInput({
   label: {
