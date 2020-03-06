@@ -1,60 +1,17 @@
-{{ govukTable({
-  head: [
-    {
-      text: "Milestone UID"
-    },
-    {
-      text: "Milestone Description"
-    },
-    {
-      text: "Due date"
-    },
-    {
-      text: "Latest comment"
-    }
-  ],
-  rows: [
-    [
+    {{ govukTable({
+    head: [
       {
-        text: "January"
+        text: "Milestone UID"
       },
       {
-        text: "£85"
+        text: "Milestone Description"
       },
       {
-        text: "95"
+        text: "Due date"
       },
       {
-        text: "95"
+        text: "Latest comment"
       }
     ],
-    [
-      {
-        text: "February"
-      },
-      {
-        text: "£75"
-      },
-      {
-        text: "£65"
-      },
-      {
-        text: "95"
-      }
-    ],
-    [
-      {
-        text: "March"
-      },
-      {
-        text: "£65"
-      },
-      {
-        text: "£42"
-      },
-      {
-        text: "95"
-      }
-    ]
-  ]
+    rows: content
 }) }}

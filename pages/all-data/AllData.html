@@ -5,8 +5,10 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set cellBlock = "cell-color-"  %}
+{% set flag = '' %}
 
 {% set dates  %}
 {% include "all-data/partials/filters/dates.njk" %}
@@ -22,8 +24,9 @@
 
 {% set count = 0 %}
 {% set items = [] %}
-{% set rows = [] %}
+{% set content = [] %}
 {% set sections = [] %}
+{% set summary = [] %}
 
 {{ sections.push ({
     heading: {
@@ -61,7 +64,9 @@
   {% for filter in filters() | await %}
     {% set filterCheckboxes  %}
       {% for option in filter.options %}
+        {% if option.value !== null %}
           {% include "all-data/partials/filters/checkboxes.njk" %}
+        {% endif %}
       {% endfor %}
     {% endset -%}
 
@@ -102,6 +107,29 @@
     {% include "all-data/partials/data-table/data-rows.njk" %}
   {% endset  %}
 
+  {% if data.milestones.due_date < currentDate %}
+    {% set flag = 'red-date' %}
+  {% endif %}
+
+    {{ content.push ([      
+      {
+        text: data.milestones.milestone_uid
+      },
+      {
+        text: data.milestones.description
+      },
+      {
+        html: "<span class=" + flag + ">" + data.milestones.due_date | date("D MMM YYYY") + "</span>"
+      },
+      {
+        text: data.milestones.last_comment
+      }])
+    }}
+
+  {% set contentHtml  %}
+    {% include "all-data/partials/data-table/content.njk" %}
+  {% endset  %}
+
       {{ sections.push ({
           summary: {
             html: dataRowsHtml
@@ -116,7 +144,8 @@
 
   {% endfor %}
 
-    <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
+  <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
+
   <hr>
 
   {% include "all-data/partials/data-table/table.njk" %}

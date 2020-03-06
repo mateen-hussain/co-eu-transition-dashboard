@@ -36,25 +36,26 @@ CREATE TABLE `projects` (
   `eu_state_confidence` int(11) DEFAULT NULL,
   `createdAt` date DEFAULT NULL,
   `updatedAt` date DEFAULT NULL,
+  `status` text,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `projects` WRITE;
 /*!40000 ALTER TABLE `projects` DISABLE KEYS */;
 
-INSERT INTO `projects` (`project_name`, `department`, `impact`, `hmg_confidence`, `citizen_readiness`, `business_readiness`, `eu_state_confidence`)
+INSERT INTO `projects` (`project_name`, `department`, `impact`, `hmg_confidence`, `citizen_readiness`, `business_readiness`, `eu_state_confidence`, `status`)
 VALUES
-  ('GB-SEM BEIS Electricity trading and operation of SEM','BEIS',0,0,0,0,0),
-  ('Animal and Plant Health - Imports of Animal and Animal Products (Initial)','DEFRA',0,1,0,2,3),
-  ('Government secured freight capacity','DFT',0,1,1,1,1),
-  ('Trade Remedies','DIT',0,1,1,1,1),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',1,1,0,0,0),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,2,0,3,0),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',1,0,1,0,0),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',1,0,0,2,0),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,2,2,0,0),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,0,1,1,1),
-  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,1,2,3,0);
+  ('GB-SEM BEIS Electricity trading and operation of SEM','BEIS',0,0,0,0,0, 'Project complete'),
+  ('Animal and Plant Health - Imports of Animal and Animal Products (Initial)','DEFRA',0,1,0,2,3, 'Project complete'),
+  ('Government secured freight capacity','DFT',0,1,1,1,1, NULL),
+  ('Trade Remedies','DIT',0,1,1,1,1, 'Project complete'),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',1,1,0,0,0, NULL),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,2,0,3,0, NULL),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',1,0,1,0,0, NULL),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',1,0,0,2,0, NULL),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,2,2,0,0, NULL),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,0,1,1,1, NULL),
+  ('GB-SEM Electricity trading and operation of SEM','BEIS',0,1,2,3,0, NULL);
 
 /*!40000 ALTER TABLE `projects` ENABLE KEYS */;
 UNLOCK TABLES;

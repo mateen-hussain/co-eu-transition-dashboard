@@ -2,11 +2,18 @@ const { sinon } = require('test/unit/util/chai');
 const path = require('path');
 const proxyquire = require('proxyquire');
 
-const expressNunjucksStub = sinon.stub().returns({});
+const addFilter = sinon.stub()
+const expressNunjucksStub = sinon.stub().returns({
+  env: {
+    addFilter
+  }
+});
 const nunjucksAwaitFilterStub = sinon.stub();
+const nunjucksDateFilterStub = sinon.stub();
 const nunjucks = proxyquire('middleware/nunjucks', {
   'express-nunjucks': expressNunjucksStub,
-  'nunjucks-await-filter': nunjucksAwaitFilterStub
+  'nunjucks-await-filter': nunjucksAwaitFilterStub,
+  'nunjucks-date-filter': nunjucksDateFilterStub
 });
 
 const viewsToInclude = [
@@ -17,6 +24,7 @@ const viewsToInclude = [
 ];
 
 let app = {};
+
 
 describe('middleware/nunjucks', () => {
   describe('#attach', () => {
@@ -37,5 +45,10 @@ describe('middleware/nunjucks', () => {
     it('executes await filter', () => {
       sinon.assert.calledOnce(nunjucksAwaitFilterStub);
     });
+
+    it('executes date filter', () => {
+      sinon.assert.calledWith(addFilter, 'date', nunjucksDateFilterStub);
+    });
+
   });
 });

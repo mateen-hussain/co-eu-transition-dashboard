@@ -4,6 +4,7 @@ const sequelize = require('sequelize');
 const Projects = require('models/projects');
 const Milestones = require('models/milestones');
 const { filters } = require('helpers');
+const moment = require('moment');
 
 class AllData extends Page {
   get url() {
@@ -28,6 +29,10 @@ class AllData extends Page {
 
   async filters() {
     return await filters(this.search);
+  }
+
+  get currentDate() {
+    return moment().format()
   }
 }
 
