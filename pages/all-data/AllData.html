@@ -153,7 +153,7 @@
       {% for option in filter.options %}
       {% if option.value in data.filters[filter.id] | default([]) %}
          {% set filtersExist = 'true' %}
-          {% include "all-data/partials/filters/summary.njk" %}
+          {% include "all-data/partials/filters/filter-list.njk" %}
       {% endif %}
       {% endfor %}
     {% endset  %}
@@ -171,10 +171,7 @@
   {% endfor %}
 
   {% if filtersExist == 'true' %}
-    {{ govukSummaryList({
-      classes: 'filter-list',
-      rows: summary
-    }) }}
+      {% include "all-data/partials/filters/filter-summary.njk" %}
   {% endif %}
 
   </div>
