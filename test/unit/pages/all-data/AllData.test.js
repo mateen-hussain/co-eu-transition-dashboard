@@ -35,22 +35,31 @@ describe('pages/all-data/AllData', () => {
     expect(page.url).to.eql(paths.allData);
   });
 
-  it('returns the search criteria formatted for database', () => {
-    const data = { AllData: { filters: {'test': ['test1', 'test2'] } } };
+  it('returns the project search criteria formatted for database', () => {
+    const data = { AllData: { filters: { projects: { 'test': ['test1', 'test2'] } } } };
     jwt.restoreData.returns(data);
 
     const shouldEql = { test: { [sequelize.Op.or]: [ 'test1', 'test2' ] } };
-    expect(page.search).to.eql(shouldEql);
+    expect(page.search.projects).to.eql(shouldEql);
+  });
+
+  it('returns the milestone search criteria formatted for database', () => {
+    const data = { AllData: { filters: { milestones: { 'test': ['test1', 'test2'] } } } };
+    jwt.restoreData.returns(data);
+
+    const shouldEql = { test: { [sequelize.Op.or]: [ 'test1', 'test2' ] } };
+    expect(page.search.milestones).to.eql(shouldEql);
   });
 
   it('returns projects from database', async () => {
     await page.projects();
 
     return sinon.assert.calledWith(Projects.findAll, {
-      where: page.search,
-      include: [{ model: Milestone }],
-      raw: true,
-      nest: true
+      where: page.search.projects,
+      include: [{
+        model: Milestone,
+        where: page.search.milestones
+      }]
     });
   });
 

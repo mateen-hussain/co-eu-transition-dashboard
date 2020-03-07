@@ -25,7 +25,6 @@
 
 {% set count = 0 %}
 {% set items = [] %}
-{% set content = [] %}
 {% set sections = [] %}
 {% set summary = [] %}
 
@@ -108,24 +107,30 @@
     {% include "all-data/partials/data-table/data-rows.njk" %}
   {% endset  %}
 
-  {% if data.milestones.due_date < currentDate %}
-    {% set flag = 'red-date' %}
-  {% endif %}
+  {% set content = [] %}
 
-    {{ content.push ([      
+  {% for milestone in data.milestones %}
+
+    {% if milestone.due_date < currentDate %}
+      {% set flag = 'red-date' %}
+    {% endif %}
+
+    {{ content.push ([
       {
-        text: data.milestones.milestone_uid
+        text: milestone.milestone_uid
       },
       {
-        text: data.milestones.description
+        text: milestone.description
       },
       {
-        html: "<span class=" + flag + ">" + data.milestones.due_date | date("D MMM YYYY") + "</span>"
+        html: "<span class=" + flag + ">" + milestone.due_date | date("D MMM YYYY") + "</span>"
       },
       {
-        text: data.milestones.last_comment
+        text: milestone.last_comment
       }])
     }}
+
+  {% endfor %}
 
   {% set contentHtml  %}
     {% include "all-data/partials/data-table/content.njk" %}

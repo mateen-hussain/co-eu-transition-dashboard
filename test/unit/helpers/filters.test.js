@@ -1,7 +1,6 @@
 const filters = require('helpers/filters');
 const Projects = require('models/projects');
 const { expect, sinon } = require('test/unit/util/chai');
-const sequelize = require('sequelize');
 
 describe('helpers/filters', () => {
   describe('#getFiltersWithCounts', () => {
@@ -9,26 +8,14 @@ describe('helpers/filters', () => {
       const attribute = {
         fieldName: 'field_name'
       };
-      const search = {};
+      const search = {
+        projects: {},
+        milestones: {}
+      };
 
       await filters.getFiltersWithCounts(attribute, search);
 
-      return sinon.assert.calledWith(Projects.findAll, {
-        attributes: [
-          [sequelize.literal(`projects.${attribute.fieldName}`), 'value'],
-          [sequelize.literal(`COUNT(projects_count.id)`), 'count']
-        ],
-        include: [{
-          model: Projects,
-          as: 'projects_count',
-          attributes: [],
-          where: search,
-          required: false
-        }],
-        group: `projects.${attribute.fieldName}`,
-        raw: true,
-        nest: true
-      });
+      return sinon.assert.called(Projects.findAll);
     });
   });
 

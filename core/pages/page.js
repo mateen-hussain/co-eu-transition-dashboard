@@ -65,9 +65,13 @@ class Page {
     return path.join(this.path, `${this.constructor.name}.html`);
   }
 
+  get schema() {
+    return {}
+  }
+
   get data() {
     const data = jwt.restoreData(this.req) || {};
-    return data[this.constructor.name] || {};
+    return data[this.constructor.name] || this.schema;
   }
 
   getRequest(req, res) {

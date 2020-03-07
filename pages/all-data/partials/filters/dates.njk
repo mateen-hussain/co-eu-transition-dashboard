@@ -1,5 +1,5 @@
-{% set currentYear = "01/01/" + currentDate | date("YYYY") %}
-{% set nextYear = "01/01/" + currentDate | date("add", 1, "year") | date("YYYY") %}
+{% set fromDate = "01/01/" + currentDate | date("YYYY") %}
+{% set toDate = "01/01/" + currentDate | date("add", 1, "year") | date("YYYY") %}
 
 {{ govukInput({
   label: {
@@ -7,11 +7,11 @@
   },
   classes: "govuk-input--width-10",
   hint: {
-    html: "For example, " + currentYear
+    html: "For example, " + fromDate
   },
     id: "fromDate",
-    name: "fromDate",
-    value: currentYear
+    name: "filters[milestones][due_date][]",
+    value: data.filters.milestones.due_date[0] | default(fromDate)
 }) }}
 {{ govukInput({
   label: {
@@ -19,9 +19,9 @@
   },
   classes: "govuk-input--width-10",
   hint: {
-    text: "For example, " + nextYear
+    text: "For example, " + toDate
   },
     id: "toDate",
-    name: "toDate",
-    value: nextYear
+    name: "filters[milestones][due_date][]",
+    value: data.filters.milestones.due_date[1] | default(toDate)
 }) }}

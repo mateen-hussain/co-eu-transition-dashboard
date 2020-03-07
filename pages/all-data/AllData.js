@@ -11,19 +11,41 @@ class AllData extends Page {
     return paths.allData;
   }
 
+  get schema() {
+    return {
+      filters: {
+        projects: [],
+        milestones: []
+      }
+    };
+  }
+
   get search() {
-    return Object.entries(this.data.filters || {}).reduce((filters, [attirbute, options]) => {
-      filters[attirbute] = { [sequelize.Op.or]: options };
-      return filters;
-    }, {});
+    const getFilters = type => {
+      return Object.entries(this.data.filters[type] || {}).reduce((filters, [attirbute, options]) => {
+        if (attirbute.includes('date')) {
+          const dates = options.map(date => moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD'));
+          filters[attirbute] = { [sequelize.Op.between]: dates };
+        } else {
+          filters[attirbute] = { [sequelize.Op.or]: options };
+        }
+        return filters;
+      }, {});
+    }
+
+    return {
+      projects: getFilters('projects'),
+      milestones: getFilters('milestones')
+    };
   }
 
   async projects() {
     return await Projects.findAll({
-      where: this.search,
-      include: [{ model: Milestones }],
-      raw: true,
-      nest: true
+      where: this.search.projects,
+      include: [{
+        model: Milestones,
+        where: this.search.milestones
+      }]
     });
   }
 
