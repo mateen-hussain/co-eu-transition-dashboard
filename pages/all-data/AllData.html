@@ -27,6 +27,7 @@
 {% set items = [] %}
 {% set sections = [] %}
 {% set summary = [] %}
+{% set filterNames = [] %}
 
 {{ sections.push ({
     heading: {
@@ -156,22 +157,29 @@
 
     {% set filterSummary  %}
       {% for option in filter.options %}
+      <div class="filter-nav">
+        <nav>
       {% if option.value in data.filters[filter.id] | default([]) %}
          {% set filtersExist = 'true' %}
+         {{ filterNames.push(filter.name) }}
           {% include "all-data/partials/filters/filter-list.njk" %}
       {% endif %}
+        </nav>
+      </div>
       {% endfor %}
     {% endset  %}
 
+  {% if filter.name in filterNames %}
     {{ summary.push ({
         key: {
-          text: filter.name
+          html: "<span class='filter-name'>" + filter.name + "</span>"
         },
         value: {
           html: filterSummary
         }
       })
     }}
+  {% endif %}
 
   {% endfor %}
 
