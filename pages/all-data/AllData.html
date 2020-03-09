@@ -11,8 +11,15 @@
 {% set flag = '' %}
 {% set filtersExist = 'false' %}
 
+{% set fromDate = "01/01/" + currentDate | date("YYYY") %}
+{% set toDate = "01/01/" + currentDate | date("add", 1, "year") | date("YYYY") %}
+
 {% set dates  %}
 {% include "all-data/partials/filters/dates.njk" %}
+{% endset %}
+
+{% set dateList  %}
+{% include "all-data/partials/filters/date-list.njk" %}
 {% endset %}
 
 {% set tableHeaderHtml %}
@@ -28,6 +35,7 @@
 {% set sections = [] %}
 {% set summary = [] %}
 {% set filterNames = [] %}
+{% set filters = filters() | await %}
 
 {{ sections.push ({
     heading: {
@@ -45,14 +53,20 @@
     }
   })
 }}
+            
+ {{ summary.push ({
+    key: {
+      html: "<span class='date-name'>Date</span>"
+    },
+    value: {
+      html: dateList
+    }
+  })
+}}
 
 {% block pageTitle %}{{ index }}{% endblock %}
 
 {% block content %}
-
-{{ projects() | await | dump }}
-
-<br><br><br>
 
 {{ data.filters | dump }}
 
@@ -62,7 +76,7 @@
 
 <div class="govuk-grid-column-one-quarter" id="filterPanel">
 
-  {% for filter in filters() | await %}
+  {% for filter in filters %}
     {% set filterCheckboxes  %}
       {% for option in filter.options %}
         {% if option.value !== null %}
@@ -71,15 +85,15 @@
       {% endfor %}
     {% endset -%}
 
-       {{ items.push ({
+       {% set items = (items.push ({
           heading: {
             text: filter.name
           },
           content: {
             html: filterCheckboxes
           }
-        })
-      }}
+        }), items)
+      %}
 
   {% endfor %}
 
@@ -116,7 +130,7 @@
       {% set flag = 'red-date' %}
     {% endif %}
 
-    {{ content.push ([
+    {% set content = (content.push ([
       {
         text: milestone.milestone_uid
       },
@@ -128,8 +142,8 @@
       },
       {
         text: milestone.last_comment
-      }])
-    }}
+      }]), content)
+    %}
 
   {% endfor %}
 
@@ -137,53 +151,45 @@
     {% include "all-data/partials/data-table/content.njk" %}
   {% endset  %}
 
-      {{ sections.push ({
+      {% set sections = (sections.push ({
           summary: {
             html: dataRowsHtml
           },
           content: {
             html: contentHtml
           }
-        })
-      }}
+        }), sections)
+      %}
 
    {% set count = loop.index %}
 
   {% endfor %}
 
   <div>
-
-  {% for filter in filters() | await %}
-
-    {% set filterSummary  %}
-      {% for option in filter.options %}
-      <div class="filter-nav">
-        <nav>
-      {% if option.value in data.filters[filter.id] | default([]) %}
-         {% set filtersExist = 'true' %}
-         {{ filterNames.push(filter.name) }}
-          {% include "all-data/partials/filters/filter-list.njk" %}
-      {% endif %}
-        </nav>
-      </div>
-      {% endfor %}
-    {% endset  %}
-
-  {% if filter.name in filterNames %}
-    {{ summary.push ({
-        key: {
-          html: "<span class='filter-name'>" + filter.name + "</span>"
-        },
-        value: {
-          html: filterSummary
-        }
-      })
-    }}
-  {% endif %}
-
+  
+  {% for key, items in data.filters.projects %}
+        {% set filterDefinition = getFilter(key, filters) %}
+        {% set filterSummary %}
+          {% for item in items %}
+            <div class="filter-nav">
+              <nav>
+            {% include "all-data/partials/filters/filter-list.njk" %}
+              </nav>
+            </div>
+          {% endfor %}
+        {% endset  %}
+        {% set summary = (summary.push ({
+            key: {
+              html: "<span class='filter-name'>" + filterDefinition.name + "</span>"
+            },
+            value: {
+              html: filterSummary
+            }
+          }), summary)
+        %}
   {% endfor %}
 
-  {% if filtersExist == 'true' %}
+  {% if (data.filters.projects) or (data.filters.milestones.due_date) %}
       {% include "all-data/partials/filters/filter-summary.njk" %}
   {% endif %}
 

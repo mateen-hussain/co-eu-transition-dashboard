@@ -15,7 +15,9 @@ class AllData extends Page {
     return {
       filters: {
         projects: [],
-        milestones: []
+        milestones: {
+          due_date: ['01/01/2020', '01/01/2021']
+        }
       }
     };
   }
@@ -55,6 +57,10 @@ class AllData extends Page {
 
   get currentDate() {
     return moment().format()
+  }
+
+  getFilter(id, filters) {
+    return filters.find(filter => filter.id === id);
   }
 }
 

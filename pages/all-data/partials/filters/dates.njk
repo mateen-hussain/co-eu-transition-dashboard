@@ -1,6 +1,3 @@
-{% set fromDate = "01/01/" + currentDate | date("YYYY") %}
-{% set toDate = "01/01/" + currentDate | date("add", 1, "year") | date("YYYY") %}
-
 {{ govukInput({
   label: {
     text: "From"
@@ -11,7 +8,7 @@
   },
     id: "fromDate",
     name: "filters[milestones][due_date][]",
-    value: data.filters.milestones.due_date[0] | default(fromDate)
+    value: data.filters.milestones.due_date[0] 
 }) }}
 {{ govukInput({
   label: {
@@ -23,5 +20,5 @@
   },
     id: "toDate",
     name: "filters[milestones][due_date][]",
-    value: data.filters.milestones.due_date[1] | default(toDate)
+    value: data.filters.milestones.due_date[1]
 }) }}
