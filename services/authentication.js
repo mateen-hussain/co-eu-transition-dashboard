@@ -9,7 +9,7 @@ const { Strategy: passportJWTStrategy } = require("passport-jwt");
 
 const authenticateLogin = (email, password, cb) => {
   return User.findOne({
-    attributes: ['id', 'email', 'password'],
+    attributes: ['id', 'email', 'password', 'role'],
     where: {
       email: email
     },
@@ -21,7 +21,7 @@ const authenticateLogin = (email, password, cb) => {
       if (error || passwordMatches === false) {
         return cb(error, passwordMatches);
       }
-      cb(error, { id: user.id });
+      cb(null, user);
     });
   })
   .catch(cb);
@@ -35,7 +35,7 @@ passport.use(localStrategy);
 
 const authenticateUser = (jwtPayload, cb) => {
   return User.findOne({
-    attributes: ['id'],
+    attributes: ['id', 'role'],
     where: {
       id: jwtPayload.id
     },
@@ -53,10 +53,26 @@ const jwtStrategy = new passportJWTStrategy({
 }, authenticateUser);
 passport.use(jwtStrategy);
 
-const protect = passport.authenticate('jwt', {
-  session: false,
-  failureRedirect: config.paths.authentication
-});
+const protect = (roles = []) => {
+  const auth = passport.authenticate('jwt', {
+    session: false,
+    failureRedirect: config.paths.authentication
+  });
+
+  const checkRole = (req, res, next) => {
+    if(!req.user) {
+      return res.redirect(config.paths.authentication);
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.redirect(config.paths.authentication);
+    }
+
+    return next();
+  };
+
+  return [auth, checkRole];
+};
 
 const login = (req, res) => {
   const authenticatWithJwt = (err, user) => {
@@ -73,8 +89,13 @@ const login = (req, res) => {
         return res.redirect(config.paths.authentication);
       }
 
-      jwt.saveData(req, res, user);
-      res.redirect(config.paths.allData);
+      jwt.saveData(req, res, { id: user.id });
+
+      if (req.user.role === 'admin') {
+        res.redirect(config.paths.admin.import);
+      } else {
+        res.redirect(config.paths.allData);
+      }
     });
   };
 

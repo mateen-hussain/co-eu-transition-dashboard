@@ -1,6 +1,6 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
-const { login } = require('services/authentication');
+const authentication = require('services/authentication');
 
 class Authentication extends Page {
   get url() {
@@ -12,7 +12,7 @@ class Authentication extends Page {
   }
 
   async postRequest(req, res) {
-    await login(req, res);
+    await authentication.login(req, res);
   }
 }
 

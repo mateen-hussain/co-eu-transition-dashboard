@@ -27,8 +27,8 @@ DROP TABLE IF EXISTS `projects`;
 
 CREATE TABLE `projects` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `project_name` text,
-  `department` text,
+  `project_name` text NOT NULL,
+  `department` text NOT NULL,
   `impact` int(11) DEFAULT NULL,
   `hmg_confidence` int(11) DEFAULT NULL,
   `citizen_readiness` int(11) DEFAULT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE `projects` (
   `eu_state_confidence` int(11) DEFAULT NULL,
   `createdAt` date DEFAULT NULL,
   `updatedAt` date DEFAULT NULL,
-  `status` text,
+  `status` text DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -68,10 +68,10 @@ DROP TABLE IF EXISTS `milestones`;
 
 CREATE TABLE `milestones` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `milestone_uid` text,
-  `description` text,
+  `milestone_uid` text NOT NULL,
+  `description` text NOT NULL,
   `due_date` date DEFAULT NULL,
-  `last_comment` text,
+  `last_comment` text NOT NULL,
   `projectId` int(11) DEFAULT NULL,
   `createdAt` date DEFAULT NULL,
   `updatedAt` date DEFAULT NULL,
@@ -104,20 +104,22 @@ DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` text,
-  `email` text,
-  `password` text,
+  `name` text NOT NULL,
+  `email` text NOT NULL,
+  `password` text NOT NULL,
   `createdAt` date DEFAULT NULL,
   `updatedAt` date DEFAULT NULL,
+  `role` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `createdAt`, `updatedAt`)
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `createdAt`, `updatedAt`, `role`)
 VALUES
-  (1,'Some name','email@email.com','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.',NULL,NULL);
+  (1,'User','user@email.com','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.',NULL,NULL,'user'),
+  (2,'Admin','admin@email.com','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.',NULL,NULL,'admin');
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;

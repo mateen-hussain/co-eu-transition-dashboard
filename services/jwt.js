@@ -17,7 +17,11 @@ const token = req => {
 
 const restoreData = req => {
   if (req && req.cookies['jwt']) {
-    return jwt.verify(req.cookies['jwt'], config.cookie.secret);
+    try {
+      return jwt.verify(req.cookies['jwt'], config.cookie.secret);
+    } catch (error) {
+      return {};
+    }
   } else {
     return {};
   }

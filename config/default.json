@@ -15,6 +15,9 @@
     }
   },
   "paths": {
+    "admin": {
+      "import": "/admin/import"
+    },
     "allData": "/all-data",
     "filterExample": "/filter-example",
     "authentication": "/login"

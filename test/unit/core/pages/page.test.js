@@ -31,7 +31,7 @@ describe('core/pages/page', () => {
   });
 
   it('#middleware', () => {
-    expect(page.middleware).to.eql([ protect ]);
+    expect(page.middleware.toString()).to.eql([ ...protect() ].toString());
   });
 
   it('#template', () => {
@@ -50,13 +50,24 @@ describe('core/pages/page', () => {
     sinon.assert.calledWith(res.render, page.template);
   });
 
-  it('#postRequest', async () => {
-    const res = { redirect: sinon.stub() };
+  describe('#postRequest', () => {
+    it('#postRequest', async () => {
+      const res = { redirect: sinon.stub() };
 
-    await page.postRequest({}, res);
+      await page.postRequest({}, res);
 
-    expect(jwt.saveData.calledOnce).to.eql(true);
-    sinon.assert.calledWith(res.redirect, page.url);
+      expect(jwt.saveData.calledOnce).to.eql(true);
+      sinon.assert.calledWith(res.redirect, page.url);
+    });
+
+    it('deeply removes nulls from body', async () => {
+      const res = { redirect: sinon.stub() };
+      const req = { body: { foo: 'test', bar: { a: undefined, b: '', c: 'some data' }, baz: undefined } };
+
+      await page.postRequest(req, res);
+
+      sinon.assert.calledWith(jwt.saveData, req, res, { Page: { bar: { c: "some data" }, foo: "test" } });
+    });
   });
 
   describe('#handler', async () => {

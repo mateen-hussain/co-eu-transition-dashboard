@@ -4,11 +4,19 @@ const proxyquire = require('proxyquire');
 const config = require('config');
 const logger = require('services/logger');
 const bcrypt = require('bcrypt');
+const User = require('models/users');
 
 let passportLocalStrategyStub = {};
 let passportJWTStrategyStub = {};
 let passportStub = {};
 let authentication = {};
+
+const user = {
+  email: 'email',
+  password: 'password',
+  role: 'user',
+  id: 1
+};
 
 describe('services/authentication', () => {
   beforeEach(() => {
@@ -52,57 +60,183 @@ describe('services/authentication', () => {
     });
 
     describe('#authenticateLogin', () => {
-      it('passes if correct credentials are given', async () => {
-        bcrypt.compare.callsArgWith(2, null, true);
+      let authenticateLoginCallback = {}
 
-        const email = 'test';
-        const password = 'password';
+      describe('correct credentials', () => {
+        beforeEach(async () => {
+          User.findOne.resolves(user);
+          bcrypt.compare.callsArgWith(2, null, true);
 
-        const callback = sinon.stub();
+          authenticateLoginCallback = sinon.stub();
 
-        await authentication.authenticateLogin(email, password, callback);
+          await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
+        });
 
-        sinon.assert.calledWith(callback, null, { id: undefined });
+        it('correctly searches database', () => {
+          sinon.assert.calledWith(User.findOne, {
+            attributes: ['id', 'email', 'password', 'role'],
+            where: { email: user.email },
+            raw: true,
+            nest: true
+          });
+        });
+
+        it('checks password', () => {
+          sinon.assert.calledWith(bcrypt.compare, user.password, user.password);
+        });
+
+        it('returns user id', () => {
+          sinon.assert.calledWith(authenticateLoginCallback, null, user);
+        });
       });
 
-      it('rejects if correct credentials are given', async () => {
+      describe('incorrect credentials', () => {
+        beforeEach(async () => {
+          User.findOne.resolves(user);
+          bcrypt.compare.callsArgWith(2, null, false);
+
+          authenticateLoginCallback = sinon.stub();
+
+          await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
+        });
+
+        it('correctly searches database', () => {
+          sinon.assert.calledWith(User.findOne, {
+            attributes: ['id', 'email', 'password', 'role'],
+            where: { email: user.email },
+            raw: true,
+            nest: true
+          });
+        });
+
+        it('checks password', () => {
+          sinon.assert.calledWith(bcrypt.compare, user.password, user.password);
+        });
+
+        it('returns user id', () => {
+          sinon.assert.calledWith(authenticateLoginCallback, null, false);
+        });
+      });
+
+      it('error with bcrypt', async () => {
         const error = new Error('some error');
         bcrypt.compare.callsArgWith(2, error);
+        User.findOne.resolves(user);
+        authenticateLoginCallback = sinon.stub();
 
-        const email = 'test';
-        const password = 'bad password';
+        await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
 
-        const callback = sinon.stub();
+        sinon.assert.calledWith(authenticateLoginCallback, error);
+      });
 
-        await authentication.authenticateLogin(email, password, callback);
+      it('error finding user', async () => {
+        const error = new Error('some error');
+        User.findOne.rejects(error);
+        authenticateLoginCallback = sinon.stub();
 
-        sinon.assert.calledWith(callback, error);
+        await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
+
+        sinon.assert.calledWith(authenticateLoginCallback, error);
       });
     });
 
     describe('#authenticateUser', () => {
-      it('passes', async () => {
-        const jwtPayload = { id: 2 };
+      const jwtPayload = { id: 1 };
 
-        const callback = sinon.stub();
+      it('returns found user', async () => {
+        User.findOne.resolves({ id: user.id, role: user.role });
+        const authenticateUserCallback = sinon.stub();
 
-        await authentication.authenticateUser(jwtPayload, callback);
+        await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
-        sinon.assert.calledWith(callback, null, {});
+        sinon.assert.calledWith(User.findOne, {
+          attributes: ['id', 'role'],
+          where: { id: jwtPayload.id },
+          raw: true,
+          nest: true
+        });
+
+        sinon.assert.calledWith(authenticateUserCallback, null, { id: user.id, role: user.role });
+      });
+
+      it('rejects on findone error', async () => {
+        const error = new Error('some error...');
+        User.findOne.rejects(error);
+        const authenticateUserCallback = sinon.stub();
+
+        await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
+
+        sinon.assert.calledWith(User.findOne, {
+          attributes: ['id', 'role'],
+          where: { id: jwtPayload.id },
+          raw: true,
+          nest: true
+        });
+
+        sinon.assert.calledWith(authenticateUserCallback, error);
       });
     });
   });
 
   describe('#protect', () => {
     it('is created correctly', () => {
+      const middleware = authentication.protect();
+
       sinon.assert.calledWith(passportStub.authenticate, 'jwt', {
         session: false,
         failureRedirect: config.paths.authentication
       });
+
+      expect(middleware[0]).to.eql(passportStub.authenticate());
+      expect(middleware[1].name).to.eql('checkRole');
     });
 
-    it('passes', () => {
-      expect(authentication.protect).to.eql(passportStub.authenticate());
+    describe('handle roles', () => {
+      it('allows defined role', () => {
+        const middleware = authentication.protect(['user']);
+        const req = { user: { role: 'user' } };
+        const next = sinon.stub();
+
+        middleware[1](req, {}, next);
+
+        sinon.assert.called(next);
+      });
+
+      it('allows mulitple defined roles', () => {
+        const middleware = authentication.protect(['admin', 'user']);
+        const req = { user: { role: 'user' } };
+        const next = sinon.stub();
+
+        middleware[1](req, {}, next);
+
+        sinon.assert.called(next);
+      });
+
+      it('redirects to login if no user assigned to req', () => {
+        const middleware = authentication.protect(['user']);
+        const req = {};
+        const res = {
+          redirect: sinon.stub()
+        }
+        const next = sinon.stub();
+
+        middleware[1](req, res, next);
+
+        sinon.assert.calledWith(res.redirect, config.paths.authentication);
+      });
+
+      it('redirects to login if user role does not match', () => {
+        const middleware = authentication.protect(['admin']);
+        const req = { user: { role: 'user' } };
+        const res = {
+          redirect: sinon.stub()
+        }
+        const next = sinon.stub();
+
+        middleware[1](req, res, next);
+
+        sinon.assert.calledWith(res.redirect, config.paths.authentication);
+      });
     });
   });
 
@@ -113,19 +247,16 @@ describe('services/authentication', () => {
     let res = {
       redirect: sinon.stub()
     };
-    let user = {};
     let authenticatWithJwt = {};
     let loginStub = {};
 
-
     beforeEach(() => {
       loginStub = sinon.stub().callsArgWith(2, null);
-      req = { login: loginStub };
+      req = { login: loginStub, user };
       res = { redirect: sinon.stub() };
-      user = { name: 'some name'};
 
       passportStub.authenticate.returns(() => {
-        authenticatWithJwt = passportStub.authenticate.getCall(1).args[2];
+        authenticatWithJwt = passportStub.authenticate.getCall(0).args[2];
       });
 
       sinon.stub(jwt, 'saveData').returns();
@@ -142,8 +273,18 @@ describe('services/authentication', () => {
 
       authenticatWithJwt(null, user);
 
-      sinon.assert.calledWith(jwt.saveData, req, res, user);
+      sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id });
       sinon.assert.calledWith(res.redirect, config.paths.allData);
+    });
+
+    it('redirects to admin page', () => {
+      req.user.role = 'admin';
+      authentication.login(req, res);
+
+      authenticatWithJwt(null, user);
+
+      sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id });
+      sinon.assert.calledWith(res.redirect, config.paths.admin.import);
     });
 
     it('redirects to login page if error with authenticatWithJwt', () => {

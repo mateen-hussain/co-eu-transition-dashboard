@@ -8,11 +8,13 @@ describe('models/projects', () => {
     expect(Projects.init).to.have.been.calledWith({
       project_name: {
         type: STRING,
-        displayName: 'Project Name'
+        displayName: 'Project Name',
+        allowNull: false
       },
       department: {
         type: STRING,
-        displayName: 'Department'
+        displayName: 'Department',
+        allowNull: false
       },
       impact: {
         type: ENUM(0,1,2,3),

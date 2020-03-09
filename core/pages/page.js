@@ -30,9 +30,6 @@ const allProperties = (obj, arr = []) => {
     }),
     ...arr
   ];
-  if (obj.name === 'BaseStep') {
-    return props;
-  }
   return allProperties(Object.getPrototypeOf(obj), props);
 };
 
@@ -55,7 +52,7 @@ class Page {
     const middleware = [];
 
     if (this.requireAuth) {
-      middleware.push(protect);
+      middleware.push(...protect(['admin', 'user']));
     }
 
     return middleware;
@@ -79,12 +76,10 @@ class Page {
   }
 
   async postRequest(req, res) {
-    const data = { [this.constructor.name]: removeNulls(req.body) };
-
     function removeNulls(obj){
       var isArray = obj instanceof Array;
       for (var k in obj){
-        if (obj[k] === null || (typeof obj[k] === "string" && !obj[k].length)) {
+        if (obj[k] === null || obj[k] === undefined || (typeof obj[k] === "string" && !obj[k].length)) {
           if(isArray) {
             obj.splice(k,1);
           } else {
@@ -98,6 +93,8 @@ class Page {
       }
       return obj;
     }
+
+    const data = { [this.constructor.name]: removeNulls(req.body) };
 
     jwt.saveData(req, res, data);
 

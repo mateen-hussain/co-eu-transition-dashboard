@@ -11,3 +11,14 @@
 1. Open new console
 2. run `npm install`
 3. run `npm run dev`
+
+## Authentication
+
+There are two mock users setup for local development:
+1. Admin
+username: admin@email.com
+password: password
+
+2. User
+username: user@email.com
+password: password

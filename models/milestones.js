@@ -3,10 +3,21 @@ const sequelize = require('services/sequelize');
 
 class Milestone extends Model {}
 Milestone.init({
-  milestone_uid: STRING,
-  description: STRING,
-  due_date: DATE,
-  last_comment: STRING
+  milestone_uid: {
+    type: STRING,
+    allowNull: false
+  },
+  description: {
+    type: STRING,
+    allowNull: false
+  },
+  due_date: {
+    type: DATE,
+    allowNull: false
+  },
+  last_comment: {
+    type: STRING
+  }
 }, { sequelize, modelName: 'milestone' });
 
 module.exports = Milestone;

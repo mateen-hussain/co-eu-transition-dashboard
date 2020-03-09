@@ -4,19 +4,25 @@ const { Sequelize } = require('sequelize-test-helpers');
 const { STRING, DATE, ENUM, Op, literal } = require('sequelize');
 
 class Model {}
-Model.init = sinon.stub();
-Model.hasMany = sinon.stub();
-Model.findOne = sinon.stub().resolves({});
-Model.findAll = sinon.stub().resolves([]);
-Model.rawAttributes = {};
 
-const s = sinon.stub().returns(Sequelize);
+let s = {};
 
-s.STRING = STRING;
-s.ENUM = ENUM;
-s.Model = Model;
-s.DATE = DATE;
-s.Op = Op;
-s.literal = literal;
+// beforeEach(() => {
+  Model.init = sinon.stub();
+  Model.hasMany = sinon.stub();
+  Model.findOne = sinon.stub().resolves({});
+  Model.findAll = sinon.stub().resolves([]);
+  Model.rawAttributes = {};
+
+  s = sinon.stub().returns(Sequelize);
+
+  s.STRING = STRING;
+  s.ENUM = ENUM;
+  s.Model = Model;
+  s.DATE = DATE;
+  s.Op = Op;
+  s.literal = literal;
+// });
 
 mock('sequelize', s);
+
