@@ -3,17 +3,6 @@ const sequelize = require('services/sequelize');
 const Milestone = require('./milestones');
 
 const modelDefinition = {
-  project_name: {
-    type: STRING,
-    displayName: 'Project Name',
-    allowNull: false
-  },
-  department: {
-    type: STRING,
-    displayName: 'Department',
-    allowNull: false,
-    showCount: true
-  },
   impact: {
     type: ENUM(0,1,2,3),
     allowNull: true,
@@ -38,6 +27,17 @@ const modelDefinition = {
     type: ENUM(0,1,2,3),
     allowNull: true,
     displayName: 'EU State Readiness'
+  },
+  department: {
+    type: STRING,
+    displayName: 'Department',
+    allowNull: false,
+    showCount: true
+  },
+  project_name: {
+    type: STRING,
+    displayName: 'Project Name',
+    allowNull: false
   },
   status: {
     type: STRING,
