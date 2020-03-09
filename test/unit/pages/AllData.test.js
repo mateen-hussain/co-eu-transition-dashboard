@@ -75,9 +75,9 @@ describe('pages/all-data/AllData', () => {
   it('should return the correct filter name when passed in an ID', () => {
     const id = 'test_1';
     const name = 'Test 1';
-    expect(page.getFilter(id , [{
+    expect(page.getFilter(id, [{
       id, name
-    }] )).to.eql({
+    }])).to.eql({
       id, name
     });
   });
