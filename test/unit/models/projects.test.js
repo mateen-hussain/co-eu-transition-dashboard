@@ -14,7 +14,8 @@ describe('models/projects', () => {
       department: {
         type: STRING,
         displayName: 'Department',
-        allowNull: false
+        allowNull: false,
+        showCount: true
       },
       impact: {
         type: ENUM(0,1,2,3),

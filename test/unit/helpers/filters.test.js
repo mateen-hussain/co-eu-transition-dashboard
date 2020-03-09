@@ -1,6 +1,8 @@
 const filters = require('helpers/filters');
 const Projects = require('models/projects');
 const { expect, sinon } = require('test/unit/util/chai');
+const sequelize = require('sequelize');
+const Milestones = require('models/milestones');
 
 describe('helpers/filters', () => {
   describe('#getFiltersWithCounts', () => {
@@ -16,6 +18,36 @@ describe('helpers/filters', () => {
       await filters.getFiltersWithCounts(attribute, search);
 
       return sinon.assert.called(Projects.findAll);
+    });
+
+    it('calls Projects.findAll with correct arguments for attribute with counts', async () => {
+      const attribute = {
+        fieldName: 'field_name',
+        showCount: true
+      };
+      const search = {
+        projects: {},
+        milestones: {}
+      };
+
+      await filters.getFiltersWithCounts(attribute, search);
+
+      return sinon.assert.calledWith(Projects.findAll, {
+        attributes: [
+          [sequelize.literal(`projects.${attribute.fieldName}`), 'value'],
+          [sequelize.literal(`COUNT(DISTINCT milestones.projectId)`), 'count']
+        ],
+        where: {},
+        include: [{
+          model: Milestones,
+          attributes: [],
+          where: search.milestones,
+          required: true
+        }],
+        group: [ 'field_name' ],
+        raw: true,
+        nest: true
+      });
     });
   });
 

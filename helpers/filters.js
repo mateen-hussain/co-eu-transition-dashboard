@@ -6,11 +6,21 @@ const getFiltersWithCounts = async (attribute, search) => {
   const searchIgnoreCurrentAttribute = Object.assign({}, search.projects);
   delete searchIgnoreCurrentAttribute[attribute.fieldName];
 
+  const attributes = [];
+  let group;
+
+  if(attribute.showCount) {
+    attributes.push([sequelize.literal(`projects.${attribute.fieldName}`), 'value']);
+    attributes.push([sequelize.literal(`COUNT(DISTINCT milestones.projectId)`), 'count']);
+
+    group = [];
+    group.push(`${attribute.fieldName}`);
+  } else {
+    attributes.push([sequelize.literal(`DISTINCT projects.${attribute.fieldName}`), 'value']);
+  }
+
   return await Projects.findAll({
-    attributes: [
-      [sequelize.literal(`projects.${attribute.fieldName}`), 'value'],
-      [sequelize.literal(`COUNT(DISTINCT milestones.projectId)`), 'count']
-    ],
+    attributes: attributes,
     where: searchIgnoreCurrentAttribute,
     include: [{
       model: Milestones,
@@ -18,7 +28,7 @@ const getFiltersWithCounts = async (attribute, search) => {
       where: search.milestones,
       required: true
     }],
-    group: [`${attribute.fieldName}`],
+    group,
     raw: true,
     nest: true
   });
