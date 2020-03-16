@@ -20,10 +20,7 @@ button#accordion-table-heading-1 ~ .govuk-accordion__icon {
 }
 
 #accordion-table .govuk-accordion__controls {
-    margin-top: 40px;
-    top: -80px;
-    position: relative;
-    pointer-events: all;
+    display: none;
 }
 
 button#accordion-table-heading-1 {
@@ -187,23 +184,10 @@ span.date-name {
     bottom: 15px;
 }
 
-.navigation {
-    background-color: #f3f2f1;
-    padding-top: 10px;
-    padding-left: 10px;
-}
+//defintions
 
-a.govuk-header__link.nav {
-    color: #1d70b8;
+h3.govuk-heading-s.def-title {
+    margin-bottom: 0;
 }
-
-li.govuk-header__navigation-item.govuk-header__navigation-item--active {
-    border-bottom: 5px solid #1d70b8;
-}
-
-li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
-    text-decoration: none;
-}
-
 
 

@@ -1,3 +1,21 @@
 @import '~govuk-frontend/govuk/all';
 
 @import 'pages/all-data/AllData.scss';
+
+.navigation {
+    background-color: #f3f2f1;
+    padding-top: 10px;
+    padding-left: 10px;
+}
+
+a.govuk-header__link.nav {
+    color: #1d70b8;
+}
+
+li.govuk-header__navigation-item.govuk-header__navigation-item--active {
+    border-bottom: 5px solid #1d70b8;
+}
+
+li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
+    text-decoration: none;
+}
