@@ -71,6 +71,7 @@
 
 <div class="govuk-grid-column-one-quarter" id="filterPanel">
 
+
   {% for filter in filters %}
     {% set filterCheckboxes  %}
       {% if (filter.options | length != 1) %}
@@ -197,19 +198,20 @@
   {% endfor %}
 
   <div>
+  <h3 class="govuk-heading-s">Selected filters</h3>
 
-{% for filter in filters %}
-
-    {% set filterSummary  %}
-      {% for option in filter.options %}
-        {% if option.value in data.filters[filter.id] | default([]) %}
-          {% include "all-data/partials/filters/filter-list.njk" %}
-        {% endif %}
-      {% endfor %}
-    {% endset -%}
-
-      {% if filter.name in filterNames %}
-            {% set summary = (summary.push ({
+  {% for key, items in data.filters.projects %}
+        {% set filterDefinition = getFilter(key, filters) %}
+        {% set filterSummary %}
+          {% for item in items %}
+            <div class="filter-nav">
+              <nav>
+            {% include "all-data/partials/filters/filter-list.njk" %}
+              </nav>
+            </div>
+          {% endfor %}
+        {% endset  %}
+        {% set summary = (summary.push ({
             key: {
               html: "<span class='filter-name'>" + filter.name + "</span>"
             },

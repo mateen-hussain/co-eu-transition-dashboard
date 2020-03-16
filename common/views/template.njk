@@ -1,6 +1,7 @@
 {% extends "govuk/template.njk" %}
 
 {% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {% set index = "All project data" %}
 
@@ -26,25 +27,34 @@
 
 {% block header %}
   {{ govukHeader({
-    homepageUrl: "https://www.gov.uk/",
-    serviceName: "Cabinet Office",
-    serviceUrl: "/",
-     navigation: [
-      {
-        href: "#1",
-        text: "Priority projects"
-      },
-      {
-        href: "#2",
-        text: "Barriers to delivery"
-      },
-      {
-        href: "/",
-        text: index,
-        active: true
-      }
-    ]
+    homepageUrl: "https://www.gov.uk/government/organisations/cabinet-office",
+    serviceName: "Transition Taskforce Dashboard",
+    serviceUrl: "/"
   }) }}
+{% endblock %}
+
+{% block beforeContent %}
+    <div>
+        <nav class="navigation">
+          <ul id="navigation" class="govuk-header__navigation " aria-label="Top Level Navigation">
+            <li class="govuk-header__navigation-item govuk-header__navigation-item--active">
+              <a class="govuk-header__link nav" href="/">
+                All project data
+              </a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link nav" href="#">
+                Missed milestones
+              </a>
+            </li>
+            <li class="govuk-header__navigation-item">
+              <a class="govuk-header__link nav" href="#">
+                Upcoming milestones
+              </a>
+            </li>
+          </ul>
+        </nav>
+    </div>
 {% endblock %}
 
 {% block main %}
