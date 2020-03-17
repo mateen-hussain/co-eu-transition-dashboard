@@ -43,7 +43,7 @@
 
  {{ items.push ({
     heading: {
-      text: "Date"
+      text: "Milestone Due Dates"
     },
     content: {
       html: dates
@@ -53,7 +53,7 @@
 
  {{ summary.push ({
     key: {
-      html: "<span class='date-name'>Date</span>"
+      html: "<span class='date-name'>Showing milestone due dates </span>"
     },
     value: {
       html: dateList
@@ -98,9 +98,8 @@
 
   {% endfor %}
 
-
   <form action="{{ url }}" method="post">
-
+    <h3 class="govuk-heading-s panelTitle">Filters</h3>
     {% include "all-data/partials/filters/all-filters.njk" %}
     {% include "all-data/partials/filters/filter-btn.njk" %}
 
@@ -200,18 +199,17 @@
   <div>
   <h3 class="govuk-heading-s">Selected filters</h3>
 
-  {% for key, items in data.filters.projects %}
-        {% set filterDefinition = getFilter(key, filters) %}
-        {% set filterSummary %}
-          {% for item in items %}
-            <div class="filter-nav">
-              <nav>
-            {% include "all-data/partials/filters/filter-list.njk" %}
-              </nav>
-            </div>
-          {% endfor %}
-        {% endset  %}
-        {% set summary = (summary.push ({
+  {% for filter in filters %}
+    {% set filterSummary  %}
+      {% for option in filter.options %}
+        {% if option.value in data.filters[filter.id] | default([]) %}
+          {% include "all-data/partials/filters/filter-list.njk" %}
+        {% endif %}
+      {% endfor %}
+    {% endset -%}
+
+      {% if filter.name in filterNames %}
+            {% set summary = (summary.push ({
             key: {
               html: "<span class='filter-name'>" + filter.name + "</span>"
             },

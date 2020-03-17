@@ -35,6 +35,11 @@ Milestone.init({
     type: DATE,
     allowNull: false,
     displayName: 'Due Date'
+  },
+  comment: {
+    type: STRING,
+    allowNull: false,
+    displayName: 'Latest comment'
   }
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
 
