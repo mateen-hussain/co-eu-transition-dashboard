@@ -260,7 +260,6 @@ CREATE TABLE `milestone` (
   `project_uid` varchar(32) NOT NULL,
   `description` text,
   `date` date DEFAULT NULL,
-  `comment` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`uid`),
@@ -271,19 +270,19 @@ CREATE TABLE `milestone` (
 LOCK TABLES `milestone` WRITE;
 /*!40000 ALTER TABLE `milestone` DISABLE KEYS */;
 
-INSERT INTO `milestone` (`uid`, `project_uid`, `description`, `date`, `comment`, `created_at`, `updated_at`)
+INSERT INTO `milestone` (`uid`, `project_uid`, `description`, `date`, `created_at`, `updated_at`)
 VALUES
-  ('Milestone 1','Project 1','description','2020-01-22', 'Latest comment', NULL,NULL),
-  ('Milestone 12','Project 1','description','2020-01-22', 'Latest comment', NULL,NULL),
-  ('Milestone 2','Project 2','description','2020-02-22', 'Latest comment', NULL,NULL),
-  ('Milestone 3','Project 3','description','2020-03-22', 'Latest comment', NULL,NULL),
-  ('Milestone 4','Project 4','description','2020-04-22', 'Latest comment', NULL,NULL),
-  ('Milestone 5','Project 5','description','2020-05-22', 'Latest comment', NULL,NULL),
-  ('Milestone 6','Project 6','description','2020-06-22', 'Latest comment', NULL,NULL),
-  ('Milestone 7','Project 7','description','2020-07-22', 'Latest comment', NULL,NULL),
-  ('Milestone 8','Project 8','description','2020-08-22', 'Latest comment', NULL,NULL),
-  ('Milestone 9','Project 9','description','2020-09-22', 'Latest comment', NULL,NULL),
-  ('Milestone 11','Project 10','description','2020-10-22', 'Latest comment', NULL,NULL);
+  ('Milestone 1','Project 1','description','2020-01-22', NULL,NULL),
+  ('Milestone 12','Project 1','description','2020-01-22', NULL,NULL),
+  ('Milestone 2','Project 2','description','2020-02-22', NULL,NULL),
+  ('Milestone 3','Project 3','description','2020-03-22', NULL,NULL),
+  ('Milestone 4','Project 4','description','2020-04-22', NULL,NULL),
+  ('Milestone 5','Project 5','description','2020-05-22', NULL,NULL),
+  ('Milestone 6','Project 6','description','2020-06-22', NULL,NULL),
+  ('Milestone 7','Project 7','description','2020-07-22', NULL,NULL),
+  ('Milestone 8','Project 8','description','2020-08-22', NULL,NULL),
+  ('Milestone 9','Project 9','description','2020-09-22', NULL,NULL),
+  ('Milestone 11','Project 10','description','2020-10-22', NULL,NULL);
 
 /*!40000 ALTER TABLE `milestone` ENABLE KEYS */;
 UNLOCK TABLES;

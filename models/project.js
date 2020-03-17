@@ -45,7 +45,7 @@ Project.init({
   },
   is_completed: {
     type: BOOLEAN,
-    // displayName: 'Status',
+    displayName: 'Status',
     searchable: true
   },
   sro: {
