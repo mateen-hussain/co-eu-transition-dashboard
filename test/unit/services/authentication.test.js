@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire');
 const config = require('config');
 const logger = require('services/logger');
 const bcrypt = require('bcrypt');
-const User = require('models/users');
+const User = require('models/user');
 
 let passportLocalStrategyStub = {};
 let passportJWTStrategyStub = {};
@@ -14,6 +14,7 @@ let authentication = {};
 const user = {
   email: 'email',
   password: 'password',
+  hashed_passphrase: 'password',
   role: 'user',
   id: 1
 };
@@ -74,7 +75,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'password', 'role'],
+            attributes: ['id', 'email', 'hashed_passphrase', 'role'],
             where: { email: user.email },
             raw: true,
             nest: true
@@ -102,7 +103,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'password', 'role'],
+            attributes: ['id', 'email', 'hashed_passphrase', 'role'],
             where: { email: user.email },
             raw: true,
             nest: true
@@ -151,9 +152,7 @@ describe('services/authentication', () => {
 
         sinon.assert.calledWith(User.findOne, {
           attributes: ['id', 'role'],
-          where: { id: jwtPayload.id },
-          raw: true,
-          nest: true
+          where: { id: jwtPayload.id }
         });
 
         sinon.assert.calledWith(authenticateUserCallback, null, { id: user.id, role: user.role });
@@ -168,9 +167,7 @@ describe('services/authentication', () => {
 
         sinon.assert.calledWith(User.findOne, {
           attributes: ['id', 'role'],
-          where: { id: jwtPayload.id },
-          raw: true,
-          nest: true
+          where: { id: jwtPayload.id }
         });
 
         sinon.assert.calledWith(authenticateUserCallback, error);

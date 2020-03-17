@@ -3,13 +3,13 @@ const jwt = require('services/jwt');
 const config = require('config');
 const logger = require('services/logger');
 const bcrypt = require('bcrypt');
-const User = require('models/users');
+const User = require('models/user');
 const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 
 const authenticateLogin = (email, password, cb) => {
   return User.findOne({
-    attributes: ['id', 'email', 'password', 'role'],
+    attributes: ['id', 'email', 'hashed_passphrase', 'role'],
     where: {
       email: email
     },
@@ -17,7 +17,7 @@ const authenticateLogin = (email, password, cb) => {
     nest: true
   })
   .then(user => {
-    bcrypt.compare(password, user.password, (error, passwordMatches) => {
+    bcrypt.compare(password, user.hashed_passphrase, (error, passwordMatches) => {
       if (error || passwordMatches === false) {
         return cb(error, passwordMatches);
       }
@@ -38,9 +38,7 @@ const authenticateUser = (jwtPayload, cb) => {
     attributes: ['id', 'role'],
     where: {
       id: jwtPayload.id
-    },
-    raw: true,
-    nest: true
+    }
   })
   .then(user => {
     cb(null, user);

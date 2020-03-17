@@ -1,8 +1,11 @@
 const filters = require('helpers/filters');
-const Projects = require('models/projects');
+const Project = require('models/project');
+const ProjectFieldEntry = require('models/projectFieldEntry');
 const { expect, sinon } = require('test/unit/util/chai');
 const sequelize = require('sequelize');
-const Milestones = require('models/milestones');
+const Milestone = require('models/milestone');
+const User = require('models/user');
+const Department = require('models/department');
 
 describe('helpers/filters', () => {
   describe('#getFiltersWithCounts', () => {
@@ -10,90 +13,90 @@ describe('helpers/filters', () => {
       const attribute = {
         fieldName: 'field_name'
       };
-      const search = {
-        projects: {},
-        milestones: {}
-      };
+      const search = {};
+      const user = { id: 1 };
 
-      await filters.getFiltersWithCounts(attribute, search);
+      await filters.getFiltersWithCounts(attribute, search, user);
 
-      return sinon.assert.called(Projects.findAll);
+      return sinon.assert.called(Project.findAll);
     });
 
     it('calls Projects.findAll with correct arguments for attribute with counts', async () => {
       const attribute = {
-        fieldName: 'field_name',
-        showCount: true
+        fieldName: 'field_name'
       };
-      const search = {
-        projects: {},
-        milestones: {}
-      };
+      const search = {};
+      const user = { id: 1 };
 
-      await filters.getFiltersWithCounts(attribute, search);
+      await filters.getFiltersWithCounts(attribute, search, user);
 
-      return sinon.assert.calledWith(Projects.findAll, {
+      return sinon.assert.calledWith(Project.findAll, {
         attributes: [
-          [sequelize.literal(`projects.${attribute.fieldName}`), 'value'],
-          [sequelize.literal(`COUNT(DISTINCT milestones.projectId)`), 'count']
+          [sequelize.literal(`project.${attribute.fieldName}`), 'value'],
+          [sequelize.literal(`COUNT(DISTINCT projects_count.uid)`), 'count']
         ],
-        where: {},
-        include: [{
-          model: Milestones,
-          attributes: [],
-          where: search.milestones,
-          required: true
-        }],
-        group: [ 'field_name' ],
+        include: [
+          {
+            model: Project,
+            as: 'projects_count',
+            attributes: [],
+            where: {[attribute.fieldName]: { [sequelize.Op.ne]: null } },
+            required: false,
+            include: [{
+              required: true,
+              as: 'ProjectFieldEntryFilter',
+              attributes: [],
+              model: ProjectFieldEntry,
+              where: {
+                [sequelize.Op.and]: []
+              }
+            }]
+          },
+          {
+            model: Milestone,
+            attributes: [],
+            required: true,
+            where: {}
+          },
+          {
+            model: Department,
+            required: true,
+            attributes: [],
+            include: [{
+              attributes: [],
+              model: User,
+              required: true,
+              where: {
+                id: user.id
+              }
+            }]
+          }
+        ],
+        group: [`project.${attribute.fieldName}`],
         raw: true,
-        nest: true
+        nest: true,
+        includeIgnoreAttributes: false
       });
     });
   });
 
-  describe('#applyDefaultOptions', () => {
-    it('applies default values if defined', () => {
-      const attribute = {
-        fieldName: 'field_name',
-        values: ['value1', 'value2']
-      };
-      const options = [{
-        value: 'value1',
-        count: 2
-      }];
-
-      const optionsWithDefaults = filters.applyDefaultOptions(attribute, options);
-
-      expect(optionsWithDefaults).to.eql([ { value: 'value1', count: 2 }, { value: 'value2', count: 0 } ]);
-    });
-
-    it('does not apply default values if not defined', () => {
-      const attribute = {
-        fieldName: 'field_name'
-      };
-      const options = [{
-        value: 'value1',
-        count: 2
-      }];
-
-      const optionsWithDefaults = filters.applyDefaultOptions(attribute, options);
-
-      expect(optionsWithDefaults).to.eql([ { value: 'value1', count: 2 } ]);
-    });
-  });
-
-  describe('#getFilters', () => {
-    const defaultValue = Projects.rawAttributes;
+  describe('#getProjectCoreFields', () => {
+    const defaultValue = Project.rawAttributes;
 
     beforeEach(() => {
-      Projects.rawAttributes = {
+      Project.rawAttributes = {
         name: {
           fieldName: 'name',
-          displayName: 'Name'
+          displayName: 'Name',
+          searchable: true
+        },
+        other: {
+          fieldName: 'other',
+          displayName: 'other'
         }
       };
 
-      Projects.findAll.resolves([
+      Project.findAll.resolves([
         { value: 'BEIS', count: 2 },
         { value: 'DEFRA', count: 0 },
         { value: 'DFT', count: 1 },
@@ -102,8 +105,50 @@ describe('helpers/filters', () => {
     });
 
     afterEach(() => {
-      Projects.rawAttributes = defaultValue;
-      Projects.findAll = sinon.stub();
+      Project.rawAttributes = defaultValue;
+      Project.findAll = sinon.stub();
+    });
+
+    it('gets project core fields', async () => {
+      const search = {};
+      const user = { id: 1 };
+      const response = await filters.getProjectCoreFields(search, user);
+
+      expect(response).to.eql([{
+        id: 'name',
+        name: 'Name',
+        options: [
+          { value: 'BEIS', count: 2 },
+          { value: 'DEFRA', count: 0 },
+          { value: 'DFT', count: 1 },
+          { value: 'DIT', count: 1 }
+        ]
+      }]);
+    });
+  });
+
+  describe.skip('#getFilters', () => {
+    const defaultValue = Project.rawAttributes;
+
+    beforeEach(() => {
+      Project.rawAttributes = {
+        name: {
+          fieldName: 'name',
+          displayName: 'Name'
+        }
+      };
+
+      Project.findAll.resolves([
+        { value: 'BEIS', count: 2 },
+        { value: 'DEFRA', count: 0 },
+        { value: 'DFT', count: 1 },
+        { value: 'DIT', count: 1 }
+      ])
+    });
+
+    afterEach(() => {
+      Project.rawAttributes = defaultValue;
+      Project.findAll = sinon.stub();
     });
 
     it('finds filters with attributes that have a displayName', async () => {
@@ -123,7 +168,7 @@ describe('helpers/filters', () => {
     });
 
     it('finds filters with attributes without a displayName', async () => {
-      Projects.rawAttributes = {
+      Project.rawAttributes = {
         name: {
           fieldName: 'name'
         }

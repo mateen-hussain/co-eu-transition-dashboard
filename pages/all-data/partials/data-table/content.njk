@@ -1,18 +1,5 @@
     {{ govukTable({
     classes: "table-content",
-    head: [
-      {
-        text: "Milestone UID"
-      },
-      {
-        text: "Milestone Description"
-      },
-      {
-        text: "Due date"
-      },
-      {
-        text: "Latest comment"
-      }
-    ],
-    rows: content
+    head: milestoneKey,
+    rows: milestoneFields
 }) }}

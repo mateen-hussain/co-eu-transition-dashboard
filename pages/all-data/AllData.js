@@ -1,9 +1,6 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
-const sequelize = require('sequelize');
-const Projects = require('models/projects');
-const Milestones = require('models/milestones');
-const { filters } = require('helpers');
+const { getFilters } = require('helpers/filters');
 const moment = require('moment');
 
 class AllData extends Page {
@@ -14,49 +11,21 @@ class AllData extends Page {
   get schema() {
     return {
       filters: {
-        projects: [],
-        milestones: {
-          due_date: ['01/01/2020', '01/01/2021']
-        }
+        date: ['01/01/2020', '01/01/2021']
       }
     };
   }
 
-  get search() {
-    const getFilters = type => {
-      return Object.entries(this.data.filters[type] || {}).reduce((filters, [attirbute, options]) => {
-        if (attirbute.includes('date')) {
-          const dates = options.map(date => moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD'));
-          filters[attirbute] = { [sequelize.Op.between]: dates };
-        } else {
-          filters[attirbute] = { [sequelize.Op.or]: options };
-        }
-        return filters;
-      }, {});
-    }
-
-    return {
-      projects: getFilters('projects'),
-      milestones: getFilters('milestones')
-    };
-  }
-
   async projects() {
-    return await Projects.findAll({
-      where: this.search.projects,
-      include: [{
-        model: Milestones,
-        where: this.search.milestones
-      }]
-    });
+    return await this.req.user.getProjects(this.data.filters);
   }
 
   async filters() {
-    return await filters(this.search);
+    return await getFilters(this.data.filters, this.req.user);
   }
 
   get currentDate() {
-    return moment().format()
+    return moment().format();
   }
 
   getFilter(id, filters) {

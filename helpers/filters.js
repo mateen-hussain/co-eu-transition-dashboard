@@ -1,62 +1,72 @@
-const Projects = require('models/projects');
-const Milestones = require('models/milestones');
-const sequelize = require('sequelize');
+const Project = require('models/project');
+const Milestone = require('models/milestone');
+const User = require('models/user');
+const ProjectFieldEntry = require('models/projectFieldEntry');
+const ProjectField = require('models/projectField');
+const Department = require('models/department');
+const { Op, literal } = require('sequelize');
+const modelUtils = require('helpers/models');
 
-const getFiltersWithCounts = async (attribute, search) => {
-  const searchIgnoreCurrentAttribute = Object.assign({}, search.projects);
-  delete searchIgnoreCurrentAttribute[attribute.fieldName];
+const getFiltersWithCounts = async (attribute, search, user) => {
+  const groupedSearch = modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter'}});
+  const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.fieldName]: { [Op.ne]: null } });
 
-  const attributes = [];
-  let group;
-
-  if(attribute.showCount) {
-    attributes.push([sequelize.literal(`projects.${attribute.fieldName}`), 'value']);
-    attributes.push([sequelize.literal(`COUNT(DISTINCT milestones.projectId)`), 'count']);
-
-    group = [];
-    group.push(`${attribute.fieldName}`);
-  } else {
-    attributes.push([sequelize.literal(`DISTINCT projects.${attribute.fieldName}`), 'value']);
-  }
-
-  return await Projects.findAll({
-    attributes: attributes,
-    where: searchIgnoreCurrentAttribute,
-    include: [{
-      model: Milestones,
-      attributes: [],
-      where: search.milestones,
-      required: true
-    }],
-    group,
+  return await Project.findAll({
+    attributes: [
+      [literal(`project.${attribute.fieldName}`), 'value'],
+      [literal(`COUNT(DISTINCT projects_count.uid)`), 'count']
+    ],
+    include: [
+      {
+        model: Project,
+        as: 'projects_count',
+        attributes: [],
+        where: searchIgnoreCurrentAttribute,
+        required: false,
+        include: [{
+          required: true,
+          as: 'ProjectFieldEntryFilter',
+          attributes: [],
+          model: ProjectFieldEntry,
+          where: {
+            [Op.and]: groupedSearch.projectField
+          }
+        }]
+      },
+      {
+        model: Milestone,
+        attributes: [],
+        required: true,
+        where: groupedSearch.milestone
+      },
+      {
+        model: Department,
+        required: true,
+        attributes: [],
+        include: [{
+          attributes: [],
+          model: User,
+          required: true,
+          where: {
+            id: user.id
+          }
+        }]
+      }
+    ],
+    group: [`project.${attribute.fieldName}`],
     raw: true,
-    nest: true
+    nest: true,
+    includeIgnoreAttributes: false
   });
 };
 
-const applyDefaultOptions = (attribute, options) => {
-  if (attribute.values) {
-    return attribute.values.map(value => {
-      const found = options.find(r => r.value === value);
-      return {
-        value,
-        count: found ? found.count : 0
-      }
-    });
-  }
-
-  return options;
-};
-
-const getFilters = async (search = {}) => {
+const getProjectCoreFields = async (search, user) => {
   const filters = [];
+  for(const attributeName of Object.keys(Project.rawAttributes)) {
+    const attribute = Project.rawAttributes[attributeName];
+    if (!attribute.searchable) continue;
 
-  for(const attributeName of Object.keys(Projects.rawAttributes)) {
-    const attribute = Projects.rawAttributes[attributeName];
-    if (!attribute.displayName) continue;
-
-    let options = await getFiltersWithCounts(attribute,search);
-    options = applyDefaultOptions(attribute, options);
+    let options = await getFiltersWithCounts(attribute, search, user);
 
     filters.push({
       id: attribute.fieldName,
@@ -64,12 +74,123 @@ const getFilters = async (search = {}) => {
       options
     });
   }
+  return filters;
+};
+
+const getProjectFields = async (search, user) => {
+  const groupedSearch = modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projectFieldEntries->project_field_entry_count'}});
+
+  const response = await ProjectField.findAll({
+    attributes: [
+      [literal(`projectField.id`), 'id'],
+      [literal(`projectField.name`), 'name'],
+      [literal(`projectField.type`), 'type'],
+      [literal(`projectFieldEntries.value`), 'value'],
+      // [literal('COUNT(`projectFieldEntries->project_field_entry_count`.value)'), 'count']
+    ],
+    group: [
+      `projectField.id`,
+      `projectField.name`,
+      `projectField.type`,
+      `projectFieldEntries.value`
+    ],
+    raw: true,
+    includeIgnoreAttributes: false,
+    include: [
+      {
+        model: ProjectFieldEntry,
+        include: [
+          {
+            model: ProjectFieldEntry,
+            // where: {
+            //   [Op.and]: groupedSearch.projectField
+            // },
+            required: false,
+            as: 'project_field_entry_count',
+            include: [
+              {
+                model: Project,
+                required: true,
+                where: groupedSearch.project,
+                include: [
+                  {
+                    model: Milestone,
+                    include: { all: true, nested: true },
+                    required: true,
+                    where: groupedSearch.milestone
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            model: ProjectField,
+            required: true
+          },
+          {
+            model: Project,
+            required: true,
+            include: [{
+              model: Department,
+              required: true,
+              include: [{
+                model: User,
+                required: true,
+                where: {
+                  id: user.id
+                }
+              }]
+            }]
+          }
+        ]
+      }
+    ]
+  });
+
+  return response.reduce((fields, item) => {
+    const exsistingField = fields.find(field => field.name === item.name);
+    const value = modelUtils.parseFieldEntryValue(item.value, item.type);
+
+    if(!exsistingField) {
+      fields.push({
+        id: JSON.stringify({
+          path: 'projects->ProjectFieldEntryFilter',
+          id: item.id
+        }),
+        name: item.name,
+        options: [{
+          count: item.count,
+          value
+        }]
+      });
+    } else {
+      exsistingField.options.push({
+        count: item.count,
+        value
+      });
+    }
+
+    return fields;
+  }, []);
+};
+
+const getFilters = async (search = {}, user) => {
+  const filters = await getProjectCoreFields(search, user);
+
+  const projectFields = await getProjectFields(search, user);
+  filters.push(...projectFields);
+
+  filters.forEach(filter => {
+    filter.options = filter.options.sort((a,b) => {
+      return a.value > b.value;
+    });
+  });
 
   return filters;
 };
 
 module.exports = {
   getFiltersWithCounts,
-  applyDefaultOptions,
+  getProjectCoreFields,
   getFilters
 };

@@ -1,8 +1,8 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const xlsx = require('services/xlsx');
-const Projects = require('models/projects');
-const Milestones = require('models/milestones');
+const Projects = require('models/project');
+const Milestones = require('models/milestone');
 const fileUpload = require('express-fileupload');
 const flash = require('middleware/flash');
 const authentication = require('services/authentication');

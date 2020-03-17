@@ -10,13 +10,53 @@
 
 {% block content %}
 
-{{ projects() | await | dump }}
+{% for project in projects() | await %}
+
+  Project:
+  ================
+
+  <br>
+
+  {% for field in project.fields %}
+
+    {{ field.name }}: {{ field.value }}<br>
+
+  {% endfor %}
+
+  <br><br>
+
+  Milestones:
+  ================
+
+  <br>
+  {% for milestone in project.milestones %}
+
+    {% for field in milestone.fields %}
+
+      {{ field.name }}: {{ field.value }}<br>
+
+    {% endfor %}
+
+    <br><br>
+
+  {% endfor %}
+
+  <br><br><br>
+
+{% endfor %}
 
 <br><br><br>
+
+{{ filters() | await | dump }} <br><br>
 
 {{ data.filters | dump }}
 
 <form action="{{ url }}" method="post">
+
+  <label for="date">Date :</label><br>
+  <input type="text" name="filters[date][]" value="{{ data.filters.date[0] }}"><br>
+  <input type="text" name="filters[date][]" value="{{ data.filters.date[1] }}"><br><br>
+
   {% for filter in filters() | await %}
     <label for="{{ filter.name }}">{{ filter.name }} :</label><br>
     {% for option in filter.options %}
@@ -32,8 +72,13 @@
   <input type="submit" value="Submit">
 </form>
 
-<form action="{{ url }}" method="post">
 
+{% endblock %}
+{% block spare %}
+
+
+
+<form action="{{ url }}" method="post">
 
   {% for filter in filters() | await %}
     <label for="{{ filter.name }}">{{ filter.name }} :</label><br>
@@ -91,5 +136,4 @@
 
   <input type="submit" value="Submit">
 </form>
-
 {% endblock %}

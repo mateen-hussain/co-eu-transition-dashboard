@@ -7,8 +7,8 @@
     html: "For example, " + fromDate
   },
     id: "fromDate",
-    name: "filters[milestones][due_date][]",
-    value: data.filters.milestones.due_date[0] 
+    name: "filters[date][]",
+    value: data.filters.date[0]
 }) }}
 {{ govukInput({
   label: {
@@ -19,6 +19,6 @@
     text: "For example, " + toDate
   },
     id: "toDate",
-    name: "filters[milestones][due_date][]",
-    value: data.filters.milestones.due_date[1]
+    name: "filters[date][]",
+    value: data.filters.date[1]
 }) }}

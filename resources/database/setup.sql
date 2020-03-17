@@ -6,8 +6,8 @@
 # https://github.com/sequelpro/sequelpro
 #
 # Host: 127.0.0.1 (MySQL 5.7.29)
-# Database: dashboard
-# Generation Time: 2020-02-28 14:46:44 +0000
+# Database: co_transition_dashboard
+# Generation Time: 2020-03-11 12:15:56 +0000
 # ************************************************************
 
 
@@ -20,109 +20,450 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-# Dump of table projects
+# Dump of table department
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `projects`;
+DROP TABLE IF EXISTS `department`;
 
-CREATE TABLE `projects` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `project_name` text NOT NULL,
-  `department` text NOT NULL,
-  `impact` int(11) DEFAULT NULL,
-  `hmg_confidence` int(11) DEFAULT NULL,
-  `citizen_readiness` int(11) DEFAULT NULL,
-  `business_readiness` int(11) DEFAULT NULL,
-  `eu_state_confidence` int(11) DEFAULT NULL,
-  `createdAt` date DEFAULT NULL,
-  `updatedAt` date DEFAULT NULL,
-  `status` text DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `department` (
+  `name` varchar(10) NOT NULL,
+  PRIMARY KEY (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `projects` WRITE;
-/*!40000 ALTER TABLE `projects` DISABLE KEYS */;
+LOCK TABLES `department` WRITE;
+/*!40000 ALTER TABLE `department` DISABLE KEYS */;
 
-INSERT INTO `projects` (`project_name`, `department`, `impact`, `hmg_confidence`, `citizen_readiness`, `business_readiness`, `eu_state_confidence`, `status`)
+INSERT INTO `department` (`name`)
 VALUES
-  ('GB-SEM BEIS Electricity trading and operation of SEM','BEIS',0,0,0,0,0, 'Project complete'),
-  ('Animal and Plant Health - Imports of Animal and Animal Products (Initial)','DEFRA',0,1,0,2,3, 'Project complete'),
-  ('Government secured freight capacity','DFT',0,1,1,1,1, NULL),
-  ('Trade Remedies','DIT',0,1,1,1,1, 'Project complete'),
-  ('GB-SEM 2','BEIS',1,1,0,0,0, NULL),
-  ('GB-SEM 3','BEIS',0,2,0,3,0, NULL),
-  ('GB-SEM 4','BEIS',1,0,1,0,0, NULL),
-  ('GB-SEM 5','BEIS',1,0,0,2,0, NULL),
-  ('GB-SEM 6','BEIS',0,2,2,0,0, NULL),
-  ('GB-SEM 7','BEIS',0,0,1,1,1, NULL),
-  ('GB-SEM 8','BEIS',0,1,2,3,0, NULL);
+  ('DFT'),
+  ('DIT'),
+  ('BEIS');
 
-/*!40000 ALTER TABLE `projects` ENABLE KEYS */;
+/*!40000 ALTER TABLE `department` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
-# Dump of table milestones
+# Dump of table department_user
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `milestones`;
+DROP TABLE IF EXISTS `department_user`;
 
-CREATE TABLE `milestones` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `milestone_uid` text NOT NULL,
-  `description` text NOT NULL,
-  `due_date` date DEFAULT NULL,
-  `last_comment` text NOT NULL,
-  `projectId` int(11) DEFAULT NULL,
-  `createdAt` date DEFAULT NULL,
-  `updatedAt` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `department_user` (
+  `department_name` varchar(10) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  KEY `fk_department_user_department` (`department_name`),
+  KEY `fk_department_user_user_idx` (`user_id`),
+  CONSTRAINT `fk_department_user_department` FOREIGN KEY (`department_name`) REFERENCES `department` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `milestones` WRITE;
-/*!40000 ALTER TABLE `milestones` DISABLE KEYS */;
+LOCK TABLES `department_user` WRITE;
+/*!40000 ALTER TABLE `department_user` DISABLE KEYS */;
 
-INSERT INTO `milestones` (`milestone_uid`, `description`, `due_date`, `last_comment`, `projectId`)
+INSERT INTO `department_user` (`department_name`, `user_id`)
 VALUES
-  ('BEIS-37-M01','BEIS to publish government response to consultation on Future of UK carbon pricing to set out what carbon pricing policy framework the UK intends to implement to help achieve our carbon emissions reduction targets','2020-01-31','Latest comment about the status of this milestone and the activities that have been completed should go in this text area.',1),
-  ('BEIS-37-M02','BEIS to publish government response to consultation on Future of UK carbon pricing to set out what carbon pricing policy framework the UK intends to implement to help achieve our carbon emissions reduction targets','2020-02-28','Latest comment about the status of this milestone and the activities that have been completed should go in this text area.',1),
-  ('DEFRA-02-M01','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-10-21','Lorem ipsum dolor sit amet, consectetur adipiscing elit',1),
-  ('DEFRA-02-M02','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-08-22','Lorem ipsum dolor sit amet, consectetur adipiscing elit',1),
-  ('DEFRA-02-M03','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-06-02','Lorem ipsum dolor sit amet, consectetur adipiscing elit',2),
-  ('DFT-37-M01','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-05-10','Lorem ipsum dolor sit amet, consectetur adipiscing elit',2),
-  ('DFT-37-M01','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-05-14','Lorem ipsum dolor sit amet, consectetur adipiscing elit',2),
-  ('DIT-37-M01','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-06-1','Lorem ipsum dolor sit amet, consectetur adipiscing elit',3),
-  ('BEIS-37-M01','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-06-5','Lorem ipsum dolor sit amet, consectetur adipiscing elit',4),
-  ('BEIS-37-M01','Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','2020-05-17','Lorem ipsum dolor sit amet, consectetur adipiscing elit',5);
+  ('DIT',1),
+  ('DFT',2),
+  ('BEIS',3),
+  ('DIT',4),
+  ('DFT',4),
+  ('BEIS',4),
+  ('DIT',5),
+  ('DFT',5),
+  ('BEIS',5);
 
-/*!40000 ALTER TABLE `milestones` ENABLE KEYS */;
+/*!40000 ALTER TABLE `department_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
-# Dump of table users
+
+
+
+# Dump of table project
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `project`;
 
-CREATE TABLE `users` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` text NOT NULL,
-  `email` text NOT NULL,
-  `password` text NOT NULL,
-  `createdAt` date DEFAULT NULL,
-  `updatedAt` date DEFAULT NULL,
-  `role` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `project` (
+  `uid` varchar(32) NOT NULL,
+  `department_name` varchar(10) NOT NULL,
+  `issue` varchar(1024) DEFAULT NULL,
+  `impact` int(10) unsigned DEFAULT NULL,
+  `is_completed` tinyint(4) DEFAULT NULL,
+  `sro` varchar(256) DEFAULT NULL,
+  `description` text,
+  `created_at` date DEFAULT NULL,
+  `updated_at` date DEFAULT NULL,
+  PRIMARY KEY (`uid`),
+  KEY `fk_project_department_idx` (`department_name`),
+  CONSTRAINT `fk_project_department` FOREIGN KEY (`department_name`) REFERENCES `department` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+LOCK TABLES `project` WRITE;
+/*!40000 ALTER TABLE `project` DISABLE KEYS */;
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `createdAt`, `updatedAt`, `role`)
+INSERT INTO `project` (`uid`, `department_name`, `issue`, `impact`, `is_completed`, `sro`, `description`, `created_at`, `updated_at`)
 VALUES
-  (1,'User','user@email.com','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.',NULL,NULL,'user'),
-  (2,'Admin','admin@email.com','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.',NULL,NULL,'admin');
+  ('Project 1','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 2','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 3','DFT','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 4','DFT','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 5','DFT','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 6','DIT','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 7','DIT','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 8','DIT','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 9','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL),
+  ('Project 10','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL);
 
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+/*!40000 ALTER TABLE `project` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+# Dump of table project_field
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `project_field`;
+
+CREATE TABLE `project_field` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `type` enum('string','boolean','integer','float','group') DEFAULT NULL,
+  `is_active` tinyint(4) DEFAULT NULL,
+  `is_required` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `project_field` WRITE;
+/*!40000 ALTER TABLE `project_field` DISABLE KEYS */;
+
+INSERT INTO `project_field` (`id`, `name`, `type`, `is_active`, `is_required`)
+VALUES
+  (1,'HMG Confidence','integer',1,NULL),
+  (2,'Citizen Readiness','integer',1,NULL),
+  (3,'Business Readiness','integer',1,NULL),
+  (4,'EU State Readiness','integer',1,NULL);
+
+/*!40000 ALTER TABLE `project_field` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table project_field_entry
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `project_field_entry`;
+
+CREATE TABLE `project_field_entry` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `project_field_id` int(11) DEFAULT NULL,
+  `project_uid` varchar(32) DEFAULT NULL,
+  `value` blob,
+  `created_at` date DEFAULT NULL,
+  `updated_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `project_field_entry` WRITE;
+/*!40000 ALTER TABLE `project_field_entry` DISABLE KEYS */;
+
+INSERT INTO `project_field_entry` (`project_field_id`, `project_uid`, `value`, `created_at`, `updated_at`)
+VALUES
+  (1,'Project 1',"1",NULL,NULL),
+  (2,'Project 1',X'31',NULL,NULL),
+  (3,'Project 1',X'31',NULL,NULL),
+  (4,'Project 1',X'30',NULL,NULL),
+  (1,'Project 2',X'33',NULL,NULL),
+  (2,'Project 2',X'32',NULL,NULL),
+  (3,'Project 2',X'30',NULL,NULL),
+  (4,'Project 2',X'30',NULL,NULL),
+  (1,'Project 3',X'32',NULL,NULL),
+  (2,'Project 3',X'31',NULL,NULL),
+  (3,'Project 3',X'33',NULL,NULL),
+  (4,'Project 3',X'32',NULL,NULL),
+  (1,'Project 4',X'30',NULL,NULL),
+  (2,'Project 4',X'31',NULL,NULL),
+  (3,'Project 4',X'31',NULL,NULL),
+  (4,'Project 4',X'31',NULL,NULL),
+  (1,'Project 5',X'31',NULL,NULL),
+  (2,'Project 5',X'32',NULL,NULL),
+  (3,'Project 5',X'32',NULL,NULL),
+  (4,'Project 5',X'32',NULL,NULL),
+  (1,'Project 6',X'32',NULL,NULL),
+  (2,'Project 6',X'33',NULL,NULL),
+  (3,'Project 6',X'33',NULL,NULL),
+  (4,'Project 6',X'33',NULL,NULL),
+  (1,'Project 7',X'33',NULL,NULL),
+  (2,'Project 7',X'30',NULL,NULL),
+  (3,'Project 7',X'30',NULL,NULL),
+  (4,'Project 7',X'30',NULL,NULL),
+  (1,'Project 8',X'30',NULL,NULL),
+  (2,'Project 8',X'30',NULL,NULL),
+  (3,'Project 8',X'31',NULL,NULL),
+  (4,'Project 8',X'31',NULL,NULL),
+  (1,'Project 9',X'31',NULL,NULL),
+  (2,'Project 9',X'33',NULL,NULL),
+  (3,'Project 9',X'31',NULL,NULL),
+  (4,'Project 9',X'32',NULL,NULL),
+  (1,'Project 10',X'31',NULL,NULL),
+  (2,'Project 10',X'33',NULL,NULL),
+  (3,'Project 10',X'32',NULL,NULL),
+  (4,'Project 10',X'30',NULL,NULL);
+
+/*!40000 ALTER TABLE `project_field_entry` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table project_field_entry_audit
+# ------------------------------------------------------------
+
+-- DROP TABLE IF EXISTS `project_field_entry_audit`;
+
+-- CREATE TABLE `project_field_entry_audit` (
+--   `project_field_id` int(10) unsigned NOT NULL,
+--   `project_uid` varchar(32) NOT NULL,
+--   `value` blob,
+--   `created_at` timestamp NULL DEFAULT NULL,
+--   `updated_at` timestamp NULL DEFAULT NULL,
+--   `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+--   KEY `fk_project_field_entry_audit_project_field_entry_idx` (`project_field_id`,`project_uid`),
+--   CONSTRAINT `fk_project_field_entry_audit_project_field_entry` FOREIGN KEY (`project_field_id`, `project_uid`) REFERENCES `project_field_entry` (`project_field_id`, `project_uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table project_rag_rating
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `project_rag_rating`;
+
+CREATE TABLE `project_rag_rating` (
+  `rag_rating` varchar(32) NOT NULL,
+  PRIMARY KEY (`rag_rating`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table project_reprofiling_category
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `project_reprofiling_category`;
+
+CREATE TABLE `project_reprofiling_category` (
+  `reprofiling_category` varchar(128) NOT NULL,
+  PRIMARY KEY (`reprofiling_category`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+# Dump of table milestone
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone`;
+
+CREATE TABLE `milestone` (
+  `uid` varchar(32) NOT NULL,
+  `project_uid` varchar(32) NOT NULL,
+  `description` text,
+  `date` date DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`uid`),
+  KEY `fk_milestone_project_idx` (`project_uid`),
+  CONSTRAINT `fk_milestone_project` FOREIGN KEY (`project_uid`) REFERENCES `project` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `milestone` WRITE;
+/*!40000 ALTER TABLE `milestone` DISABLE KEYS */;
+
+INSERT INTO `milestone` (`uid`, `project_uid`, `description`, `date`, `created_at`, `updated_at`)
+VALUES
+  ('Milestone 1','Project 1','description','2020-01-22',NULL,NULL),
+  ('Milestone 12','Project 1','description','2020-01-22',NULL,NULL),
+  ('Milestone 2','Project 2','description','2020-02-22',NULL,NULL),
+  ('Milestone 3','Project 3','description','2020-03-22',NULL,NULL),
+  ('Milestone 4','Project 4','description','2020-04-22',NULL,NULL),
+  ('Milestone 5','Project 5','description','2020-05-22',NULL,NULL),
+  ('Milestone 6','Project 6','description','2020-06-22',NULL,NULL),
+  ('Milestone 7','Project 7','description','2020-07-22',NULL,NULL),
+  ('Milestone 8','Project 8','description','2020-08-22',NULL,NULL),
+  ('Milestone 9','Project 9','description','2020-09-22',NULL,NULL),
+  ('Milestone 11','Project 10','description','2020-10-22',NULL,NULL);
+
+/*!40000 ALTER TABLE `milestone` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table milestone_category
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_category`;
+
+CREATE TABLE `milestone_category` (
+  `category` varchar(32) NOT NULL,
+  PRIMARY KEY (`category`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_complete
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_complete`;
+
+CREATE TABLE `milestone_complete` (
+  `complete` varchar(32) NOT NULL,
+  PRIMARY KEY (`complete`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_department
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_department`;
+
+CREATE TABLE `milestone_department` (
+  `department_name` varchar(10) NOT NULL,
+  `milestone_uid` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`department_name`),
+  KEY `milestone_department_milestone_idx` (`milestone_uid`),
+  CONSTRAINT `milestone_department_department` FOREIGN KEY (`department_name`) REFERENCES `department` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `milestone_department_milestone` FOREIGN KEY (`milestone_uid`) REFERENCES `milestone` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_field
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_field`;
+
+CREATE TABLE `milestone_field` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `type` enum('string','boolean','integer','float','group') DEFAULT NULL,
+  `is_active` tinyint(4) DEFAULT NULL,
+  `is_required` tinyint(4) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_field_entry
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_field_entry`;
+
+CREATE TABLE `milestone_field_entry` (
+  `milestone_field_id` int(10) unsigned NOT NULL,
+  `milestone_uid` varchar(32) NOT NULL,
+  `value` blob,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`milestone_uid`,`milestone_field_id`),
+  KEY `fk_milestone_field_entry_milestone_field_idx` (`milestone_field_id`),
+  CONSTRAINT `fk_milestone_field_entry_milestone` FOREIGN KEY (`milestone_uid`) REFERENCES `milestone` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_milestone_field_entry_milestone_field` FOREIGN KEY (`milestone_field_id`) REFERENCES `milestone_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_field_entry_audit
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_field_entry_audit`;
+
+CREATE TABLE `milestone_field_entry_audit` (
+  `milestone_field_id` int(10) unsigned NOT NULL,
+  `milestone_uid` varchar(32) NOT NULL,
+  `value` blob,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_readiness
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_readiness`;
+
+CREATE TABLE `milestone_readiness` (
+  `readiness` varchar(32) NOT NULL,
+  PRIMARY KEY (`readiness`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table milestone_type
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `milestone_type`;
+
+CREATE TABLE `milestone_type` (
+  `type` varchar(32) NOT NULL,
+  PRIMARY KEY (`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table toolbox_user
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `toolbox_user`;
+
+CREATE TABLE `toolbox_user` (
+  `user_id` int(11) NOT NULL,
+  `can_publish` tinyint(4) DEFAULT '0',
+  `can_admin` tinyint(4) DEFAULT '0',
+  `created_by` varchar(64) DEFAULT NULL,
+  `updated_by` varchar(64) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+# Dump of table user
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user`;
+
+CREATE TABLE `user` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(64) NOT NULL,
+  `last_login_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `hashed_passphrase` varchar(128) DEFAULT NULL,
+  `role` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+
+INSERT INTO `user` (`id`, `email`, `hashed_passphrase`, `role`)
+VALUES
+  (1,'dit_user','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.','user'),
+  (2,'dft_user','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.','user'),
+  (3,'beis_user','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.','user'),
+  (4,'user','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.','user'),
+  (5,'admin','$2a$10$k.4z/V9N1nQQKVQ/92m/xO16dl82R1OsEA.5o5DJADfLBi0wLPbv.','admin');
+
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+# Dump of table user_actions
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `user_actions`;
+
+CREATE TABLE `user_actions` (
+  `user_id` int(11) NOT NULL,
+  `comment` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `fk_department_user_user_idx` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

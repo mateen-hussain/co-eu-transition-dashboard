@@ -22,10 +22,6 @@
 {% include "all-data/partials/filters/date-list.njk" %}
 {% endset %}
 
-{% set tableHeaderHtml %}
-{% include "all-data/partials/data-table/table-header.njk" %}
-{% endset -%}
-
 {% set contentHtml %}
 {% include "all-data/partials/data-table/content.njk" %}
 {% endset -%}
@@ -35,14 +31,15 @@
 {% set sections = [] %}
 {% set summary = [] %}
 {% set filterNames = [] %}
+{% set projectKey = [] %}
+{% set projectValue = [] %}
+{% set projectFields = [] %}
+{% set milestoneKey = [] %}
+{% set milestoneValue = [] %}
+{% set milestoneFields = [] %}
+{% set filterNames = [] %}
+{% set filterTitles = [] %}
 {% set filters = filters() | await %}
-
-{{ sections.push ({
-    heading: {
-      html: tableHeaderHtml
-    }
-  })
-}}
 
  {{ items.push ({
     heading: {
@@ -53,7 +50,7 @@
     }
   })
 }}
-            
+
  {{ summary.push ({
     key: {
       html: "<span class='date-name'>Date</span>"
@@ -68,8 +65,6 @@
 
 {% block content %}
 
-{{ data.filters | dump }}
-
 <h1 class="govuk-heading-xl">{{ index }}</h1>
 
 <div class="govuk-grid-row" id="show">
@@ -78,13 +73,17 @@
 
   {% for filter in filters %}
     {% set filterCheckboxes  %}
-      {% for option in filter.options %}
-        {% if option.value !== null %}
-          {% include "all-data/partials/filters/checkboxes.njk" %}
-        {% endif %}
-      {% endfor %}
+      {% if (filter.options | length != 1) %}
+        {% set filterTitles = (filterTitles.push (filter.name), filterTitles) %}
+        {% for option in filter.options %}
+          {% if option.value !== null %}
+            {% include "all-data/partials/filters/checkboxes.njk" %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
     {% endset -%}
 
+    {% if filter.name in filterTitles %}
        {% set items = (items.push ({
           heading: {
             text: filter.name
@@ -94,8 +93,10 @@
           }
         }), items)
       %}
+    {% endif %}
 
   {% endfor %}
+
 
   <form action="{{ url }}" method="post">
 
@@ -116,39 +117,65 @@
   {% include "all-data/partials/filters/hide-filter-btn.njk" %}
   </div>
 
- {% for data in projects() | await %}
+  {% for project in projects() | await %}
+    {% set projectKey = [] %}
+    {% for field in project.fields %}
+      {% if (field.name == 'Department') and (field.name not in filterTitles) %}
+      {% else %}
+      {% set projectKey = (projectKey.push({text: field.name }), projectKey) %}  
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
 
-  {% set dataRowsHtml  %}
-    {% include "all-data/partials/data-table/data-rows.njk" %}
-  {% endset  %}
+{% set tableHeaderHtml %}
+    {% include "all-data/partials/data-table/table-header.njk" %}
+{% endset -%}
 
-  {% set content = [] %}
+{% set sections = (sections.push ({
+    heading: {
+      html: tableHeaderHtml
+    }
+  }), sections) %}  
 
-  {% for milestone in data.milestones %}
+  {% for project in projects() | await %}
 
-    {% if milestone.due_date < currentDate %}
-      {% set flag = 'red-date' %}
-    {% endif %}
+  {% for field in project.fields %}
 
-    {% set content = (content.push ([
-      {
-        text: milestone.milestone_uid
-      },
-      {
-        text: milestone.description
-      },
-      {
-        html: "<span class=" + flag + ">" + milestone.due_date | date("D MMM YYYY") + "</span>"
-      },
-      {
-        text: milestone.last_comment
-      }]), content)
-    %}
+      {% if (field.name == 'Department') and (field.name not in filterTitles) %}
+      {% else %}
+      {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value + "</span>" }), projectValue) %}  
+      {% endif %}
 
   {% endfor %}
 
-  {% set contentHtml  %}
-    {% include "all-data/partials/data-table/content.njk" %}
+    {% set projectFields = (projectFields.push(projectValue), projectFields) %} 
+
+  {% for milestone in project.milestones %}
+    {% set milestoneValue = [] %}
+    {% set milestoneKey = [] %}
+    {% for field in milestone.fields %}
+
+      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %} 
+
+    {% if (field.name == 'Due Date') and (field.value < currentDate) %}
+      {% set flag = 'red-date' %}
+    {% endif %}
+
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.name == 'Due Date' else 
+      "<span>" + field.value + "</span>" }), milestoneValue) %} 
+
+    {% endfor %}
+
+    {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %} 
+
+    {% set contentHtml  %}
+      {% include "all-data/partials/data-table/content.njk" %}
+    {% endset  %}
+
+  {% endfor %}
+
+  {% set dataRowsHtml  %}
+    {% include "all-data/partials/data-table/data-rows.njk" %}
   {% endset  %}
 
       {% set sections = (sections.push ({
@@ -161,37 +188,40 @@
         }), sections)
       %}
 
-   {% set count = loop.index %}
+    {% set projectFields = [] %}
+    {% set milestoneFields = [] %}
+    {% set projectValue = [] %}
+
+    {% set count = loop.index %}
 
   {% endfor %}
 
   <div>
-  
-  {% for key, items in data.filters.projects %}
-        {% set filterDefinition = getFilter(key, filters) %}
-        {% set filterSummary %}
-          {% for item in items %}
-            <div class="filter-nav">
-              <nav>
-            {% include "all-data/partials/filters/filter-list.njk" %}
-              </nav>
-            </div>
-          {% endfor %}
-        {% endset  %}
-        {% set summary = (summary.push ({
+
+{% for filter in filters %}
+
+    {% set filterSummary  %}
+      {% for option in filter.options %}
+        {% if option.value in data.filters[filter.id] | default([]) %}
+          {% include "all-data/partials/filters/filter-list.njk" %}
+        {% endif %}
+      {% endfor %}
+    {% endset -%}
+
+      {% if filter.name in filterNames %}
+            {% set summary = (summary.push ({
             key: {
-              html: "<span class='filter-name'>" + filterDefinition.name + "</span>"
+              html: "<span class='filter-name'>" + filter.name + "</span>"
             },
             value: {
               html: filterSummary
             }
           }), summary)
         %}
-  {% endfor %}
-
-  {% if (data.filters.projects) or (data.filters.milestones.due_date) %}
-      {% include "all-data/partials/filters/filter-summary.njk" %}
-  {% endif %}
+      {% endif %}
+    {% endfor %}
+  
+    {% include "all-data/partials/filters/filter-summary.njk" %}
 
   </div>
 
@@ -207,14 +237,4 @@
 
 {% endblock %}
 
-{#
-
-<form action="{{ url }}" method="post">
-  <label for="department">Project Name:</label>
-  <input type="text" id="department" name="filters[department][]" value="{{ data.filters.department }}"><br><br>
-  <input type="text" id="department" name="filters[department][]" value="{{ data.filters.department }}"><br><br>
-  <input type="submit" value="Submit">
-</form>
-
-#}
 
