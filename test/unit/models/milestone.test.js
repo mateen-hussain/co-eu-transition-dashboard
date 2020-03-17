@@ -32,7 +32,12 @@ describe('models/milestone', () => {
         type: DATE,
         allowNull: false,
         displayName: 'Due Date'
-      }
+      },
+      comment: {
+        type: STRING,
+        allowNull: false,
+        displayName: 'Latest Comment'
+      },
     });
   });
 
