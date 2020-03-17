@@ -6,6 +6,7 @@
 {% set index = "All project data" %}
 
 {% block head %}
+
   <!--[if !IE 8]><!-->
     <link href="/assets/main.css" media="screen" rel="stylesheet" />
   <!--<![endif]-->
@@ -26,11 +27,22 @@
 {% endblock %}
 
 {% block header %}
-  {{ govukHeader({
-    homepageUrl: "https://www.gov.uk/government/organisations/cabinet-office",
-    serviceName: "Transition Taskforce Dashboard",
-    serviceUrl: "/"
-  }) }}
+<header class="govuk-header " role="banner" data-module="govuk-header">
+  <div class="govuk-header__container govuk-width-container">
+    <div class="govuk-header__logo">
+      <a href="https://www.gov.uk/government/organisations/cabinet-office" class="govuk-header__link govuk-header__link--homepage">
+        <span class="govuk-header__logotype">
+            <image src="/assets/images/logo.png" xlink:href="" class="cabinet-office__logotype-image"></image>
+        </span>
+      </a>
+    </div>
+    <div class="govuk-header__content">
+      <a href="/" class="govuk-header__link govuk-header__link--service-name">
+        Transition Taskforce Dashboard
+      </a>
+    </div>
+  </div>
+</header>
 {% endblock %}
 
 {% block beforeContent %}
