@@ -1,0 +1,51 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: "/"
+}) }}
+{% endblock %}
+
+{% block pageTitle %}Project Details{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+  <h1 class="govuk-heading-xl project-name">Project name</h1>
+  <span class="govuk-caption-xl dept-name">BEIS</span>
+
+{{ govukTabs({
+  items: [
+    {
+      label: "Project description",
+      id: "project-description",
+      panel: {
+        html: ''
+      }
+    },
+    {
+      label: "Project solution",
+      id: "project-solution",
+      panel: {
+        html: ''
+      }
+    },
+    {
+      label: "Contact details",
+      id: "contact-details",
+      panel: {
+        html: ''
+      }
+    }
+  ]
+}) }}
+
+ </div>
+</div>
+
+{% endblock %}

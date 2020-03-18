@@ -11,6 +11,10 @@ span.govuk-accordion__icon {
     pointer-events: all;
 }
 
+a.govuk-link.project-link {
+    pointer-events: all;
+}
+
 button#accordion-table-heading-1 ~ .govuk-accordion__icon {
     display: none;
 }
@@ -188,5 +192,15 @@ span.date-name {
     margin-bottom: -20px;
 }
 
+
+// project details
+
+h1.govuk-heading-xl.project-name {
+    margin-bottom: 0px;
+}
+
+span.govuk-caption-xl.dept-name {
+    margin-bottom: 50px;
+}
 
 
