@@ -43,6 +43,8 @@ class AllData extends Page {
   getFilter(id, filters) {
     return filters.find(filter => filter.id === id);
   }
+
+  
 }
 
 module.exports = AllData;

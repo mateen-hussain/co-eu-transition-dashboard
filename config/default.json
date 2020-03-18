@@ -25,7 +25,8 @@
       "setup": "/login/setup",
       "verified": "/login/verified",
       "verify": "/login/verify"
-    }
+    },
+    "projectDetails": "/project-details"
   },
   "features": {
     "twoFactorAuth": true
