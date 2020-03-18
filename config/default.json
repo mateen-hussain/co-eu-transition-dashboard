@@ -20,6 +20,7 @@
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
-    "authentication": "/login"
+    "authentication": "/login",
+    "impactDefinitions": "/impact-definitions"
   }
 }
