@@ -139,7 +139,7 @@ VALUES
   (1,'HMG Confidence','integer',1,NULL),
   (2,'Citizen Readiness','integer',1,NULL),
   (3,'Business Readiness','integer',1,NULL),
-  (4,'EU State Readiness','integer',1,NULL);
+  (4,'EU Member State Readiness Delivery Confidence','integer',1,NULL);
 
 /*!40000 ALTER TABLE `project_field` ENABLE KEYS */;
 UNLOCK TABLES;

@@ -2,6 +2,7 @@ const { Router } = require('express');
 const path = require('path');
 const jwt = require('services/jwt');
 const { protect } = require('services/authentication');
+const config = require('config');
 
 const notLocals = [
   '_router',
@@ -72,7 +73,7 @@ class Page {
   }
 
   getRequest(req, res) {
-    res.render(this.template, this.locals);
+    res.render(this.template, Object.assign(this.locals, { config } ));
   }
 
   async postRequest(req, res) {

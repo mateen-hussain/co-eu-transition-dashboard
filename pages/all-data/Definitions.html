@@ -1,0 +1,39 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: "/"
+}) }}
+{% endblock %}
+
+{% block pageTitle %}Impact and confidence definitions{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">Impact and confidence definitions</h1>
+
+  <h3 class="govuk-heading-s def-title">Impact</h3>
+  {% include "all-data/partials/definitions/impact.njk" %}
+
+  <h3 class="govuk-heading-s def-title">HMG delivery confidence</h3>
+  {% include "all-data/partials/definitions/confidence.njk" %}
+
+  <h3 class="govuk-heading-s def-title">Citizen readiness</h3>
+  {% include "all-data/partials/definitions/confidence.njk" %}
+
+  <h3 class="govuk-heading-s def-title">Business readiness</h3>
+  {% include "all-data/partials/definitions/confidence.njk" %}
+
+  <h3 class="govuk-heading-s def-title">EU member state delivery confidence</h3>
+  {% include "all-data/partials/definitions/confidence.njk" %}
+
+ </div>
+</div>
+
+{% endblock %}

@@ -8,6 +8,7 @@ const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 const webpackSettings = () => {
   const govUkPath = 'node_modules/govuk-frontend/govuk';
+  const publicPath = 'common';
 
   return {
     mode: 'development',
@@ -18,7 +19,8 @@ const webpackSettings = () => {
       }]),
       new CopyWebpackPlugin([
         { from: path.resolve(govUkPath, 'assets/images'), to: 'images' },
-        { from: path.resolve(govUkPath, 'assets/fonts'), to: 'fonts' }
+        { from: path.resolve(govUkPath, 'assets/fonts'), to: 'fonts' },
+        { from: path.resolve(publicPath, 'images'), to: 'images' }
       ]),
       new webpack.HotModuleReplacementPlugin(),
       new MiniCssExtractPlugin()

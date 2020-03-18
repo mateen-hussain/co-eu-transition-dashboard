@@ -1,0 +1,52 @@
+{{ govukTable({
+  head: [
+    {
+      text: "Icon"
+    },
+    {
+      text: "Definitions"
+    }
+  ],
+  rows: [
+    [
+      {
+        html: "<span class='cell-color-0'>0</span>"
+      },
+      {
+        text: "Very low confidence"
+      }
+    ],
+    [
+      {
+        html: "<span class='cell-color-1'>1</span>"
+      },
+      {
+        text: "Low confidence"
+      }
+    ],
+    [
+      {
+        html: "<span class='cell-color-2'>2</span>"
+      },
+      {
+        text: "Medium confidence"
+      }
+    ],
+    [
+      {
+        html: "<span class='cell-color-3'>3</span>"
+      },
+      {
+        text: "High confidence"
+      }
+    ],
+    [
+      {
+        text: "N/A"
+      },
+      {
+        text: "No confidence level given"
+      }
+    ]
+  ]
+}) }}
