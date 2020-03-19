@@ -9,6 +9,8 @@ const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
+const ProjectDetails = require('./projectDetails');
+
 
 class User extends Model {
   async getProjects (search) {
@@ -51,13 +53,12 @@ class User extends Model {
   }
 
   async getProject () {
-    const groupedSearch = modelUtils.groupSearchItems({ date: [ '01/01/2020', '01/01/2021' ], uid: [ 'Project 1' ] },
-    { date: [ '01/01/2020', '01/01/2021' ], uid: [ 'Project 1' ] });
+    const groupedSearch = modelUtils.groupSearchItems({ uid: [ 'Project 1' ] });
 
     const departments = await this.getDepartments({
       attributes: [],
       include: [{
-        model: Project,
+        model: ProjectDetails,
         where: groupedSearch.project,
         include: [
           {

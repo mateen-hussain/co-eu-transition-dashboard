@@ -1,0 +1,25 @@
+{{ govukTabs({
+  items: [
+    {
+      label: "Project description",
+      id: "project-description",
+      panel: {
+        html: "<p class='govuk-body'>" + projectDescription + "</p>"
+      }
+    },
+    {
+      label: "Project solution",
+      id: "project-solution",
+      panel: {
+        html: ''
+      }
+    },
+    {
+      label: "Contact details",
+      id: "contact-details",
+      panel: {
+        html: contactTable
+      }
+    }
+  ]
+}) }}

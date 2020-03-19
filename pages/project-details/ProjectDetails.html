@@ -11,6 +11,8 @@
 {% set milestoneFields = [] %}
 {% set projectName = '' %}
 {% set department = '' %}
+{% set projectDescription = '' %}
+{% set SROname = '' %}
 {% set cellBlock = "cell-color-"  %}
 {% set flag = '' %}
 
@@ -20,15 +22,19 @@
 
       {% if (field.name == 'Department') %}
         {% set department = field.value  %}
+      {% elif (field.name == 'Description') %}
+        {% set projectDescription = field.value  %}
+      {% elif (field.name == 'SRO Name') %}
+        {% set SROname = field.value  %}
       {% else %}
       {% set projectKey = (projectKey.push({text: field.name }), projectKey) %}
       {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value + "</span>" }), projectValue) %}
 
-        {% if (field.name == 'Project Name') %}
-          {% set projectName = field.value  %}
-        {% endif %}
+      {% if (field.name == 'Project Name') %}
+        {% set projectName = field.value  %}
       {% endif %}
 
+      {% endif %}
     {% endfor %}
 
     {% for milestone in project.milestones %}
@@ -51,11 +57,7 @@
 {% endfor %}
 
 {% set milestonesHtml %}
-  {{ govukTable({
-    classes: "milestones-table",
-    head: milestoneKey,
-    rows: milestoneFields
-  }) }}
+ {% include "project-details/partials/milestones-table.njk" %}
 {% endset %}
 
 {% block beforeContent %}
@@ -75,78 +77,17 @@
   <h1 class="govuk-heading-xl project-name">{{ projectName }}</h1>
   <span class="govuk-caption-xl dept-name">{{ department }}</span>
 
-{{ govukTabs({
-  items: [
-    {
-      label: "Project description",
-      id: "project-description",
-      panel: {
-        html: ''
-      }
-    },
-    {
-      label: "Project solution",
-      id: "project-solution",
-      panel: {
-        html: ''
-      }
-    },
-    {
-      label: "Contact details",
-      id: "contact-details",
-      panel: {
-        html: ''
-      }
-    }
-  ]
-}) }}
+{% set contactTable %}
+{% include "project-details/partials/contact-table.njk" %}
+{% endset %}
 
-{{ govukTable({
-  head: projectKey,
-  rows: [
-    projectValue
-  ]
-}) }}
+{% include "project-details/partials/project-tabs.njk" %}
 
-<a class="govuk-link" href="{{ url }}">View impact and confidence definitions</a>
+{% include "project-details/partials/project-table.njk" %}
 
-{{ govukAccordion({
-  id: "accordion-default",
-  items: [
-    {
-      heading: {
-        text: "Missed milestones"
-      },
-      content: {
-        html: milestonesHtml
-      }
-    },
-    {
-      heading: {
-        text: "Writing well for specialists"
-      },
-      content: {
-        html: "<p class='govuk-body'>This is the content for Writing well for specialists.</p>"
-      }
-    },
-      {
-      heading: {
-        text: "Know your audience"
-      },
-      content: {
-        html: "<p class='govuk-body'>This is the content for Know your audience.</p>"
-      }
-    },
-      {
-      heading: {
-        text: "How people read"
-      },
-      content: {
-        html: "<p class='govuk-body'>This is the content for How people read.</p>"
-      }
-    }
-  ]
-}) }}
+<a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
+
+{% include "project-details/partials/accordion-details.njk" %}
 
  </div>
 </div>

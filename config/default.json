@@ -29,6 +29,6 @@
     "projectDetails": "/project-details"
   },
   "features": {
-    "twoFactorAuth": true
+    "twoFactorAuth": false
   }
 }
