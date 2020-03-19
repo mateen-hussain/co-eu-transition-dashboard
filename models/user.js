@@ -49,6 +49,45 @@ class User extends Model {
       return projects;
     }, []);
   }
+
+  async getProject (id) {
+    const groupedSearch = modelUtils.groupSearchItems(id);
+    console.log(groupedSearch)
+
+    const departments = await this.getDepartments({
+      attributes: [],
+      include: [{
+        model: Project,
+        where: groupedSearch.id,
+        include: [
+          {
+            model: Milestone,
+            include: { all: true, nested: true },
+            required: true,
+            where: groupedSearch.milestone
+          },
+          {
+            model: ProjectFieldEntry,
+            include: ProjectField
+          },
+          {
+            required: true,
+            as: 'ProjectFieldEntryFilter',
+            attributes: [],
+            model: ProjectFieldEntry,
+            where: {
+              [Op.and]: groupedSearch.projectField
+            }
+          }
+        ]
+       }]
+    });
+
+    return departments.reduce((projects, department) => {
+      projects.push(...department.get('projects'));
+      return projects;
+    }, []);
+  }
 }
 
 User.init({
