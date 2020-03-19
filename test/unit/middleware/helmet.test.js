@@ -35,6 +35,7 @@ describe('middleware/helmet', () => {
           ],
           imgSrc: [
             '\'self\'',
+            '\'self\' data:',
             'www.google-analytics.com'
           ]
         }

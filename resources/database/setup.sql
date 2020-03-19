@@ -432,6 +432,7 @@ CREATE TABLE `user` (
   `last_login_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `hashed_passphrase` varchar(128) DEFAULT NULL,
   `role` varchar(64) DEFAULT NULL,
+  `twofa_secret` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

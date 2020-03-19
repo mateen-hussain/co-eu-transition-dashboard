@@ -1,0 +1,25 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<h1 class="govuk-heading-xl">Verify Google Authenticator</h1>
+
+<p class="govuk-body">Enter a code from Google Authenticator</p>
+
+<form action="{{ paths.verify }}" method="post">
+
+  {{ govukInput({
+  label: {
+    html: "<strong>6-digit code</strong>"
+  },
+  classes: "govuk-input--width-20",
+  id: "sixDigit",
+  name: "sixDigit"
+  }) }}
+
+  {{ govukButton({
+  text: "Verify",
+  type: "submit",
+  preventDoubleClick: true
+  }) }}
+
+</form>

@@ -7,10 +7,16 @@
 
 {% block content %}
 
-<form action="{{ url }}/login" method="post">
-  <input type="text" name="email" placeholder="Email address">
-  <input type="password" name="password" placeholder="Email address">
-  <input type="submit" value="Submit">
-</form>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {% if flash %}
+      <p>{{ flash }}</p>
+    {% endif %}
+
+    {% include "authentication/partials/" + mode + ".njk" %}
+
+ </div>
+</div>
 
 {% endblock %}

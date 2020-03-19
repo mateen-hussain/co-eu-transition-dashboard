@@ -58,7 +58,8 @@ User.init({
   last_login_at: DATE,
   role: {
     type: ENUM('admin', 'user')
-  }
+  },
+  twofa_secret: STRING(128)
 }, { sequelize, modelName: 'user', tableName: 'user', timestamps: false });
 
 User.belongsToMany(Department, { through: DepartmentUser, foreignKey: 'user_id' });

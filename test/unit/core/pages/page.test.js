@@ -18,10 +18,6 @@ describe('core/pages/page', () => {
     jwt.saveData.restore();
   });
 
-  it('#requireAuth', () => {
-    expect(page.requireAuth).to.eql(true);
-  });
-
   it('#router', () => {
     expect(page.router.constructor.name).to.eql('Function');
   });
@@ -63,6 +59,8 @@ describe('core/pages/page', () => {
     it('deeply removes nulls from body', async () => {
       const res = { redirect: sinon.stub() };
       const req = { body: { foo: 'test', bar: { a: undefined, b: '', c: 'some data' }, baz: undefined } };
+      page.res = res;
+      page.req = req;
 
       await page.postRequest(req, res);
 

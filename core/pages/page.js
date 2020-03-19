@@ -19,6 +19,23 @@ const notLocals = [
 
 const notDefined = val => typeof val === 'undefined' || val === null;
 const defined = val => !notDefined(val);
+const removeNulls = (obj) => {
+  var isArray = obj instanceof Array;
+  for (var k in obj){
+    if (obj[k] === null || obj[k] === undefined || (typeof obj[k] === "string" && !obj[k].length)) {
+      if(isArray) {
+        obj.splice(k,1);
+      } else {
+        delete obj[k];
+      }
+    } else if (typeof obj[k] === "object") {
+      obj[k] = removeNulls(obj[k]);
+    } else if (!isNaN(obj[k])) {
+      obj[k] = parseInt(obj[k]);
+    }
+  }
+  return obj;
+}
 
 const allProperties = (obj, arr = []) => {
   if (notDefined(obj)) {
@@ -45,18 +62,8 @@ class Page {
     return '/';
   }
 
-  get requireAuth() {
-    return true;
-  }
-
   get middleware() {
-    const middleware = [];
-
-    if (this.requireAuth) {
-      middleware.push(...protect(['admin', 'user']));
-    }
-
-    return middleware;
+    return [...protect(['admin', 'user'])];
   }
 
   get template() {
@@ -76,28 +83,13 @@ class Page {
     res.render(this.template, Object.assign(this.locals, { config } ));
   }
 
+  saveData(data = {}, keepExistingData) {
+    const _data = { [this.constructor.name]: data };
+    jwt.saveData(this.req, this.res, _data, keepExistingData);
+  }
+
   async postRequest(req, res) {
-    function removeNulls(obj){
-      var isArray = obj instanceof Array;
-      for (var k in obj){
-        if (obj[k] === null || obj[k] === undefined || (typeof obj[k] === "string" && !obj[k].length)) {
-          if(isArray) {
-            obj.splice(k,1);
-          } else {
-            delete obj[k];
-          }
-        } else if (typeof obj[k] === "object") {
-          obj[k] = removeNulls(obj[k]);
-        } else if (!isNaN(obj[k])) {
-          obj[k] = parseInt(obj[k]);
-        }
-      }
-      return obj;
-    }
-
-    const data = { [this.constructor.name]: removeNulls(req.body) };
-
-    jwt.saveData(req, res, data);
+    this.saveData(removeNulls(req.body));
 
     res.redirect(this.url);
   }

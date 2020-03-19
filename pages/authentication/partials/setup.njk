@@ -1,0 +1,14 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<h1 class="govuk-heading-xl">Set up two-factor authentication</h1>
+
+<p class="govuk-body">To use the Transition Taskforce Dashboard, you will need to set up two-factor authentication using the <strong>Google Authenticator</strong> app.</p>
+
+<p class="govuk-body">Google Authenticator is a free two-factor authentication app.</p>
+
+<p class="govuk-body">Download it on your mobile device by searching "Google Authenticator" on the Play Store or App Store.</p>
+
+{{ govukButton({
+  text: "Save and continue",
+  href: paths.authentication.register
+}) }}

@@ -8,5 +8,8 @@
       "database": "MYSQL_DATABASE",
       "port": "MYSQL_PORT"
     }
+  },
+  "features": {
+    "twoFactorAuth": "FEATURE_2FA"
   }
 }
