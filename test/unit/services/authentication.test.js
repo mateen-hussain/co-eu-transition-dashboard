@@ -245,7 +245,7 @@ describe('services/authentication', () => {
 
     beforeEach(() => {
       loginStub = sinon.stub().callsArgWith(2, null);
-      req = { login: loginStub, user };
+      req = { login: loginStub, user, flash: sinon.stub() };
       res = { redirect: sinon.stub() };
 
       passportStub.authenticate.returns(() => {
