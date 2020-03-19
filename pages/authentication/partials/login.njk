@@ -4,6 +4,10 @@
 
 <h1 class="govuk-heading-xl">Sign in to the Transition Taskforce Dashboard</h1>
 
+{% if flash %}
+    {% include "authentication/partials/auth-error.njk" %}
+{% endif %}
+
 <form action="{{ url }}" method="post">
 
   {{ govukInput({

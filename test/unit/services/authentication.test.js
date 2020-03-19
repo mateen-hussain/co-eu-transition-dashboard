@@ -267,7 +267,7 @@ describe('services/authentication', () => {
       authenticatWithJwt(null, user);
 
       sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id, tfa: false });
-      sinon.assert.calledWith(res.redirect, config.paths.authentication.register);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.setup);
     });
 
     it('redirects to login page if error with authenticatWithJwt', () => {

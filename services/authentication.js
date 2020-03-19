@@ -89,6 +89,7 @@ const login = (req, res) => {
   const authenticatWithJwt = (err, user) => {
     if(err || !user) {
       logger.error('Bad authentication');
+      req.flash(`Incorrect username and/or password entered`);
       return res.redirect(config.paths.authentication.login);
     }
 
@@ -106,7 +107,7 @@ const login = (req, res) => {
         if (user.twofa_secret) {
           res.redirect(config.paths.authentication.verify);
         } else {
-          res.redirect(config.paths.authentication.register);
+          res.redirect(config.paths.authentication.setup);
         }
       } else {
         res.redirect(config.paths.allData);
