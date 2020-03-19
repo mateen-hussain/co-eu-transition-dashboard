@@ -1,5 +1,6 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
+const moment = require('moment');
 
 class ProjectDetails extends Page {
   get url() {
@@ -7,7 +8,11 @@ class ProjectDetails extends Page {
   }
 
   async project() {
-    return await this.req.user.getProject('Project 1');
+    return await this.req.user.getProject();
+  }
+
+  get currentDate() {
+    return moment().format();
   }
 }
 

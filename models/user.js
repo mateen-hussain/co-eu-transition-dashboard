@@ -50,15 +50,15 @@ class User extends Model {
     }, []);
   }
 
-  async getProject (id) {
-    const groupedSearch = modelUtils.groupSearchItems(id);
-    console.log(groupedSearch)
+  async getProject () {
+    const groupedSearch = modelUtils.groupSearchItems({ date: [ '01/01/2020', '01/01/2021' ], uid: [ 'Project 1' ] },
+    { date: [ '01/01/2020', '01/01/2021' ], uid: [ 'Project 1' ] });
 
     const departments = await this.getDepartments({
       attributes: [],
       include: [{
         model: Project,
-        where: groupedSearch.id,
+        where: groupedSearch.project,
         include: [
           {
             model: Milestone,
