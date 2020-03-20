@@ -1,9 +1,7 @@
 const { services } = require('config');
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize(services.mysql.database, services.mysql.user, services.mysql.password, {
-  host: services.mysql.host,
-  dialect: 'mysql',
+const sequelize = new Sequelize(services.mysql.uri, {
   logging: false
 });
 

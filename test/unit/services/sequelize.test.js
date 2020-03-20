@@ -8,9 +8,7 @@ describe('services/sequelize', () => {
   });
 
   it('should create a Sequelize instance', () => {
-    sinon.assert.calledWith(Sequelize, services.mysql.database, services.mysql.user, services.mysql.password, {
-      host: services.mysql.host,
-      dialect: 'mysql',
+    sinon.assert.calledWith(Sequelize, services.mysql.uri, {
       logging: false
     });
   });
