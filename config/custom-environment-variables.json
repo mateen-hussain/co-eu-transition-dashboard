@@ -2,11 +2,10 @@
   "env": "NODE_ENV",
   "services": {
     "mysql": {
-      "uri": "DATABASE_URI"
+      "uri": "DATABASE_URL"
     }
   },
-  "port": "PORT"
-}
+  "port": "PORT",
   "features": {
     "twoFactorAuth": "FEATURE_2FA"
   }

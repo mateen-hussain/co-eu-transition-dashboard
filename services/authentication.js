@@ -88,7 +88,7 @@ const protectNo2FA = passport.authenticate('jwt', {
 const login = (req, res) => {
   const authenticatWithJwt = (err, user) => {
     if(err || !user) {
-      logger.error('Bad authentication');
+      logger.error(`Bad authentication: ${err}`);
       req.flash(`Incorrect username and/or password entered`);
       return res.redirect(config.paths.authentication.login);
     }
