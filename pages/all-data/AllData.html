@@ -40,6 +40,7 @@
 {% set filterNames = [] %}
 {% set filterTitles = [] %}
 {% set filters = filters() | await %}
+{% set projects = projects() | await %}
 
  {{ items.push ({
     heading: {
@@ -71,8 +72,10 @@
 
 <div class="govuk-grid-column-one-quarter" id="filterPanel">
 
+  {% for tableFieldId in filtersFields %}
 
-  {% for filter in filters %}
+    {% set filter = getField(filters, tableFieldId) %}
+
     {% set filterCheckboxes  %}
       {% if (filter.options | length != 1) %}
         {% set filterTitles = (filterTitles.push (filter.name), filterTitles) %}
@@ -117,15 +120,7 @@
   {% include "all-data/partials/filters/hide-filter-btn.njk" %}
   </div>
 
-  {% for project in projects() | await %}
-    {% set projectKey = [] %}
-    {% for field in project.fields %}
-      {% if (field.name == 'Department') and (field.name not in filterTitles) %}
-      {% else %}
-      {% set projectKey = (projectKey.push({text: field.name }), projectKey) %}  
-      {% endif %}
-    {% endfor %}
-  {% endfor %}
+  {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }] %}
 
 {% set tableHeaderHtml %}
     {% include "all-data/partials/data-table/table-header.njk" %}
@@ -135,38 +130,36 @@
     heading: {
       html: tableHeaderHtml
     }
-  }), sections) %}  
+  }), sections) %}
 
-  {% for project in projects() | await %}
+  {% for project in projects %}
 
-  {% for field in project.fields %}
+  {% for tableFieldId in tableFields %}
 
-      {% if (field.name == 'Department') and (field.name not in filterTitles) %}
-      {% else %}
-      {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value + "</span>" }), projectValue) %}  
-      {% endif %}
+    {% set field = getField(project.fields, tableFieldId) %}
+    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A')  + "</span>" }), projectValue) %}
 
   {% endfor %}
 
-    {% set projectFields = (projectFields.push(projectValue), projectFields) %} 
+    {% set projectFields = (projectFields.push(projectValue), projectFields) %}
 
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
     {% set milestoneKey = [] %}
     {% for field in milestone.fields %}
 
-      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %} 
+      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %}
 
     {% if (field.name == 'Due Date') and (field.value < currentDate) %}
       {% set flag = 'red-date' %}
     {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.name == 'Due Date' else 
-      "<span>" + field.value + "</span>" }), milestoneValue) %} 
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.type == 'date' else
+      "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
 
     {% endfor %}
 
-    {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %} 
+    {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
 
     {% set contentHtml  %}
       {% include "all-data/partials/data-table/content.njk" %}
@@ -220,7 +213,7 @@
         %}
       {% endif %}
     {% endfor %}
-  
+
     {% include "all-data/partials/filters/filter-summary.njk" %}
 
   </div>
@@ -228,7 +221,7 @@
   <h2 class="govuk-heading-m">{{ count }} Projects displayed</h2>
   <hr>
 
-  <a class="govuk-link" href="{{ url }}/definitions">View impact and confidence definitions</a>
+  <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
   <br><br><br><br><br><br>
 
   {% include "all-data/partials/data-table/table.njk" %}

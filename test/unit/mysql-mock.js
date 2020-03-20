@@ -7,24 +7,23 @@ class Model {}
 
 let s = {};
 
-// beforeEach(() => {
-  Model.init = sinon.stub();
-  Model.hasMany = sinon.stub();
-  Model.belongsTo = sinon.stub();
-  Model.belongsToMany = sinon.stub();
-  Model.findOne = sinon.stub().resolves({});
-  Model.findAll = sinon.stub().resolves([]);
-  Model.rawAttributes = {};
+Model.init = sinon.stub().callsFake(function() {
+  this.hasMany = sinon.stub();
+  this.belongsTo = sinon.stub();
+  this.belongsToMany = sinon.stub();
+  this.findOne = sinon.stub().resolves({});
+  this.findAll = sinon.stub().resolves([]);
+  this.rawAttributes = {};
+});
 
-  s = sinon.stub().returns(Sequelize);
+s = sinon.stub().returns(Sequelize);
 
-  s.STRING = STRING;
-  s.ENUM = ENUM;
-  s.Model = Model;
-  s.DATE = DATE;
-  s.Op = Op;
-  s.literal = literal;
-// });
+s.STRING = STRING;
+s.ENUM = ENUM;
+s.Model = Model;
+s.DATE = DATE;
+s.Op = Op;
+s.literal = literal;
 
 mock('sequelize', s);
 

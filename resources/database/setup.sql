@@ -85,9 +85,8 @@ DROP TABLE IF EXISTS `project`;
 CREATE TABLE `project` (
   `uid` varchar(32) NOT NULL,
   `department_name` varchar(10) NOT NULL,
-  `issue` varchar(1024) DEFAULT NULL,
+  `title` varchar(1024) DEFAULT NULL,
   `impact` int(10) unsigned DEFAULT NULL,
-  `is_completed` tinyint(4) DEFAULT NULL,
   `sro` varchar(256) DEFAULT NULL,
   `description` text,
   `created_at` date DEFAULT NULL,
@@ -100,18 +99,18 @@ CREATE TABLE `project` (
 LOCK TABLES `project` WRITE;
 /*!40000 ALTER TABLE `project` DISABLE KEYS */;
 
-INSERT INTO `project` (`uid`, `department_name`, `issue`, `impact`, `is_completed`, `sro`, `description`, `created_at`, `updated_at`)
+INSERT INTO `project` (`uid`, `department_name`, `title`, `impact`, `sro`, `description`, `created_at`, `updated_at`)
 VALUES
-  ('Project 1','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 2','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 3','DFT','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 4','DFT','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 5','DFT','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 6','DIT','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 7','DIT','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 8','DIT','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 9','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL),
-  ('Project 10','BEIS','issue string',1,NULL,'SRC','description',NULL,NULL);
+  ('Project 1','BEIS','Project 1 title',1,'SRO','description',NULL,NULL),
+  ('Project 2','BEIS','Project 2 title',1,'SRO','description',NULL,NULL),
+  ('Project 3','DFT','Project 3 title',1,'SRO','description',NULL,NULL),
+  ('Project 4','DFT','Project 4 title',1,'SRO','description',NULL,NULL),
+  ('Project 5','DFT','Project 5 title',1,'SRO','description',NULL,NULL),
+  ('Project 6','DIT','Project 6 title',1,'SRO','description',NULL,NULL),
+  ('Project 7','DIT','Project 7 title',1,'SRO','description',NULL,NULL),
+  ('Project 8','DIT','Project 8 title',1,'SRO','description',NULL,NULL),
+  ('Project 9','BEIS','Project 9 title',1,'SRO','description',NULL,NULL),
+  ('Project 10','BEIS','Project 10 title',1,'SRO','description',NULL,NULL);
 
 /*!40000 ALTER TABLE `project` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -125,7 +124,9 @@ DROP TABLE IF EXISTS `project_field`;
 CREATE TABLE `project_field` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
-  `type` enum('string','boolean','integer','float','group') DEFAULT NULL,
+  `displayName` varchar(100) DEFAULT NULL,
+  `type` enum('string','boolean','integer','float','group','date') DEFAULT NULL,
+  `config` JSON NULL,
   `is_active` tinyint(4) DEFAULT NULL,
   `is_required` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -134,12 +135,29 @@ CREATE TABLE `project_field` (
 LOCK TABLES `project_field` WRITE;
 /*!40000 ALTER TABLE `project_field` DISABLE KEYS */;
 
-INSERT INTO `project_field` (`id`, `name`, `type`, `is_active`, `is_required`)
+INSERT INTO `project_field` (`id`, `name`, `displayName`, `type`, `is_active`, `is_required`)
 VALUES
-  (1,'HMG Confidence','integer',1,NULL),
-  (2,'Citizen Readiness','integer',1,NULL),
-  (3,'Business Readiness','integer',1,NULL),
-  (4,'EU Member State Readiness Delivery Confidence','integer',1,NULL);
+  (1,'hmgConfidence','HMG Confidence','integer',1,NULL),
+  (2,'citizenReadiness','Citizen Readiness','integer',1,NULL),
+  (3,'businessReadiness','Business Readiness','integer',1,NULL),
+  (4,'euStateConfidence','EU State Confidence','integer',1,NULL),
+  (6,'solution','Solution','string',1,NULL),
+  (7,'progressStatus','Progress status','string',1,NULL),
+  (8,'deliveryBarriers','Delivery Barriers','string',1,NULL),
+  (9,'deliveryBarriersRationale','Delivery Barriers Rationale','string',1,NULL),
+  (10,'beginDelivery','Begin Delivery','date',1,NULL),
+  (11,'withdrawalAgreement','Withdrawal Agreement','string',1,NULL),
+  (12,'withdrawalAgreementDetails','Withdrawal Agreement - Details','string',1,NULL),
+  (13,'citizenAction','Citizen action','string',1,NULL),
+  (14,'businessAction','Business action','string',1,NULL),
+  (16,'euStatesAction','EU States action','string',1,NULL),
+  (17,'possibleNegotiationOutcomes','Possible negotiation outcomes','string',1,NULL),
+  (18,'baselineDeliveryChange','Baseline delivery change','string',1,NULL),
+  (19,'baselineDeliveryChangeImpact','Baseline delivery change impact','integer',1,NULL),
+  (20,'changeInImpact','Change in impact','integer',1,NULL),
+  (21,'changeStartDate','Change in latest start date','date',1,NULL),
+  (22,'priorityTheme','Priority Theme','string',1,NULL),
+  (24,'hmgDeliveryConfidenceRationale','HMG Delivery Confidence Ration','string',1,NULL);
 
 /*!40000 ALTER TABLE `project_field` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -151,17 +169,16 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `project_field_entry`;
 
 CREATE TABLE `project_field_entry` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `project_field_id` int(11) DEFAULT NULL,
-  `project_uid` varchar(32) DEFAULT NULL,
+  `project_field_id` int(10) unsigned NOT NULL,
+  `project_uid` varchar(32) NOT NULL,
   `value` blob,
-  `created_at` date DEFAULT NULL,
-  `updated_at` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`project_uid`,`project_field_id`),
+  KEY `fk_project_field_entry_project_field_idx` (`project_field_id`),
+  CONSTRAINT `fk_project_field_entry_milestone` FOREIGN KEY (`project_uid`) REFERENCES `project` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_project_field_entry_milestone_field` FOREIGN KEY (`project_field_id`) REFERENCES `project_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-LOCK TABLES `project_field_entry` WRITE;
-/*!40000 ALTER TABLE `project_field_entry` DISABLE KEYS */;
 
 INSERT INTO `project_field_entry` (`project_field_id`, `project_uid`, `value`, `created_at`, `updated_at`)
 VALUES
@@ -336,11 +353,22 @@ DROP TABLE IF EXISTS `milestone_field`;
 CREATE TABLE `milestone_field` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
-  `type` enum('string','boolean','integer','float','group') DEFAULT NULL,
+  `displayName` varchar(100) DEFAULT NULL,
+  `type` enum('string','boolean','integer','float','group','date') DEFAULT NULL,
+  `config` JSON NULL,
   `is_active` tinyint(4) DEFAULT NULL,
   `is_required` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `milestone_field` (`id`, `name`, `displayName`, `type`, `is_active`, `is_required`)
+VALUES
+  (1,'deliveryDate','Delivery Date','date',1,NULL),
+  (2,'complete','Complete','boolean',1,NULL),
+  (3,'deliveryConfidence','Delivery Confidence','integer',1,NULL),
+  (4,'category','Category','string',1,NULL),
+  (5,'reprofiledReason','Reprofiled Reason','string',1,NULL),
+  (6,'comments','Comments','string',1,NULL);
 
 
 
@@ -432,6 +460,7 @@ CREATE TABLE `user` (
   `last_login_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `hashed_passphrase` varchar(128) DEFAULT NULL,
   `role` varchar(64) DEFAULT NULL,
+  `twofa_secret` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

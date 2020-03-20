@@ -7,7 +7,7 @@
     "start": "NODE_PATH=. node server.js",
     "dev": "NODE_PATH=. nodemon server.js",
     "test:lint": "eslint .",
-    "test:unit": "NODE_PATH=. mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'"
+    "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'"
   },
   "nodemonConfig": {
     "ignore": [
@@ -26,6 +26,7 @@
     "glob": "^7.1.6",
     "govuk-frontend": "^3.5.0",
     "helmet": "^3.21.3",
+    "http-status-codes": "^1.4.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
     "mysql2": "^2.1.0",
@@ -35,10 +36,13 @@
     "nunjucks-date-filter": "^0.1.1",
     "nyc": "^15.0.0",
     "passport": "^0.4.1",
+    "passport-2fa-totp": "0.0.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "pg-promise": "^10.4.4",
+    "qrcode": "^1.4.4",
     "sequelize": "^5.21.5",
+    "speakeasy": "^2.0.0",
     "winston": "^3.2.1"
   },
   "devDependencies": {
@@ -91,7 +95,7 @@
       "services/logger.js",
       "middleware/logger.js",
       "pages/filters-example/**/*.js",
-      "pages/admin/import/**/*.js"
+      "pages/admin/**/*.js"
     ]
   }
 }

@@ -13,7 +13,15 @@ class Milestone extends Model {
   }
 
   get fields() {
-    return modelUtils.transformForView(this);
+    const fields = modelUtils.transformForView(this);
+
+    if(this.get('milestoneFieldEntries')){
+      this.get('milestoneFieldEntries').forEach(field => {
+        fields.push(field.fields);
+      });
+    }
+
+    return fields;
   }
 }
 
@@ -38,6 +46,6 @@ Milestone.init({
   }
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestone_uid' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'uid' });
 
 module.exports = Milestone;

@@ -37,7 +37,7 @@ describe('models/milestone', () => {
   });
 
   it('called Milestone.belongsTo with the correct parameters', () => {
-    expect(Milestone.hasMany).to.have.been.calledWith(MilestoneFieldEntry, { foreignKey: 'milestone_uid' });
+    expect(Milestone.hasMany).to.have.been.calledWith(MilestoneFieldEntry, { foreignKey: 'uid' });
   });
 
   it.skip('returns true if attribute exsists in class', () => {

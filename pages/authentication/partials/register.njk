@@ -1,0 +1,14 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<h1 class="govuk-heading-xl">Register the Transition Taskforce Dashboard</h1>
+
+<p class="govuk-body">Open the Google Authenticator app and scan this QR code.</p>
+
+<img src="{{ getQRCode() | await }}" alt="QR Code">
+
+<p class="govuk-body">You will then see a six-digit verification code that you need to enter on the next page.</p>
+
+{{ govukButton({
+  text: "Next",
+  href: paths.authentication.verify
+}) }}

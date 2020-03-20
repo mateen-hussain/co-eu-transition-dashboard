@@ -16,6 +16,17 @@
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
-    "authentication": "/login"
+    "authentication": "/login",
+    "impactDefinitions": "/impact-definitions",
+    "authentication": {
+      "login": "/login",
+      "register": "/login/register",
+      "setup": "/login/setup",
+      "verified": "/login/verified",
+      "verify": "/login/verify"
+    }
+  },
+  "features": {
+    "twoFactorAuth": true
   }
 }

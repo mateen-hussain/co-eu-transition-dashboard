@@ -16,7 +16,8 @@ describe('models/user', () => {
       last_login_at: DATE,
       role: {
         type: ENUM('admin', 'user')
-      }
+      },
+      twofa_secret: STRING(128)
     });
 
     it('called User.belongsToMany with the correct parameters', () => {

@@ -75,7 +75,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'hashed_passphrase', 'role'],
+            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofa_secret'],
             where: { email: user.email },
             raw: true,
             nest: true
@@ -103,7 +103,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'hashed_passphrase', 'role'],
+            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofa_secret'],
             where: { email: user.email },
             raw: true,
             nest: true
@@ -151,7 +151,6 @@ describe('services/authentication', () => {
         await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
         sinon.assert.calledWith(User.findOne, {
-          attributes: ['id', 'role'],
           where: { id: jwtPayload.id }
         });
 
@@ -166,7 +165,6 @@ describe('services/authentication', () => {
         await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
         sinon.assert.calledWith(User.findOne, {
-          attributes: ['id', 'role'],
           where: { id: jwtPayload.id }
         });
 
@@ -181,20 +179,22 @@ describe('services/authentication', () => {
 
       sinon.assert.calledWith(passportStub.authenticate, 'jwt', {
         session: false,
-        failureRedirect: config.paths.authentication
+        failureRedirect: config.paths.authentication.login
       });
 
       expect(middleware[0]).to.eql(passportStub.authenticate());
-      expect(middleware[1].name).to.eql('checkRole');
+      expect(middleware[1].name).to.eql('check2fa');
+      expect(middleware[2].name).to.eql('checkRole');
     });
 
     describe('handle roles', () => {
       it('allows defined role', () => {
         const middleware = authentication.protect(['user']);
         const req = { user: { role: 'user' } };
+        const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
-        middleware[1](req, {}, next);
+        middleware[2](req, res, next);
 
         sinon.assert.called(next);
       });
@@ -204,35 +204,31 @@ describe('services/authentication', () => {
         const req = { user: { role: 'user' } };
         const next = sinon.stub();
 
-        middleware[1](req, {}, next);
+        middleware[2](req, {}, next);
 
         sinon.assert.called(next);
       });
 
       it('redirects to login if no user assigned to req', () => {
         const middleware = authentication.protect(['user']);
-        const req = {};
-        const res = {
-          redirect: sinon.stub()
-        }
+        const req = { };
+        const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
-        middleware[1](req, res, next);
+        middleware[2](req, res, next);
 
-        sinon.assert.calledWith(res.redirect, config.paths.authentication);
+        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
       });
 
       it('redirects to login if user role does not match', () => {
         const middleware = authentication.protect(['admin']);
         const req = { user: { role: 'user' } };
-        const res = {
-          redirect: sinon.stub()
-        }
+        const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
-        middleware[1](req, res, next);
+        middleware[2](req, res, next);
 
-        sinon.assert.calledWith(res.redirect, config.paths.authentication);
+        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
       });
     });
   });
@@ -249,11 +245,11 @@ describe('services/authentication', () => {
 
     beforeEach(() => {
       loginStub = sinon.stub().callsArgWith(2, null);
-      req = { login: loginStub, user };
+      req = { login: loginStub, user, flash: sinon.stub() };
       res = { redirect: sinon.stub() };
 
       passportStub.authenticate.returns(() => {
-        authenticatWithJwt = passportStub.authenticate.getCall(0).args[2];
+        authenticatWithJwt = passportStub.authenticate.getCall(1).args[2];
       });
 
       sinon.stub(jwt, 'saveData').returns();
@@ -265,23 +261,13 @@ describe('services/authentication', () => {
       logger.error.restore();
     });
 
-    it('redirects to all-data page', () => {
+    it('redirects to 2fa register page', () => {
       authentication.login(req, res);
 
       authenticatWithJwt(null, user);
 
-      sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id });
-      sinon.assert.calledWith(res.redirect, config.paths.allData);
-    });
-
-    it('redirects to admin page', () => {
-      req.user.role = 'admin';
-      authentication.login(req, res);
-
-      authenticatWithJwt(null, user);
-
-      sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id });
-      sinon.assert.calledWith(res.redirect, config.paths.admin.import);
+      sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id, tfa: false });
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.setup);
     });
 
     it('redirects to login page if error with authenticatWithJwt', () => {
@@ -291,7 +277,7 @@ describe('services/authentication', () => {
 
       authenticatWithJwt(error);
 
-      sinon.assert.calledWith(res.redirect, config.paths.authentication);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
       sinon.assert.notCalled(jwt.saveData);
     });
 
@@ -303,7 +289,7 @@ describe('services/authentication', () => {
 
       authenticatWithJwt(null, user);
 
-      sinon.assert.calledWith(res.redirect, config.paths.authentication);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
       sinon.assert.notCalled(jwt.saveData);
     });
   });

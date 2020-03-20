@@ -16,6 +16,18 @@ class AllData extends Page {
     };
   }
 
+  get filtersFields() {
+    return ['uid', 'department_name', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+  }
+
+  get tableFields() {
+    return ['uid', 'department_name', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+  }
+
+  getField(fields = [], id) {
+    return fields.find(field => field.id === id);
+  }
+
   async projects() {
     return await this.req.user.getProjects(this.data.filters);
   }

@@ -7,3 +7,7 @@
   },
   "port": "PORT"
 }
+  "features": {
+    "twoFactorAuth": "FEATURE_2FA"
+  }
+}

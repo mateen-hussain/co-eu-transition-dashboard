@@ -6,10 +6,11 @@ const bcrypt = require('bcrypt');
 const User = require('models/user');
 const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
+const speakeasy = require('speakeasy');
 
 const authenticateLogin = (email, password, cb) => {
   return User.findOne({
-    attributes: ['id', 'email', 'hashed_passphrase', 'role'],
+    attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofa_secret'],
     where: {
       email: email
     },
@@ -35,7 +36,6 @@ passport.use(localStrategy);
 
 const authenticateUser = (jwtPayload, cb) => {
   return User.findOne({
-    attributes: ['id', 'role'],
     where: {
       id: jwtPayload.id
     }
@@ -54,29 +54,43 @@ passport.use(jwtStrategy);
 const protect = (roles = []) => {
   const auth = passport.authenticate('jwt', {
     session: false,
-    failureRedirect: config.paths.authentication
+    failureRedirect: config.paths.authentication.login
   });
+
+  const check2fa = (req, res, next) => {
+    const data = jwt.restoreData(req) || {};
+    if(!data.tfa && config.features.twoFactorAuth) {
+      return res.redirect(config.paths.authentication.login);
+    }
+    return next();
+  };
 
   const checkRole = (req, res, next) => {
     if(!req.user) {
-      return res.redirect(config.paths.authentication);
+      return res.redirect(config.paths.authentication.login);
     }
 
     if (!roles.includes(req.user.role)) {
-      return res.redirect(config.paths.authentication);
+      return res.redirect(config.paths.authentication.login);
     }
 
     return next();
   };
 
-  return [auth, checkRole];
+  return [auth, check2fa, checkRole];
 };
+
+const protectNo2FA = passport.authenticate('jwt', {
+  session: false,
+  failureRedirect: config.paths.authentication.login
+});
 
 const login = (req, res) => {
   const authenticatWithJwt = (err, user) => {
     if(err || !user) {
       logger.error('Bad authentication');
-      return res.redirect(config.paths.authentication);
+      req.flash(`Incorrect username and/or password entered`);
+      return res.redirect(config.paths.authentication.login);
     }
 
     req.login(user, {
@@ -84,13 +98,17 @@ const login = (req, res) => {
     }, err => {
       if (err) {
         logger.error(err);
-        return res.redirect(config.paths.authentication);
+        return res.redirect(config.paths.authentication.login);
       }
 
-      jwt.saveData(req, res, { id: user.id });
+      jwt.saveData(req, res, { id: user.id, tfa: false });
 
-      if (req.user.role === 'admin') {
-        res.redirect(config.paths.admin.import);
+      if(config.features.twoFactorAuth) {
+        if (user.twofa_secret) {
+          res.redirect(config.paths.authentication.verify);
+        } else {
+          res.redirect(config.paths.authentication.setup);
+        }
       } else {
         res.redirect(config.paths.allData);
       }
@@ -104,9 +122,19 @@ const login = (req, res) => {
   authenticatWithCredentials(req, res);
 };
 
+const verify2FA = (secret, token) => {
+  return speakeasy.totp.verify({
+    secret,
+    encoding: 'base32',
+    token
+  });
+};
+
 module.exports = {
   login,
   protect,
   authenticateLogin,
-  authenticateUser
+  authenticateUser,
+  protectNo2FA,
+  verify2FA,
 }

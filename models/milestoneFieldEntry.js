@@ -7,30 +7,47 @@ class MilestoneFieldEntry extends Model {
   get fields() {
     const milestoneField = this.get('milestoneField');
     return {
-      id: `milestoneFieldEntry->${milestoneField.id}`,
-      name: milestoneField.name,
-      value: this.get('value')
+      id: milestoneField.name,
+      name: milestoneField.displayName,
+      value: this.get('value'),
+      type: milestoneField.type
     };
   }
 }
 
 MilestoneFieldEntry.init({
-  milestone_field_id: {
+  field_id: {
     type: INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    field: 'milestone_field_id'
   },
-  milestone_uid: {
+  uid: {
     type: STRING(45),
+    primaryKey: true,
+    field: 'milestone_uid'
   },
   value: {
     type: BLOB,
     get() {
-      let value = this.getDataValue('value').toString('utf8');
-      return modelUtils.parseFieldEntryValue(value, this.milestoneField.get('type'))
+      if (!this.getDataValue('value')) return;
+      const value = this.getDataValue('value').toString('utf8');
+      return modelUtils.parseFieldEntryValue(value, this.get('milestoneField').get('type'))
+    },
+    set(value) {
+      if (!this.milestoneField) {
+        return this.setDataValue('value', value)
+      }
+
+      return this.setDataValue('value', value);
+    },
+    validate: {
+      isValid(val) {
+        return modelUtils.validateFieldEntryValue.call(this, val);
+      }
     }
   }
 }, { sequelize, modelName: 'milestoneFieldEntry', tableName: 'milestone_field_entry', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-MilestoneFieldEntry.belongsTo(MilestoneField, { foreignKey: 'milestone_field_id' });
+MilestoneFieldEntry.belongsTo(MilestoneField, { foreignKey: 'field_id' });
 
 module.exports = MilestoneFieldEntry;

@@ -11,7 +11,7 @@ const attach = app => {
       connectSrc: ['\'self\''],
       mediaSrc: ['\'self\''],
       frameSrc: ['\'none\''],
-      imgSrc: ['\'self\'', 'www.google-analytics.com']
+      imgSrc: ['\'self\'', '\'self\' data:', 'www.google-analytics.com']
     }
   }));
 
