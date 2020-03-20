@@ -5,6 +5,10 @@
 
 <p class="govuk-body">Enter a code from Google Authenticator</p>
 
+{% if flash %}
+    {% include "authentication/partials/digit-error.njk" %}
+{% endif %}
+
 <form action="{{ paths.verify }}" method="post">
 
   {{ govukInput({

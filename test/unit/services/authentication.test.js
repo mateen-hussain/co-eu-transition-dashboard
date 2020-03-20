@@ -245,7 +245,7 @@ describe('services/authentication', () => {
 
     beforeEach(() => {
       loginStub = sinon.stub().callsArgWith(2, null);
-      req = { login: loginStub, user };
+      req = { login: loginStub, user, flash: sinon.stub() };
       res = { redirect: sinon.stub() };
 
       passportStub.authenticate.returns(() => {
@@ -267,7 +267,7 @@ describe('services/authentication', () => {
       authenticatWithJwt(null, user);
 
       sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id, tfa: false });
-      sinon.assert.calledWith(res.redirect, config.paths.authentication.register);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.setup);
     });
 
     it('redirects to login page if error with authenticatWithJwt', () => {
