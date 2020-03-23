@@ -110,7 +110,7 @@ table.govuk-table.table-content {
     font-weight: bold;
 }
 
-.govuk-summary-list__row {
+dl.govuk-summary-list.filter-list .govuk-summary-list__row {
     background-color: #f3f2f1;
   }
 
@@ -121,8 +121,12 @@ table.govuk-table.table-content {
     line-height: 1.7em;
 }
 
-.govuk-summary-list__key, .govuk-summary-list__value, .govuk-summary-list__actions {
-    border-bottom: none;
+dl.govuk-summary-list.filter-list .govuk-summary-list__key {
+    border-bottom: 0;
+}
+
+dl.govuk-summary-list.filter-list .govuk-summary-list__value {
+    border-bottom: 0;
 }
 
 ul.govuk-list.govuk-list--bullet.filter-list li {
@@ -130,11 +134,11 @@ ul.govuk-list.govuk-list--bullet.filter-list li {
     line-height: 1.8;
 }
 
-.govuk-summary-list__key {
+dl.govuk-summary-list.filter-list .govuk-summary-list__key {
     width: 15%;
 }
 
-.govuk-summary-list__value:last-child {
+dl.govuk-summary-list.filter-list .govuk-summary-list__value:last-child {
     width: 50%;
 }
 
@@ -159,7 +163,7 @@ div#accordion-filters .govuk-accordion__section-content {
     float: left;
 }
   
-.govuk-summary-list__key, .govuk-summary-list__value, .govuk-summary-list__actions {
+dl.govuk-summary-list.filter-list .govuk-summary-list__key, .govuk-summary-list__value, .govuk-summary-list__actions {
     padding-right: 2px;
     padding-left: 8px;
     display: table-cell;
@@ -192,15 +196,5 @@ span.date-name {
     margin-bottom: -20px;
 }
 
-
-// project details
-
-h1.govuk-heading-xl.project-name {
-    margin-bottom: 0px;
-}
-
-span.govuk-caption-xl.dept-name {
-    margin-bottom: 50px;
-}
 
 

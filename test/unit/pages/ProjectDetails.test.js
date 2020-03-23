@@ -2,6 +2,7 @@ const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const jwt = require('services/jwt');
 const proxyquire = require('proxyquire');
+const moment = require('moment');
 
 let page = {};
 let getProject = {};
@@ -32,6 +33,12 @@ describe('pages/project-details/ProjectDetails', () => {
   describe('#url', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(paths.projectDetails);
+    });
+  });
+
+  describe('#currentDate', () => {
+    it('should return the current date', () => {
+      expect(page.currentDate).to.eql(moment().format());
     });
   });
 

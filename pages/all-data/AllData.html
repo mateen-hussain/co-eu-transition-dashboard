@@ -121,7 +121,7 @@
   </div>
 
   {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }] %}
-  {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Comments' }] %}
+  {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
 
 {% set tableHeaderHtml %}
     {% include "all-data/partials/data-table/table-header.njk" %}
@@ -140,7 +140,7 @@
     {% set field = getField(project.fields, tableFieldId) %}
     {% set projectValue = (projectValue.push({html:
 
-    "<a href=" + config.paths.projectDetailsUrl + '/' + field.value | replace(" ", "%20") + " class='govuk-link project-link'>" + field.value + "</a>"
+    "<a href=" + config.paths.projectDetails | replace(":uid", field.value | replace(" ", "%20"))  + " class='govuk-link project-link'>" + field.value + "</a>"
       if field.name == 'Project Name'
         else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
     }), projectValue) %}
@@ -154,6 +154,7 @@
 
 
     {% for tableFieldId in milestoneTableFields %}
+    {% set flag = '' %}
     {% set field = getField(milestone.fields, tableFieldId) %}
       {% if (field.id == 'date') and (field.value < currentDate) %}
         {% set flag = 'red-date' %}

@@ -3,17 +3,17 @@
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set projectValue = [] %}
 {% set milestoneValue = [] %}
-{% set milestoneKey = [] %}
 {% set milestoneFields = [] %}
 
 {% set cellBlock = "cell-color-"  %}
 {% set flag = '' %}
+{% set missedMilestonesCount = 0 %}
 
 {% set project = project() | await %}
-{% set projectKey = [] %}
 
 {% block beforeContent %}
 {{ govukBackLink({
@@ -26,46 +26,66 @@
 
 {% block content %}
 
+{% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }, { text:'Missed milestones' }] %}
+  {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
+
   {% for tableFieldId in tableFields %}
 
     {% set field = getField(project.fields, tableFieldId) %}
 
-    {% set projectKey = (projectKey.push({ text:field.name }), projectKey) %}
-
-    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value + "</span>" }), projectValue) %}
+    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
 
   {% endfor %}
 
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
-    {% set milestoneKey = [] %}
-    {% for field in milestone.fields %}
-      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %}
+    {% set flag = '' %}
+    {% for tableFieldId in milestoneTableFields %}
+    {% set field = getField(milestone.fields, tableFieldId) %}
 
       {% if (field.name == 'Due Date') and (field.value < currentDate) %}
         {% set flag = 'red-date' %}
+        {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}
 
       {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.name == 'Due Date' else
-      "<span>" + field.value + "</span>" }), milestoneValue) %}
+      "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
 
     {% endfor %}
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
 
   {% endfor %}
 
+{% set projectValue = (projectValue.push({html: "<span>" + missedMilestonesCount + "</span>" }), projectValue) %}
+
 {% set milestonesHtml %}
- {% include "project-details/partials/milestones-table.njk" %}
+ {% include "project-details/partials/accordion-info/milestones-table.njk" %}
+{% endset %}
+
+{% set deliveryStatusHtml %}
+ {% include "project-details/partials/accordion-info/current-delivery-status.njk" %}
+{% endset %}
+
+{% set HMGdeliveryHTML %}
+ {% include "project-details/partials/accordion-info/hmg-delivery.njk" %}
+{% endset %}
+
+{% set citizenReadinessHtml %}
+ {% include "project-details/partials/accordion-info/citizen-readiness.njk" %}
+{% endset %}
+
+{% set businessReadinessHtml %}
+ {% include "project-details/partials/accordion-info/business-readiness.njk" %}
+{% endset %}
+
+{% set EUmemberStateHtml %}
+ {% include "project-details/partials/accordion-info/eu-member-state.njk" %}
 {% endset %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <h1 class="govuk-heading-xl project-name">{{ project.uid }}</h1>
-    <span class="govuk-caption-xl dept-name">{{ project.department_name }}</span>
-
-{% set contactTable %}
-{% include "project-details/partials/contact-table.njk" %}
-{% endset %}
+    <h1 class="govuk-heading-xl" id="project-name">{{ project.uid }}</h1>
+    <span class="govuk-caption-xl" id="dept-name">{{ project.department_name }}</span>
 
 {% include "project-details/partials/project-tabs.njk" %}
 

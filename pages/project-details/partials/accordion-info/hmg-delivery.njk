@@ -1,0 +1,12 @@
+{{ govukSummaryList({
+  rows: [
+    {
+      key: {
+        text: "Rationale"
+      },
+      value: {
+        html: getField(project.fields, 'hmgDeliveryConfidenceRationale').value| default('N/A')
+      }
+    }
+  ]
+}) }}

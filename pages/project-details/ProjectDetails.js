@@ -22,6 +22,10 @@ class ProjectDetails extends Page {
   get currentDate() {
     return moment().format();
   }
+
+  get milestoneTableFields() {
+    return ['uid', 'description', 'date', 'comments'];
+  }
 }
 
 module.exports = ProjectDetails;

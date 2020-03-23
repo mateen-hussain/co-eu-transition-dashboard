@@ -26,7 +26,6 @@
       "verified": "/login/verified",
       "verify": "/login/verify"
     },
-    "projectDetailsUrl": "/project-details",
     "projectDetails": "/project-details/:uid"
   },
   "features": {
