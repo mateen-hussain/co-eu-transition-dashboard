@@ -1,27 +1,26 @@
 const filters = require('helpers/filters');
 const Project = require('models/project');
 const ProjectFieldEntry = require('models/projectFieldEntry');
+const ProjectField = require('models/projectField');
 const { expect, sinon } = require('test/unit/util/chai');
 const sequelize = require('sequelize');
 const Milestone = require('models/milestone');
 const User = require('models/user');
 const Department = require('models/department');
+const modelUtils = require('helpers/models');
 
 describe('helpers/filters', () => {
-  describe.skip('#getFiltersWithCounts', () => {
+  beforeEach(() => {
+    sinon.stub(modelUtils, 'groupSearchItems')
+      .returns({ project: {}, milestone: {}, projectField: [], milestoneField: {} });
+  });
+
+  afterEach(() => {
+    modelUtils.groupSearchItems.restore();
+  });
+
+  describe('#getFiltersWithCounts', () => {
     it('calls Projects.findAll with correct arguments', async () => {
-      const attribute = {
-        fieldName: 'field_name'
-      };
-      const search = {};
-      const user = { id: 1 };
-
-      await filters.getFiltersWithCounts(attribute, search, user);
-
-      return sinon.assert.called(Project.findAll);
-    });
-
-    it('calls Projects.findAll with correct arguments for attribute with counts', async () => {
       const attribute = {
         fieldName: 'field_name'
       };
@@ -47,9 +46,7 @@ describe('helpers/filters', () => {
               as: 'ProjectFieldEntryFilter',
               attributes: [],
               model: ProjectFieldEntry,
-              where: {
-                [sequelize.Op.and]: []
-              }
+              where: []
             }]
           },
           {
@@ -80,7 +77,7 @@ describe('helpers/filters', () => {
     });
   });
 
-  describe.skip('#getProjectCoreFields', () => {
+  describe('#getProjectCoreFields', () => {
     const defaultValue = Project.rawAttributes;
 
     beforeEach(() => {
@@ -94,11 +91,13 @@ describe('helpers/filters', () => {
         name: {
           fieldName: 'name',
           displayName: 'Name',
-          searchable: true
+          searchable: true,
+          type: 'string'
         },
         other: {
           fieldName: 'other',
-          displayName: 'other'
+          displayName: 'other',
+          type: 'string'
         }
       };
 
@@ -129,19 +128,77 @@ describe('helpers/filters', () => {
           { value: 'DEFRA', count: 0 },
           { value: 'DFT', count: 1 },
           { value: 'DIT', count: 1 }
-        ]
+        ],
+        type: 'string'
       }]);
     });
   });
 
-  describe.skip('#getFilters', () => {
+  describe('#getProjectFields', () => {
+    it('searches project field with correct parameters', async () => {
+      const search = {};
+      const user = { id: 1 };
+
+      await filters.getProjectFields(search, user);
+
+      return sinon.assert.calledWith(ProjectField.findAll, {
+        attributes: [
+          [sequelize.literal(`projectField.id`), 'id'],
+          [sequelize.literal(`projectField.name`), 'name'],
+          [sequelize.literal(`projectField.displayName`), 'displayName'],
+          [sequelize.literal(`projectField.type`), 'type'],
+          [sequelize.literal(`projectFieldEntries.value`), 'value']
+        ],
+        group: [
+          `projectField.id`,
+          `projectField.name`,
+          `projectField.displayName`,
+          `projectField.type`,
+          `projectFieldEntries.value`
+        ],
+        raw: true,
+        includeIgnoreAttributes: false,
+        include: [
+          {
+            model: ProjectFieldEntry,
+            include: [
+              {
+                model: ProjectField,
+                required: true
+              },
+              {
+                model: Project,
+                required: true,
+                include: [{
+                  model: Department,
+                  required: true,
+                  include: [{
+                    model: User,
+                    required: true,
+                    where: {
+                      id: user.id
+                    }
+                  }]
+                }]
+              }
+            ]
+          }
+        ]
+      });
+    });
+  });
+
+  describe('#getFilters', () => {
     const defaultValue = Project.rawAttributes;
+    const user = { id: 1 };
 
     beforeEach(() => {
       Project.rawAttributes = {
         name: {
           fieldName: 'name',
-          displayName: 'Name'
+          displayName: 'Name',
+          searchable: true,
+          type: 'string'
         }
       };
 
@@ -150,21 +207,25 @@ describe('helpers/filters', () => {
         { value: 'DEFRA', count: 0 },
         { value: 'DFT', count: 1 },
         { value: 'DIT', count: 1 }
-      ])
+      ]);
+
+      ProjectField.findAll.resolves([]);
     });
 
     afterEach(() => {
       Project.rawAttributes = defaultValue;
       Project.findAll = sinon.stub();
+      ProjectField.findAll = sinon.stub();
     });
 
     it('finds filters with attributes that have a displayName', async () => {
       const search = {};
-      const optionsWithDefaults = await filters.getFilters(search);
+      const optionsWithDefaults = await filters.getFilters(search, user);
 
       expect(optionsWithDefaults).to.eql([{
         id: 'name',
         name: 'Name',
+        type: 'string',
         options: [
           { value: 'BEIS', count: 2 },
           { value: 'DEFRA', count: 0 },
@@ -172,18 +233,6 @@ describe('helpers/filters', () => {
           { value: 'DIT', count: 1 }
         ]
       }]);
-    });
-
-    it('finds filters with attributes without a displayName', async () => {
-      Project.rawAttributes = {
-        name: {
-          fieldName: 'name'
-        }
-      };
-
-      const search = {};
-      const optionsWithDefaults = await filters.getFilters(search);
-      expect(optionsWithDefaults).to.eql([]);
     });
   });
 });

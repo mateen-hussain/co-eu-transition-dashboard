@@ -28,6 +28,65 @@ describe('helpers/models', () => {
     })
   });
 
+  describe('#validateFieldEntryValue', () => {
+    let scope = {};
+    beforeEach(() => {
+      scope.projectField = {
+        type: ''
+      };
+    });
+
+    const tests = [{
+      type: 'boolean',
+      valids: [true, 'true', 'yes', 1, '1', 'y', false, 'false', 'no', 0, '0', 'n'],
+      invalids: ['some string', 1234]
+    },{
+      type: 'integer',
+      valids: [1, 100, '100', '123123.00'],
+      invalids: ['not integer']
+    },{
+      type: 'float',
+      valids: [1.24, '1.24'],
+      invalids: ['not float']
+    },{
+      type: 'date',
+      valids: ['2020-02-20'],
+      invalids: ['not date', '2020-02-50']
+    },{
+      type: 'group',
+      valids: ['foo', 'bar'],
+      invalids: ['baz'],
+      config: {
+        options: ['foo', 'bar']
+      }
+    }];
+
+    tests.forEach(test => {
+      describe(`validates ${test.type}`, () => {
+        beforeEach(() => {
+          scope.projectField.type = test.type;
+          if(test.config) {
+            scope.projectField.config = test.config;
+          }
+        });
+
+        test.valids.forEach(valid => {
+          it(`accepts ${valid}`, () => {
+            scope.projectField.type = test.type;
+            expect(models.validateFieldEntryValue.call(scope, valid)).to.be.ok;
+          });
+        });
+
+        test.invalids.forEach(invalid => {
+
+          it(`rejects ${invalid}`, () => {
+            expect(() => models.validateFieldEntryValue.call(scope, invalid)).to.throw();
+          });
+        });
+      });
+    });
+  });
+
   describe('#parseFieldEntryValue', () => {
     it('parses a true boolean value', () => {
       const type = 'boolean';
