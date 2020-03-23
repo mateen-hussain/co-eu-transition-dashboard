@@ -121,6 +121,7 @@
   </div>
 
   {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }] %}
+  {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Comments' }] %}
 
 {% set tableHeaderHtml %}
     {% include "all-data/partials/data-table/table-header.njk" %}
@@ -137,10 +138,10 @@
   {% for tableFieldId in tableFields %}
 
     {% set field = getField(project.fields, tableFieldId) %}
-    {% set projectValue = (projectValue.push({html: 
-        
-    "<a href=" + config.paths.projectDetailsUrl + '/' + field.value | replace(" ", "%20") + " class='govuk-link project-link'>" + field.value + "</a>" 
-      if field.name == 'Project Name' 
+    {% set projectValue = (projectValue.push({html:
+
+    "<a href=" + config.paths.projectDetailsUrl + '/' + field.value | replace(" ", "%20") + " class='govuk-link project-link'>" + field.value + "</a>"
+      if field.name == 'Project Name'
         else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
     }), projectValue) %}
 
@@ -150,14 +151,13 @@
 
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
-    {% set milestoneKey = [] %}
-    {% for field in milestone.fields %}
 
-      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %}
 
-    {% if (field.name == 'Due Date') and (field.value < currentDate) %}
-      {% set flag = 'red-date' %}
-    {% endif %}
+    {% for tableFieldId in milestoneTableFields %}
+    {% set field = getField(milestone.fields, tableFieldId) %}
+      {% if (field.id == 'date') and (field.value < currentDate) %}
+        {% set flag = 'red-date' %}
+      {% endif %}
 
       {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.type == 'date' else
       "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}

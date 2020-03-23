@@ -8,13 +8,12 @@
 {% set milestoneValue = [] %}
 {% set milestoneKey = [] %}
 {% set milestoneFields = [] %}
-{% set projectName = '' %}
-{% set department = '' %}
-{% set projectDescription = '' %}
-{% set SROname = '' %}
+
 {% set cellBlock = "cell-color-"  %}
 {% set flag = '' %}
-{% set projectKey = [{ text:'Project Name' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }] %}
+
+{% set project = project() | await %}
+{% set projectKey = [] %}
 
 {% block beforeContent %}
 {{ govukBackLink({
@@ -27,44 +26,33 @@
 
 {% block content %}
 
-  {% for project in project() | await %}
   {% for tableFieldId in tableFields %}
 
     {% set field = getField(project.fields, tableFieldId) %}
 
-      {% if (field.name == 'Department') %}
-        {% set department = field.value  %}
-      {% elif (field.name == 'Description') %}
-        {% set projectDescription = field.value  %}
-      {% else %}
+    {% set projectKey = (projectKey.push({ text:field.name }), projectKey) %}
 
-      {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value + "</span>" }), projectValue) %}
+    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value + "</span>" }), projectValue) %}
 
-      {% if (field.name == 'Project Name') %}
-        {% set projectName = field.value  %}
-      {% endif %}
+  {% endfor %}
 
-      {% endif %}
-    {% endfor %}
-
-    {% for milestone in project.milestones %}
+  {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
     {% set milestoneKey = [] %}
     {% for field in milestone.fields %}
-      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %} 
+      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %}
 
       {% if (field.name == 'Due Date') and (field.value < currentDate) %}
         {% set flag = 'red-date' %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.name == 'Due Date' else 
-      "<span>" + field.value + "</span>" }), milestoneValue) %} 
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.name == 'Due Date' else
+      "<span>" + field.value + "</span>" }), milestoneValue) %}
 
     {% endfor %}
-    {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %} 
-  {% endfor %}
+    {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
 
-{% endfor %}
+  {% endfor %}
 
 {% set milestonesHtml %}
  {% include "project-details/partials/milestones-table.njk" %}
@@ -72,9 +60,8 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-
-  <h1 class="govuk-heading-xl project-name">{{ projectName }}</h1>
-  <span class="govuk-caption-xl dept-name">{{ department }}</span>
+    <h1 class="govuk-heading-xl project-name">{{ project.uid }}</h1>
+    <span class="govuk-caption-xl dept-name">{{ project.department_name }}</span>
 
 {% set contactTable %}
 {% include "project-details/partials/contact-table.njk" %}

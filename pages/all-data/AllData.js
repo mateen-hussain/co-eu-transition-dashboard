@@ -24,6 +24,10 @@ class AllData extends Page {
     return ['uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
+  get milestoneTableFields() {
+    return ['uid', 'description', 'date', 'comments'];
+  }
+
   getField(fields = [], id) {
     return fields.find(field => field.id === id);
   }
@@ -44,7 +48,7 @@ class AllData extends Page {
     return filters.find(filter => filter.id === id);
   }
 
-  
+
 }
 
 module.exports = AllData;

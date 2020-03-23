@@ -4,21 +4,21 @@
       label: "Project description",
       id: "project-description",
       panel: {
-        html: "<p class='govuk-body'>" + projectDescription + "</p>"
+        html: "<p class='govuk-body'>" + project.description| default('N/A') + "</p>"
       }
     },
     {
       label: "Project solution",
       id: "project-solution",
       panel: {
-        html: ''
+        html: "<p class='govuk-body'>" + getField(project.fields, 'solution').value| default('N/A') + "</p>"
       }
     },
     {
       label: "Contact details",
       id: "contact-details",
       panel: {
-        html: contactTable
+        html: "<p class='govuk-body'>" + project.sro| default('N/A') + "</p>"
       }
     }
   ]

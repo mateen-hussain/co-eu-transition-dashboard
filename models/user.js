@@ -9,8 +9,6 @@ const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
-const ProjectDetails = require('./projectDetails');
-
 
 class User extends Model {
   async getProjects (search) {
@@ -58,34 +56,28 @@ class User extends Model {
     const departments = await this.getDepartments({
       attributes: [],
       include: [{
-        model: ProjectDetails,
+        model: Project,
         where: groupedSearch.project,
         include: [
           {
             model: Milestone,
             include: { all: true, nested: true },
-            required: true,
-            where: groupedSearch.milestone
+            required: true
           },
           {
             model: ProjectFieldEntry,
             include: ProjectField
-          },
-          {
-            required: true,
-            as: 'ProjectFieldEntryFilter',
-            attributes: [],
-            model: ProjectFieldEntry,
-            where: groupedSearch.projectField
           }
         ]
        }]
     });
 
-    return departments.reduce((projects, department) => {
+    const projects = departments.reduce((projects, department) => {
       projects.push(...department.get('projects'));
       return projects;
     }, []);
+
+    return projects.length ? projects[0] : undefined;
   }
 }
 

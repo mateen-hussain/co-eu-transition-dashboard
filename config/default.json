@@ -30,6 +30,6 @@
     "projectDetails": "/project-details/:uid"
   },
   "features": {
-    "twoFactorAuth": false
+    "twoFactorAuth": true
   }
 }
