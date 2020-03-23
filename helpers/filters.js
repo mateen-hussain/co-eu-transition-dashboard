@@ -77,16 +77,13 @@ const getProjectCoreFields = async (search, user) => {
 };
 
 const getProjectFields = async (search, user) => {
-  // const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projectFieldEntries->project_field_entry_count'}});
-
   const response = await ProjectField.findAll({
     attributes: [
       [literal(`projectField.id`), 'id'],
       [literal(`projectField.name`), 'name'],
       [literal(`projectField.displayName`), 'displayName'],
       [literal(`projectField.type`), 'type'],
-      [literal(`projectFieldEntries.value`), 'value'],
-      // [literal('COUNT(`projectFieldEntries->project_field_entry_count`.value)'), 'count']
+      [literal(`projectFieldEntries.value`), 'value']
     ],
     group: [
       `projectField.id`,
@@ -101,29 +98,6 @@ const getProjectFields = async (search, user) => {
       {
         model: ProjectFieldEntry,
         include: [
-          // {
-          //   model: ProjectFieldEntry,
-          //   // where: {
-          //   //   [Op.and]: groupedSearch.projectField
-          //   // },
-          //   required: false,
-          //   as: 'project_field_entry_count',
-          //   include: [
-          //     {
-          //       model: Project,
-          //       required: true,
-          //       where: groupedSearch.project,
-          //       include: [
-          //         {
-          //           model: Milestone,
-          //           include: { all: true, nested: true },
-          //           required: true,
-          //           where: groupedSearch.milestone
-          //         }
-          //       ]
-          //     }
-          //   ]
-          // },
           {
             model: ProjectField,
             required: true
@@ -190,5 +164,6 @@ const getFilters = async (search = {}, user) => {
 module.exports = {
   getFiltersWithCounts,
   getProjectCoreFields,
-  getFilters
+  getFilters,
+  getProjectFields
 };
