@@ -8,7 +8,7 @@ class ProjectDetails extends Page {
   }
 
   async project() {
-    return await this.req.user.getProject();
+    return await this.req.user.getProject(this.req.params.uid);
   }
 
   get currentDate() {

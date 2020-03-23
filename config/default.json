@@ -26,7 +26,8 @@
       "verified": "/login/verified",
       "verify": "/login/verify"
     },
-    "projectDetails": "/project-details"
+    "projectDetailsUrl": "/project-details",
+    "projectDetails": "/project-details/:uid"
   },
   "features": {
     "twoFactorAuth": false

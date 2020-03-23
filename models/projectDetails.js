@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER, BOOLEAN, TEXT } = require('sequelize');
+const { Model, STRING, INTEGER , TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
 const Milestone = require('./milestone');
 const ProjectFieldEntry = require('./projectFieldEntry');
