@@ -11,18 +11,20 @@ describe('helpers/models', () => {
         rawAttributes: {
           fname: {
             fieldName: 'fname',
-            displayName: 'First Name'
+            displayName: 'First Name',
+            type: 'string'
           },
           lname: {
             fieldName: 'lname',
-            displayName: 'Last Name'
+            displayName: 'Last Name',
+            type: 'string'
           }
         }
       };
 
       const forView = models.transformForView(model);
 
-      expect(forView).to.eql([{ id:"fname", name:"First Name", value: "first_name" }, { id:"lname", name:"Last Name", value: "last_name" }]);
+      expect(forView).to.eql([{ id:"fname", name:"First Name", type: 'string', value: "first_name" }, { id:"lname", name:"Last Name", type: 'string', value: "last_name" }]);
     })
   });
 

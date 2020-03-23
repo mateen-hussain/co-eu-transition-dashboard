@@ -95,7 +95,7 @@
       "services/logger.js",
       "middleware/logger.js",
       "pages/filters-example/**/*.js",
-      "pages/admin/import/**/*.js"
+      "pages/admin/**/*.js"
     ]
   }
 }

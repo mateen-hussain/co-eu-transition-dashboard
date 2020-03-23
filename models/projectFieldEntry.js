@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER, BLOB, literal } = require('sequelize');
+const { Model, STRING, INTEGER, BLOB, Op } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const ProjectField = require('./projectField');
@@ -8,52 +8,67 @@ class ProjectFieldEntry extends Model {
     return attributeKey.includes('ProjectFieldEntryFilter');
   }
 
-  static createSearch(attributeKey, options, override) {
-    const filter = Object.assign(JSON.parse(attributeKey), override);
+  static createSearch(projectField, options) {
+    const filters = options.map(option => {
+      return {
+        [Op.and]: {
+          project_field_id: projectField.id,
+          value: {
+            [Op.like]: `%${option}%`
+          }
+        }
+      }
+    });
 
-    const likeString = [];
-    for(const option of options) {
-      likeString.push(`\`${filter.path}\`.\`value\` LIKE "%${option}%"`)
-    }
-
-    return literal(`\`${filter.path}\`.\`project_field_id\`=${filter.id} AND ${likeString.join(' OR ')}`);
+    return {[Op.or]: filters};
   }
 
   get fields() {
     const projectField = this.get('projectField');
     return {
-      id: JSON.stringify({
-        path: 'projects->ProjectFieldEntryFilter',
-        id: this.get('id')
-      }),
-      name: projectField.name,
-      value: modelUtils.parseFieldEntryValue(this.get('value'), projectField.get('type'))
+      id: projectField.name,
+      name: projectField.displayName,
+      value: this.get('value'),
+      type: projectField.type
     };
   }
 }
 
 ProjectFieldEntry.init({
-  id: {
+  field_id: {
     type: INTEGER,
+    field: 'project_field_id',
     primaryKey: true
   },
-  project_field_id: {
-    type: INTEGER
-  },
-  project_uid: {
+  uid: {
     type: STRING(45),
+    field: 'project_uid',
+    primaryKey: true
   },
   value: {
     type: BLOB,
     get() {
-      let value = this.getDataValue('value').toString('utf8');
-      return modelUtils.parseFieldEntryValue(value, this.projectField.get('type'))
+      if (!this.getDataValue('value')) return;
+      const value = this.getDataValue('value').toString('utf8');
+      return modelUtils.parseFieldEntryValue(value, this.get('projectField').get('type'))
+    },
+    set(value) {
+      if (!this.projectField) {
+        return this.setDataValue('value', value)
+      }
+
+      return this.setDataValue('value', value);
+    },
+    validate: {
+      isValid(val) {
+        return modelUtils.validateFieldEntryValue.call(this, val);
+      }
     }
   }
 }, { sequelize, modelName: 'projectFieldEntry', tableName: 'project_field_entry', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-ProjectFieldEntry.hasMany(ProjectFieldEntry, { as: 'project_field_entry_count', foreignKey: 'id' });
-ProjectFieldEntry.belongsTo(ProjectField, { foreignKey: 'project_field_id' });
-ProjectField.hasMany(ProjectFieldEntry, { foreignKey: 'project_field_id' });
+// ProjectFieldEntry.hasMany(ProjectFieldEntry, { as: 'project_field_entry_count', foreignKey: 'id' });
+ProjectFieldEntry.belongsTo(ProjectField, { foreignKey: 'field_id' });
+ProjectField.hasMany(ProjectFieldEntry, { foreignKey: 'field_id' });
 
 module.exports = ProjectFieldEntry;

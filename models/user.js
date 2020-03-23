@@ -1,16 +1,18 @@
-const { Model, STRING, ENUM, DATE, INTEGER, Op } = require('sequelize');
+const { Model, STRING, ENUM, DATE, INTEGER } = require('sequelize');
 const sequelize = require('services/sequelize');
 const Project = require('./project');
 const Milestone = require('./milestone');
 const ProjectFieldEntry = require('./projectFieldEntry');
 const ProjectField = require('./projectField');
+const MilestoneFieldEntry = require('./milestoneFieldEntry');
+const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
 
 class User extends Model {
   async getProjects (search) {
-    const groupedSearch = modelUtils.groupSearchItems(search);
+    const groupedSearch = await modelUtils.groupSearchItems(search);
 
     const departments = await this.getDepartments({
       attributes: [],
@@ -20,7 +22,10 @@ class User extends Model {
         include: [
           {
             model: Milestone,
-            include: { all: true, nested: true },
+            include: [{
+              model: MilestoneFieldEntry,
+              include: MilestoneField
+            }],
             required: true,
             where: groupedSearch.milestone
           },
@@ -33,9 +38,7 @@ class User extends Model {
             as: 'ProjectFieldEntryFilter',
             attributes: [],
             model: ProjectFieldEntry,
-            where: {
-              [Op.and]: groupedSearch.projectField
-            }
+            where: groupedSearch.projectField
           }
         ]
        }]

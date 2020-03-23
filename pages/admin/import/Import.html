@@ -5,7 +5,7 @@
 {% block content %}
 
 {% if flash %}
-  <p>{{ flash }}</p>
+  <p>{{ flash | safe }}</p>
 {% endif %}
 
 <form action='{{ url }}' method='POST' encType="multipart/form-data">

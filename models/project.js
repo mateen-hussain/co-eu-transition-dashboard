@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER, BOOLEAN, TEXT } = require('sequelize');
+const { Model, STRING, INTEGER, TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
 const Milestone = require('./milestone');
 const ProjectFieldEntry = require('./projectFieldEntry');
@@ -40,13 +40,8 @@ Project.init({
     showCount: true,
     searchable: true
   },
-  issue: {
+  title: {
     type: STRING(1024)
-  },
-  is_completed: {
-    type: BOOLEAN,
-    // displayName: 'Status',
-    searchable: true
   },
   sro: {
     type: STRING(256)
@@ -57,14 +52,23 @@ Project.init({
   impact: {
     type: INTEGER,
     displayName: 'Impact',
-    searchable: true
+    searchable: true,
+    set(val = '') {
+      const isNA = val.toLowerCase().trim() === 'n/a';
+      if (!isNA) {
+        this.setDataValue('impact', val);
+      }
+    },
+    get() {
+      return this.getDataValue('impact') || undefined;
+    }
   }
 }, { sequelize, modelName: 'project', tableName: 'project', createdAt: 'created_at', updatedAt: 'updated_at' });
 
 Project.hasMany(Milestone, { foreignKey: 'project_uid' });
-Project.hasMany(ProjectFieldEntry, { foreignKey: 'project_uid' });
-Project.hasMany(ProjectFieldEntry, { foreignKey: 'project_uid', as: 'ProjectFieldEntryFilter' });
-ProjectFieldEntry.belongsTo(Project, { foreignKey: 'project_uid' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'uid' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'uid', as: 'ProjectFieldEntryFilter' });
+ProjectFieldEntry.belongsTo(Project, { foreignKey: 'uid' });
 Project.hasMany(Project, { as: 'projects_count', foreignKey: 'uid' });
 
 module.exports = Project;

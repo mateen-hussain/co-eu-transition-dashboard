@@ -1,11 +1,15 @@
-const { Model, STRING, BOOLEAN, ENUM } = require('sequelize');
+const { Model, STRING, BOOLEAN, ENUM, JSON } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class ProjectField extends Model {}
 ProjectField.init({
   name: STRING(45),
   type: ENUM("string", "boolean", "integer", "float", "group"),
-  is_active: BOOLEAN
+  config: JSON,
+  is_active: BOOLEAN,
+  displayName: {
+    type: STRING(300),
+  }
 }, { sequelize, modelName: 'projectField', tableName: 'project_field', timestamps: false });
 
 module.exports = ProjectField;
