@@ -33,12 +33,13 @@ Project.init({
     displayName: 'Project Name',
     searchable: true
   },
-  department_name: {
+  departmentName: {
     type: STRING(10),
     displayName: 'Department',
     allowNull: false,
     showCount: true,
-    searchable: true
+    searchable: true,
+    field: "department_name"
   },
   title: {
     type: STRING(1024)
@@ -65,10 +66,10 @@ Project.init({
   }
 }, { sequelize, modelName: 'project', tableName: 'project', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-Project.hasMany(Milestone, { foreignKey: 'project_uid' });
-Project.hasMany(ProjectFieldEntry, { foreignKey: 'uid' });
-Project.hasMany(ProjectFieldEntry, { foreignKey: 'uid', as: 'ProjectFieldEntryFilter' });
-ProjectFieldEntry.belongsTo(Project, { foreignKey: 'uid' });
+Project.hasMany(Milestone, { foreignKey: 'projectUid' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilter' });
+ProjectFieldEntry.belongsTo(Project, { foreignKey: 'projectUid' });
 Project.hasMany(Project, { as: 'projects_count', foreignKey: 'uid' });
 
 module.exports = Project;

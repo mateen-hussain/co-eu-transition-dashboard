@@ -31,8 +31,9 @@ Milestone.init({
     primaryKey: true,
     displayName: 'Milestone UID'
   },
-  project_uid: {
-    type: STRING(32)
+  projectUid: {
+    type: STRING(32),
+    field: "project_uid"
   },
   description: {
     type: STRING,
@@ -46,6 +47,6 @@ Milestone.init({
   }
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'uid' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid' });
 
 module.exports = Milestone;

@@ -124,7 +124,7 @@ DROP TABLE IF EXISTS `project_field`;
 CREATE TABLE `project_field` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
-  `displayName` varchar(100) DEFAULT NULL,
+  `display_name` varchar(100) DEFAULT NULL,
   `type` enum('string','boolean','integer','float','group','date') DEFAULT NULL,
   `config` JSON NULL,
   `is_active` tinyint(4) DEFAULT NULL,
@@ -135,7 +135,7 @@ CREATE TABLE `project_field` (
 LOCK TABLES `project_field` WRITE;
 /*!40000 ALTER TABLE `project_field` DISABLE KEYS */;
 
-INSERT INTO `project_field` (`id`, `name`, `displayName`, `type`, `is_active`, `is_required`)
+INSERT INTO `project_field` (`id`, `name`, `display_name`, `type`, `is_active`, `is_required`)
 VALUES
   (1,'hmgConfidence','HMG Confidence','integer',1,NULL),
   (2,'citizenReadiness','Citizen Readiness','integer',1,NULL),
@@ -353,7 +353,7 @@ DROP TABLE IF EXISTS `milestone_field`;
 CREATE TABLE `milestone_field` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
-  `displayName` varchar(100) DEFAULT NULL,
+  `display_name` varchar(100) DEFAULT NULL,
   `type` enum('string','boolean','integer','float','group','date') DEFAULT NULL,
   `config` JSON NULL,
   `is_active` tinyint(4) DEFAULT NULL,
@@ -361,7 +361,7 @@ CREATE TABLE `milestone_field` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `milestone_field` (`id`, `name`, `displayName`, `type`, `is_active`, `is_required`)
+INSERT INTO `milestone_field` (`id`, `name`, `display_name`, `type`, `is_active`, `is_required`)
 VALUES
   (1,'deliveryDate','Delivery Date','date',1,NULL),
   (2,'complete','Complete','boolean',1,NULL),

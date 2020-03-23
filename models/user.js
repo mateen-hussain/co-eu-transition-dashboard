@@ -57,15 +57,21 @@ User.init({
     primaryKey: true
   },
   email: STRING,
-  hashed_passphrase: STRING(128),
-  last_login_at: DATE,
+  hashedPassphrase: {
+    type: STRING(128),
+    field: "hashed_passphrase",
+  },
+  lastLoginAt: {
+    type: DATE,
+    field: "last_login_at"
+  },
   role: {
     type: ENUM('admin', 'user')
   },
   twofa_secret: STRING(128)
 }, { sequelize, modelName: 'user', tableName: 'user', timestamps: false });
 
-User.belongsToMany(Department, { through: DepartmentUser, foreignKey: 'user_id' });
-Department.belongsToMany(User, { through: DepartmentUser, foreignKey: 'department_name' });
+User.belongsToMany(Department, { through: DepartmentUser, foreignKey: 'userId' });
+Department.belongsToMany(User, { through: DepartmentUser, foreignKey: 'departmentName' });
 
 module.exports = User;

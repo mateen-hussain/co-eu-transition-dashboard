@@ -6,8 +6,12 @@ ProjectField.init({
   name: STRING(45),
   type: ENUM("string", "boolean", "integer", "float", "group"),
   config: JSON,
-  is_active: BOOLEAN,
+  isActive: {
+    type: BOOLEAN,
+    field: "is_active",
+  },
   displayName: {
+    field: "display_name",
     type: STRING(300),
   }
 }, { sequelize, modelName: 'projectField', tableName: 'project_field', timestamps: false });
