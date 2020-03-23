@@ -137,11 +137,16 @@
   {% for tableFieldId in tableFields %}
 
     {% set field = getField(project.fields, tableFieldId) %}
-    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A')  + "</span>" }), projectValue) %}
+    {% set projectValue = (projectValue.push({html: 
+        
+    "<a href=" + config.paths.projectDetailsUrl + '/' + field.value | replace(" ", "%20") + " class='govuk-link project-link'>" + field.value + "</a>" 
+      if field.name == 'Project Name' 
+        else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
+    }), projectValue) %}
 
   {% endfor %}
 
-    {% set projectFields = (projectFields.push(projectValue), projectFields) %}
+  {% set projectFields = (projectFields.push(projectValue), projectFields) %}
 
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}

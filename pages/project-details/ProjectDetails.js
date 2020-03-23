@@ -11,6 +11,14 @@ class ProjectDetails extends Page {
     return await this.req.user.getProject(this.req.params.uid);
   }
 
+  get tableFields() {
+    return ['uid', 'department_name', 'description', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+  }
+
+  getField(fields = [], id) {
+    return fields.find(field => field.id === id);
+  }
+
   get currentDate() {
     return moment().format();
   }

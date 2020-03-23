@@ -53,7 +53,7 @@ class User extends Model {
   }
 
   async getProject (projectUID) {
-    const groupedSearch = modelUtils.groupSearchItems({ uid: [ projectUID ] });
+    const groupedSearch = await modelUtils.groupSearchItems({ uid: [ projectUID ] });
 
     const departments = await this.getDepartments({
       attributes: [],
@@ -76,9 +76,7 @@ class User extends Model {
             as: 'ProjectFieldEntryFilter',
             attributes: [],
             model: ProjectFieldEntry,
-            where: {
-              [Op.and]: groupedSearch.projectField
-            }
+            where: groupedSearch.projectField
           }
         ]
        }]
