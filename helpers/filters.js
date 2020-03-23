@@ -10,7 +10,7 @@ const logger = require('services/logger');
 
 const getFiltersWithCounts = async (attribute, search, user) => {
   const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter'}});
-  const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.fieldName]: { [Op.ne]: null } });
+  const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.field]: { [Op.ne]: null } });
 
   return await Project.findAll({
     attributes: [

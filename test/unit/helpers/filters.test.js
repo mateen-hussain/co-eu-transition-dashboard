@@ -22,16 +22,18 @@ describe('helpers/filters', () => {
   describe('#getFiltersWithCounts', () => {
     it('calls Projects.findAll with correct arguments', async () => {
       const attribute = {
-        fieldName: 'field_name'
+        fieldName: 'fieldName',
+        field: 'field_name'
       };
       const search = {};
       const user = { id: 1 };
 
       await filters.getFiltersWithCounts(attribute, search, user);
+      console.log(JSON.stringify(attribute));
 
       return sinon.assert.calledWith(Project.findAll, {
         attributes: [
-          [sequelize.literal(`project.${attribute.fieldName}`), 'value'],
+          [sequelize.literal(`project.${attribute.field}`), 'value'],
           [sequelize.literal(`COUNT(DISTINCT projects_count.uid)`), 'count']
         ],
         include: [
@@ -39,7 +41,7 @@ describe('helpers/filters', () => {
             model: Project,
             as: 'projects_count',
             attributes: [],
-            where: {[attribute.fieldName]: { [sequelize.Op.ne]: null } },
+            where: {[attribute.field]: { [sequelize.Op.ne]: null } },
             required: false,
             include: [{
               required: true,
@@ -69,7 +71,7 @@ describe('helpers/filters', () => {
             }]
           }
         ],
-        group: [`project.${attribute.fieldName}`],
+        group: [`project.${attribute.field}`],
         raw: true,
         nest: true,
         includeIgnoreAttributes: false
@@ -90,12 +92,14 @@ describe('helpers/filters', () => {
       Project.rawAttributes = {
         name: {
           fieldName: 'name',
+          field: 'name',
           displayName: 'Name',
           searchable: true,
           type: 'string'
         },
         other: {
           fieldName: 'other',
+          field: 'other',
           displayName: 'other',
           type: 'string'
         }
@@ -145,14 +149,14 @@ describe('helpers/filters', () => {
         attributes: [
           [sequelize.literal(`projectField.id`), 'id'],
           [sequelize.literal(`projectField.name`), 'name'],
-          [sequelize.literal(`projectField.displayName`), 'displayName'],
+          [sequelize.literal(`projectField.display_name`), 'displayName'],
           [sequelize.literal(`projectField.type`), 'type'],
           [sequelize.literal(`projectFieldEntries.value`), 'value']
         ],
         group: [
           `projectField.id`,
           `projectField.name`,
-          `projectField.displayName`,
+          `projectField.display_name`,
           `projectField.type`,
           `projectFieldEntries.value`
         ],
