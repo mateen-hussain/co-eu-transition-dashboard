@@ -1,5 +1,5 @@
 const { expect, sinon } = require('test/unit/util/chai');
-const { STRING, INTEGER, BOOLEAN, TEXT } = require('sequelize');
+const { STRING, INTEGER, TEXT } = require('sequelize');
 const Project = require('models/project');
 const Milestone = require('models/milestone');
 const modelUtils = require('helpers/models');
