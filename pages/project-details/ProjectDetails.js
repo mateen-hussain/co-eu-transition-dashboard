@@ -12,7 +12,7 @@ class ProjectDetails extends Page {
   }
 
   get tableFields() {
-    return ['uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    return ['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
   getField(fields = [], id) {

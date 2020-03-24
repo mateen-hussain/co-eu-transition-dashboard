@@ -50,8 +50,8 @@ class User extends Model {
     }, []);
   }
 
-  async getProject (projectUID) {
-    const groupedSearch = await modelUtils.groupSearchItems({ uid: [ projectUID ] });
+  async getProject (projectUid) {
+    const groupedSearch = await modelUtils.groupSearchItems({ uid: [ projectUid ] });
 
     const departments = await this.getDepartments({
       attributes: [],

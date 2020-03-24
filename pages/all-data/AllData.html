@@ -41,6 +41,7 @@
 {% set filterTitles = [] %}
 {% set filters = filters() | await %}
 {% set projects = projects() | await %}
+{% set departmentView = 'false' %}
 
  {{ items.push ({
     heading: {
@@ -99,6 +100,10 @@
       %}
     {% endif %}
 
+    {% if (filter.name == 'Department') and (filter.name not in filterTitles) %}
+      {% set departmentView = 'true' %}
+    {% endif %}
+
   {% endfor %}
 
   <form action="{{ url }}" method="post">
@@ -120,7 +125,13 @@
   {% include "all-data/partials/filters/hide-filter-btn.njk" %}
   </div>
 
-  {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }] %}
+
+  {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
+  {% if (departmentView == 'true') %}
+  {% set projectKey = [{ text:'Project Name' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
+  {% endif %}
+
+
   {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
 
 {% set tableHeaderHtml %}
@@ -138,12 +149,17 @@
   {% for tableFieldId in tableFields %}
 
     {% set field = getField(project.fields, tableFieldId) %}
+
+    {% if (field.name == 'Department') and (departmentView == 'true') %}
+    {% else %}
     {% set projectValue = (projectValue.push({html:
 
     "<a href=" + config.paths.projectDetails | replace(":uid", field.value | replace(" ", "%20"))  + " class='govuk-link project-link'>" + field.value + "</a>"
       if field.name == 'Project Name'
         else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
     }), projectValue) %}
+
+  {% endif %}
 
   {% endfor %}
 
