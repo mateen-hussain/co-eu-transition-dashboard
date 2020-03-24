@@ -140,7 +140,7 @@ VALUES
   (1,'hmgConfidence','HMG Confidence','integer',1,NULL),
   (2,'citizenReadiness','Citizen Readiness','integer',1,NULL),
   (3,'businessReadiness','Business Readiness','integer',1,NULL),
-  (4,'euStateConfidence','EU State Confidence','integer',1,NULL),
+  (4,'euStateConfidence','EU Member State Delivery Confidence','integer',1,NULL),
   (6,'solution','Solution','string',1,NULL),
   (7,'progressStatus','Progress status','string',1,NULL),
   (8,'deliveryBarriers','Delivery Barriers','string',1,NULL),
