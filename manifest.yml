@@ -1,8 +1,8 @@
 applications:
-  - name: TRANSITION_DASHBOARD
+  - name: transition-dashboard
     command: NODE_PATH=. node server.js
     memory: 256M
     buildpacks:
     - https://github.com/cloudfoundry/nodejs-buildpack
     services:
-    - TRANSITION_DASHBOARD_DB
+    - co-eu-transition-database
