@@ -43,7 +43,7 @@
     {% for tableFieldId in milestoneTableFields %}
     {% set field = getField(milestone.fields, tableFieldId) %}
 
-      {% if (field.name == 'Due Date') and (field.value < currentDate) %}
+      {% if (field.id == 'date') and (field.value < currentDate) %}
         {% set flag = 'red-date' %}
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}

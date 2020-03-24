@@ -7,6 +7,7 @@ const moment = require('moment');
 let page = {};
 let filtersStub = {};
 let getProjects = {};
+let departmentalView = {}
 
 describe('pages/all-data/AllData', () => {
   beforeEach(() => {
@@ -17,9 +18,11 @@ describe('pages/all-data/AllData', () => {
       }
     });
 
-    const res = { cookies: sinon.stub() };
+    const res = { cookies: sinon.stub(), locals: { departmentalView } };
 
     getProjects = sinon.stub();
+    departmentalView = sinon.stub();
+    
     const req = { cookies: [], user: { getProjects }};
 
     page = new AllData('some path', req, res);
@@ -77,6 +80,12 @@ describe('pages/all-data/AllData', () => {
       }])).to.eql({
         id, name
       });
+    });
+  });
+
+  describe('#tableFields', () => {
+    it('should not return the department if departmental view', () => {
+      expect(page.tableFields).to.eql(['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence']);
     });
   });
 });

@@ -150,12 +150,12 @@
 
     {% set field = getField(project.fields, tableFieldId) %}
 
-    {% if (field.name == 'Department') and (departmentView == 'true') %}
+    {% if (field.id == 'departmentName') and (departmentView == 'true') %}
     {% else %}
     {% set projectValue = (projectValue.push({html:
 
     "<a href=" + config.paths.projectDetails | replace(":uid", field.value | replace(" ", "%20"))  + " class='govuk-link project-link'>" + field.value + "</a>"
-      if field.name == 'Project Name'
+      if field.id == 'uid'
         else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
     }), projectValue) %}
 
