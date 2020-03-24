@@ -16,7 +16,7 @@ class MilestoneFieldEntry extends Model {
 }
 
 MilestoneFieldEntry.init({
-  milestoneFieldId: {
+  fieldId: {
     type: INTEGER,
     primaryKey: true,
     field: 'milestone_field_id'
@@ -48,6 +48,6 @@ MilestoneFieldEntry.init({
   }
 }, { sequelize, modelName: 'milestoneFieldEntry', tableName: 'milestone_field_entry', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-MilestoneFieldEntry.belongsTo(MilestoneField, { foreignKey: 'milestoneFieldId' });
+MilestoneFieldEntry.belongsTo(MilestoneField, { foreignKey: 'fieldId' });
 
 module.exports = MilestoneFieldEntry;

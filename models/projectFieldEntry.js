@@ -35,7 +35,7 @@ class ProjectFieldEntry extends Model {
 }
 
 ProjectFieldEntry.init({
-  projectFieldId: {
+  fieldId: {
     type: INTEGER,
     field: 'project_field_id',
     primaryKey: true
@@ -67,8 +67,7 @@ ProjectFieldEntry.init({
   }
 }, { sequelize, modelName: 'projectFieldEntry', tableName: 'project_field_entry', createdAt: 'created_at', updatedAt: 'updated_at' });
 
-// ProjectFieldEntry.hasMany(ProjectFieldEntry, { as: 'project_field_entry_count', foreignKey: 'id' });
-ProjectFieldEntry.belongsTo(ProjectField, { foreignKey: 'projectFieldId' });
-ProjectField.hasMany(ProjectFieldEntry, { foreignKey: 'projectFieldId' });
+ProjectFieldEntry.belongsTo(ProjectField, { foreignKey: 'fieldId' });
+ProjectField.hasMany(ProjectFieldEntry, { foreignKey: 'fieldId' });
 
 module.exports = ProjectFieldEntry;

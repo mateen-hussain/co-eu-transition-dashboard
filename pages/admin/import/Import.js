@@ -16,7 +16,7 @@ const logger = require('services/logger');
 
 const projectDatabaseExcelMap = {
   'uid': 'UID',
-  'department_name': 'Dept',
+  'departmentName': 'Dept',
   'title': 'Project Title',
   'description': 'Project Description',
   'impact': 'Impact Rating',
@@ -47,7 +47,7 @@ const projectDatabaseExcelMap = {
 
 
 const milestoneDatabaseExcelMap = {
-  'project_uid': 'Project UID',
+  'projectUid': 'Project UID',
   'uid': 'Milestone UID',
   'description': 'Milestone Description',
   'date': 'Target date for delivery',
@@ -107,7 +107,7 @@ class Import extends Page {
 
           const entry = await fieldEntryModel.build({
             uid: item[databaseExcelMap.uid],
-            field_id: field.id,
+            fieldId: field.id,
             value,
             [fieldModel.name]: field
           }, { include: [ fieldModel ] });
