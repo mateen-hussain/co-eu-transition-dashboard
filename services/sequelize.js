@@ -1,27 +1,13 @@
 const { services } = require('config');
 const Sequelize = require('sequelize');
-const logger = require('services/logger');
 
-function createCloudSequelize() {
-  let jsonConfig = JSON.parse(process.env.VCAP_SERVICES);
-  let mysqlConfig = jsonConfig.mysql[0].credentials;
-
-  return new Sequelize(mysqlConfig.name, mysqlConfig.username, mysqlConfig.password, {
-    host: mysqlConfig.host,
+// Something in cloudfoundry is replacing mysql:// with mysql2:// which is causing some issues
+const sequelize = new Sequelize(services.mysql.uri.replace(/^mysql2:\/\//,'mysql://'),{
     dialect: 'mysql',
     dialectOptions: {
-      ssl: "Amazon RDS"
+      ssl: services.mysql.sslCertificate
     },
-    logging: false,
-  });
-}
-
-function createLocalSequelize() {
-  return new Sequelize(services.mysql.uri, {
-    dialect: 'mysql',
     logging: false
-  });
-}
+});
 
-const sequelize = process.env.VCAP_SERVICES ? createCloudSequelize() : createLocalSequelize();
 module.exports = sequelize;

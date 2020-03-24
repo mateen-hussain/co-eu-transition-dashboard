@@ -10,6 +10,9 @@ describe('services/sequelize', () => {
   it('should create a Sequelize instance', () => {
     sinon.assert.calledWith(Sequelize, services.mysql.uri, {
       dialect: 'mysql',
+      dialectOptions: {
+        ssl: null
+      },
       logging: false
     });
   });

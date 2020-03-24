@@ -56,7 +56,7 @@ User.init({
     type: INTEGER,
     primaryKey: true
   },
-  email: STRING,
+  email: STRING(64),
   hashedPassphrase: {
     type: STRING(128),
     field: "hashed_passphrase",
@@ -68,7 +68,10 @@ User.init({
   role: {
     type: ENUM('admin', 'user')
   },
-  twofa_secret: STRING(128)
+  twofaSecret: {
+    type: STRING(128),
+    field: "twofa_secret"
+  }
 }, { sequelize, modelName: 'user', tableName: 'user', timestamps: false });
 
 User.belongsToMany(Department, { through: DepartmentUser, foreignKey: 'userId' });

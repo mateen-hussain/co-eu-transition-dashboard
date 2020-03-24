@@ -56,14 +56,14 @@ describe('models/project', () => {
   });
 
   it('called Project.hasMany with the correct parameters', () => {
-    expect(Project.hasMany).to.have.been.calledWith(Milestone, { foreignKey: 'project_uid' });
-    expect(Project.hasMany).to.have.been.calledWith(ProjectFieldEntry, { foreignKey: 'uid' });
-    expect(Project.hasMany).to.have.been.calledWith(ProjectFieldEntry, { foreignKey: 'uid', as: 'ProjectFieldEntryFilter' });
+    expect(Project.hasMany).to.have.been.calledWith(Milestone, { foreignKey: 'projectUid' });
+    expect(Project.hasMany).to.have.been.calledWith(ProjectFieldEntry, { foreignKey: 'projectUid' });
+    expect(Project.hasMany).to.have.been.calledWith(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilter' });
     expect(Project.hasMany).to.have.been.calledWith(Project, { as: 'projects_count', foreignKey: 'uid' });
   });
 
   it('called ProjectFieldEntry.belongsTo with the correct parameters', () => {
-    expect(ProjectFieldEntry.belongsTo).to.have.been.calledWith(Project, { foreignKey: 'uid' });
+    expect(ProjectFieldEntry.belongsTo).to.have.been.calledWith(Project, { foreignKey: 'projectUid' });
   });
 
   it.skip('returns true if attribute exsists in class', () => {

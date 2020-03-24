@@ -5,11 +5,16 @@ const DepartmentUser = require('models/departmentUser');
 describe('models/departmentUser', () => {
   it('called DepartmentUser.init with the correct parameters', () => {
     expect(DepartmentUser.init).to.have.been.calledWith({
-      department_name: {
+      departmentName: {
         type: STRING(10),
+        field: 'department_name',
         primaryKey: true
       },
-      user_id: INTEGER
+      userId: {
+        type: INTEGER,
+        field: 'user_id',
+        primaryKey: true
+      }
     });
   });
 });
