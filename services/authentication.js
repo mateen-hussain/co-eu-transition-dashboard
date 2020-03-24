@@ -10,7 +10,7 @@ const speakeasy = require('speakeasy');
 
 const authenticateLogin = (email, password, cb) => {
   return User.findOne({
-    attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofa_secret'],
+    attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
     where: {
       email: email
     },
@@ -104,7 +104,7 @@ const login = (req, res) => {
       jwt.saveData(req, res, { id: user.id, tfa: false });
 
       if(config.features.twoFactorAuth) {
-        if (user.twofa_secret) {
+        if (user.twofaSecret) {
           res.redirect(config.paths.authentication.verify);
         } else {
           res.redirect(config.paths.authentication.setup);

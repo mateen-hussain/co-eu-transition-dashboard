@@ -106,7 +106,7 @@ describe('pages/authentication/Authentication', () => {
   describe('#verify2FA', () => {
     beforeEach(() => {
       page.req.body = { sixDigit: 'sixDigit' };
-      page.req.user = { twofa_secret: 'secret' };
+      page.req.user = { twofaSecret: 'secret' };
       page.req.flash = sinon.stub();
       page.res.redirect = sinon.stub();
 
@@ -115,7 +115,7 @@ describe('pages/authentication/Authentication', () => {
 
     it('redirects if no secret is given', async () => {
       jwt.restoreData.returns({ Authentication: {} });
-      delete page.req.user.twofa_secret;
+      delete page.req.user.twofaSecret;
 
       await page.verify2FA();
 
@@ -144,7 +144,7 @@ describe('pages/authentication/Authentication', () => {
   describe('#verified', () => {
     beforeEach(() => {
       page.req.body = { sixDigit: 'sixDigit' };
-      page.req.user = { twofa_secret: 'secret', update: sinon.stub() };
+      page.req.user = { twofaSecret: 'secret', update: sinon.stub() };
       page.req.flash = sinon.stub();
       page.res.redirect = sinon.stub();
 
@@ -156,13 +156,13 @@ describe('pages/authentication/Authentication', () => {
 
       await page.verified();
 
-      sinon.assert.calledWith(page.req.user.update, { twofa_secret: 'secret' });
+      sinon.assert.calledWith(page.req.user.update, { twofaSecret: 'secret' });
       sinon.assert.calledWith(jwt.saveData, page.req, page.res, { tfa: true });
       sinon.assert.calledWith(page.res.redirect, paths.authentication.verified);
     });
 
     it('redirects to entry url if user is already registered', async () => {
-      delete page.req.user.twofa_secret;
+      delete page.req.user.twofaSecret;
 
       await page.verified();
 

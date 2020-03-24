@@ -75,7 +75,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofa_secret'],
+            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
             where: { email: user.email },
             raw: true,
             nest: true
@@ -103,7 +103,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofa_secret'],
+            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
             where: { email: user.email },
             raw: true,
             nest: true
