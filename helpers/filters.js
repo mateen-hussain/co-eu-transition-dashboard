@@ -6,14 +6,15 @@ const ProjectField = require('models/projectField');
 const Department = require('models/department');
 const { Op, literal } = require('sequelize');
 const modelUtils = require('helpers/models');
+const logger = require('services/logger');
 
 const getFiltersWithCounts = async (attribute, search, user) => {
   const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter'}});
-  const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.fieldName]: { [Op.ne]: null } });
+  const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.field]: { [Op.ne]: null } });
 
   return await Project.findAll({
     attributes: [
-      [literal(`project.${attribute.fieldName}`), 'value'],
+      [literal(`project.${attribute.field}`), 'value'],
       [literal(`COUNT(DISTINCT projects_count.uid)`), 'count']
     ],
     include: [
@@ -51,7 +52,7 @@ const getFiltersWithCounts = async (attribute, search, user) => {
         }]
       }
     ],
-    group: [`project.${attribute.fieldName}`],
+    group: [`project.${attribute.field}`],
     raw: true,
     nest: true,
     includeIgnoreAttributes: false
@@ -81,14 +82,14 @@ const getProjectFields = async (search, user) => {
     attributes: [
       [literal(`projectField.id`), 'id'],
       [literal(`projectField.name`), 'name'],
-      [literal(`projectField.displayName`), 'displayName'],
+      [literal(`projectField.display_name`), 'displayName'],
       [literal(`projectField.type`), 'type'],
       [literal(`projectFieldEntries.value`), 'value']
     ],
     group: [
       `projectField.id`,
       `projectField.name`,
-      `projectField.displayName`,
+      `projectField.display_name`,
       `projectField.type`,
       `projectFieldEntries.value`
     ],

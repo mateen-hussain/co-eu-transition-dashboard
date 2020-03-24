@@ -61,7 +61,7 @@ class Authentication extends Page {
   }
 
   async verify2FA() {
-    const secret = this.data.two_factor_temp_secret || this.req.user.twofa_secret;
+    const secret = this.data.two_factor_temp_secret || this.req.user.twofaSecret;
     if ( !secret ) {
       logger.error('User has no 2FA secret');
       return this.res.redirect(config.paths.authentication.login);
@@ -85,7 +85,7 @@ class Authentication extends Page {
     if (this.data.two_factor_temp_secret) {
       // save secret to user in database
       await this.req.user.update({
-        twofa_secret: this.data.two_factor_temp_secret
+        twofaSecret: this.data.two_factor_temp_secret
       });
 
       // remove any temporary secrets

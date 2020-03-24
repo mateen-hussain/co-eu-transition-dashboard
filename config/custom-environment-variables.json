@@ -2,13 +2,10 @@
   "env": "NODE_ENV",
   "services": {
     "mysql": {
-      "host": "MYSQL_HOST",
-      "user": "MYSQL_USER",
-      "password": "MYSQL_PASSWORD",
-      "database": "MYSQL_DATABASE",
-      "port": "MYSQL_PORT"
+      "uri": "DATABASE_URL"
     }
   },
+  "port": "PORT",
   "features": {
     "twoFactorAuth": "FEATURE_2FA"
   }

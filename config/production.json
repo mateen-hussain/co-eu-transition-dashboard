@@ -1,0 +1,8 @@
+{
+  "env": "production",
+  "services": {
+    "mysql": {
+      "sslCertificate": "Amazon RDS"
+    }
+  }
+}

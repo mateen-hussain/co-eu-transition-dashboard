@@ -20,8 +20,9 @@ describe('models/milestone', () => {
         primaryKey: true,
         displayName: 'Milestone UID'
       },
-      project_uid: {
-        type: STRING(32)
+      projectUid: {
+        type: STRING(32),
+        field: "project_uid"
       },
       description: {
         type: STRING,
@@ -37,7 +38,7 @@ describe('models/milestone', () => {
   });
 
   it('called Milestone.belongsTo with the correct parameters', () => {
-    expect(Milestone.hasMany).to.have.been.calledWith(MilestoneFieldEntry, { foreignKey: 'uid' });
+    expect(Milestone.hasMany).to.have.been.calledWith(MilestoneFieldEntry, { foreignKey: 'milestoneUid' });
   });
 
   it.skip('returns true if attribute exsists in class', () => {
