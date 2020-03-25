@@ -6,7 +6,6 @@ const ProjectField = require('models/projectField');
 const Department = require('models/department');
 const { Op, literal } = require('sequelize');
 const modelUtils = require('helpers/models');
-const logger = require('services/logger');
 
 const getFiltersWithCounts = async (attribute, search, user) => {
   const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter'}});

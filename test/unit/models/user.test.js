@@ -1,6 +1,6 @@
 const User = require('models/user');
 const { expect } = require('test/unit/util/chai');
-const { STRING, INTEGER, DATE, ENUM } = require('sequelize');
+const { STRING, DATE, ENUM } = require('sequelize');
 const Department = require('models/department');
 const DepartmentUser = require('models/departmentUser');
 
