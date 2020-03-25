@@ -15,10 +15,6 @@ class ProjectDetails extends Page {
     return ['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
-  getField(fields = [], id) {
-    return fields.find(field => field.id === id);
-  }
-
   get currentDate() {
     return moment().format();
   }

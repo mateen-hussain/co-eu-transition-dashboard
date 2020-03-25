@@ -24,7 +24,8 @@ describe('helpers/models', () => {
 
       const forView = models.transformForView(model);
 
-      expect(forView).to.eql([{ id:"fname", name:"First Name", type: 'string', value: "first_name" }, { id:"lname", name:"Last Name", type: 'string', value: "last_name" }]);
+      expect(forView.get('fname')).to.eql({ id:"fname", name:"First Name", type: 'string', value: "first_name" });
+      expect(forView.get('lname')).to.eql({ id:"lname", name:"Last Name", type: 'string', value: "last_name" });
     })
   });
 

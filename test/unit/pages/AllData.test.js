@@ -22,7 +22,7 @@ describe('pages/all-data/AllData', () => {
 
     getProjects = sinon.stub();
     departmentalView = sinon.stub();
-    
+
     const req = { cookies: [], user: { getProjects }};
 
     page = new AllData('some path', req, res);
@@ -42,11 +42,7 @@ describe('pages/all-data/AllData', () => {
 
   describe('#schema', () => {
     it('returns the correct data schema', () => {
-      expect(page.schema).to.eql({
-        filters: {
-          date: ['01/01/2020', '01/01/2021']
-        }
-      });
+      expect(page.schema).to.eql({ filters: {} });
     });
   });
 
@@ -61,25 +57,13 @@ describe('pages/all-data/AllData', () => {
   describe('#filters', () => {
     it('should call the filters helper function', async () => {
       await page.filters();
-      return sinon.assert.calledWith(filtersStub, { date: ['01/01/2020', '01/01/2021'] });
+      return sinon.assert.calledWith(filtersStub, {});
     });
   });
 
   describe('#currentDate', () => {
     it('should return the current date', () => {
       expect(page.currentDate).to.eql(moment().format());
-    });
-  });
-
-  describe('#getFilter', () => {
-    it('should return the correct filter name when passed in an ID', () => {
-      const id = 'test_1';
-      const name = 'Test 1';
-      expect(page.getFilter(id, [{
-        id, name
-      }])).to.eql({
-        id, name
-      });
     });
   });
 

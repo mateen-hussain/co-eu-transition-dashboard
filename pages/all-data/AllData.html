@@ -30,7 +30,6 @@
 {% set items = [] %}
 {% set sections = [] %}
 {% set summary = [] %}
-{% set filterNames = [] %}
 {% set projectKey = [] %}
 {% set projectValue = [] %}
 {% set projectFields = [] %}
@@ -43,15 +42,7 @@
 {% set projects = projects() | await %}
 {% set departmentView = 'false' %}
 
- {{ items.push ({
-    heading: {
-      text: "Milestone Due Dates"
-    },
-    content: {
-      html: dates
-    }
-  })
-}}
+
 
  {{ summary.push ({
     key: {
@@ -75,7 +66,7 @@
 
   {% for tableFieldId in filtersFields %}
 
-    {% set filter = getField(filters, tableFieldId) %}
+    {% set filter = filters.get(tableFieldId) %}
 
     {% set filterCheckboxes  %}
       {% if (filter.options | length != 1) %}
@@ -106,6 +97,16 @@
 
   {% endfor %}
 
+   {% set items = (items.push ({
+        heading: {
+          text: "Milestone Due Dates"
+        },
+        content: {
+          html: dates
+        }
+      }), items)
+    %}
+
   <form action="{{ url }}" method="post">
     <h3 class="govuk-heading-s panelTitle">Filters</h3>
     {% include "all-data/partials/filters/all-filters.njk" %}
@@ -126,9 +127,9 @@
   </div>
 
 
-  {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
+  {% set projectKey = [{ text:'Project Name' }, { text:'Delivery Theme' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
   {% if (departmentView == 'true') %}
-  {% set projectKey = [{ text:'Project Name' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
+  {% set projectKey = [{ text:'Project Name' }, { text:'Delivery Theme' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
   {% endif %}
 
 
@@ -148,7 +149,7 @@
 
   {% for tableFieldId in tableFields %}
 
-    {% set field = getField(project.fields, tableFieldId) %}
+    {% set field = project.fields.get(tableFieldId) %}
 
     {% if (field.id == 'departmentName') and (departmentView == 'true') %}
     {% else %}
@@ -168,10 +169,9 @@
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
 
-
     {% for tableFieldId in milestoneTableFields %}
     {% set flag = '' %}
-    {% set field = getField(milestone.fields, tableFieldId) %}
+    {% set field = milestone.fields.get(tableFieldId) %}
       {% if (field.id == 'date') and (field.value < currentDate) %}
         {% set flag = 'red-date' %}
       {% endif %}
@@ -214,16 +214,17 @@
   <div>
   <h3 class="govuk-heading-s">Selected filters</h3>
 
-  {% for filter in filters %}
-    {% set filterSummary  %}
+  {% for key, filter in filters.entries() %}
+    {%- set filterSummary  %}
       {% for option in filter.options %}
         {% if option.value in data.filters[filter.id] | default([]) %}
+          {% set filterNames = (filterNames.push (filter.id), filterNames) %}
           {% include "all-data/partials/filters/filter-list.njk" %}
         {% endif %}
       {% endfor %}
     {% endset -%}
 
-      {% if filter.name in filterNames %}
+      {% if filter.id in filterNames %}
             {% set summary = (summary.push ({
             key: {
               html: "<span class='filter-name'>" + filter.name + "</span>"

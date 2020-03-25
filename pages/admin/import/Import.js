@@ -22,7 +22,7 @@ const projectDatabaseExcelMap = {
   'impact': 'Impact Rating',
   'sro': 'Project SRO + email address',
 
-  'priorityTheme': 'Priority Theme',
+  'deliveryTheme': 'Priority Theme',
   'solution': 'Solution',
   'progressStatus': 'Progress status',
   'deliveryBarriers': 'Delivery Barriers',

@@ -59,20 +59,22 @@ const getFiltersWithCounts = async (attribute, search, user) => {
 };
 
 const getProjectCoreFields = async (search, user) => {
-  const filters = [];
+  const filters = new Map();
+
   for(const attributeName of Object.keys(Project.rawAttributes)) {
     const attribute = Project.rawAttributes[attributeName];
     if (!attribute.searchable) continue;
 
     let options = await getFiltersWithCounts(attribute, search, user);
 
-    filters.push({
+    filters.set(attribute.fieldName, {
       id: attribute.fieldName,
       name: attribute.displayName,
       type: attribute.type,
       options
     });
   }
+
   return filters;
 };
 
@@ -123,40 +125,42 @@ const getProjectFields = async (search, user) => {
   });
 
   return response.reduce((fields, item) => {
-    const exsistingField = fields.find(field => field.id === item.name);
-    const value = modelUtils.parseFieldEntryValue(item.value, item.type);
+    const projectFieldEntry = ProjectFieldEntry.build({
+      value: item.value,
+      projectField: {
+        id: item.id,
+        name: item.name,
+        displayName: item.displayName,
+        type: item.type
+      }
+    }, { include: ProjectField });
+    const exsistingField = fields.get(item.name);
+    const value = modelUtils.parseFieldEntryValue(projectFieldEntry.value, item.type);
 
     if(!exsistingField) {
-      fields.push({
-        id: item.name,
-        name: item.displayName,
+      fields.set(projectFieldEntry.projectField.name, {
+        id: projectFieldEntry.projectField.name,
+        name: projectFieldEntry.projectField.displayName,
+        type: projectFieldEntry.projectField.type,
         options: [{
-          count: item.count,
           value
         }]
       });
     } else {
       exsistingField.options.push({
-        count: item.count,
         value
       });
     }
 
     return fields;
-  }, []);
+  }, new Map());
 };
 
 const getFilters = async (search = {}, user) => {
   const filters = await getProjectCoreFields(search, user);
 
   const projectFields = await getProjectFields(search, user);
-  filters.push(...projectFields);
-
-  filters.forEach(filter => {
-    filter.options = filter.options.sort((a,b) => {
-      return a.value > b.value;
-    });
-  });
+  projectFields.forEach((value, key) => filters.set(key, value));
 
   return filters;
 };

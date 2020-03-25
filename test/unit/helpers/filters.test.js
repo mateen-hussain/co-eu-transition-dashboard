@@ -124,7 +124,7 @@ describe('helpers/filters', () => {
       const user = { id: 1 };
       const response = await filters.getProjectCoreFields(search, user);
 
-      expect(response).to.eql([{
+      expect(response.get('name')).to.eql({
         id: 'name',
         name: 'Name',
         options: [
@@ -134,7 +134,7 @@ describe('helpers/filters', () => {
           { value: 'DIT', count: 1 }
         ],
         type: 'string'
-      }]);
+      });
     });
   });
 
@@ -226,7 +226,7 @@ describe('helpers/filters', () => {
       const search = {};
       const optionsWithDefaults = await filters.getFilters(search, user);
 
-      expect(optionsWithDefaults).to.eql([{
+      expect(optionsWithDefaults.get('name')).to.eql({
         id: 'name',
         name: 'Name',
         type: 'string',
@@ -236,7 +236,7 @@ describe('helpers/filters', () => {
           { value: 'DFT', count: 1 },
           { value: 'DIT', count: 1 }
         ]
-      }]);
+      });
     });
   });
 });

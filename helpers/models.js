@@ -33,14 +33,15 @@ const transformForView = model => {
   return Object.keys(model.rawAttributes)
     .map(attributeKey => Object.assign({}, model.rawAttributes[attributeKey], { value: model[attributeKey] }))
     .filter(attribute => attribute.displayName)
-    .map(attribute => {
-      return {
+    .reduce((_map, attribute) => {
+      _map.set(attribute.fieldName, {
         id: attribute.fieldName,
         name: attribute.displayName,
         value: attribute.value,
         type: attribute.type.constructor.name.toLowerCase()
-      }
-    });
+      });
+      return _map;
+    }, new Map());
 };
 
 const truthy = [true, 'true', 'yes', 1, '1', 'y'];

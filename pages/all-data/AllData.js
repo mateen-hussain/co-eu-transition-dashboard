@@ -9,30 +9,22 @@ class AllData extends Page {
   }
 
   get schema() {
-    return {
-      filters: {
-        date: ['01/01/2020', '01/01/2021']
-      }
-    };
+    return { filters: {} };
   }
 
   get filtersFields() {
-    return ['uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    return ['deliveryTheme', 'uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
   get tableFields() {
     if(this.res.locals.departmentalView){
-      return ['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+      return ['uid', 'deliveryTheme', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
     }
-    return ['uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    return ['uid', 'deliveryTheme', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
   get milestoneTableFields() {
     return ['uid', 'description', 'date', 'comments'];
-  }
-
-  getField(fields = [], id) {
-    return fields.find(field => field.id === id);
   }
 
   async projects() {
@@ -46,12 +38,6 @@ class AllData extends Page {
   get currentDate() {
     return moment().format();
   }
-
-  getFilter(id, filters) {
-    return filters.find(filter => filter.id === id);
-  }
-
-
 }
 
 module.exports = AllData;
