@@ -9,7 +9,6 @@ const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
-const logger = require('services/logger');
 
 class User extends Model {
   async getProjects (search) {
