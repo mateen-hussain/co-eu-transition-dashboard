@@ -14,8 +14,10 @@ rl.question("Enter email: ", (email) => {
   let passphrase = randomString.generate({
     readable: true
   });
+  rl.close();
+  rl.removeAllListeners();
   authentication.hashPassphrase(passphrase).then( (hashedPassphrase) => {
-   User.create({
+    User.create({
       role: "user",
       email: email,
       hashedPassphrase: hashedPassphrase
@@ -37,12 +39,9 @@ rl.question("Enter email: ", (email) => {
         console.log(`User ${email} created with password ${passphrase}`);
       }
     });
-
   }).catch( (err) => {
     console.log(`Could not create user [${err}]`);
   });
   rl.close();
 });
-
-
 
