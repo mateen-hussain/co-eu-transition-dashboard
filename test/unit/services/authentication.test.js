@@ -41,7 +41,7 @@ describe('services/authentication', () => {
     bcrypt.compare.restore();
   });
 
-  describe('strategyies', () => {
+  describe('strategies', () => {
     it('attaches local strategy', () => {
       sinon.assert.calledWith(passportLocalStrategyStub, {
         usernameField: 'email',
@@ -185,6 +185,12 @@ describe('services/authentication', () => {
       expect(middleware[0]).to.eql(passportStub.authenticate());
       expect(middleware[1].name).to.eql('check2fa');
       expect(middleware[2].name).to.eql('checkRole');
+    });
+
+    it('can create hashed passphrases', () => {
+      sinon.stub(bcrypt,'hash');
+      authentication.hashPassphrase('password');
+      sinon.assert.calledWith(bcrypt.hash,'password');
     });
 
     describe('handle roles', () => {
