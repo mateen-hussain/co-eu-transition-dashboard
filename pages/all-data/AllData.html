@@ -42,8 +42,7 @@
 {% set projects = projects() | await %}
 {% set departmentView = 'false' %}
 
-
-
+{% if (data.filters['date']) %}
  {{ summary.push ({
     key: {
       html: "<span class='date-name'>Showing milestone due dates </span>"
@@ -53,6 +52,7 @@
     }
   })
 }}
+{% endif %}
 
 {% block pageTitle %}{{ index }}{% endblock %}
 
@@ -212,7 +212,10 @@
   {% endfor %}
 
   <div>
-  <h3 class="govuk-heading-s">Selected filters</h3>
+
+  {% if (data.filters | length) %}
+    <h3 class="govuk-heading-s">Selected filters</h3>
+  {% endif %}
 
   {% for key, filter in filters.entries() %}
     {%- set filterSummary  %}

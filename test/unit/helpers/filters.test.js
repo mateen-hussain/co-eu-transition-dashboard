@@ -29,7 +29,6 @@ describe('helpers/filters', () => {
       const user = { id: 1 };
 
       await filters.getFiltersWithCounts(attribute, search, user);
-      console.log(JSON.stringify(attribute));
 
       return sinon.assert.calledWith(Project.findAll, {
         attributes: [
