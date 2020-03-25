@@ -3,7 +3,7 @@
   "cookie": {
       "secret": "some secrent..."
     }
-  }
+  },
   "services": {
     "mysql": {
       "uri": "mysql://root:password@127.0.0.1:3306/dashboard",
