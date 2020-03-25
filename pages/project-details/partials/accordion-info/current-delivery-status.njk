@@ -1,12 +1,12 @@
 {{ govukSummaryList({
-  classes: 'project-summary',  
+  classes: 'project-summary',
   rows: [
     {
       key: {
         text: "Delivery barriers"
       },
       value: {
-        html: getField(project.fields, 'deliveryBarriers').value| default('N/A') 
+        html: project.fields.get('deliveryBarriers').value| default('N/A')
       }
     },
     {
@@ -14,7 +14,7 @@
         text: "Rationale"
       },
       value: {
-        html: getField(project.fields, 'deliveryBarriersRationale').value| default('N/A') 
+        html: project.fields.get('deliveryBarriersRationale').value| default('N/A')
       }
     },
     {
@@ -22,7 +22,7 @@
         text: "Latest date by which delivery can begin"
       },
       value: {
-        html: getField(project.fields, 'beginDelivery').value | date("D MMMM YYYY") | default('N/A')
+        html: project.fields.get('beginDelivery').value | date("D MMMM YYYY") | default('N/A')
       }
     }
   ]

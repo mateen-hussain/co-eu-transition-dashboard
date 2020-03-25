@@ -156,7 +156,7 @@ VALUES
   (19,'baselineDeliveryChangeImpact','Baseline delivery change impact','integer',1,NULL),
   (20,'changeInImpact','Change in impact','integer',1,NULL),
   (21,'changeStartDate','Change in latest start date','date',1,NULL),
-  (22,'priorityTheme','Priority Theme','string',1,NULL),
+  (22,'deliveryTheme','Delivery Theme','string',1,NULL),
   (24,'hmgDeliveryConfidenceRationale','HMG Delivery Confidence Ration','string',1,NULL);
 
 /*!40000 ALTER TABLE `project_field` ENABLE KEYS */;

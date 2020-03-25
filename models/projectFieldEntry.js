@@ -25,12 +25,12 @@ class ProjectFieldEntry extends Model {
 
   get fields() {
     const projectField = this.get('projectField');
-    return {
+    return new Map().set(projectField.name, {
       id: projectField.name,
       name: projectField.displayName,
       value: this.get('value'),
       type: projectField.type
-    };
+    });
   }
 }
 

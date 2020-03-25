@@ -42,7 +42,6 @@ rl.question("Enter email: ", (email) => {
   }).catch( (err) => {
     console.log(`Could not create user [${err}]`);
   });
+  rl.close();
 });
-
-
 

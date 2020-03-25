@@ -6,12 +6,12 @@ const MilestoneField = require('./milestoneField');
 class MilestoneFieldEntry extends Model {
   get fields() {
     const milestoneField = this.get('milestoneField');
-    return {
+    return new Map().set(milestoneField.name, {
       id: milestoneField.name,
       name: milestoneField.displayName,
       value: this.get('value'),
       type: milestoneField.type
-    };
+    });
   }
 }
 

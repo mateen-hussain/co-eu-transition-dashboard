@@ -1,12 +1,12 @@
 {{ govukSummaryList({
-  classes: 'project-summary',  
+  classes: 'project-summary',
   rows: [
     {
       key: {
         text: "EU member state confidence"
       },
       value: {
-        html: getField(project.fields, 'euStatesAction').value| default('N/A')
+        html: project.fields.get('euStatesAction').value| default('N/A')
       }
     }
   ]

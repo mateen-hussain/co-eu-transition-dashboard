@@ -17,7 +17,7 @@
 
   <br>
 
-  {% for field in project.fields %}
+  {% for key, field in project.fields.entries() %}
 
     {{ field.name }}: {{ field.value }}<br>
 
@@ -31,7 +31,7 @@
   <br>
   {% for milestone in project.milestones %}
 
-    {% for field in milestone.fields %}
+    {% for key, field in milestone.fields.entries() %}
 
       {{ field.name }}: {{ field.value }}<br>
 

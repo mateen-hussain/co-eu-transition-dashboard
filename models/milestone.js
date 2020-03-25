@@ -17,7 +17,7 @@ class Milestone extends Model {
 
     if(this.get('milestoneFieldEntries')){
       this.get('milestoneFieldEntries').forEach(field => {
-        fields.push(field.fields);
+        field.fields.forEach((value, key) => fields.set(key, value));
       });
     }
 

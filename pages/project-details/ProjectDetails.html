@@ -31,7 +31,7 @@
 
   {% for tableFieldId in tableFields %}
 
-    {% set field = getField(project.fields, tableFieldId) %}
+    {% set field = project.fields.get(tableFieldId) %}
 
     {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
 
@@ -41,7 +41,7 @@
     {% set milestoneValue = [] %}
     {% set flag = '' %}
     {% for tableFieldId in milestoneTableFields %}
-    {% set field = getField(milestone.fields, tableFieldId) %}
+      {% set field = milestone.fields.get(tableFieldId) %}
 
       {% if (field.id == 'date') and (field.value < currentDate) %}
         {% set flag = 'red-date' %}
@@ -58,7 +58,7 @@
 
 {% set projectValue = (projectValue.push({
       html: "<span>" + missedMilestonesCount + "</span>" }, {
-      html: "<span>" + getField(project.fields, 'priorityTheme').value| default('N/A') + "</span>" }), 
+      html: "<span>" + project.fields.get('deliveryTheme').value| default('N/A') + "</span>" }),
     projectValue) %}
 
 {% set milestonesHtml %}

@@ -18,7 +18,7 @@ class Project extends Model {
 
     if(this.get('projectFieldEntries')){
       this.get('projectFieldEntries').forEach(field => {
-        fields.push(field.fields);
+        field.fields.forEach((value, key) => fields.set(key, value));
       });
     }
 

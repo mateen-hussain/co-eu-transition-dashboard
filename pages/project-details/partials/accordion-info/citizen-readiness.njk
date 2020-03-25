@@ -1,12 +1,12 @@
 {{ govukSummaryList({
-  classes: 'project-summary',  
+  classes: 'project-summary',
   rows: [
     {
       key: {
         text: "Citizen readiness confidence"
       },
       value: {
-        html: getField(project.fields, 'citizenAction').value| default('N/A')
+        html: project.fields.get('citizenAction').value| default('N/A')
       }
     }
   ]
