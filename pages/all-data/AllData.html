@@ -227,9 +227,9 @@
               <ul class="govuk-header__navigation" aria-label="Top Level Filters">
                 <li class="govuk-header__navigation-item govuk-header__navigation-item">
                   {% set filterNames = (filterNames.push (filter.name), filterNames) %}
-                  <form type="post" url="{{ url }}">
+                  <form action="{{ url }}" method="post">
                     <input type="hidden" name="filterId" value="{{ filter.id }}" />
-                    <input type="hidden" name="optionId" value="{{ option.value }}" />
+                    <input type="hidden" name="optionValue" value="{{ option.value }}" />
                     {{ govukButton({
                       text: 'X ' + applyFormatting(filter, option.value),
                       classes: "govuk-button--secondary filterBtn"

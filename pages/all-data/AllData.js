@@ -75,9 +75,11 @@ class AllData extends Page {
   async postRequest(req, res) {
     if(req.body.filterId) {
       const filters = this.data.filters;
-      console.log(req.body.optionId)
-      console.log(req.body.filterId)
-      delete filters[req.body.filterId][req.body.optionId];
+      
+      for (var i = filters[req.body.filterId].length - 1; i >= 0; i--) {
+        if (filters[req.body.filterId][i] == req.body.optionValue) filters[req.body.filterId].splice(i, 1);
+    }
+
       this.saveData({ filters });
       res.redirect(this.url);
     } else {
