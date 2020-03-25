@@ -45,7 +45,6 @@ const projectDatabaseExcelMap = {
   'changeStartDate': 'Change in latest start date',
 };
 
-
 const milestoneDatabaseExcelMap = {
   'projectUid': 'Project UID',
   'uid': 'Milestone UID',
@@ -81,6 +80,9 @@ class Import extends Page {
       let value = String(item[excelName] || '');
 
       if (Object.keys(model.rawAttributes).includes(databaseName)) {
+        if(model.rawAttributes[databaseName].type.toString() === 'DATETIME') {
+          value = modelUtils.parseFieldEntryValue(value, 'date', true);
+        }
         newItem[databaseName] = value;
       } else {
         const field = fields.find(field => field.name === databaseName);

@@ -2,6 +2,17 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const sequelize = require('services/sequelize');
 
+const parseDateExcel = (excelTimestamp) => {
+  const secondsInDay = 24 * 60 * 60;
+  const excelEpoch = new Date(1899, 11, 31);
+  const excelEpochAsUnixTimestamp = excelEpoch.getTime();
+  const missingLeapYearDay = secondsInDay * 1000;
+  const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
+  const excelTimestampAsUnixTimestamp = excelTimestamp * secondsInDay * 1000;
+  const parsed = excelTimestampAsUnixTimestamp + delta;
+  return isNaN(parsed) ? null : parsed;
+};
+
 const groupSearchItems = async (search, overrides = {}) => {
   const groupedSearch = { project: {}, milestone: {}, projectField: [], milestoneField: {} };
   const projectFields = await sequelize.models.projectField.findAll();
@@ -95,13 +106,13 @@ const parseFieldEntryValue = (value, type, forDatabase = false) => {
         break;
       case 'date':
         if( forDatabase ) {
-          const date = moment(value, 'DD/MM/YYYY');
+          const date = moment(parseDateExcel(value));
+
           if(date.isValid()) {
             value = date.format('YYYY-MM-DD');
           } else {
             value = moment(value).format('YYYY-MM-DD');
           }
-
         } else {
           value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
         }
