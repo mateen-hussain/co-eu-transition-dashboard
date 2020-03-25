@@ -26,7 +26,7 @@
 
 {% block content %}
 
-{% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Missed milestones' }] %}
+{% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Missed milestones' }, { text:'Themes' }] %}
 {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
 
   {% for tableFieldId in tableFields %}
@@ -56,7 +56,10 @@
 
   {% endfor %}
 
-{% set projectValue = (projectValue.push({html: "<span>" + missedMilestonesCount + "</span>" }), projectValue) %}
+{% set projectValue = (projectValue.push({
+      html: "<span>" + missedMilestonesCount + "</span>" }, {
+      html: "<span>" + getField(project.fields, 'priorityTheme').value| default('N/A') + "</span>" }), 
+    projectValue) %}
 
 {% set milestonesHtml %}
  {% include "project-details/partials/accordion-info/milestones-table.njk" %}
