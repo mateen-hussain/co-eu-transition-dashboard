@@ -69,7 +69,7 @@ describe('pages/all-data/AllData', () => {
 
   describe('#tableFields', () => {
     it('should not return the department if departmental view', () => {
-      expect(page.tableFields).to.eql(['uid', 'deliveryTheme', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence']);
+      expect(page.tableFields).to.eql(['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence']);
     });
   });
 });

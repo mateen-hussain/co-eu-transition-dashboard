@@ -18,9 +18,9 @@ class AllData extends Page {
 
   get tableFields() {
     if(this.res.locals.departmentalView){
-      return ['uid', 'deliveryTheme', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+      return ['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
     }
-    return ['uid', 'deliveryTheme', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    return ['uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
   get milestoneTableFields() {
