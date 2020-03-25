@@ -1,7 +1,7 @@
 applications:
   - name: transition-dashboard
     command: NODE_PATH=. node server.js
-    memory: 256M
+    memory: 1G
     buildpacks:
     - https://github.com/cloudfoundry/nodejs-buildpack
     services:
