@@ -9,45 +9,41 @@ const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
+const logger = require('services/logger');
 
 class User extends Model {
   async getProjects (search) {
     const groupedSearch = await modelUtils.groupSearchItems(search);
 
-    const departments = await this.getDepartments({
-      attributes: [],
-      include: [{
-        model: Project,
-        where: groupedSearch.project,
-        include: [
-          {
-            model: Milestone,
-            include: [{
-              model: MilestoneFieldEntry,
-              include: MilestoneField
-            }],
+    return await Project.findAll({
+      where: groupedSearch.project,
+      include: [
+        {
+          model: Department,
+          required: true,
+          include: {
+            model: User,
             required: true,
-            where: groupedSearch.milestone
-          },
-          {
-            model: ProjectFieldEntry,
-            include: ProjectField
-          },
-          {
-            required: true,
-            as: 'ProjectFieldEntryFilter',
-            attributes: [],
-            model: ProjectFieldEntry,
-            where: groupedSearch.projectField
+            through: { attributes: [] },
+            where: {
+              id: this.id
+            }
           }
-        ]
-       }]
+        },
+        {
+          model: Milestone,
+          include: [{
+            model: MilestoneFieldEntry,
+          }],
+          where: groupedSearch.milestone
+        },
+        {
+          model: ProjectFieldEntry,
+          as: 'ProjectFieldEntryFilter',
+          where: groupedSearch.projectField
+        },
+      ]
     });
-
-    return departments.reduce((projects, department) => {
-      projects.push(...department.get('projects'));
-      return projects;
-    }, []);
   }
 }
 
