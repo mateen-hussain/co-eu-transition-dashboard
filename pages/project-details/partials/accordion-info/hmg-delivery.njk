@@ -1,0 +1,21 @@
+{{ govukSummaryList({
+  classes: 'project-summary',  
+  rows: [
+    {
+      key: {
+        text: "HMG Delivery Confidence"
+      },
+      value: {
+        html: getField(project.fields, 'progressStatus').value| default('N/A')
+      }
+    },
+    {
+      key: {
+        text: "Rationale"
+      },
+      value: {
+        html: getField(project.fields, 'hmgDeliveryConfidenceRationale').value| default('N/A')
+      }
+    }
+  ]
+}) }}

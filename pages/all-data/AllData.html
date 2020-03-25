@@ -41,6 +41,7 @@
 {% set filterTitles = [] %}
 {% set filters = filters() | await %}
 {% set projects = projects() | await %}
+{% set departmentView = 'false' %}
 
  {{ items.push ({
     heading: {
@@ -99,6 +100,10 @@
       %}
     {% endif %}
 
+    {% if (filter.name == 'Department') and (filter.name not in filterTitles) %}
+      {% set departmentView = 'true' %}
+    {% endif %}
+
   {% endfor %}
 
   <form action="{{ url }}" method="post">
@@ -120,7 +125,14 @@
   {% include "all-data/partials/filters/hide-filter-btn.njk" %}
   </div>
 
-  {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU State Confidence' }] %}
+
+  {% set projectKey = [{ text:'Project Name' }, { text:'Department' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
+  {% if (departmentView == 'true') %}
+  {% set projectKey = [{ text:'Project Name' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }] %}
+  {% endif %}
+
+
+  {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
 
 {% set tableHeaderHtml %}
     {% include "all-data/partials/data-table/table-header.njk" %}
@@ -137,22 +149,32 @@
   {% for tableFieldId in tableFields %}
 
     {% set field = getField(project.fields, tableFieldId) %}
-    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A')  + "</span>" }), projectValue) %}
+
+    {% if (field.id == 'departmentName') and (departmentView == 'true') %}
+    {% else %}
+    {% set projectValue = (projectValue.push({html:
+
+    "<a href=" + config.paths.projectDetails | replace(":uid", field.value | replace(" ", "%20"))  + " class='govuk-link project-link'>" + field.value + "</a>"
+      if field.id == 'uid'
+        else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
+    }), projectValue) %}
+
+  {% endif %}
 
   {% endfor %}
 
-    {% set projectFields = (projectFields.push(projectValue), projectFields) %}
+  {% set projectFields = (projectFields.push(projectValue), projectFields) %}
 
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
-    {% set milestoneKey = [] %}
-    {% for field in milestone.fields %}
 
-      {% set milestoneKey = (milestoneKey.push({text: field.name }), milestoneKey) %}
 
-    {% if (field.name == 'Due Date') and (field.value < currentDate) %}
-      {% set flag = 'red-date' %}
-    {% endif %}
+    {% for tableFieldId in milestoneTableFields %}
+    {% set flag = '' %}
+    {% set field = getField(milestone.fields, tableFieldId) %}
+      {% if (field.id == 'date') and (field.value < currentDate) %}
+        {% set flag = 'red-date' %}
+      {% endif %}
 
       {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.type == 'date' else
       "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}

@@ -1,0 +1,14 @@
+{{ govukSummaryList({
+  classes: 'project-summary',  
+  rows: [
+    {
+      key: {
+        text: "Business readiness confidence"
+      },
+      value: {
+        html: getField(project.fields, 'businessAction').value| default('N/A') 
+      }
+    }
+  ]
+}) }}
+

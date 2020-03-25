@@ -21,7 +21,14 @@ class AllData extends Page {
   }
 
   get tableFields() {
+    if(this.res.locals.departmentalView){
+      return ['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    }
     return ['uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+  }
+
+  get milestoneTableFields() {
+    return ['uid', 'description', 'date', 'comments'];
   }
 
   getField(fields = [], id) {
@@ -43,6 +50,8 @@ class AllData extends Page {
   getFilter(id, filters) {
     return filters.find(filter => filter.id === id);
   }
+
+
 }
 
 module.exports = AllData;
