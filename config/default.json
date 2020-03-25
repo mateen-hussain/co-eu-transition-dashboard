@@ -11,6 +11,9 @@
       "sslCertificate": null
     }
   },
+  "bcrypt": {
+    "saltRounds": 10
+  },
   "paths": {
     "admin": {
       "import": "/admin/import"

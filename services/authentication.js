@@ -8,6 +8,14 @@ const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
 
+const hashPassphrase = (passphrase) => {
+  try {
+    return bcrypt.hash(passphrase,config.bcrypt.saltRounds);
+  } catch(err) {
+      throw Error(`Bcrypt error: ${err}`);
+  }
+};
+
 const authenticateLogin = (email, password, cb) => {
   return User.findOne({
     attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
@@ -137,4 +145,5 @@ module.exports = {
   authenticateUser,
   protectNo2FA,
   verify2FA,
+  hashPassphrase
 }
