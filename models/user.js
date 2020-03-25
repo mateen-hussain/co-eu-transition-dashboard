@@ -32,15 +32,21 @@ class User extends Model {
         },
         {
           model: Milestone,
-          include: [{
-            model: MilestoneFieldEntry,
-          }],
+          include: {
+            model: MilestoneField,
+            include: {
+              model: MilestoneFieldEntry,
+            }
+          },
           where: groupedSearch.milestone
         },
         {
-          model: ProjectFieldEntry,
-          as: 'ProjectFieldEntryFilter',
-          where: groupedSearch.projectField
+          model: ProjectField,
+          include: {
+            model: ProjectFieldEntry,
+            as: 'ProjectFieldEntryFilter',
+            where: groupedSearch.projectField
+          }
         },
       ]
     });
