@@ -23,19 +23,25 @@ const getFiltersWithCounts = async (attribute, search, user) => {
         attributes: [],
         where: searchIgnoreCurrentAttribute,
         required: false,
-        include: [{
-          required: true,
-          as: 'ProjectFieldEntryFilter',
-          attributes: [],
-          model: ProjectFieldEntry,
-          where: groupedSearch.projectField
-        }]
+        include: [
+          {
+            required: true,
+            as: 'ProjectFieldEntryFilter',
+            attributes: [],
+            model: ProjectFieldEntry,
+            where: groupedSearch.projectField
+          },
+          {
+            model: Milestone,
+            attributes: [],
+            required: true,
+            where: groupedSearch.milestone
+          }
+        ]
       },
       {
         model: Milestone,
-        attributes: [],
-        required: true,
-        where: groupedSearch.milestone
+        attributes: []
       },
       {
         model: Department,

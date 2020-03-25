@@ -12,6 +12,10 @@ class AllData extends Page {
     return { filters: {} };
   }
 
+  formatDate(date) {
+    return moment(date, 'DD/MM/YYYY').format("Do MMMM YYYY");
+  }
+
   get filtersFields() {
     return ['deliveryTheme', 'uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }

@@ -1,7 +1,8 @@
 <div class='filter-nav date'>
     <ul class="govuk-header__navigation" aria-label="Top Level Date Filters">
         <li class="govuk-header__navigation-item govuk-header__navigation-item">
-            Between &nbsp;<span class="filter-block">{{ data.filters.date[0] | date("Do MMMM YYYY") }}</span>
+            Between &nbsp;<span class="filter-block">{{ formatDate(data.filters.date[0]) }}</span>
+
         </li>
     </ul>
 </div>
@@ -10,7 +11,7 @@
     <ul class="govuk-header__navigation" aria-label="Top Level Date Filters">
         <li class="govuk-header__navigation-item govuk-header__navigation-item">
         and &nbsp;
-            <span class="filter-block">{{ data.filters.date[1] | date("Do MMMM YYYY")  }}</span>
+            <span class="filter-block">{{ formatDate(data.filters.date[1])  }}</span>
         </li>
     </ul>
 </div>
