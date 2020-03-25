@@ -31,7 +31,7 @@
     "moment": "^2.24.0",
     "mysql2": "^2.1.0",
     "node-xlsx": "^0.15.0",
-    "nunjucks": "^3.2.0",
+    "nunjucks": "^3.2.1",
     "nunjucks-await-filter": "0.0.1",
     "nunjucks-date-filter": "^0.1.1",
     "nyc": "^15.0.0",

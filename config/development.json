@@ -1,8 +1,7 @@
 {
   "env": "development",
   "cookie": {
-      "secret": "some secrent..."
-    }
+    "secret": "some secrent..."
   },
   "services": {
     "mysql": {
