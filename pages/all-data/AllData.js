@@ -71,6 +71,19 @@ class AllData extends Page {
   get currentDate() {
     return moment().format();
   }
+
+  async postRequest(req, res) {
+    if(req.body.filterId) {
+      const filters = this.data.filters;
+      console.log(req.body.optionId)
+      console.log(req.body.filterId)
+      delete filters[req.body.filterId][req.body.optionId];
+      this.saveData({ filters });
+      res.redirect(this.url);
+    } else {
+      super.postRequest(req, res);
+    }
+  }
 }
 
 module.exports = AllData;

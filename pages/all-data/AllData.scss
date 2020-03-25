@@ -213,5 +213,12 @@ dl.govuk-summary-list.project-summary > .govuk-summary-list__row:last-child > dt
     border-bottom: 0;
 }
 
+button.govuk-button.govuk-button--secondary.filterBtn {
+    box-shadow: none;
+    background-color: white;
+    margin-bottom: -10px;
+    border: 1px solid #000000;
+}
+
 
 
