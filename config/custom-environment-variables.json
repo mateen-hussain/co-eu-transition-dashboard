@@ -8,5 +8,8 @@
   "port": "PORT",
   "features": {
     "twoFactorAuth": "FEATURE_2FA"
+  },
+  "notify": {
+    "apiKey": "NOTIFY_API_KEY"
   }
 }
