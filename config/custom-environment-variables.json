@@ -1,4 +1,7 @@
 {
+  "cookie": {
+    "secret": "COOKIE_SECRET"
+  },
   "env": "NODE_ENV",
   "services": {
     "mysql": {
