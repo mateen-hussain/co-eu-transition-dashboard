@@ -14,41 +14,40 @@ class User extends Model {
   async getProjects (search) {
     const groupedSearch = await modelUtils.groupSearchItems(search);
 
-    return await Project.findAll({
-      where: groupedSearch.project,
-      include: [
-        {
-          model: Department,
-          required: true,
-          include: {
-            model: User,
-            required: true,
-            through: { attributes: [] },
-            where: {
-              id: this.id
-            }
-          }
-        },
-        {
-          model: Milestone,
-          include: {
-            model: MilestoneField,
-            include: {
+    const departments = await this.getDepartments({
+      attributes: [],
+      include: [{
+        model: Project,
+        where: groupedSearch.project,
+        include: [
+          {
+            model: Milestone,
+            include: [{
               model: MilestoneFieldEntry,
-            }
+              include: MilestoneField
+            }],
+            required: true,
+            where: groupedSearch.milestone
           },
-          where: groupedSearch.milestone
-        },
-        {
-          model: ProjectField,
-          include: {
+          {
             model: ProjectFieldEntry,
+            include: ProjectField
+          },
+          {
+            required: true,
             as: 'ProjectFieldEntryFilter',
+            attributes: [],
+            model: ProjectFieldEntry,
             where: groupedSearch.projectField
           }
-        },
-      ]
+        ]
+       }]
     });
+
+    return departments.reduce((projects, department) => {
+      projects.push(...department.get('projects'));
+      return projects;
+    }, []);
   }
 }
 
