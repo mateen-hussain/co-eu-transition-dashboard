@@ -95,7 +95,13 @@ const parseFieldEntryValue = (value, type, forDatabase = false) => {
         break;
       case 'date':
         if( forDatabase ) {
-          value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD');
+          const date = moment(value, 'DD/MM/YYYY');
+          if(date.isValid()) {
+            value = date.format('YYYY-MM-DD');
+          } else {
+            value = moment(value).format('YYYY-MM-DD');
+          }
+
         } else {
           value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
         }
