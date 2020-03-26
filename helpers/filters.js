@@ -80,7 +80,7 @@ const getProjectCoreFields = async (search, user) => {
       id: attribute.fieldName,
       name: attribute.displayName,
       type: attribute.type,
-      options
+      options: options.sort((a, b) => (a.value > b.value) ? 1 : -1)
     });
   }
 
