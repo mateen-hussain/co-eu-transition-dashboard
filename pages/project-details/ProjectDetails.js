@@ -12,7 +12,7 @@ class ProjectDetails extends Page {
   }
 
   get tableFields() {
-    return ['uid', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    return ['title', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
   }
 
   get currentDate() {

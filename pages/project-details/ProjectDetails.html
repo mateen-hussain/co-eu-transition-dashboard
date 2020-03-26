@@ -26,15 +26,17 @@
 
 {% block content %}
 
-{% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Missed milestones' }, { text:'Themes' }] %}
+{% set projectKey = [{ text:'Project Name' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Missed milestones' }, { text:'Themes' }] %}
 {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
 
   {% for tableFieldId in tableFields %}
 
     {% set field = project.fields.get(tableFieldId) %}
 
-    {% set projectValue = (projectValue.push({html: "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
-
+    {% set projectValue = (projectValue.push({html: 
+    "<div class='scrollable'>" + field.value + "</div>"
+    if field.id == 'title' else
+    "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
   {% endfor %}
 
   {% for milestone in project.milestones %}
@@ -48,7 +50,7 @@
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.name == 'Due Date' else
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.id == 'date' else
       "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
 
     {% endfor %}
@@ -95,7 +97,6 @@
 {% include "project-details/partials/project-table.njk" %}
 
 <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
-<br><br><br>
 
 {% include "project-details/partials/accordion-details.njk" %}
 

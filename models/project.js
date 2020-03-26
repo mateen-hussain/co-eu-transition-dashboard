@@ -30,7 +30,7 @@ Project.init({
   uid: {
     type: STRING(45),
     primaryKey: true,
-    displayName: 'Project Name',
+    displayName: 'Project UID',
     searchable: true
   },
   departmentName: {
@@ -42,7 +42,8 @@ Project.init({
     field: "department_name"
   },
   title: {
-    type: STRING(1024)
+    type: STRING(1024),
+    displayName: 'Project Name',
   },
   sro: {
     type: STRING(256)
