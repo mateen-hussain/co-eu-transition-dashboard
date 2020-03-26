@@ -41,6 +41,7 @@
 {% set filters = filters() | await %}
 {% set projects = projects() | await %}
 {% set departmentView = 'false' %}
+{% set uid = '' %}
 
 {% if (data.filters['date']) %}
  {{ summary.push ({
@@ -151,12 +152,16 @@
 
     {% set field = project.fields.get(tableFieldId) %}
 
-    {% if (field.id == 'departmentName') and (departmentView == 'true') %}
+    {% if (field.id == 'uid')%}
+    {% set uid = field.value %}
+    {% elif (field.id == 'departmentName') and (departmentView == 'true') %}
     {% else %}
+
     {% set projectValue = (projectValue.push({html:
 
-    "<a href=" + config.paths.projectDetails | replace(":uid", field.value | replace(" ", "%20"))  + " class='govuk-link project-link'>" + field.value + "</a>"
-      if field.id == 'uid'
+    "<a href=" + config.paths.projectDetails | replace(":uid", uid | replace(" ", "%20"))  + " class='govuk-link project-link'>" + 
+    "<div class='scrollable'>" + field.value + "</div></a>"
+      if field.id == 'title'
         else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
     }), projectValue) %}
 
