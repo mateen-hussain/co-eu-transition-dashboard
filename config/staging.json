@@ -1,0 +1,9 @@
+{
+  "env": "staging",
+  "serviceUrl": "https://transition-dashboard-staging.london.cloudapps.digital/",
+  "services": {
+    "mysql": {
+      "sslCertificate": "Amazon RDS"
+    }
+  }
+}
