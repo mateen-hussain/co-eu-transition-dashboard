@@ -159,6 +159,7 @@ const getProjectFields = async (search, user) => {
       exsistingField.options.push({
         value
       });
+      exsistingField.options.sort((a, b) => (a.value > b.value) ? 1 : -1);
     }
 
     return fields;
