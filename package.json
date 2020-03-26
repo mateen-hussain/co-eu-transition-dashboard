@@ -9,8 +9,8 @@
     "test:lint": "eslint .",
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
     "release": "release-it --no-npm.publish --ci",
-    "deploy-staging": "bash deploy.sh staging transition-dashboard-staging",
-    "deploy-production": "bash deploy.sh production transition-dashboard"
+    "deploy-staging": "bash deploy.sh staging staging.yml",
+    "deploy-production": "bash deploy.sh production production.yml"
   },
   "nodemonConfig": {
     "ignore": [
