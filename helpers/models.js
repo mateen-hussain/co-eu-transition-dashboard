@@ -107,9 +107,7 @@ const parseFieldEntryValue = (value, type, forDatabase = false) => {
       case 'date':
         if( forDatabase ) {
           if (String(value || '').includes('/')) {
-          console.log(value)
             value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD');
-          console.log(value)
           } else {
             const date = moment(parseDateExcel(value));
             if(date.isValid()) {

@@ -11,11 +11,14 @@ const getFiltersWithCounts = async (attribute, search, user) => {
   const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter'}});
   const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.field]: { [Op.ne]: null } });
 
+  const attributes = [[literal(`project.${attribute.field}`), 'value']];
+
+  if(attribute.showCount) {
+    attributes.push([literal(`COUNT(DISTINCT projects_count.uid)`), 'count']);
+  }
+
   return await Project.findAll({
-    attributes: [
-      [literal(`project.${attribute.field}`), 'value'],
-      [literal(`COUNT(DISTINCT projects_count.uid)`), 'count']
-    ],
+    attributes,
     include: [
       {
         model: Project,

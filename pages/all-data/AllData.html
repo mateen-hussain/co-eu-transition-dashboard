@@ -222,6 +222,7 @@
       {% for option in filter.options %}
         {% if option.value in data.filters[filter.id] | default([]) %}
           {% set filterNames = (filterNames.push (filter.id), filterNames) %}
+          {% set filter = filter %}
           {% include "all-data/partials/filters/filter-list.njk" %}
         {% endif %}
       {% endfor %}

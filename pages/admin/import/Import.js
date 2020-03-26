@@ -89,7 +89,7 @@ class Import extends Page {
         const isNA = String(value || '').toLowerCase().includes('n/a');
 
         if (field) {
-          if(!String(value || '').length) {
+          if(!String(value || '').length && value !== 0) {
             if (field.is_required) {
               throw Error(`Field must have a value ${excelName}`);
             }
