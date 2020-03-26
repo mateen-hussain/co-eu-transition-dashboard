@@ -1,5 +1,7 @@
 applications:
   - name: transition-dashboard
+    instances: ((instances))
+    host: ((host))
     command: NODE_PATH=. node server.js
     memory: 1G
     buildpacks:
