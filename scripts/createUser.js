@@ -29,7 +29,9 @@ rl.question("Enter email: ", (email) => {
           email,
           {
             personalisation: {
-              password: passphrase
+              password: passphrase,
+              email: email,
+              link: config.serviceUrl
             },
             reference: user.id
           },

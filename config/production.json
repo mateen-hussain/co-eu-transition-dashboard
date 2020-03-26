@@ -1,5 +1,6 @@
 {
   "env": "production",
+  "serviceUrl": "https://transition-dashboard.london.cloudapps.digital/",
   "services": {
     "mysql": {
       "sslCertificate": "Amazon RDS"
