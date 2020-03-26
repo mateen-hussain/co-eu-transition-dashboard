@@ -230,8 +230,9 @@
                   <form action="{{ url }}" method="post">
                     <input type="hidden" name="filterId" value="{{ filter.id }}" />
                     <input type="hidden" name="optionValue" value="{{ option.value }}" />
+
                     {{ govukButton({
-                      text: 'X ' + applyFormatting(filter, option.value),
+                      html: "<img src='/assets/images/cross.png' class='cross' alt='delete-filter' />" + applyFormatting(filter, option.value),
                       classes: "govuk-button--secondary filterBtn"
                     }) }}
                   </form>
