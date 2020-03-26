@@ -1,5 +1,6 @@
 applications:
   - name: transition-dashboard
+    host: transition-dashboard-staging
     command: NODE_PATH=. node server.js
     memory: 1G
     buildpacks:
