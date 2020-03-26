@@ -2,7 +2,7 @@
 
 CURRENT_SPACE=`cf target|grep space|sed 's/^space: \+\(.*$\)/\1/'`
 REQUESTED_SPACE=$1
-REQUESTED_HOST=$2
+VARS_FILE=$2
 
 if [ -z "$REQUESTED_SPACE" ] || [ -z "$REQUESTED_HOST" ]
 then
@@ -10,7 +10,7 @@ then
   exit 1
 fi
 
-cf target -s $REQUESTED_SPACE && cf push -n $REQUESTED_HOST
+cf target -s $REQUESTED_SPACE && cf push --vars-file $VARS_FILE
 RETURN=$?
 cf target -s $CURRENT_SPACE
 
