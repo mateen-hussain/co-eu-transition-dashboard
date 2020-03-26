@@ -2,6 +2,7 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const { getFilters } = require('helpers/filters');
 const moment = require('moment');
+const { removeNulls } = require('helpers/utils');
 
 class AllData extends Page {
   get url() {
@@ -30,7 +31,7 @@ class AllData extends Page {
 
     switch(attribute.id) {
       case 'impact':
-        return `${value} - ${getDescription('confidence')}`;
+        return `${value} - ${getDescription('impact')}`;
       case 'hmgConfidence':
       case 'citizenReadiness':
       case 'businessReadiness':
@@ -74,15 +75,15 @@ class AllData extends Page {
 
   async postRequest(req, res) {
     if(req.body.filterId) {
-      const filters = this.data.filters;
+      let filters = this.data.filters;
       const filterId = req.body.filterId;
       const optionValue = req.body.optionValue;
-      
+
       for (var i = filters[filterId].length - 1; i >= 0; i--) {
         if (filters[filterId][i] == optionValue) filters[filterId].splice(i, 1);
-    }
+      }
 
-      this.saveData({ filters });
+      this.saveData(removeNulls({ filters }));
       res.redirect(this.url);
     } else {
       super.postRequest(req, res);
