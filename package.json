@@ -15,6 +15,9 @@
       "common/*"
     ]
   },
+  "npm": {
+    "publish": false
+  },
   "dependencies": {
     "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
@@ -105,5 +108,10 @@
   "engines": {
     "node": "10.x.x",
     "npm": "6.x.x"
+  },
+  "release-it": {
+    "github": {
+      "release": true
+    }
   }
 }
