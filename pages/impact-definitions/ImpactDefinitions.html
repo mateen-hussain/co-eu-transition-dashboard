@@ -5,7 +5,10 @@
 {% block beforeContent %}
 {{ govukBackLink({
   text: "Back",
-  href: "/"
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
 }) }}
 {% endblock %}
 
