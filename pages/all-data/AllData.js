@@ -79,8 +79,12 @@ class AllData extends Page {
       const filterId = req.body.filterId;
       const optionValue = req.body.optionValue;
 
-      for (var i = filters[filterId].length - 1; i >= 0; i--) {
-        if (filters[filterId][i] == optionValue) filters[filterId].splice(i, 1);
+      if (!optionValue) {
+        delete filters[filterId];
+      } else {
+        for (var i = filters[filterId].length - 1; i >= 0; i--) {
+          if (filters[filterId][i] == optionValue) filters[filterId].splice(i, 1);
+        }
       }
 
       this.saveData(removeNulls({ filters }));
