@@ -228,5 +228,15 @@ button.govuk-button.govuk-button--secondary.filterBtn {
     padding-right: 15px;
 }
 
+button.govuk-button.govuk-button--no-style {
+    box-shadow: none;
+    background-color: none;
+    margin-bottom: 5px;
+    border: none;
+    background: none;
+    .cross {
+        padding-right: 0;
+    }
+}
 
 
