@@ -24,7 +24,9 @@ button#accordion-table-heading-1 ~ .govuk-accordion__icon {
 }
 
 #accordion-table .govuk-accordion__controls {
-    display: none;
+    position: relative;
+    top: -75px;
+    pointer-events: all;
 }
 
 button#accordion-table-heading-1 {
