@@ -26,7 +26,7 @@
 
 {% block content %}
 
-{% set projectKey = [{ text:'Project Name' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Missed milestones' }, { text:'Themes' }] %}
+{% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Missed milestones' }, { text:'Themes' }] %}
 {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
 
   {% for tableFieldId in tableFields %}
@@ -34,8 +34,6 @@
     {% set field = project.fields.get(tableFieldId) %}
 
     {% set projectValue = (projectValue.push({html: 
-    "<div class='scrollable'>" + field.value + "</div>"
-    if field.id == 'title' else
     "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
   {% endfor %}
 
@@ -89,7 +87,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
-    <h1 class="govuk-heading-xl project-name">{{ project.uid }}</h1>
+    <h1 class="govuk-heading-xl project-name">{{ project.title }}</h1>
     <span class="govuk-caption-xl dept-name">{{ project.department_name }}</span>
 
 {% include "project-details/partials/project-tabs.njk" %}
