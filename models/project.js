@@ -54,8 +54,8 @@ Project.init({
     type: INTEGER,
     displayName: 'Impact',
     searchable: true,
-    set(val = '') {
-      const isNA = val.toLowerCase().trim() === 'n/a';
+    set(val) {
+      const isNA = String(val || '').toLowerCase().trim() === 'n/a';
       if (!isNA) {
         this.setDataValue('impact', val);
       }

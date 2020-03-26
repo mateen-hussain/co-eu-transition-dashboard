@@ -67,7 +67,7 @@ const validateFieldEntryValue = function(val = '') {
 
   switch(this.projectField.type) {
     case 'boolean':
-      if (!isBool(value.toLowerCase())) {
+      if (!isBool(String(value || '').toLowerCase())) {
         throw Error(`"${value}" is not a valid boolean`);
       }
       break;
@@ -106,12 +106,17 @@ const parseFieldEntryValue = (value, type, forDatabase = false) => {
         break;
       case 'date':
         if( forDatabase ) {
-          const date = moment(parseDateExcel(value));
-
-          if(date.isValid()) {
-            value = date.format('YYYY-MM-DD');
+          if (String(value || '').includes('/')) {
+          console.log(value)
+            value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD');
+          console.log(value)
           } else {
-            value = moment(value).format('YYYY-MM-DD');
+            const date = moment(parseDateExcel(value));
+            if(date.isValid()) {
+              value = date.format('YYYY-MM-DD');
+            } else {
+              value = moment(value).format('YYYY-MM-DD');
+            }
           }
         } else {
           value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');

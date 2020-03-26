@@ -99,5 +99,9 @@
       "pages/filters-example/**/*.js",
       "pages/admin/**/*.js"
     ]
+  },
+  "engines": {
+    "node": "10.x.x",
+    "npm": "6.x.x"
   }
 }

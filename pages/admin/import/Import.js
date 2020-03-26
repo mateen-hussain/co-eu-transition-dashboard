@@ -77,7 +77,7 @@ class Import extends Page {
 
     for (const [databaseName, excelName] of Object.entries(databaseExcelMap)) {
 
-      let value = String(item[excelName] || '');
+      let value = item[excelName];
 
       if (Object.keys(model.rawAttributes).includes(databaseName)) {
         if(model.rawAttributes[databaseName].type.toString() === 'DATETIME') {
@@ -86,10 +86,10 @@ class Import extends Page {
         newItem[databaseName] = value;
       } else {
         const field = fields.find(field => field.name === databaseName);
-        const isNA = value.toLowerCase().includes('n/a');
+        const isNA = String(value || '').toLowerCase().includes('n/a');
 
         if (field) {
-          if(!value.length) {
+          if(!String(value || '').length) {
             if (field.is_required) {
               throw Error(`Field must have a value ${excelName}`);
             }
@@ -189,9 +189,8 @@ class Import extends Page {
 
       req.flash(`Imported ${req.files.import.name} successfully`);
     } catch (error) {
-      logger.error(error);
-      req.flash(error.message);
       await transaction.rollback();
+      throw error;
     }
   }
 
@@ -200,6 +199,7 @@ class Import extends Page {
       try {
         await this.importData(req);
       } catch(error) {
+        logger.error(error);
         req.flash(error.message);
       }
     }
