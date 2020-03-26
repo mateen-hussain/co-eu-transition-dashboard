@@ -4,9 +4,9 @@ CURRENT_SPACE=`cf target|grep space|sed 's/^space: \+\(.*$\)/\1/'`
 REQUESTED_SPACE=$1
 VARS_FILE=$2
 
-if [ -z "$REQUESTED_SPACE" ] || [ -z "$REQUESTED_HOST" ]
+if [ -z "$REQUESTED_SPACE" ] || [ -z "$VARS_FILE" ]
 then
-  echo "Usage $0 <target space> <target host>"
+  echo "Usage $0 <target space> <manifest vars file>"
   exit 1
 fi
 
