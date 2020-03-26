@@ -47,7 +47,7 @@ class AllData extends Page {
   }
 
   get filtersFields() {
-    return ['deliveryTheme', 'uid', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence', 'progressStatus'];
+    return ['departmentName', 'title', 'deliveryTheme', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence', 'progressStatus'];
   }
 
   get tableFields() {

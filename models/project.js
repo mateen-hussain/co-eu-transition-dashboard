@@ -44,6 +44,7 @@ Project.init({
   title: {
     type: STRING(1024),
     displayName: 'Project Name',
+    searchable: true
   },
   sro: {
     type: STRING(256)

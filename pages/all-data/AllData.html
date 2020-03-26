@@ -55,6 +55,16 @@
 }}
 {% endif %}
 
+   {% set items = (items.push ({
+        heading: {
+          text: "Milestone Due Dates"
+        },
+        content: {
+          html: dates
+        }
+      }), items)
+    %}
+
 {% block pageTitle %}{{ index }}{% endblock %}
 
 {% block content %}
@@ -97,16 +107,6 @@
     {% endif %}
 
   {% endfor %}
-
-   {% set items = (items.push ({
-        heading: {
-          text: "Milestone Due Dates"
-        },
-        content: {
-          html: dates
-        }
-      }), items)
-    %}
 
   <form action="{{ url }}" method="post">
     <h3 class="govuk-heading-s panelTitle">Filters</h3>
