@@ -16,6 +16,7 @@
 {% set project = project() | await %}
 
 {% block beforeContent %}
+{% include "feedback.njk" %}
 {{ govukBackLink({
   text: "Back",
   href: "/"
