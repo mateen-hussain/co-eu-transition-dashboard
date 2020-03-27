@@ -14,9 +14,11 @@ let authentication = {};
 const user = {
   email: 'email',
   password: 'password',
-  hashed_passphrase: 'password',
+  hashedPassphrase: 'password',
   role: 'user',
-  id: 1
+  id: 1,
+  increment: sinon.stub().resolves(),
+  update: sinon.stub().resolves()
 };
 
 describe('services/authentication', () => {
@@ -29,6 +31,7 @@ describe('services/authentication', () => {
     };
 
     sinon.stub(bcrypt, 'compare');
+    sinon.stub(bcrypt, 'hash');
 
     authentication = proxyquire('services/authentication', {
       'passport-local': { Strategy: passportLocalStrategyStub },
@@ -39,7 +42,25 @@ describe('services/authentication', () => {
 
   afterEach(() => {
     bcrypt.compare.restore();
+    bcrypt.hash.restore();
   });
+
+  describe('#hashPassphrase', () => {
+    it('encrypts a passphrase', () => {
+      const password = 'password';
+      bcrypt.hash.returns(password);
+      const hash = authentication.hashPassphrase(password);
+      sinon.assert.calledWith(bcrypt.hash, password, config.bcrypt.saltRounds)
+      expect(hash).to.eql(password);
+    });
+
+    it('handles an error', () => {
+      bcrypt.hash.callsFake(()  => {
+        throw new Error('some error');
+      });
+      expect(() => authentication.hashPassphrase('password')).to.throw('Bcrypt error: Error: some error');
+    });
+  })
 
   describe('strategies', () => {
     it('attaches local strategy', () => {
@@ -65,8 +86,12 @@ describe('services/authentication', () => {
 
       describe('correct credentials', () => {
         beforeEach(async () => {
+          user.loginAttempts = 0;
+          user.increment = sinon.stub();
+          user.update = sinon.stub();
+
           User.findOne.resolves(user);
-          bcrypt.compare.callsArgWith(2, null, true);
+          bcrypt.compare.resolves(true);
 
           authenticateLoginCallback = sinon.stub();
 
@@ -75,10 +100,7 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
-            where: { email: user.email },
-            raw: true,
-            nest: true
+            where: { email: user.email }
           });
         });
 
@@ -86,15 +108,21 @@ describe('services/authentication', () => {
           sinon.assert.calledWith(bcrypt.compare, user.password, user.password);
         });
 
-        it('returns user id', () => {
+        it('updates users login attempts', () => {
+          sinon.assert.calledWith(user.update, { loginAttempts: 0 });
+        });
+
+        it('returns user', () => {
           sinon.assert.calledWith(authenticateLoginCallback, null, user);
         });
       });
 
       describe('incorrect credentials', () => {
         beforeEach(async () => {
+          user.increment = sinon.stub();
+          user.loginAttempts = 1;
           User.findOne.resolves(user);
-          bcrypt.compare.callsArgWith(2, null, false);
+          bcrypt.compare.resolves(false);
 
           authenticateLoginCallback = sinon.stub();
 
@@ -103,41 +131,43 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
-            where: { email: user.email },
-            raw: true,
-            nest: true
+            where: { email: user.email }
           });
         });
 
-        it('checks password', () => {
+        it('checks password and increases login attempt', () => {
           sinon.assert.calledWith(bcrypt.compare, user.password, user.password);
+          sinon.assert.calledOnce(user.increment);
         });
 
-        it('returns user id', () => {
-          sinon.assert.calledWith(authenticateLoginCallback, null, false);
+        it('throws error with remaining login attempts', () => {
+          const error = authenticateLoginCallback.getCall(0).args[0];
+          expect(error.message).to.eql('Password doest not match');
+          expect(error.loginAttempts).to.eql(2);
         });
       });
 
-      it('error with bcrypt', async () => {
-        const error = new Error('some error');
-        bcrypt.compare.callsArgWith(2, error);
+      it('no user found', async () => {
+        User.findOne.resolves();
+        authenticateLoginCallback = sinon.stub();
+
+        await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
+
+        const error = authenticateLoginCallback.getCall(0).args[0];
+        expect(error.message).to.eql('No user found');
+      });
+
+      it('increments login attempts', async () => {
+        user.loginAttempts = 3;
         User.findOne.resolves(user);
+
         authenticateLoginCallback = sinon.stub();
 
         await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
 
-        sinon.assert.calledWith(authenticateLoginCallback, error);
-      });
-
-      it('error finding user', async () => {
-        const error = new Error('some error');
-        User.findOne.rejects(error);
-        authenticateLoginCallback = sinon.stub();
-
-        await authentication.authenticateLogin(user.email, user.password, authenticateLoginCallback);
-
-        sinon.assert.calledWith(authenticateLoginCallback, error);
+        const error = authenticateLoginCallback.getCall(0).args[0];
+        expect(error.message).to.eql('Maximum login attempts exeeded');
+        expect(error.loginAttempts).to.eql(3);
       });
     });
 
@@ -185,12 +215,7 @@ describe('services/authentication', () => {
       expect(middleware[0]).to.eql(passportStub.authenticate());
       expect(middleware[1].name).to.eql('check2fa');
       expect(middleware[2].name).to.eql('checkRole');
-    });
-
-    it('can create hashed passphrases', () => {
-      sinon.stub(bcrypt,'hash');
-      authentication.hashPassphrase('password');
-      sinon.assert.calledWith(bcrypt.hash,'password');
+      expect(middleware[3].name).to.eql('updateCookieExpiration');
     });
 
     describe('handle roles', () => {
@@ -237,6 +262,59 @@ describe('services/authentication', () => {
         sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
       });
     });
+
+    describe('check 2fa', () => {
+      beforeEach(() => {
+        sinon.stub(jwt, 'restoreData');
+      });
+
+      afterEach(() => {
+        jwt.restoreData.restore();
+      });
+
+      it('allow if 2fa passed', () => {
+        jwt.restoreData.returns({ tfa: true });
+
+        const middleware = authentication.protect(['user']);
+        const req = { user: { role: 'user' } };
+        const res = { redirect: sinon.stub() };
+        const next = sinon.stub();
+
+        middleware[1](req, res, next);
+
+        sinon.assert.called(next);
+      });
+
+      it('redirects if no tfa ', () => {
+        jwt.restoreData.returns({ tfa: false });
+
+        const middleware = authentication.protect(['user']);
+        const req = { user: { role: 'user' } };
+        const res = { redirect: sinon.stub() };
+        const next = sinon.stub();
+
+        middleware[1](req, res, next);
+
+        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+        sinon.assert.notCalled(next);
+      });
+    });
+
+    it('update cookie expiration', () => {
+      sinon.stub(jwt, 'saveData');
+
+      const middleware = authentication.protect(['user']);
+      const req = { user: { role: 'user' } };
+      const res = { redirect: sinon.stub() };
+      const next = sinon.stub();
+
+      middleware[3](req, res, next);
+
+      sinon.assert.calledWith(jwt.saveData, req, res);
+      sinon.assert.called(next);
+
+      jwt.saveData.restore();
+    });
   });
 
   describe('#login', () => {
@@ -276,15 +354,44 @@ describe('services/authentication', () => {
       sinon.assert.calledWith(res.redirect, config.paths.authentication.setup);
     });
 
-    it('redirects to login page if error with authenticatWithJwt', () => {
-      authentication.login(req, res);
+    describe('bad login', () => {
+      it('redirects to login page if error with authenticatWithJwt', () => {
+        authentication.login(req, res);
 
-      const error = new Error('some error');
+        const error = new Error('some error');
 
-      authenticatWithJwt(error);
+        authenticatWithJwt(error);
 
-      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
-      sinon.assert.notCalled(jwt.saveData);
+        sinon.assert.calledWith(req.flash, `Incorrect username and/or password entered`);
+        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+        sinon.assert.notCalled(jwt.saveData);
+      });
+
+      it('sets flash error if user locked out', () => {
+        authentication.login(req, res);
+
+        const error = new Error('some error');
+        error.loginAttempts = 3;
+
+        authenticatWithJwt(error);
+
+        sinon.assert.calledWith(req.flash, `You account is now locked, please contact us.`);
+        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+        sinon.assert.notCalled(jwt.saveData);
+      });
+
+      it('sets flash error if user has limited login attempts remaining', () => {
+        authentication.login(req, res);
+
+        const error = new Error('some error');
+        error.loginAttempts = 1;
+
+        authenticatWithJwt(error);
+
+        sinon.assert.calledWith(req.flash, `Incorrect username and/or password entered, 2 login attempts remaining`);
+        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+        sinon.assert.notCalled(jwt.saveData);
+      });
     });
 
     it('redirects to login page if error with req.login', () => {

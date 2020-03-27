@@ -103,6 +103,10 @@ User.init({
   twofaSecret: {
     type: STRING(128),
     field: "twofa_secret"
+  },
+  loginAttempts: {
+    type: INTEGER,
+    field: "login_attempts"
   }
 }, { sequelize, modelName: 'user', tableName: 'user', timestamps: false });
 

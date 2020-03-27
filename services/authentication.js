@@ -7,33 +7,42 @@ const User = require('models/user');
 const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
+const maximumLoginAttempts = 3;
 
-const hashPassphrase = (passphrase) => {
+const hashPassphrase = passphrase => {
   try {
     return bcrypt.hash(passphrase,config.bcrypt.saltRounds);
   } catch(err) {
-      throw Error(`Bcrypt error: ${err}`);
+    throw Error(`Bcrypt error: ${err}`);
   }
 };
 
-const authenticateLogin = (email, password, cb) => {
-  return User.findOne({
-    attributes: ['id', 'email', 'hashed_passphrase', 'role', 'twofaSecret'],
-    where: {
-      email: email
-    },
-    raw: true,
-    nest: true
-  })
-  .then(user => {
-    bcrypt.compare(password, user.hashed_passphrase, (error, passwordMatches) => {
-      if (error || passwordMatches === false) {
-        return cb(error, passwordMatches);
-      }
-      cb(null, user);
-    });
-  })
-  .catch(cb);
+const authenticateLogin = async (email, password, done) => {
+  const user = await User.findOne({
+    where: { email }
+  });
+
+  if(!user) {
+    const error = new Error('No user found');
+    return done(error);
+  }
+
+  if(user.loginAttempts >= maximumLoginAttempts) {
+    const error = new Error('Maximum login attempts exeeded');
+    error.loginAttempts = user.loginAttempts;
+    return done(error);
+  }
+
+  const passwordMatches = await bcrypt.compare(password, user.hashedPassphrase);
+  if (!passwordMatches) {
+    await user.increment("loginAttempts")
+    const error = new Error('Password doest not match');
+    error.loginAttempts = user.loginAttempts + 1;
+    return done(error);
+  }
+
+  await user.update({ loginAttempts: 0 });
+  done(null, user);
 };
 
 const localStrategy = new passportLocalStrategy({
@@ -102,7 +111,17 @@ const login = (req, res) => {
   const authenticatWithJwt = (err, user) => {
     if(err || !user) {
       logger.error(`Bad authentication: ${err}`);
-      req.flash(`Incorrect username and/or password entered`);
+
+      if (err.loginAttempts) {
+        if (err.loginAttempts === maximumLoginAttempts) {
+          req.flash(`You account is now locked, please contact us.`);
+        } else {
+          req.flash(`Incorrect username and/or password entered, ${maximumLoginAttempts - err.loginAttempts} login attempts remaining`);
+        }
+      } else {
+        req.flash(`Incorrect username and/or password entered`);
+      }
+
       return res.redirect(config.paths.authentication.login);
     }
 
@@ -151,4 +170,4 @@ module.exports = {
   protectNo2FA,
   verify2FA,
   hashPassphrase
-}
+};

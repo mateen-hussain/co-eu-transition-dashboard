@@ -1,6 +1,6 @@
 const User = require('models/user');
 const { expect } = require('test/unit/util/chai');
-const { STRING, DATE, ENUM } = require('sequelize');
+const { STRING, DATE, ENUM, INTEGER } = require('sequelize');
 const Department = require('models/department');
 const DepartmentUser = require('models/departmentUser');
 
@@ -27,6 +27,10 @@ describe('models/user', () => {
       twofaSecret: {
         type: STRING(128),
         field: "twofa_secret"
+      },
+      loginAttempts: {
+        type: INTEGER,
+        field: "login_attempts"
       }
     });
 

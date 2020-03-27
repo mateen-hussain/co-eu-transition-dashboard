@@ -461,6 +461,7 @@ CREATE TABLE `user` (
   `hashed_passphrase` varchar(128) DEFAULT NULL,
   `role` varchar(64) DEFAULT NULL,
   `twofa_secret` varchar(128) DEFAULT NULL,
+  `login_attempts` int(10) DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -14,7 +14,9 @@ Model.init = sinon.stub().callsFake(function() {
   this.findOne = sinon.stub().resolves({});
   this.findAll = sinon.stub().resolves([]);
   this.rawAttributes = {};
+  this.getQueryInterface = sinon.stub();
 });
+Sequelize.getQueryInterface = sinon.stub();
 
 s = sinon.stub().returns(Sequelize);
 
@@ -26,4 +28,9 @@ s.Op = Op;
 s.literal = literal;
 
 mock('sequelize', s);
+
+const umzug = sinon.stub().returns({
+  up: sinon.stub()
+});
+mock('umzug', umzug);
 
