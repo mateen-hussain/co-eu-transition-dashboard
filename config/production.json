@@ -10,6 +10,9 @@
     },
     "tfa": {
       "name": "Transition Taskforce Dashboard"
+    },
+    "googleAnalytics": {
+      "id": "UA-161904342-1"
     }
   }
 }

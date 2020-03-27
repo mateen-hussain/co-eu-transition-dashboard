@@ -8,7 +8,8 @@
     "mysql": {},
     "tfa": {
       "name": "Transition Taskforce Dashboard"
-    }
+    },
+    "googleAnalytics": {}
   },
   "bcrypt": {
     "saltRounds": 10

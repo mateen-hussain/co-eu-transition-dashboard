@@ -10,6 +10,17 @@
 {% endblock %}
 
 {% block head %}
+  {% if config.services.googleAnalytics.id %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.services.googleAnalytics.id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ config.services.googleAnalytics.id }}', { 'anonymize_ip': true });
+    </script>
+  {% endif %}
 
   <!--[if !IE 8]><!-->
     <link href="/assets/main.css" media="screen" rel="stylesheet" />
