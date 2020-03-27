@@ -75,6 +75,12 @@ table.govuk-table.table-content {
 
 #show:target #dataTable {
     width: 75%;
+    div.scrollable {
+        max-height: 150px;
+        max-width: 80px;
+        overflow-x: scroll;
+        overflow-y: scroll;
+    }
 }
 
 .govuk-table__header, .govuk-table__cell {
@@ -154,6 +160,7 @@ div#accordion-filters .govuk-accordion__section-content {
 ::-webkit-scrollbar {
     -webkit-appearance: none;
     width: 7px;
+    height: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -243,8 +250,11 @@ button.govuk-button.govuk-button--no-style {
 
 div.scrollable {
     max-height: 150px;
+    max-width: 110px;
+    overflow-x: scroll;
     overflow-y: scroll;
 }
+
 
 
 
