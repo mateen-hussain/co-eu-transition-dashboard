@@ -85,7 +85,12 @@ const protect = (roles = []) => {
     return next();
   };
 
-  return [auth, check2fa, checkRole];
+  const updateCookieExpiration = (req, res, next) => {
+    jwt.saveData(req, res);
+    next();
+  };
+
+  return [auth, check2fa, checkRole, updateCookieExpiration];
 };
 
 const protectNo2FA = passport.authenticate('jwt', {
