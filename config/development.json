@@ -1,7 +1,9 @@
 {
   "env": "development",
   "cookie": {
-    "secret": "some secrent..."
+    "secret": "some secrent...",
+    "domain": "localhost",
+    "expires": 86400000
   },
   "services": {
     "mysql": {
@@ -9,7 +11,7 @@
       "sslCertificate": null
     },
     "tfa": {
-      "name": "[Local] Transition Taskforce Dashboard"
+      "name": "[Development] Transition Taskforce Dashboard"
     }
   }
 }

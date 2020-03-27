@@ -1,5 +1,5 @@
 const { expect, sinon } = require('test/unit/util/chai');
-const { paths } = require('config');
+const config = require('config');
 const Authentication = require('pages/authentication/Authentication');
 const authenticationService = require('services/authentication');
 const flash = require('middleware/flash');
@@ -95,12 +95,12 @@ describe('pages/authentication/Authentication', () => {
     it('redirects login if mode not matched', () => {
       req.path = '/some-random-url';
       page.setMode(req, res, next);
-      sinon.assert.calledWith(res.redirect, paths.authentication.login);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
     });
   });
 
   it('returns correct url', () => {
-    expect(page.url).to.eql(paths.authentication.login);
+    expect(page.url).to.eql(config.paths.authentication.login);
   });
 
   describe('#verify2FA', () => {
@@ -119,7 +119,7 @@ describe('pages/authentication/Authentication', () => {
 
       await page.verify2FA();
 
-      sinon.assert.calledWith(page.res.redirect, paths.authentication.login);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.login);
     });
 
     it('redirects and calls flash if user entered incorrect 2FA code', async () => {
@@ -129,15 +129,15 @@ describe('pages/authentication/Authentication', () => {
       await page.verify2FA();
 
       sinon.assert.calledWith(page.req.flash, `Incorrect code entered`);
-      sinon.assert.calledWith(page.res.redirect, paths.authentication.verify);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.verify);
     });
 
     it('redirects and calls flash if user entered incorrect 2FA code', async () => {
       await page.verify2FA();
 
       sinon.assert.notCalled(page.req.flash);
-      sinon.assert.neverCalledWith(page.res.redirect, paths.authentication.login);
-      sinon.assert.neverCalledWith(page.res.redirect, paths.authentication.verify);
+      sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.login);
+      sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.verify);
     });
   });
 
@@ -158,7 +158,7 @@ describe('pages/authentication/Authentication', () => {
 
       sinon.assert.calledWith(page.req.user.update, { twofaSecret: 'secret' });
       sinon.assert.calledWith(jwt.saveData, page.req, page.res, { tfa: true });
-      sinon.assert.calledWith(page.res.redirect, paths.authentication.verified);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.verified);
     });
 
     it('redirects to entry url if user is already registered', async () => {
@@ -177,12 +177,12 @@ describe('pages/authentication/Authentication', () => {
 
     it('returns import url if user is admin', () => {
       page.req.user = { role: 'admin' };
-      expect(page.entryUrl).to.eql(paths.admin.import);
+      expect(page.entryUrl).to.eql(config.paths.admin.import);
     });
 
     it('returns all-data url', () => {
       page.req.user = { role: 'user' };
-      expect(page.entryUrl).to.eql(paths.allData);
+      expect(page.entryUrl).to.eql(config.paths.allData);
     });
   });
 
@@ -241,8 +241,7 @@ describe('pages/authentication/Authentication', () => {
 
     it('returns a qr code for registering', async () => {
       const url = await page.getQRCode();
-
-      sinon.assert.calledWith(speakeasy.generateSecret, { name: `Transition Taskforce Dashboard:some-email` })
+      sinon.assert.calledWith(speakeasy.generateSecret, { name: `${config.services.tfa.name}:some-email` })
       sinon.assert.calledWith(page.saveData, { two_factor_temp_secret: 'base32' });
       sinon.assert.calledWith(QRCode.toDataURL, 'otpauth_url');
 

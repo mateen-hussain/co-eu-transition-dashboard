@@ -2,7 +2,7 @@
   "env": "development",
   "port": "3000",
   "cookie": {
-    "expires": 100
+    "expires": 900000
   },
   "services": {
     "mysql": {},

@@ -2,10 +2,17 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 const saveData = (req, res, data = {}, keepExisting = true) => {
+  const cookieOptions = {
+    maxAge: config.cookie.expires,
+    httpOnly: true,
+    secure: config.env !== 'development',
+    domain: 'localhost'
+  };
+
   const existingData = keepExisting ? restoreData(req) : {};
   const dataToSave = Object.assign({}, existingData, data);
   const token = jwt.sign(dataToSave, config.cookie.secret);
-  res.cookie('jwt', token);
+  res.cookie('jwt', token, cookieOptions);
 };
 
 const token = req => {
