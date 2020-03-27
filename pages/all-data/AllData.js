@@ -17,13 +17,13 @@ class AllData extends Page {
     const getConfidenceDescription = (type) => {
       switch(value) {
         case 3:
-          return `Very high ${type}`;
-        case 2:
           return `High ${type}`;
-        case 1:
+        case 2:
           return `Medium ${type}`;
-        case 0:
+        case 1:
           return `Low ${type}`;
+        case 0:
+          return `Very low ${type}`;
         default:
           return `No ${type} level given`;
       }
