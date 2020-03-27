@@ -27,11 +27,13 @@ class User extends Model {
               include: MilestoneField
             }],
             required: true,
-            where: groupedSearch.milestone
+            where: groupedSearch.milestone,
+            separate: true
           },
           {
             model: ProjectFieldEntry,
-            include: ProjectField
+            include: ProjectField,
+            separate: true
           },
           {
             required: true,
