@@ -6,7 +6,7 @@ const saveData = (req, res, data = {}, keepExisting = true) => {
     maxAge: config.cookie.expires,
     httpOnly: true,
     secure: config.env !== 'development',
-    domain: 'localhost'
+    domain: config.cookie.domain
   };
 
   const existingData = keepExisting ? restoreData(req) : {};
