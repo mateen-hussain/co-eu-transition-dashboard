@@ -60,7 +60,7 @@ departments.then( (departmentsArray) => {
                 email: email,
                 link: config.serviceUrl
               },
-              reference: user.id
+              reference: `${user.id}`
             },
           );
           console.log(`User ${email} created with departments ${departmentsString} and sent with password`);
