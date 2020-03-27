@@ -16,7 +16,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 nunjucks.attach(app);
-webpack.configure(app);
+
+if (config.env === 'development') {
+  webpack.configure(app);
+} else {
+  app.use('/assets', express.static('dist'));
+}
 
 logger.attachRouteLogger(app);
 
