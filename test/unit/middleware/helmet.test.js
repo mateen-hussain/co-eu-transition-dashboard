@@ -26,7 +26,8 @@ describe('middleware/helmet', () => {
             '\'self\'',
             '\'unsafe-eval\'',
             '\'unsafe-inline\'',
-            'www.google-analytics.com'
+            'www.google-analytics.com',
+            'www.googletagmanager.com'
           ],
           connectSrc: ['\'self\''],
           mediaSrc: ['\'self\''],
