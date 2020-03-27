@@ -73,8 +73,6 @@ class User extends Model {
        }]
     });
 
-    console.log(departments);
-
     const projects = departments.reduce((projects, department) => {
       projects.push(...department.get('projects'));
       return projects;
