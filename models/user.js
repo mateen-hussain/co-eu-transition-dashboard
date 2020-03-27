@@ -53,18 +53,17 @@ class User extends Model {
   }
 
   async getProject (projectUid) {
-    const groupedSearch = await modelUtils.groupSearchItems({ uid: [ projectUid ] });
-
     const departments = await this.getDepartments({
       attributes: [],
       include: [{
         model: Project,
-        where: groupedSearch.project,
+        where: {
+          uid: projectUid
+        },
         include: [
           {
             model: Milestone,
-            include: { all: true, nested: true },
-            required: true
+            include: { all: true, nested: true }
           },
           {
             model: ProjectFieldEntry,
@@ -73,6 +72,8 @@ class User extends Model {
         ]
        }]
     });
+
+    console.log(departments);
 
     const projects = departments.reduce((projects, department) => {
       projects.push(...department.get('projects'));

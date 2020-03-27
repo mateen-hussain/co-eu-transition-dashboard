@@ -16,13 +16,13 @@ class AllData extends Page {
   applyFormatting(attribute, value) {
     const getDescription = (type) => {
       switch(value) {
-        case 0:
-          return `Very high ${type}`;
-        case 1:
-          return `High ${type}`;
-        case 2:
-          return `Medium ${type}`;
         case 3:
+          return `Very high ${type}`;
+        case 2:
+          return `High ${type}`;
+        case 1:
+          return `Medium ${type}`;
+        case 0:
           return `Low ${type}`;
         default:
           return `No ${type} level given`;
