@@ -26,8 +26,6 @@ async function getAllDepartments() {
 
 async function createDepartmentUsers(user,departments) {
   for (let i=0;i<departments.length;i++) {
-    console.log(JSON.stringify(user));
-    console.log(JSON.stringify(departments[i]));
     await DepartmentUser.create({
       userId: user.id,
       departmentName: departments[i].name
