@@ -14,7 +14,22 @@ class AllData extends Page {
   }
 
   applyFormatting(attribute, value) {
-    const getDescription = (type) => {
+    const getConfidenceDescription = (type) => {
+      switch(value) {
+        case 3:
+          return `Very high ${type}`;
+        case 2:
+          return `High ${type}`;
+        case 1:
+          return `Medium ${type}`;
+        case 0:
+          return `Low ${type}`;
+        default:
+          return `No ${type} level given`;
+      }
+    };
+
+    const getImpactDescription = (type) => {
       switch(value) {
         case 3:
           return `Very high ${type}`;
@@ -31,12 +46,12 @@ class AllData extends Page {
 
     switch(attribute.id) {
       case 'impact':
-        return `${value} - ${getDescription('impact')}`;
+        return `${value} - ${getImpactDescription('impact')}`;
       case 'hmgConfidence':
       case 'citizenReadiness':
       case 'businessReadiness':
       case 'euStateConfidence':
-        return `${value} - ${getDescription('confidence')}`;
+        return `${value} - ${getConfidenceDescription('confidence')}`;
     }
 
     return value;
