@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_PATH=. node server.js",
     "dev": "NODE_PATH=. nodemon server.js",
-    "build": "rm -rf dist && webpack --config webpack.config.js",
+    "install": "rm -rf dist && webpack --config webpack.config.js",
     "test:lint": "eslint .",
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
     "release": "release-it --no-npm.publish --ci",
