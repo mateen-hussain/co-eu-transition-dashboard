@@ -7,10 +7,6 @@ const DepartmentUser = require("models/departmentUser");
 const NotifyClient = require('notifications-node-client').NotifyClient;
 const randomString = require('randomstring');
 
-async function getDepartment(string) {
-    return await Department.findByPk(string);
-}
-
 async function getDepartments(string) {
   let departments = string.split(",");
   return await Department.findAll({
