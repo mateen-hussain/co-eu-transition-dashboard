@@ -177,12 +177,13 @@
     {% for tableFieldId in milestoneTableFields %}
     {% set flag = '' %}
     {% set field = milestone.fields.get(tableFieldId) %}
-      {% if (field.id == 'date') and (field.value < currentDate) %}
+      {% if (field.id == 'date') and (field.value < currentDate | date("YYYY-MM-DD")) %}
         {% set flag = 'red-date' %}
       {% endif %}
 
       {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.type == 'date' else
       "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
+      
 
     {% endfor %}
 
