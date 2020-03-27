@@ -7,7 +7,7 @@ const sequelize = new Sequelize(services.mysql.uri.replace(/^mysql2:\/\//,'mysql
     dialectOptions: {
       ssl: services.mysql.sslCertificate
     },
-    logging: false
+    logging: true
 });
 
 module.exports = sequelize;

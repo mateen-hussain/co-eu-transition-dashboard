@@ -85,6 +85,7 @@ class User extends Model {
 User.init({
   id: {
     type: INTEGER,
+    autoIncrement: true,
     primaryKey: true
   },
   email: STRING(64),
