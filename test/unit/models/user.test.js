@@ -9,7 +9,8 @@ describe('models/user', () => {
     expect(User.init).to.have.been.calledWith({
       id: {
         type: undefined,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       email: STRING(64),
       hashedPassphrase: {
