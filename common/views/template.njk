@@ -1,7 +1,6 @@
 {% extends "govuk/template.njk" %}
 
 {% from "govuk/components/header/macro.njk" import govukHeader %}
-{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
 {% set index = "All project data" %}
 
@@ -72,7 +71,8 @@
           </ul>
         </nav>
     </div>
-{% endblock %}
+    {% include "feedback.njk" %}
+{% endblock %}ß
 
 {% block main %}
   {{ super() }}
