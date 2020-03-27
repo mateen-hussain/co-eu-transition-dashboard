@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CURRENT_SPACE=`cf target|grep space|sed 's/^space: \+\(.*$\)/\1/'`
+CURRENT_SPACE=`cf target|grep space|sed -E 's/^space: +([^ ]*)/\1/g'`
 REQUESTED_SPACE=$1
 VARS_FILE=$2
 
