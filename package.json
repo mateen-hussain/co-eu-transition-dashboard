@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_PATH=. node server.js",
     "dev": "NODE_PATH=. nodemon server.js",
-    "build": "rm -rf dist && webpack --config webpack.config.js",
+    "install": "bash build.sh",
     "test:lint": "eslint .",
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
     "release": "release-it --no-npm.publish --ci",
@@ -50,6 +50,7 @@
     "qrcode": "^1.4.4",
     "sequelize": "^5.21.5",
     "speakeasy": "^2.0.0",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "winston": "^3.2.1"
   },
@@ -78,7 +79,6 @@
     "sequelize-test-helpers": "^1.2.2",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.5.0",
-    "webpack": "^4.42.0",
     "webpack-dev-middleware": "^3.7.2",
     "webpack-hot-middleware": "^2.25.0"
   },

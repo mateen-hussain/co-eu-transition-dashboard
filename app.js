@@ -1,6 +1,5 @@
 const express = require('express');
 const nunjucks = require('middleware/nunjucks');
-const webpack = require('middleware/webpack');
 const pages = require('./pages');
 const bodyParser = require('body-parser');
 const logger = require('middleware/logger');
@@ -18,6 +17,7 @@ app.use(cookieParser());
 nunjucks.attach(app);
 
 if (config.env === 'development') {
+  const webpack = require('middleware/webpack');
   webpack.configure(app);
 } else {
   app.use('/assets', express.static('dist'));
