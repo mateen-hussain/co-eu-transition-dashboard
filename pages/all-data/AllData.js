@@ -31,13 +31,13 @@ class AllData extends Page {
 
     const getImpactDescription = (type) => {
       switch(value) {
-        case 3:
-          return `Very high ${type}`;
-        case 2:
-          return `High ${type}`;
-        case 1:
-          return `Medium ${type}`;
         case 0:
+          return `Very high ${type}`;
+        case 1:
+          return `High ${type}`;
+        case 2:
+          return `Medium ${type}`;
+        case 3:
           return `Low ${type}`;
         default:
           return `No ${type} level given`;
