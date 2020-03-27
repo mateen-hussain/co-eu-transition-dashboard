@@ -4,6 +4,9 @@
   "services": {
     "mysql": {
       "sslCertificate": "Amazon RDS"
+    },
+    "tfa": {
+      "name": "Transition Taskforce Dashboard"
     }
   }
 }

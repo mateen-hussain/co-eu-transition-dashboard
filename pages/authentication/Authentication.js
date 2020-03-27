@@ -126,7 +126,7 @@ class Authentication extends Page {
 
   async getQRCode() {
     const secret = speakeasy.generateSecret({
-      name: `Transition Taskforce Dashboard:${this.req.user.email}`
+      name: `${config.services.tfa.name}:${this.req.user.email}`
     });
 
     this.saveData({ two_factor_temp_secret: secret.base32 });

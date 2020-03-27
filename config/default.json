@@ -5,7 +5,9 @@
     "expires": 100
   },
   "services": {
-    "mysql": {
+    "mysql": {},
+    "tfa": {
+      "name": "Transition Taskforce Dashboard"
     }
   },
   "bcrypt": {
