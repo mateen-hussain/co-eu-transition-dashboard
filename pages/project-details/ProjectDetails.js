@@ -16,7 +16,7 @@ class ProjectDetails extends Page {
   }
 
   get currentDate() {
-    return moment().format();
+    return moment().format('YYYY-MM-DD');
   }
 
   get milestoneTableFields() {
