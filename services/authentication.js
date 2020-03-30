@@ -112,12 +112,8 @@ const login = (req, res) => {
     if(err || !user) {
       logger.error(`Bad authentication: ${err}`);
 
-      if (err.loginAttempts) {
-        if (err.loginAttempts === maximumLoginAttempts) {
-          req.flash(`You account is now locked, please contact us.`);
-        } else {
-          req.flash(`Incorrect username and/or password entered, ${maximumLoginAttempts - err.loginAttempts} login attempts remaining`);
-        }
+      if (err.loginAttempts && err.loginAttempts === maximumLoginAttempts) {
+        req.flash(`Too many incorrect login attempts have been made, you're account is now locked, please contact us.`);
       } else {
         req.flash(`Incorrect username and/or password entered`);
       }

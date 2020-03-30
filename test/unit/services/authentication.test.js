@@ -375,7 +375,7 @@ describe('services/authentication', () => {
 
         authenticatWithJwt(error);
 
-        sinon.assert.calledWith(req.flash, `You account is now locked, please contact us.`);
+        sinon.assert.calledWith(req.flash, `Too many incorrect login attempts have been made, you're account is now locked, please contact us.`);
         sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
         sinon.assert.notCalled(jwt.saveData);
       });
@@ -388,7 +388,7 @@ describe('services/authentication', () => {
 
         authenticatWithJwt(error);
 
-        sinon.assert.calledWith(req.flash, `Incorrect username and/or password entered, 2 login attempts remaining`);
+        sinon.assert.calledWith(req.flash, `Incorrect username and/or password entered`);
         sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
         sinon.assert.notCalled(jwt.saveData);
       });
