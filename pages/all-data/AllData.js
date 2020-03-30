@@ -85,7 +85,7 @@ class AllData extends Page {
   }
 
   get currentDate() {
-    return moment().format();
+    return moment().format('YYYY-MM-DD');
   }
 
   async postRequest(req, res) {
