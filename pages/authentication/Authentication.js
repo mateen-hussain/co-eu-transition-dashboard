@@ -133,6 +133,15 @@ class Authentication extends Page {
 
     return await QRCode.toDataURL(secret.otpauth_url);
   }
+
+  isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+       req.isLogged = true
+       return next();
+    }
+    res.redirect(config.paths.authentication.login);
+  }
+
 }
 
 module.exports = Authentication;
