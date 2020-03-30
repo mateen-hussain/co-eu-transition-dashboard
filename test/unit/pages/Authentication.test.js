@@ -252,7 +252,7 @@ describe('pages/authentication/Authentication', () => {
   describe('#isLoggedIn', () => {
     let next = {};
     beforeEach(() => {
-      req = { isAuthenticated: sinon.stub(), isLoggedIn: sinon.stub() };
+      req = { isAuthenticated: sinon.stub() };
       res = { redirect: sinon.stub()};
       next = sinon.stub();
     });
@@ -261,5 +261,4 @@ describe('pages/authentication/Authentication', () => {
       sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
     });
   });
-
 });
