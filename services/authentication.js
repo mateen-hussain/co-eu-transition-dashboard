@@ -166,4 +166,4 @@ module.exports = {
   protectNo2FA,
   verify2FA,
   hashPassphrase
-}
+};
