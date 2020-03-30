@@ -1,6 +1,5 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const config = require('config');
-const jwt = require('services/jwt');
 
 let page = {};
 let res = {}
@@ -15,11 +14,6 @@ describe('pages/logout/Logout', () => {
 
     page = new Logout('some path', req, res);
 
-    sinon.stub(jwt, 'restoreData');
-  });
-
-  afterEach(() => {
-    jwt.restoreData.restore();
   });
 
   describe('#url', () => {
