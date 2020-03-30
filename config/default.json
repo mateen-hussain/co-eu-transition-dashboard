@@ -20,7 +20,6 @@
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
-    "authentication": "/login",
     "impactDefinitions": "/impact-definitions",
     "authentication": {
       "login": "/login",
@@ -28,7 +27,7 @@
       "setup": "/login/setup",
       "verified": "/login/verified",
       "verify": "/login/verify",
-      "logout": "/login/logout"
+      "logout": "/logout"
     },
     "projectDetails": "/project-details/:uid"
   },

@@ -3,6 +3,13 @@
 {% from "govuk/components/header/macro.njk" import govukHeader %}
 
 {% set index = "All project data" %}
+{% set logout = "true" %}
+
+{% for key, item in config.paths.authentication%}
+  {% if url == item %}
+    {% set logout = "false" %}
+  {% endif %}
+{% endfor %}
 
 {% block headIcons %}
   <link rel="shortcut icon" href="/assets/images/coat-of-arms-favicon.png" type="image/x-icon" />
@@ -55,7 +62,7 @@
         Transition Delivery Dashboard
       </a>
 
-  {# Only display if session active #}
+  {% if logout == "true" %}
       <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide logout link">Menu</button>
       <nav>
         <ul id="navigation" class="govuk-header__navigation " aria-label="Logout Link">
@@ -66,7 +73,7 @@
           </li>
         </ul>
       </nav>
-  {# Only display if session active #}
+  {% endif %}
 
     </div>
   </div>
