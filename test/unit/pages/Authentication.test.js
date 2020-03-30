@@ -248,4 +248,18 @@ describe('pages/authentication/Authentication', () => {
       expect(url).to.eql('qr code url');
     });
   });
+
+  describe('#isLoggedIn', () => {
+    let next = {};
+    beforeEach(() => {
+      req = { isAuthenticated: sinon.stub(), isLoggedIn: sinon.stub() };
+      res = { redirect: sinon.stub()};
+      next = sinon.stub();
+    });
+    it('sets isAuthenticated to false', () => {
+      page.isLoggedIn(req, res, next);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+    });
+  });
+
 });

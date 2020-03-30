@@ -136,12 +136,11 @@ class Authentication extends Page {
 
   isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
-       req.isLogged = true
+       req.isLoggedIn = true
        return next();
     }
     res.redirect(config.paths.authentication.login);
   }
-
 }
 
 module.exports = Authentication;
