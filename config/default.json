@@ -27,7 +27,8 @@
       "register": "/login/register",
       "setup": "/login/setup",
       "verified": "/login/verified",
-      "verify": "/login/verify"
+      "verify": "/login/verify",
+      "logout": "/login/logout"
     },
     "projectDetails": "/project-details/:uid"
   },

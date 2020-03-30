@@ -158,6 +158,13 @@ const verify2FA = (secret, token) => {
   });
 };
 
+const logout = (req, res) => {
+    // const cookie = req.cookies;
+    // res.clearCookie(config.cookie.secret, config.cookie.domain)
+    // config.cookie.secret = ''
+    // res.cookie(config.cookie.secret,"", {expires:new Date(0), domain:config.cookie.domain, path:'/'});
+  };
+
 module.exports = {
   login,
   protect,
@@ -165,5 +172,6 @@ module.exports = {
   authenticateUser,
   protectNo2FA,
   verify2FA,
-  hashPassphrase
-};
+  hashPassphrase,
+  logout
+}

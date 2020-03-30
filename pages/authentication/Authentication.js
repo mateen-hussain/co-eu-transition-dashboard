@@ -32,7 +32,7 @@ class Authentication extends Page {
     return this.res.locals.mode;
   }
 
-  setMode(req, res, next) {
+  async setMode(req, res, next) {
     const pathToCompare = req.path === '/' ? paths.authentication.login : `${paths.authentication.login}${req.path}`;
     res.locals = res.locals || {};
     switch(pathToCompare) {
@@ -50,6 +50,9 @@ class Authentication extends Page {
         break;
       case paths.authentication.verify:
         res.locals.mode = 'verify';
+        break;
+      case paths.authentication.logout:
+        await authentication.logout(req, res);
         break;
     }
 
