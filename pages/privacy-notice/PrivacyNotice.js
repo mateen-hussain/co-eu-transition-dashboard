@@ -5,6 +5,10 @@ class PrivacyNotice extends Page {
   get url() {
     return paths.privacyNotice;
   }
+
+  get middleware() {
+    return [];
+  }
 }
 
 module.exports = PrivacyNotice;

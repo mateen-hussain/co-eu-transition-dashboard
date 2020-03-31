@@ -17,4 +17,10 @@ describe('pages/privacy-notice/PrivacyNotice', () => {
       expect(page.url).to.eql(paths.privacyNotice);
     });
   });
+
+  describe('#middleware', () => {
+    it('loads correct middleware', () => {
+      expect(page.middleware).to.eql([]);
+    });
+  });
 });

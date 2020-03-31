@@ -3,17 +3,6 @@
 
 {% block beforeContent %}
 {% include "feedback.njk" %}
-
-{% if req.isAuthenticated() %}
-{{ govukBackLink({
-  text: "Back",
-  href: "#",
-  attributes: {
-    onclick: "history.go(-1);"
-  }
-}) }}
-{% endif %}
-
 {% endblock %}
 
 {% block pageTitle %}Privacy Notice for Transition Delivery Dashboard{% endblock %}
