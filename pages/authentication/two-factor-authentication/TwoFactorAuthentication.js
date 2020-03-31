@@ -92,7 +92,6 @@ class TwoFactorAuthentication extends Page {
   }
 
   async postRequest(req, res) {
-    console.log('mode', this.mode)
     switch(this.mode) {
       case 'verify':
         await this.verify2FA();
