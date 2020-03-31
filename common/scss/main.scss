@@ -23,7 +23,6 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 .cabinet-office__logotype-image {
     width: 250px;
     height: 40px
-    
 }
 
 .govuk-header__link--service-name {
@@ -32,4 +31,9 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 
 .govuk-header {
     background: #003078;
+}
+
+li.govuk-header__navigation-item.logout-item {
+    float: right;
+    margin-top: -45px;
 }

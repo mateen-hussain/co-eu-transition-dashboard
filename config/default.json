@@ -20,14 +20,14 @@
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
-    "authentication": "/login",
     "impactDefinitions": "/impact-definitions",
     "authentication": {
       "login": "/login",
       "register": "/login/register",
       "setup": "/login/setup",
       "verified": "/login/verified",
-      "verify": "/login/verify"
+      "verify": "/login/verify",
+      "logout": "/logout"
     },
     "projectDetails": "/project-details/:uid"
   },

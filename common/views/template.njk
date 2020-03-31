@@ -54,6 +54,20 @@
       <a href="/" class="govuk-header__link govuk-header__link--service-name">
         Transition Delivery Dashboard
       </a>
+
+  {% if req.isAuthenticated() %}
+      <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide logout link">Menu</button>
+      <nav>
+        <ul id="navigation" class="govuk-header__navigation " aria-label="Logout Link">
+          <li class="govuk-header__navigation-item logout-item">
+            <a class="govuk-header__link" href="{{ config.paths.authentication.logout }}">
+              Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+  {% endif %}
+
     </div>
   </div>
 </header>
