@@ -19,7 +19,7 @@ class Login extends Page {
     if(config.features.twoFactorAuth) {
       this.res.redirect(config.paths.authentication.twoFactorAuthentication);
     } else if(user.passwordReset) {
-      this.res.redirect(config.paths.authentication.passwordReset.passwordReset);
+      this.res.redirect(config.paths.authentication.passwordReset);
     } else {
       this.res.redirect(config.paths.allData);
     }

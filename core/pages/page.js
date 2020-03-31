@@ -10,7 +10,6 @@ const notLocals = [
   'journey',
   'constructor',
   'form',
-  'next',
   'locals',
   'middleware',
   'handler'

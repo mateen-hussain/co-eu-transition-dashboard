@@ -16,11 +16,11 @@ class PasswordReset extends Page {
     ];
   }
 
-  next() {
+  get next() {
     if (this.req.user.role === 'admin') {
-      this.res.redirect(config.paths.admin.import);
+      return config.paths.admin.import;
     } else {
-      this.res.redirect(config.paths.allData);
+      return config.paths.allData;
     }
   }
 

@@ -19,7 +19,8 @@ const umzug = new Umzug({
     params: [ sequelize.getQueryInterface() ]
   },
   storage: 'sequelize',
-  storageOptions: { sequelize }
+  storageOptions: { sequelize },
+  logging: message => logger.info(message)
 });
 
 sequelize.runMigrations = async () => {

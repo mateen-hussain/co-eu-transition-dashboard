@@ -54,7 +54,7 @@ describe('pages/authentication/login/Login', () => {
       const user = { passwordReset: true };
       page.next(user);
 
-      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordReset.passwordReset);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordReset);
     });
 
     it('default redirect', () => {
