@@ -6,6 +6,7 @@ class PrivacyNotice extends Page {
     return paths.privacyNotice;
   }
 
+  //privacy-notice page does not require user authentication
   get middleware() {
     return [];
   }
