@@ -13,9 +13,7 @@ const notLocals = [
   'next',
   'locals',
   'middleware',
-  'handler',
-  'req',
-  'res'
+  'handler'
 ];
 
 const notDefined = val => typeof val === 'undefined' || val === null;
