@@ -34,7 +34,7 @@ describe('models/user', () => {
       },
       passwordReset: {
         type: BOOLEAN,
-        field: "password_reset"
+        field: "must_change_password"
       }
     });
 

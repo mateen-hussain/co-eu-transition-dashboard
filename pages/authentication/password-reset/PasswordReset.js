@@ -1,13 +1,12 @@
 const Page = require('core/pages/page');
-const { paths } = require('config');
+const config = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
-const config = require('config');
 const flash = require('middleware/flash');
 
 class PasswordReset extends Page {
   get url() {
-    return paths.authentication.passwordReset;
+    return config.paths.authentication.passwordReset;
   }
 
   get middleware() {
@@ -26,10 +25,10 @@ class PasswordReset extends Page {
   }
 
   get mode() {
-    const pathToCompare = this.req.path === '/' ? paths.authentication.passwordReset : `${paths.authentication.passwordReset}${this.req.path}`;
+    const pathToCompare = this.req.path === '/' ? config.paths.authentication.passwordReset : `${config.paths.authentication.passwordReset}${this.req.path}`;
 
     switch(pathToCompare) {
-      case paths.authentication.passwordResetComplete:
+      case config.paths.authentication.passwordResetComplete:
         return 'password-reset-complete';
       default:
         return 'password-reset';
@@ -46,8 +45,8 @@ class PasswordReset extends Page {
 
     let error;
 
-    if (passwordLength < 8) {
-      error = 'The password must have a minimum of 8 charaters';
+    if (passwordLength < config.users.minimumPasswordLength) {
+      error = 'The password must have a minimum of 8 characters';
     } else if (!passwordHasNumbers) {
       error = 'The password must contain at least one number';
     } else if (!passwordLowerCase) {

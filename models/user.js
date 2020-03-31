@@ -110,7 +110,7 @@ User.init({
   },
   passwordReset: {
     type: BOOLEAN,
-    field: "password_reset"
+    field: "must_change_password"
   }
 }, { sequelize, modelName: 'user', tableName: 'user', timestamps: false });
 

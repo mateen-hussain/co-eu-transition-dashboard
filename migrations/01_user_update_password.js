@@ -5,7 +5,7 @@ module.exports = {
     // logic for transforming into the new state
     await query.addColumn(
       'user',
-      'password_reset',
+      'must_change_password',
       {
         type: Sequelize.DataTypes.BOOLEAN,
         defaultValue: 1
@@ -18,7 +18,7 @@ module.exports = {
     // logic for reverting the changes
     await query.removeColumn(
       'user',
-      'password_reset'
+      'must_change_password'
     );
   }
 }

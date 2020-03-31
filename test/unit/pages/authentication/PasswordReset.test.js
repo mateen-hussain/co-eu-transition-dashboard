@@ -61,8 +61,8 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
       expect(page.validatePassword('!aS1234567', '!aS1234567')).to.be.undefined;
     });
 
-    it('rejects password if less than 8 charaters', () => {
-      expect(page.validatePassword('1234567')).to.be.eql('The password must have a minimum of 8 charaters');
+    it('rejects password if less than 8 characters', () => {
+      expect(page.validatePassword('1234567')).to.be.eql('The password must have a minimum of 8 characters');
     });
 
     it('rejects password doesnt contain nubers', () => {
