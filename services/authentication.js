@@ -1,7 +1,6 @@
 const passport = require('passport');
 const jwt = require('services/jwt');
 const config = require('config');
-const logger = require('services/logger');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
 const { Strategy: passportLocalStrategy } = require('passport-local');
@@ -29,7 +28,7 @@ const authenticateLogin = async (email, password, done) => {
 
   if(user.loginAttempts >= maximumLoginAttempts) {
     const error = new Error('Maximum login attempts exeeded');
-    error.loginAttempts = user.loginAttempts;
+    error.maximumLoginAttempts = true;
     return done(error);
   }
 
@@ -37,7 +36,6 @@ const authenticateLogin = async (email, password, done) => {
   if (!passwordMatches) {
     await user.increment("loginAttempts")
     const error = new Error('Password doest not match');
-    error.loginAttempts = user.loginAttempts + 1;
     return done(error);
   }
 
@@ -107,47 +105,10 @@ const protectNo2FA = passport.authenticate('jwt', {
   failureRedirect: config.paths.authentication.login
 });
 
-const login = (req, res) => {
-  const authenticatWithJwt = (err, user) => {
-    if(err || !user) {
-      logger.error(`Bad authentication: ${err}`);
-
-      if (err.loginAttempts && err.loginAttempts === maximumLoginAttempts) {
-        req.flash(`Too many incorrect login attempts have been made, you're account is now locked, please contact us.`);
-      } else {
-        req.flash(`Incorrect username and/or password entered`);
-      }
-
-      return res.redirect(config.paths.authentication.login);
-    }
-
-    req.login(user, {
-      session: false
-    }, err => {
-      if (err) {
-        logger.error(err);
-        return res.redirect(config.paths.authentication.login);
-      }
-
-      jwt.saveData(req, res, { id: user.id, tfa: false });
-
-      if(config.features.twoFactorAuth) {
-        if (user.twofaSecret) {
-          res.redirect(config.paths.authentication.verify);
-        } else {
-          res.redirect(config.paths.authentication.setup);
-        }
-      } else {
-        res.redirect(config.paths.allData);
-      }
-    });
-  };
-
-  const authenticatWithCredentials = passport.authenticate('local', {
+const login = (req, res, callback) => {
+  return passport.authenticate('local', {
     session: false
-  }, authenticatWithJwt);
-
-  authenticatWithCredentials(req, res);
+  }, callback)(req, res);
 };
 
 const verify2FA = (secret, token) => {

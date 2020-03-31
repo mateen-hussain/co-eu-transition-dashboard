@@ -2,7 +2,6 @@ const { expect, sinon } = require('test/unit/util/chai');
 const jwt = require('services/jwt');
 const proxyquire = require('proxyquire');
 const config = require('config');
-const logger = require('services/logger');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
 
@@ -143,7 +142,6 @@ describe('services/authentication', () => {
         it('throws error with remaining login attempts', () => {
           const error = authenticateLoginCallback.getCall(0).args[0];
           expect(error.message).to.eql('Password doest not match');
-          expect(error.loginAttempts).to.eql(2);
         });
       });
 
@@ -167,7 +165,7 @@ describe('services/authentication', () => {
 
         const error = authenticateLoginCallback.getCall(0).args[0];
         expect(error.message).to.eql('Maximum login attempts exeeded');
-        expect(error.loginAttempts).to.eql(3);
+        expect(error.maximumLoginAttempts).to.be.ok;
       });
     });
 
@@ -314,96 +312,6 @@ describe('services/authentication', () => {
       sinon.assert.called(next);
 
       jwt.saveData.restore();
-    });
-  });
-
-  describe('#login', () => {
-    let req = {
-      login: sinon.stub().callsArgWith(2, null)
-    };
-    let res = {
-      redirect: sinon.stub()
-    };
-    let authenticatWithJwt = {};
-    let loginStub = {};
-
-    beforeEach(() => {
-      loginStub = sinon.stub().callsArgWith(2, null);
-      req = { login: loginStub, user, flash: sinon.stub() };
-      res = { redirect: sinon.stub() };
-
-      passportStub.authenticate.returns(() => {
-        authenticatWithJwt = passportStub.authenticate.getCall(1).args[2];
-      });
-
-      sinon.stub(jwt, 'saveData').returns();
-      sinon.stub(logger, 'error');
-    });
-
-    afterEach(() => {
-      jwt.saveData.restore();
-      logger.error.restore();
-    });
-
-    it('redirects to 2fa register page', () => {
-      authentication.login(req, res);
-
-      authenticatWithJwt(null, user);
-
-      sinon.assert.calledWith(jwt.saveData, req, res, { id: user.id, tfa: false });
-      sinon.assert.calledWith(res.redirect, config.paths.authentication.setup);
-    });
-
-    describe('bad login', () => {
-      it('redirects to login page if error with authenticatWithJwt', () => {
-        authentication.login(req, res);
-
-        const error = new Error('some error');
-
-        authenticatWithJwt(error);
-
-        sinon.assert.calledWith(req.flash, `Incorrect username and/or password entered`);
-        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
-        sinon.assert.notCalled(jwt.saveData);
-      });
-
-      it('sets flash error if user locked out', () => {
-        authentication.login(req, res);
-
-        const error = new Error('some error');
-        error.loginAttempts = 3;
-
-        authenticatWithJwt(error);
-
-        sinon.assert.calledWith(req.flash, `Too many incorrect login attempts have been made, you're account is now locked, please contact us.`);
-        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
-        sinon.assert.notCalled(jwt.saveData);
-      });
-
-      it('sets flash error if user has limited login attempts remaining', () => {
-        authentication.login(req, res);
-
-        const error = new Error('some error');
-        error.loginAttempts = 1;
-
-        authenticatWithJwt(error);
-
-        sinon.assert.calledWith(req.flash, `Incorrect username and/or password entered`);
-        sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
-        sinon.assert.notCalled(jwt.saveData);
-      });
-    });
-
-    it('redirects to login page if error with req.login', () => {
-      authentication.login(req, res);
-
-      const error = new Error('some error');
-      loginStub.callsArgWith(2, error);
-
-      authenticatWithJwt(null, user);
-
-      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
-      sinon.assert.notCalled(jwt.saveData);
     });
   });
 });

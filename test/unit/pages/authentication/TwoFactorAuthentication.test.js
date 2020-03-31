@@ -1,9 +1,8 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const config = require('config');
-const Authentication = require('pages/authentication/Authentication');
-const authenticationService = require('services/authentication');
+const TwoFactorAuthentication = require('pages/authentication/two-factor-authentication/TwoFactorAuthentication');
+const authentication = require('services/authentication');
 const flash = require('middleware/flash');
-const { protectIfNotLoginPage } = require('middleware/authentication');
 const jwt = require('services/jwt');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const speakeasy = require('speakeasy');
@@ -13,94 +12,86 @@ let page = {};
 let req = {};
 let res = {};
 
-describe('pages/authentication/Authentication', () => {
+describe('pages/authentication/two-factor-authentication/TwoFactorAuthentication', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub(), locals: { mode: 'login' } };
-    req = { cookies: [], path: '/' };
+    res = { cookies: sinon.stub(), locals: { mode: 'login' }, redirect: sinon.stub() };
+    req = { cookies: [], path: '/', user: {} };
 
-    page = new Authentication('some path', req, res);
+    page = new TwoFactorAuthentication('some path', req, res);
 
-    sinon.stub(authenticationService, 'login').resolves();
-    sinon.stub(authenticationService, 'verify2FA').returns(true);
-    sinon.stub(jwt, 'restoreData');
+    sinon.stub(authentication, 'login').resolves();
+    sinon.stub(authentication, 'verify2FA').returns(true);
     sinon.stub(jwt, 'saveData');
+    sinon.stub(jwt, 'restoreData');
   });
 
   afterEach(() => {
-    authenticationService.login.restore();
-    authenticationService.verify2FA.restore();
-    jwt.restoreData.restore();
+    authentication.login.restore();
+    authentication.verify2FA.restore();
     jwt.saveData.restore();
+    jwt.restoreData.restore();
   });
 
   describe('#middleware', () => {
     it('loads correct middleware', () => {
       expect(page.middleware).to.eql([
-        page.setMode,
-        protectIfNotLoginPage,
-        flash,
+        authentication.protectNo2FA,
+        flash
       ]);
     });
   });
 
-  describe('#mode', () => {
-    it('return current mode', () => {
-      expect(page.mode).to.eql('login');
+  describe('#next', () => {
+    it('redirects to password reset', () => {
+      page.req.user.passwordReset = true;
+
+      page.next();
+
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordReset);
+    });
+
+    it('redirects to admin page', () => {
+      page.req.user.role = 'admin';
+
+      page.next();
+
+      sinon.assert.calledWith(page.res.redirect, config.paths.admin.import);
+    });
+
+    it('redirects to all data page', () => {
+      page.next();
+
+      sinon.assert.calledWith(page.res.redirect, config.paths.allData);
     });
   });
 
-  describe('#setMode', () => {
-    let next = {};
-    beforeEach(() => {
-      req = { path: '/' };
-      res = { redirect: sinon.stub(), locals: {} };
-      next = sinon.stub();
+  describe('#mode', () => {
+    it('current mode to be register', () => {
+      page.req.path = '/register';
+      expect(page.mode).to.eql('register');
     });
 
-    it('sets mode to login', () => {
-      req.path = '/';
-      page.setMode(req, res, next);
-      expect(res.locals.mode).to.eql('login');
-      sinon.assert.called(next);
+    it('current mode to be verified', () => {
+      page.req.path = '/verified';
+      expect(page.mode).to.eql('verified');
     });
 
-    it('sets mode to register', () => {
-      req.path = '/register';
-      page.setMode(req, res, next);
-      expect(res.locals.mode).to.eql('register');
-      sinon.assert.called(next);
+    it('current mode to be verify', () => {
+      page.req.path = '/';
+      page.req.user.twofaSecret = true;
+      expect(page.mode).to.eql('verify');
     });
 
-    it('sets mode to setup', () => {
-      req.path = '/setup';
-      page.setMode(req, res, next);
-      expect(res.locals.mode).to.eql('setup');
-      sinon.assert.called(next);
-    });
-
-    it('sets mode to verified', () => {
-      req.path = '/verified';
-      page.setMode(req, res, next);
-      expect(res.locals.mode).to.eql('verified');
-      sinon.assert.called(next);
-    });
-
-    it('sets mode to verify', () => {
-      req.path = '/verify';
-      page.setMode(req, res, next);
-      expect(res.locals.mode).to.eql('verify');
-      sinon.assert.called(next);
-    });
-
-    it('redirects login if mode not matched', () => {
-      req.path = '/some-random-url';
-      page.setMode(req, res, next);
-      sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+    it('current mode to be verify', () => {
+      page.req.path = '/setup';
+      page.req.user.twofaSecret = false;
+      page.req.user.two_factor_temp_secret = false;
+      expect(page.mode).to.eql('setup');
     });
   });
 
   it('returns correct url', () => {
-    expect(page.url).to.eql(config.paths.authentication.login);
+    expect(page.url).to.eql(config.paths.authentication.twoFactorAuthentication);
   });
 
   describe('#verify2FA', () => {
@@ -109,8 +100,6 @@ describe('pages/authentication/Authentication', () => {
       page.req.user = { twofaSecret: 'secret' };
       page.req.flash = sinon.stub();
       page.res.redirect = sinon.stub();
-
-      jwt.restoreData.returns({ Authentication: {} })
     });
 
     it('redirects if no secret is given', async () => {
@@ -123,13 +112,12 @@ describe('pages/authentication/Authentication', () => {
     });
 
     it('redirects and calls flash if user entered incorrect 2FA code', async () => {
-
-      authenticationService.verify2FA.returns(false);
+      authentication.verify2FA.returns(false);
 
       await page.verify2FA();
 
       sinon.assert.calledWith(page.req.flash, `Incorrect code entered`);
-      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.verify);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.twoFactorAuthenticationVerify);
     });
 
     it('redirects and calls flash if user entered incorrect 2FA code', async () => {
@@ -137,7 +125,7 @@ describe('pages/authentication/Authentication', () => {
 
       sinon.assert.notCalled(page.req.flash);
       sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.login);
-      sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.verify);
+      sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.twoFactorAuthenticationVerify);
     });
   });
 
@@ -148,61 +136,39 @@ describe('pages/authentication/Authentication', () => {
       page.req.flash = sinon.stub();
       page.res.redirect = sinon.stub();
 
-      jwt.restoreData.returns({ Authentication: { } })
+      jwt.restoreData.returns({ TwoFactorAuthentication: { } })
     });
 
     it('redirects to verified if user is registering', async () => {
-      jwt.restoreData.returns({ Authentication: { two_factor_temp_secret: 'secret' } });
+      jwt.restoreData.returns({ TwoFactorAuthentication: { two_factor_temp_secret: 'secret' } });
 
       await page.verified();
 
       sinon.assert.calledWith(page.req.user.update, { twofaSecret: 'secret' });
       sinon.assert.calledWith(jwt.saveData, page.req, page.res, { tfa: true });
-      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.verified);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.twoFactorAuthenticationVerified);
     });
 
-    it('redirects to entry url if user is already registered', async () => {
+    it('calls next if verified', async () => {
       delete page.req.user.twofaSecret;
+
+      sinon.stub(page, 'next');
 
       await page.verified();
 
-      sinon.assert.calledWith(page.res.redirect, page.entryUrl);
-    });
-  });
-
-  describe('#entryUrl', () => {
-    beforeEach(() => {
-      page.req.user = { };
-    });
-
-    it('returns import url if user is admin', () => {
-      page.req.user = { role: 'admin' };
-      expect(page.entryUrl).to.eql(config.paths.admin.import);
-    });
-
-    it('returns all-data url', () => {
-      page.req.user = { role: 'user' };
-      expect(page.entryUrl).to.eql(config.paths.allData);
+      sinon.assert.called(page.next);
     });
   });
 
   describe('#postRequest', () => {
     beforeEach(() => {
-      page.res.locals = {};
       res.sendStatus = sinon.stub();
-    });
-
-    it('calls authenticationService.login', async () => {
-      page.res.locals = { mode: 'login' };
-
-      await page.postRequest(req, res);
-
-      sinon.assert.calledWith(authenticationService.login, req, res);
     });
 
     it('verfies 2fa', async () => {
       sinon.stub(page, 'verify2FA').resolves();
-      page.res.locals = { mode: 'verify' };
+      page.req.path = '/verify';
+      page.req.user.twofaSecret = true;
 
       await page.postRequest(req, res);
 
@@ -212,8 +178,6 @@ describe('pages/authentication/Authentication', () => {
     });
 
     it('calls method not aloud if mode not valid', async () => {
-      page.res.locals = { mode: 'no-valid' };
-
       await page.postRequest(req, res);
 
       sinon.assert.calledWith(res.sendStatus, METHOD_NOT_ALLOWED);

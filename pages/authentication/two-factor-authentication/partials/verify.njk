@@ -1,0 +1,43 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+<h1 class="govuk-heading-xl">Verify Google Authenticator</h1>
+
+<p class="govuk-body">Enter a code from Google Authenticator</p>
+
+{% if flash %}
+  {{
+    govukErrorSummary({
+      titleText: "Fix the following",
+      errorList: [
+        {
+          text: "Your 6-digit code is incorrect, please try again",
+          href: "#sixDigit"
+        }
+      ]
+    })
+  }}
+{% endif %}
+
+<form action="{{ config.paths.authentication.verify }}" method="post">
+  {{
+    govukInput({
+      label: {
+        html: "<strong>6-digit code</strong>"
+      },
+      classes: "govuk-input--width-20",
+      id: "sixDigit",
+      name: "sixDigit",
+      autocomplete: "off"
+    })
+  }}
+
+  {{
+    govukButton({
+      text: "Verify",
+      type: "submit",
+      preventDoubleClick: true
+    })
+  }}
+</form>

@@ -8,56 +8,44 @@ const jwt = require('services/jwt');
 const config = require('config');
 const flash = require('middleware/flash');
 const logger = require('services/logger');
-const { protectIfNotLoginPage } = require('middleware/authentication');
 
-class Authentication extends Page {
-
+class TwoFactorAuthentication extends Page {
   get url() {
-    return paths.authentication.login;
-  }
-
-  get paths() {
-    return paths;
+    return paths.authentication.twoFactorAuthentication;
   }
 
   get middleware() {
     return [
-      this.setMode,
-      protectIfNotLoginPage,
+      authentication.protectNo2FA,
       flash,
     ];
   }
 
-  get mode() {
-    return this.res.locals.mode;
+  next() {
+    if(this.req.user.passwordReset) {
+      this.res.redirect(config.paths.authentication.passwordReset);
+    } else if (this.req.user.role === 'admin') {
+      return this.res.redirect(config.paths.admin.import);
+    } else {
+      return this.res.redirect(config.paths.allData);
+    }
   }
 
-  setMode(req, res, next) {
-    const pathToCompare = req.path === '/' ? paths.authentication.login : `${paths.authentication.login}${req.path}`;
-    res.locals = res.locals || {};
+  get mode() {
+    const pathToCompare = this.req.path === '/' ? paths.authentication.twoFactorAuthentication : `${paths.authentication.twoFactorAuthentication}${this.req.path}`;
+
     switch(pathToCompare) {
-      case paths.authentication.login:
-        res.locals.mode = 'login';
-        break;
-      case paths.authentication.register:
-        res.locals.mode = 'register';
-        break;
-      case paths.authentication.setup:
-        res.locals.mode = 'setup';
-        break;
-      case paths.authentication.verified:
-        res.locals.mode = 'verified';
-        break;
-      case paths.authentication.verify:
-        res.locals.mode = 'verify';
-        break;
+      case paths.authentication.twoFactorAuthenticationRegister:
+        return 'register';
+      case paths.authentication.twoFactorAuthenticationVerified:
+        return 'verified';
+      default:
+        if (!this.req.user.twofaSecret && !this.data.two_factor_temp_secret) {
+          return 'setup';
+        } else {
+          return 'verify';
+        }
     }
-
-    if (!res.locals.mode) {
-      return res.redirect(paths.authentication.login);
-    }
-
-    next();
   }
 
   async verify2FA() {
@@ -75,7 +63,7 @@ class Authentication extends Page {
     if (!verified) {
       logger.error('User entered incorrect 2FA code');
       this.req.flash(`Incorrect code entered`);
-      return this.res.redirect(config.paths.authentication.verify);
+      return this.res.redirect(config.paths.authentication.twoFactorAuthenticationVerify);
     }
 
     this.verified();
@@ -94,28 +82,18 @@ class Authentication extends Page {
       // set tfa flag in JWT token - used to verify user has 2FA
       jwt.saveData(this.req, this.res, { tfa: true });
 
-      return this.res.redirect(config.paths.authentication.verified);
+      return this.res.redirect(config.paths.authentication.twoFactorAuthenticationVerified);
     }
 
     // set tfa flag in JWT token - used to verify user has 2FA
     jwt.saveData(this.req, this.res, { tfa: true });
 
-    this.res.redirect(this.entryUrl);
-  }
-
-  get entryUrl() {
-    if (this.req.user && this.req.user.role === 'admin') {
-      return config.paths.admin.import;
-    } else {
-      return config.paths.allData;
-    }
+    this.next();
   }
 
   async postRequest(req, res) {
+    console.log('mode', this.mode)
     switch(this.mode) {
-      case 'login':
-        await authentication.login(req, res);
-        break;
       case 'verify':
         await this.verify2FA();
         break;
@@ -135,4 +113,4 @@ class Authentication extends Page {
   }
 }
 
-module.exports = Authentication;
+module.exports = TwoFactorAuthentication;

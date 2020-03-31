@@ -7,7 +7,7 @@ let req = {}
 
 describe('pages/logout/Logout', () => {
   beforeEach(() => {
-    const Logout = require('pages/logout/Logout');
+    const Logout = require('pages/authentication/logout/Logout');
 
     res = { redirect: sinon.stub(), clearCookie: sinon.stub() };
 

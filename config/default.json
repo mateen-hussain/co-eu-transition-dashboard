@@ -23,11 +23,13 @@
     "impactDefinitions": "/impact-definitions",
     "authentication": {
       "login": "/login",
-      "register": "/login/register",
-      "setup": "/login/setup",
-      "verified": "/login/verified",
-      "verify": "/login/verify",
-      "logout": "/logout"
+      "logout": "/logout",
+      "twoFactorAuthentication": "/two-factor-authentication",
+      "twoFactorAuthenticationRegister": "/two-factor-authentication/register",
+      "twoFactorAuthenticationVerify": "/two-factor-authentication/verify",
+      "twoFactorAuthenticationVerified": "/two-factor-authentication/verified",
+      "passwordReset": "/password-reset",
+      "passwordResetComplete": "/password-reset/reset-complete"
     },
     "projectDetails": "/project-details/:uid"
   },

@@ -1,4 +1,4 @@
-const { Model, STRING, ENUM, DATE, INTEGER } = require('sequelize');
+const { Model, STRING, ENUM, DATE, INTEGER, BOOLEAN } = require('sequelize');
 const sequelize = require('services/sequelize');
 const Project = require('./project');
 const Milestone = require('./milestone');
@@ -107,6 +107,10 @@ User.init({
   loginAttempts: {
     type: INTEGER,
     field: "login_attempts"
+  },
+  passwordReset: {
+    type: BOOLEAN,
+    field: "password_reset"
   }
 }, { sequelize, modelName: 'user', tableName: 'user', timestamps: false });
 

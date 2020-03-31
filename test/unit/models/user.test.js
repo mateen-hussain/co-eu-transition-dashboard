@@ -1,6 +1,6 @@
 const User = require('models/user');
 const { expect } = require('test/unit/util/chai');
-const { STRING, DATE, ENUM, INTEGER } = require('sequelize');
+const { STRING, DATE, ENUM, INTEGER, BOOLEAN } = require('sequelize');
 const Department = require('models/department');
 const DepartmentUser = require('models/departmentUser');
 
@@ -31,6 +31,10 @@ describe('models/user', () => {
       loginAttempts: {
         type: INTEGER,
         field: "login_attempts"
+      },
+      passwordReset: {
+        type: BOOLEAN,
+        field: "password_reset"
       }
     });
 
