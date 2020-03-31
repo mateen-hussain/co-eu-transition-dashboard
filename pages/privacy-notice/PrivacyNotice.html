@@ -1,4 +1,20 @@
 {% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{% include "feedback.njk" %}
+
+{% if req.isAuthenticated() %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endif %}
+
+{% endblock %}
 
 {% block pageTitle %}Privacy Notice for Transition Delivery Dashboard{% endblock %}
 
@@ -25,9 +41,9 @@
 
   <p class="govuk-body">The legal basis for processing your personal data is: </p>
 
-  <ul class="govuk-list">
+  <ul class="govuk-list govuk-list--bullet">
   <li>
-      <p class="govuk-body">processing is necessary for the performance of a task carried out in the public interest or in the exercise of official authority vested in the data controller. In this case that is the function of the Cabinet Office to coordinate transition plans. </p>
+      <p class="govuk-body">Processing is necessary for the performance of a task carried out in the public interest or in the exercise of official authority vested in the data controller. In this case that is the function of the Cabinet Office to coordinate transition plans. </p>
   </li>
   <li>
       <p class="govuk-body">It is necessary for the performance of a contract to which the data subject is a party, which in this case is your employment contract. This is because you are an authorised point of contact for other authorised/ cleared individuals to make contact to instigate queries and request progress updates to support their own departmental dependencies and deliverables with other government departments.</p>
