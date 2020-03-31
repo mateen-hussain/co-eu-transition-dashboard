@@ -23,7 +23,7 @@ describe('pages/all-data/AllData', () => {
     getProjects = sinon.stub();
     departmentalView = sinon.stub();
 
-    const req = { cookies: [], user: { getProjects }};
+    const req = { cookies: [], user: { getProjects } };
 
     page = new AllData('some path', req, res);
 

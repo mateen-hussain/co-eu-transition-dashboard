@@ -12,7 +12,7 @@ describe('pages/project-details/ProjectDetails', () => {
   beforeEach(() => {
     params = sinon.stub();
     const ProjectDetails = proxyquire('pages/project-details/ProjectDetails', {
-        params
+      params
     });
 
     const res = { cookies: sinon.stub() };

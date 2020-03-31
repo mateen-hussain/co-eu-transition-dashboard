@@ -40,7 +40,7 @@ describe('helpers/filters', () => {
             model: Project,
             as: 'projects_count',
             attributes: [],
-            where: {[attribute.field]: { [sequelize.Op.ne]: null } },
+            where: { [attribute.field]: { [sequelize.Op.ne]: null } },
             required: false,
             include: [{
               required: true,

@@ -28,10 +28,10 @@ class PasswordReset extends Page {
     const pathToCompare = this.req.path === '/' ? config.paths.authentication.passwordReset : `${config.paths.authentication.passwordReset}${this.req.path}`;
 
     switch(pathToCompare) {
-      case config.paths.authentication.passwordResetComplete:
-        return 'password-reset-complete';
-      default:
-        return 'password-reset';
+    case config.paths.authentication.passwordResetComplete:
+      return 'password-reset-complete';
+    default:
+      return 'password-reset';
     }
   }
 
@@ -83,11 +83,11 @@ class PasswordReset extends Page {
 
   async postRequest(req, res) {
     switch(this.mode) {
-      case 'password-reset':
-        await this.passwordReset();
-        break;
-      default:
-        res.sendStatus(METHOD_NOT_ALLOWED);
+    case 'password-reset':
+      await this.passwordReset();
+      break;
+    default:
+      res.sendStatus(METHOD_NOT_ALLOWED);
     }
   }
 }

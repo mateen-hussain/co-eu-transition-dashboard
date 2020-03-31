@@ -43,7 +43,7 @@ class User extends Model {
             where: groupedSearch.projectField
           }
         ]
-       }]
+      }]
     });
 
     return departments.reduce((projects, department) => {
@@ -70,7 +70,7 @@ class User extends Model {
             include: ProjectField
           }
         ]
-       }]
+      }]
     });
 
     const projects = departments.reduce((projects, department) => {

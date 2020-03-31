@@ -83,12 +83,12 @@ class Page {
     const method = req.method.toLowerCase();
 
     switch (method) {
-      case 'post':
-        await this.postRequest(req, res);
-        break;
-      case 'get':
-      default:
-        await this.getRequest(req, res);
+    case 'post':
+      await this.postRequest(req, res);
+      break;
+    case 'get':
+    default:
+      await this.getRequest(req, res);
     }
   }
 

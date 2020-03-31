@@ -6,7 +6,7 @@ const { expect } = require('test/unit/util/chai');
 describe('Pages', () => {
   it('finds and attaches to app', () => {
     const allPageNames = []
-    glob.sync('./pages/**/*.js', {"ignore":['./pages/index.js']}).forEach(file => {
+    glob.sync('./pages/**/*.js', { "ignore":['./pages/index.js'] }).forEach(file => {
       const Page = require(path.resolve(file));
       allPageNames.push(new Page().constructor.name);
     });

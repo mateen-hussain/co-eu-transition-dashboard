@@ -55,10 +55,10 @@ const authenticateUser = (jwtPayload, cb) => {
       id: jwtPayload.id
     }
   })
-  .then(user => {
-    cb(null, user);
-  })
-  .catch(cb);
+    .then(user => {
+      cb(null, user);
+    })
+    .catch(cb);
 };
 const jwtStrategy = new passportJWTStrategy({
   jwtFromRequest: jwt.token,

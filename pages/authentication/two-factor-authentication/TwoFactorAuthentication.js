@@ -35,16 +35,16 @@ class TwoFactorAuthentication extends Page {
     const pathToCompare = this.req.path === '/' ? paths.authentication.twoFactorAuthentication : `${paths.authentication.twoFactorAuthentication}${this.req.path}`;
 
     switch(pathToCompare) {
-      case paths.authentication.twoFactorAuthenticationRegister:
-        return 'register';
-      case paths.authentication.twoFactorAuthenticationVerified:
-        return 'verified';
-      default:
-        if (!this.req.user.twofaSecret && !this.data.two_factor_temp_secret) {
-          return 'setup';
-        } else {
-          return 'verify';
-        }
+    case paths.authentication.twoFactorAuthenticationRegister:
+      return 'register';
+    case paths.authentication.twoFactorAuthenticationVerified:
+      return 'verified';
+    default:
+      if (!this.req.user.twofaSecret && !this.data.two_factor_temp_secret) {
+        return 'setup';
+      } else {
+        return 'verify';
+      }
     }
   }
 
@@ -93,11 +93,11 @@ class TwoFactorAuthentication extends Page {
 
   async postRequest(req, res) {
     switch(this.mode) {
-      case 'verify':
-        await this.verify2FA();
-        break;
-      default:
-        res.sendStatus(METHOD_NOT_ALLOWED);
+    case 'verify':
+      await this.verify2FA();
+      break;
+    default:
+      res.sendStatus(METHOD_NOT_ALLOWED);
     }
   }
 

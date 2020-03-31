@@ -47,7 +47,7 @@ describe('models/milestone', () => {
 
   it('#createSearch', () => {
     const key = 'test';
-    const options = {options: 1};
+    const options = { options: 1 };
     Milestone.createSearch(key, options);
     sinon.assert.calledWith(modelUtils.createFilterOptions, key, options);
   });

@@ -13,6 +13,8 @@
   },
   "rules": {
     "require-atomic-updates": "off",
-    "no-console": 2
+    "no-console": 2,
+    "object-curly-spacing": ["error", "always"],
+    "indent": ["error", 2]
   }
 }

@@ -16,42 +16,42 @@ class AllData extends Page {
   applyFormatting(attribute, value) {
     const getConfidenceDescription = (type) => {
       switch(value) {
-        case 3:
-          return `High ${type}`;
-        case 2:
-          return `Medium ${type}`;
-        case 1:
-          return `Low ${type}`;
-        case 0:
-          return `Very low ${type}`;
-        default:
-          return `No ${type} level given`;
+      case 3:
+        return `High ${type}`;
+      case 2:
+        return `Medium ${type}`;
+      case 1:
+        return `Low ${type}`;
+      case 0:
+        return `Very low ${type}`;
+      default:
+        return `No ${type} level given`;
       }
     };
 
     const getImpactDescription = (type) => {
       switch(value) {
-        case 0:
-          return `Very high ${type}`;
-        case 1:
-          return `High ${type}`;
-        case 2:
-          return `Medium ${type}`;
-        case 3:
-          return `Low ${type}`;
-        default:
-          return `No ${type} level given`;
+      case 0:
+        return `Very high ${type}`;
+      case 1:
+        return `High ${type}`;
+      case 2:
+        return `Medium ${type}`;
+      case 3:
+        return `Low ${type}`;
+      default:
+        return `No ${type} level given`;
       }
     };
 
     switch(attribute.id) {
-      case 'impact':
-        return `${value} - ${getImpactDescription('impact')}`;
-      case 'hmgConfidence':
-      case 'citizenReadiness':
-      case 'businessReadiness':
-      case 'euStateConfidence':
-        return `${value} - ${getConfidenceDescription('confidence')}`;
+    case 'impact':
+      return `${value} - ${getImpactDescription('impact')}`;
+    case 'hmgConfidence':
+    case 'citizenReadiness':
+    case 'businessReadiness':
+    case 'euStateConfidence':
+      return `${value} - ${getConfidenceDescription('confidence')}`;
     }
 
     return value;

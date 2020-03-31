@@ -8,7 +8,7 @@ const { Op, literal } = require('sequelize');
 const modelUtils = require('helpers/models');
 
 const getFiltersWithCounts = async (attribute, search, user) => {
-  const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter'}});
+  const groupedSearch = await modelUtils.groupSearchItems(search, { ProjectFieldEntry: { path: 'projects_count->ProjectFieldEntryFilter' } });
   const searchIgnoreCurrentAttribute = Object.assign({}, groupedSearch.project, { [attribute.field]: { [Op.ne]: null } });
 
   const attributes = [[literal(`project.${attribute.field}`), 'value']];

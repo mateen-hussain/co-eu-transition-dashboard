@@ -66,27 +66,27 @@ const validateFieldEntryValue = function(val = '') {
   const value = String(val).trim();
 
   switch(this.projectField.type) {
-    case 'boolean':
-      if (!isBool(String(value || '').toLowerCase())) {
-        throw Error(`"${value}" is not a valid boolean`);
-      }
-      break;
-    case 'integer':
-    case 'float':
-      if(isNaN(value)) {
-        throw Error(`"${value}" is not a valid number`);
-      }
-      break;
-    case 'date':
-      if(!moment(value, 'YYYY-MM-DD').isValid()) {
-        throw Error(`"${value}" is not a valid date`);
-      }
-      break;
-    case 'group':
-      if(!this.projectField.config.options.includes(value)) {
-        throw Error(`"${value}" must match one of the following: ${this.projectField.config.options.join(', ')}`);
-      }
-      break;
+  case 'boolean':
+    if (!isBool(String(value || '').toLowerCase())) {
+      throw Error(`"${value}" is not a valid boolean`);
+    }
+    break;
+  case 'integer':
+  case 'float':
+    if(isNaN(value)) {
+      throw Error(`"${value}" is not a valid number`);
+    }
+    break;
+  case 'date':
+    if(!moment(value, 'YYYY-MM-DD').isValid()) {
+      throw Error(`"${value}" is not a valid date`);
+    }
+    break;
+  case 'group':
+    if(!this.projectField.config.options.includes(value)) {
+      throw Error(`"${value}" must match one of the following: ${this.projectField.config.options.join(', ')}`);
+    }
+    break;
   }
 
   return true;
@@ -95,31 +95,31 @@ const validateFieldEntryValue = function(val = '') {
 const parseFieldEntryValue = (value, type, forDatabase = false) => {
   if(type) {
     switch(type) {
-      case 'boolean':
-        value = truthy.includes(value);
-        break;
-      case 'integer':
-        value = parseInt(value);
-        break;
-      case 'float':
-        value = parseFloat(value);
-        break;
-      case 'date':
-        if( forDatabase ) {
-          if (String(value || '').includes('/')) {
-            value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD');
-          } else {
-            const date = moment(parseDateExcel(value));
-            if(date.isValid()) {
-              value = date.format('YYYY-MM-DD');
-            } else {
-              value = moment(value).format('YYYY-MM-DD');
-            }
-          }
+    case 'boolean':
+      value = truthy.includes(value);
+      break;
+    case 'integer':
+      value = parseInt(value);
+      break;
+    case 'float':
+      value = parseFloat(value);
+      break;
+    case 'date':
+      if( forDatabase ) {
+        if (String(value || '').includes('/')) {
+          value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD');
         } else {
-          value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
+          const date = moment(parseDateExcel(value));
+          if(date.isValid()) {
+            value = date.format('YYYY-MM-DD');
+          } else {
+            value = moment(value).format('YYYY-MM-DD');
+          }
         }
-        break;
+      } else {
+        value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
+      }
+      break;
     }
   }
   return value;

@@ -4,7 +4,7 @@ const { expect, sinon } = require('test/unit/util/chai');
 const { protect } = require('services/authentication');
 
 let page = {};
-const sampleData = {some: 'data'};
+const sampleData = { some: 'data' };
 
 describe('core/pages/page', () => {
   before(() => {
@@ -107,8 +107,7 @@ describe('core/pages/page', () => {
 
     locals.forEach(key => {
       expect(Object.keys(page.locals)).to.include(key);
-    })
-
+    });
   });
 });
 

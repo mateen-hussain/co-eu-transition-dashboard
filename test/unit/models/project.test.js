@@ -72,14 +72,14 @@ describe('models/project', () => {
 
   it('#createSearch', () => {
     const key = 'test 123';
-    const options = {options: 1};
+    const options = { options: 1 };
     Project.createSearch(key, options);
     sinon.assert.calledWith(modelUtils.createFilterOptions, key, options);
   });
 
   it.skip('#fields', () => {
     const key = 'test 123';
-    const options = {options: 1};
+    const options = { options: 1 };
     Project.createSearch(key, options);
     sinon.assert.calledWith(modelUtils.createFilterOptions, key, options);
   });

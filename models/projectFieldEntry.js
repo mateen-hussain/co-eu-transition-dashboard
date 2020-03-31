@@ -20,7 +20,7 @@ class ProjectFieldEntry extends Model {
       }
     });
 
-    return {[Op.or]: filters};
+    return { [Op.or]: filters };
   }
 
   get fields() {
