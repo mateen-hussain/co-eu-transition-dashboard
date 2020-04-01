@@ -46,7 +46,7 @@ ProjectFieldEntry.init({
     primaryKey: true
   },
   value: {
-    type: TEXT('medium'),
+    type: TEXT,
     get() {
       if (!this.getDataValue('value')) return;
       const value = this.getDataValue('value').toString('utf8');
