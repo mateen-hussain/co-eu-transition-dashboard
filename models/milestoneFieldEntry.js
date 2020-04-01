@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER, BLOB } = require('sequelize');
+const { Model, STRING, INTEGER, TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const MilestoneField = require('./milestoneField');
@@ -27,7 +27,7 @@ MilestoneFieldEntry.init({
     field: 'milestone_uid'
   },
   value: {
-    type: BLOB,
+    type: TEXT('medium'),
     get() {
       if (!this.getDataValue('value')) return;
       const value = this.getDataValue('value').toString('utf8');
