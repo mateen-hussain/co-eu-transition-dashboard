@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER, BLOB, Op } = require('sequelize');
+const { Model, STRING, INTEGER, TEXT, Op } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const ProjectField = require('./projectField');
@@ -46,7 +46,7 @@ ProjectFieldEntry.init({
     primaryKey: true
   },
   value: {
-    type: BLOB,
+    type: TEXT,
     get() {
       if (!this.getDataValue('value')) return;
       const value = this.getDataValue('value').toString('utf8');
