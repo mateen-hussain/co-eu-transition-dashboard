@@ -6,6 +6,7 @@ const Department = require("models/department");
 const DepartmentUser = require("models/departmentUser");
 const NotifyClient = require('notifications-node-client').NotifyClient;
 const randomString = require('randomstring');
+const getopts = require('getopts');
 
 async function getDepartments(string) {
   let departments = string.split(",");
@@ -29,8 +30,20 @@ async function createDepartmentUsers(user,departments) {
   }
 }
 
-let email = readlineSync.question("Enter email: ");
-let departmentsString = readlineSync.question("Enter departments (seperated by ',', use 'all' for all departments): ");
+const options = getopts(process.argv.slice(2), {
+  default: {
+    email: null,
+    departments: null
+  }
+});
+
+let email = options.email;
+let departmentsString = options.departments;
+
+if (!email || !departmentsString) {
+  email = readlineSync.question("Enter email: ");
+  departmentsString = readlineSync.question("Enter departments (seperated by ',', use 'all' for all departments): ");
+}
 
 let departments = [];
 if (departmentsString == "all") {

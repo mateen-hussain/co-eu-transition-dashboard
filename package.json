@@ -11,6 +11,7 @@
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
     "release": "release-it --no-npm.publish --ci",
     "deploy-staging": "bash deploy.sh staging staging.yml",
+    "deploy-research": "bash deploy.sh research research.yml",
     "deploy-production": "bash deploy.sh production production.yml"
   },
   "nodemonConfig": {
@@ -36,6 +37,7 @@
     "express-fileupload": "^1.1.6",
     "express-nunjucks": "^2.2.3",
     "express-winston": "^4.0.3",
+    "getopts": "^2.2.5",
     "glob": "^7.1.6",
     "govuk-frontend": "^3.5.0",
     "hard-source-webpack-plugin": "^0.13.1",
@@ -63,10 +65,10 @@
     "sass-loader": "^8.0.2",
     "sequelize": "^5.21.5",
     "speakeasy": "^2.0.0",
+    "umzug": "^2.3.0",
     "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
-    "winston": "^3.2.1",
-    "umzug": "^2.3.0"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
