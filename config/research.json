@@ -1,0 +1,15 @@
+{
+  "env": "research",
+  "serviceUrl": "https://transition-dashboard-research.london.cloudapps.digital/",
+  "cookie": {
+    "domain": "transition-dashboard-research.london.cloudapps.digital"
+  },
+  "services": {
+    "mysql": {
+      "sslCertificate": "Amazon RDS"
+    },
+    "tfa": {
+      "name": "[Research] Transition Taskforce Dashboard"
+    }
+  }
+}
