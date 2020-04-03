@@ -11,9 +11,6 @@
 {% set flag = '' %}
 {% set filtersExist = 'false' %}
 
-{% set fromDate = "01/01/" + currentDate | date("YYYY") %}
-{% set toDate = "01/01/" + currentDate | date("add", 1, "year") | date("YYYY") %}
-
 {% set dates  %}
 {% include "all-data/partials/filters/dates.njk" %}
 {% endset %}

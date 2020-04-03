@@ -35,29 +35,29 @@
 
   {% for department in departmentsWithMissedMilestones %}
 
-  {% set departmentRow %}
-    {{ govukTable({
-      rows: [
-        [
-          {
-            text: department.name
-          },
-          {
-            text: department.totalMilestonesMissed
-          }
+    {% set departmentRow %}
+      {{ govukTable({
+        rows: [
+          [
+            {
+              text: department.name
+            },
+            {
+              text: department.totalMilestonesMissed
+            }
+          ]
         ]
-      ]
-    }) }}
-  {% endset %}
+      }) }}
+    {% endset %}
 
-  {% set missedMilestonesTable = (missedMilestonesTable.push ({
-      summary: {
-        html: departmentRow
-      },
-      content: {
-        html: milestones.missedMilestones(department.projects, projectFields, milestoneFields, config)
-      }
-    }), missedMilestonesTable) %}
+    {% set missedMilestonesTable = (missedMilestonesTable.push ({
+        summary: {
+          html: departmentRow
+        },
+        content: {
+          html: milestones.missedMilestones(department.projects, projectFields, milestoneFields, config)
+        }
+      }), missedMilestonesTable) %}
 
   {% endfor %}
 
