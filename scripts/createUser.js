@@ -69,9 +69,10 @@ departments.then( (departmentsArray) => {
             email,
             {
               personalisation: {
-                password: passphrase,
-                email: email,
-                link: config.serviceUrl
+                "password": passphrase,
+                "email": email,
+                "link": config.serviceUrl,
+                "privacy_link": config.serviceUrl + "privacy-notice"
               },
               reference: `${user.id}`
             },
