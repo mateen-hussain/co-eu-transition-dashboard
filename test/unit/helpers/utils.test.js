@@ -1,8 +1,7 @@
 const utils = require('helpers/utils');
 const { expect } = require('test/unit/util/chai');
 
-describe.only('helpers/utils', () => {
-
+describe('helpers/utils', () => {
   it('should remove empty items from arrays', () => {
     const test = [1,'',undefined,[1, '', undefined]];
     expect(utils.removeNulls(test)).to.eql([1,[1]]);
