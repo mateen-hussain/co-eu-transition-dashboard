@@ -1,5 +1,6 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const { STRING, DATE } = require('sequelize');
+const sequelize = require('services/sequelize');
 const Milestone = require('models/milestone');
 const MilestoneFieldEntry = require('models/milestoneFieldEntry');
 const modelUtils = require('helpers/models');
@@ -14,8 +15,8 @@ describe('models/milestone', () => {
     modelUtils.createFilterOptions.restore();
   });
 
-  it.skip('called Milestone.init with the correct parameters', () => {
-    expect(Milestone.init).to.have.been.calledWith({
+  it('called Milestone.init with the correct parameters', () => {
+    sinon.assert.calledWithMatch(Milestone.init, sinon.match({
       uid: {
         type: STRING(32),
         primaryKey: true,
@@ -33,13 +34,9 @@ describe('models/milestone', () => {
       date: {
         type: DATE,
         allowNull: false,
-        displayName: 'Due Date',
-        get() {
-          if (!this.getDataValue('date')) return;
-          return moment(this.getDataValue('date'), 'YYYY-MM-DD').format('DD/MM/YYYY');
-        }
+        displayName: 'Due Date'
       }
-    });
+    }), { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
   });
 
   it('called Milestone.belongsTo with the correct parameters', () => {

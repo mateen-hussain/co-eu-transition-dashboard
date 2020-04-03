@@ -48,7 +48,7 @@ Milestone.init({
     get() {
       if (!this.getDataValue('date')) return;
       return moment(this.getDataValue('date'), 'YYYY-MM-DD').format('DD/MM/YYYY');
-    },
+    }
   }
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
 

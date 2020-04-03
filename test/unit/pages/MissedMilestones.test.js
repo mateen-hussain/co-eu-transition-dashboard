@@ -77,12 +77,10 @@ describe('pages/missed-milestones/MissedMilestones', () => {
   });
 
   describe('#totalMilestones', () => {
-    beforeEach(() => {
-      Milestone.count.resolves(5);
-    });
-
     it('calls Milestone.count with correct parameters and returns correct response', async () => {
-      const count = await page.totalMilestones('BEIS');
+      Milestone.count.resolves(5);
+
+      const count = await page.totalMilestones({ name: 'BEIS' });
 
       sinon.assert.calledWith(Milestone.count, {
         include: [{
