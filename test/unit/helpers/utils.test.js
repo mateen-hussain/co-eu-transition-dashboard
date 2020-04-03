@@ -22,7 +22,7 @@ describe('helpers/utils', () => {
         e: ['a', '']
       }, {
         a: undefined,
-        b: [1,'', undefined, null]
+        b: [1,'', undefined]
       }
     ];
 
