@@ -29,28 +29,31 @@ authentication.hashPassphrase(passphrase).then( (hashedPassphrase) => {
       email: email,
     }
   }).then( (user) => {
-    user.hashedPassword = hashedPassphrase;
+    user.hashedPassphrase = hashedPassphrase;
     user.mustChangePassword = true;
     user.twofaSecret = null;
-    user.save();
-    if (config.notify.apiKey) {
-      let notifyClient = new NotifyClient(config.notify.apiKey);
-      notifyClient.sendEmail(
-        config.notify.createTemplateKey,
-        email,
-        {
-          personalisation: {
-            password: passphrase,
-            email: email,
-            link: config.serviceUrl
+    user.loginAttempts = 0;
+    user.save().then( () => {
+      if (config.notify.apiKey) {
+        let notifyClient = new NotifyClient(config.notify.apiKey);
+        notifyClient.sendEmail(
+          config.notify.createTemplateKey,
+          email,
+          {
+            personalisation: {
+              password: passphrase,
+              email: email,
+              link: config.serviceUrl,
+              privacy_link: config.serviceUrl + "privacy-notice"
+            },
+            reference: `${user.id}`
           },
-          reference: `${user.id}`
-        },
-      );
-      console.log(`User ${email} reset and sent with password`);
-    } else {
-      console.log(`User ${email} reset with password ${passphrase}`);
-    }
+        );
+        console.log(`User ${email} reset and sent with password`);
+      } else {
+        console.log(`User ${email} reset with password ${passphrase}`);
+      }
+    });
   }).catch( (err) => {
     console.log(`Could not create user [${err}]`);
   });

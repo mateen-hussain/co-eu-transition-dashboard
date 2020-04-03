@@ -71,7 +71,8 @@ departments.then( (departmentsArray) => {
               personalisation: {
                 password: passphrase,
                 email: email,
-                link: config.serviceUrl
+                link: config.serviceUrl,
+                privacy_link: config.serviceUrl + "privacy-notice"
               },
               reference: `${user.id}`
             },
