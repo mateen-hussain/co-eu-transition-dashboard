@@ -1,6 +1,5 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
-const moment = require('moment');
 const MissedMilestones = require('pages/missed-milestones/MissedMilestones');
 const Milestone = require('models/milestone');
 const Project = require('models/project');
