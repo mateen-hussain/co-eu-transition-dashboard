@@ -3,6 +3,7 @@ import Chart from 'chart.js';
 
 const rowHeight = 8;
 const xAxisLablesHeight = 10;
+const color = '#5694CA';
 
 export default (elementId, data) =>  {
   const ctx = document.getElementById(elementId);
@@ -23,8 +24,8 @@ export default (elementId, data) =>  {
         radius: 10,
         hoverRadius: 15,
         data: data.data,
-        backgroundColor: '#5694CA',
-        hoverBackgroundColor: '#5694CA'
+        backgroundColor: color,
+        hoverBackgroundColor: color
       }]
     },
     options: {
