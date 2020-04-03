@@ -1,6 +1,8 @@
 @import '~govuk-frontend/govuk/all';
+@import '~chart.js/dist/Chart';
 
 @import 'pages/all-data/AllData.scss';
+@import 'pages/missed-milestones/MissedMilestones.scss';
 
 .navigation {
     background-color: #f3f2f1;
@@ -36,4 +38,21 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 li.govuk-header__navigation-item.logout-item {
     float: right;
     margin-top: -45px;
+}
+
+.child-navigation {
+    padding-left: 10px;
+}
+
+ul#childNavigation {
+    border-bottom: 1px solid #b1b4b6;
+}
+
+a.govuk-header__link.child-nav {
+    color: #1d70b8;
+    font-weight: normal;
+}
+
+.child-item.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
+   color: #000000;
 }

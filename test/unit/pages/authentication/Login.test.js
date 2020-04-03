@@ -64,7 +64,7 @@ describe('pages/authentication/login/Login', () => {
       const user = {};
       page.next(user);
 
-      sinon.assert.calledWith(page.res.redirect, config.paths.allData);
+      sinon.assert.calledWith(page.res.redirect, config.paths.missedMilestones);
     });
   });
 

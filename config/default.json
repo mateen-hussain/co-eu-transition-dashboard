@@ -35,7 +35,8 @@
       "passwordResetComplete": "/password-reset/reset-complete"
     },
     "projectDetails": "/project-details/:uid",
-    "privacyNotice": "/privacy-notice"
+    "privacyNotice": "/privacy-notice",
+    "missedMilestones": "/missed-milestones"
   },
   "features": {
     "twoFactorAuth": true

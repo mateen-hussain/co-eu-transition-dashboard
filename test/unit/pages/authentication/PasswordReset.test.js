@@ -32,9 +32,9 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
       expect(page.next).to.eql(config.paths.admin.import);
     });
 
-    it('redirects to all data page', () => {
+    it('redirects to missed milestones page', () => {
       page.req.user.role = 'user';
-      expect(page.next).to.eql(config.paths.allData);
+      expect(page.next).to.eql(config.paths.missedMilestones);
     });
   });
 

@@ -2,6 +2,7 @@ const { STRING, DATE, Model } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const MilestoneFieldEntry = require('./milestoneFieldEntry');
+const moment = require('moment');
 
 class Milestone extends Model {
   static includes(attributeKey) {
@@ -43,7 +44,11 @@ Milestone.init({
   date: {
     type: DATE,
     allowNull: false,
-    displayName: 'Due Date'
+    displayName: 'Due Date',
+    get() {
+      if (!this.getDataValue('date')) return;
+      return moment(this.getDataValue('date'), 'YYYY-MM-DD').format('DD/MM/YYYY');
+    },
   }
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
 

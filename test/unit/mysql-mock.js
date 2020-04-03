@@ -13,6 +13,7 @@ Model.init = sinon.stub().callsFake(function() {
   this.belongsToMany = sinon.stub();
   this.findOne = sinon.stub().resolves({});
   this.findAll = sinon.stub().resolves([]);
+  this.count = sinon.stub().resolves(0);
   this.rawAttributes = {};
   this.getQueryInterface = sinon.stub();
 });

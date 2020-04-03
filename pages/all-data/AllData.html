@@ -159,7 +159,7 @@
 
     {% set projectValue = (projectValue.push({html:
 
-    "<a href=" + config.paths.projectDetails | replace(":uid", uid | replace(" ", "%20"))  + " class='govuk-link project-link'>" + 
+    "<a href=" + config.paths.projectDetails | replace(":uid", uid | replace(" ", "%20"))  + " class='govuk-link project-link'>" +
     "<div class='scrollable'>" + field.value + "</div></a>"
       if field.id == 'title'
         else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
@@ -177,7 +177,7 @@
     {% for tableFieldId in milestoneTableFields %}
     {% set flag = '' %}
     {% set field = milestone.fields.get(tableFieldId) %}
-      {% if (field.id == 'date') and (field.value < currentDate) %}
+      {% if (field.id == 'date') and (field.value | beforeToDay) %}
         {% set flag = 'red-date' %}
       {% endif %}
 

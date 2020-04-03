@@ -66,6 +66,7 @@ Project.init({
 }, { sequelize, modelName: 'project', tableName: 'project', createdAt: 'created_at', updatedAt: 'updated_at' });
 
 Project.hasMany(Milestone, { foreignKey: 'projectUid' });
+Milestone.belongsTo(Project, { foreignKey: 'projectUid' });
 Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid' });
 Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilter' });
 ProjectFieldEntry.belongsTo(Project, { foreignKey: 'projectUid' });

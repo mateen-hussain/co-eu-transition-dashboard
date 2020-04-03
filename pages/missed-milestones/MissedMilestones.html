@@ -1,0 +1,84 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% import 'accordion-header-macro.njk' as headers %}
+{% import 'missed-milestones-macro.njk' as milestones %}
+
+{% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
+{% set missedMilestonesTable = [] %}
+{% set criticalMilestonesKey = [{ text:'Department' }, { text:'Missed Milestones' }] %}
+
+{% block pageTitle %}Missed Milestones{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+  {{ govukWarningText({
+    text: "All data displayed here is just for projects with a 0 to 1 impact rating.",
+    iconFallbackText: "All data displayed here is just for projects with a 0 to 1 impact rating."
+  }) }}
+
+  <h1 class="govuk-heading-xl">Missed milestones</h1>
+
+  <canvas id="missed-milestones" height="100"></canvas>
+
+  {% set missedMilestonesTable = (missedMilestonesTable.push ({
+    heading: {
+      html: headers.accordionHeader(criticalMilestonesKey)
+    }
+  }), missedMilestonesTable) %}
+
+  {% for department in departmentsWithMissedMilestones %}
+
+  {% set departmentRow %}
+    {{ govukTable({
+      rows: [
+        [
+          {
+            text: department.name
+          },
+          {
+            text: department.totalMilestonesMissed
+          }
+        ]
+      ]
+    }) }}
+  {% endset %}
+
+  {% set missedMilestonesTable = (missedMilestonesTable.push ({
+      summary: {
+        html: departmentRow
+      },
+      content: {
+        html: milestones.missedMilestones(department.projects, projectFields, milestoneFields, config)
+      }
+    }), missedMilestonesTable) %}
+
+  {% endfor %}
+
+  <br><br>
+  <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
+  <br><br><br><br>
+
+  {{ govukAccordion({
+    id: "accordion-table",
+    classes: "missed-milestones-accordion",
+    items: missedMilestonesTable
+  }) }}
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    var data = {{ chartData(departmentsWithMissedMilestones) | dump | safe }};
+    TRANSITIONDELIVERYDASHBOARD.missedMilestoneChart('missed-milestones', data);
+  </script>
+{% endblock %}

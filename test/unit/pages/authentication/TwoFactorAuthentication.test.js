@@ -58,10 +58,10 @@ describe('pages/authentication/two-factor-authentication/TwoFactorAuthentication
       sinon.assert.calledWith(page.res.redirect, config.paths.admin.import);
     });
 
-    it('redirects to all data page', () => {
+    it('redirects to all missed milestones page', () => {
       page.next();
 
-      sinon.assert.calledWith(page.res.redirect, config.paths.allData);
+      sinon.assert.calledWith(page.res.redirect, config.paths.missedMilestones);
     });
   });
 

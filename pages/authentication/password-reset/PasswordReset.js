@@ -20,7 +20,7 @@ class PasswordReset extends Page {
     if (this.req.user.role === 'admin') {
       return config.paths.admin.import;
     } else {
-      return config.paths.allData;
+      return config.paths.missedMilestones;
     }
   }
 

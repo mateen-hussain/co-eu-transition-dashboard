@@ -34,7 +34,7 @@
 
     {% set field = project.fields.get(tableFieldId) %}
 
-    {% set projectValue = (projectValue.push({html: 
+    {% set projectValue = (projectValue.push({html:
     "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
   {% endfor %}
 
@@ -44,7 +44,7 @@
     {% for tableFieldId in milestoneTableFields %}
       {% set field = milestone.fields.get(tableFieldId) %}
 
-      {% if (field.id == 'date') and (field.value < currentDate) %}
+      {% if (field.id == 'date') and (field.value | beforeToDay) %}
         {% set flag = 'red-date' %}
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}

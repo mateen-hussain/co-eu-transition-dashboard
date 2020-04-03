@@ -59,6 +59,8 @@ const webpackSettings = () => {
     },
     entry: [
       'webpack-hot-middleware/client',
+      path.resolve(__dirname, '..', 'node_modules/chart.js/dist/Chart.js'),
+      path.resolve(__dirname, '..', 'common/javascript/missed-milestones.js'),
       path.resolve(__dirname, '..', 'common/javascript/main.js'),
       path.resolve(__dirname, '..', 'common/scss/main.scss')
     ]

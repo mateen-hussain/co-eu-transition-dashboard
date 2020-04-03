@@ -128,8 +128,20 @@ const parseFieldEntryValue = (value, type, forDatabase = false) => {
 const createFilterOptions = (attribute, options) => {
   if (attribute.includes('date')) {
     const dates = options.map(date => moment(date, 'DD-MM-YYYY').format('YYYY-MM-DD'));
-    return { [Op.between]: dates };
+
+    if(options[0].length && options[1].length) {
+      return { [Op.between]: dates };
+    }
+
+    if(options[0].length) {
+      return { [Op.gte]: dates[0] };
+    }
+
+    if(options[1].length) {
+      return { [Op.lte]: dates[1] };
+    }
   }
+
   return { [Op.or]: options };
 };
 

@@ -26,6 +26,6 @@ if (config.env === 'development') {
 logger.attachRouteLogger(app);
 
 pages.attach(app);
-app.get('/', (req, res) => res.redirect(config.paths.allData));
+app.get('/', (req, res) => res.redirect(config.paths.missedMilestones));
 
 logger.attachErrorLogger(app);

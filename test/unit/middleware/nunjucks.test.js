@@ -9,17 +9,15 @@ const expressNunjucksStub = sinon.stub().returns({
   }
 });
 const nunjucksAwaitFilterStub = sinon.stub();
-const nunjucksDateFilterStub = sinon.stub();
 const nunjucks = proxyquire('middleware/nunjucks', {
   'express-nunjucks': expressNunjucksStub,
-  'nunjucks-await-filter': nunjucksAwaitFilterStub,
-  'nunjucks-date-filter': nunjucksDateFilterStub
+  'nunjucks-await-filter': nunjucksAwaitFilterStub
 });
 
 const viewsToInclude = [
   path.join(__dirname, '../../..', 'node_modules', 'govuk-frontend'),
   path.join(__dirname, '../../..', 'common', 'views'),
-  path.join(__dirname, '../../..', 'common', 'views'),
+  path.join(__dirname, '../../..', 'common', 'macros'),
   path.join(__dirname, '../../..', 'pages')
 ];
 
@@ -45,10 +43,5 @@ describe('middleware/nunjucks', () => {
     it('executes await filter', () => {
       sinon.assert.calledOnce(nunjucksAwaitFilterStub);
     });
-
-    it('executes date filter', () => {
-      sinon.assert.calledWith(addFilter, 'date', nunjucksDateFilterStub);
-    });
-
   });
 });

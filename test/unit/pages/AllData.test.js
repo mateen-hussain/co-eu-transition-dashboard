@@ -63,7 +63,7 @@ describe('pages/all-data/AllData', () => {
 
   describe('#currentDate', () => {
     it('should return the current date', () => {
-      expect(page.currentDate).to.eql(moment().format('YYYY-MM-DD'));
+      expect(page.currentDate).to.eql(moment().format('DD/MM/YYYY'));
     });
   });
 
