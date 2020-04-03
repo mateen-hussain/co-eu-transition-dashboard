@@ -7,7 +7,7 @@ const color = '#5694CA';
 
 export default (elementId, data) =>  {
   const ctx = document.getElementById(elementId);
-  ctx.height = xAxisLablesHeight + (data.data.length * rowHeight * 2);
+  ctx.height = xAxisLablesHeight + (data.data.length * rowHeight);
 
   const addEllipsis = (string, maxLength = 30) => {
     let text = string.substr(0, maxLength);
@@ -66,8 +66,6 @@ export default (elementId, data) =>  {
         xAxes: [{
           ticks: {
             precision: 0,
-            min: data.min,
-            max: data.max,
             callback: function(value) {
               return moment(value, 'x').format('DD MMMM');
             }
