@@ -59,7 +59,13 @@ class User extends Model {
     departmentsWithProjects.forEach(departments => {
       departments.projects.forEach(projects => {
         projects.milestones = projects.milestones
-          .sort((a, b) => (moment(a.date, 'DD/MM/YYYY').isAfter(moment(b.date, 'DD/MM/YYYY'))) ? 1 : -1);
+          .sort((a, b) => {
+            if(a.date === b.date) {
+              return 0;
+            }
+            return moment(a.date, 'DD/MM/YYYY')
+              .isAfter(moment(b.date, 'DD/MM/YYYY')) ? 1 : -1;
+          });
       });
     });
 

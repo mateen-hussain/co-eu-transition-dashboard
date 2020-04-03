@@ -69,8 +69,7 @@ export default (elementId, data) =>  {
             max: data.max,
             callback: function(value) {
               return moment(value, 'x').format('DD MMMM');
-            },
-            stepSize: 100000000 * 4,
+            }
           }
         }],
         yAxes: [{
