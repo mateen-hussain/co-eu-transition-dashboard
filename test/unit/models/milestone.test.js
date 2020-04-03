@@ -4,7 +4,6 @@ const sequelize = require('services/sequelize');
 const Milestone = require('models/milestone');
 const MilestoneFieldEntry = require('models/milestoneFieldEntry');
 const modelUtils = require('helpers/models');
-const moment = require('moment');
 
 describe('models/milestone', () => {
   beforeEach(() => {
