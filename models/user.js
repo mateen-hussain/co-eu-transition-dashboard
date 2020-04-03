@@ -13,6 +13,7 @@ const modelUtils = require('helpers/models');
 class User extends Model {
   async getProjects (search) {
     const groupedSearch = await modelUtils.groupSearchItems(search);
+    const projectsMustHaveMilestones = Object.keys(groupedSearch.milestone).length ? true : false;
 
     const departments = await this.getDepartments({
       attributes: [],
@@ -26,8 +27,8 @@ class User extends Model {
               model: MilestoneFieldEntry,
               include: MilestoneField
             }],
-            required: true,
-            where: groupedSearch.milestone,
+            required: projectsMustHaveMilestones,
+            where: groupedSearch.milestone
           },
           {
             model: ProjectFieldEntry,
