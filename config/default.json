@@ -36,7 +36,8 @@
     },
     "projectDetails": "/project-details/:uid",
     "privacyNotice": "/privacy-notice",
-    "missedMilestones": "/missed-milestones"
+    "missedMilestones": "/missed-milestones",
+    "upcomingMilestones": "/upcoming-milestones"
   },
   "features": {
     "twoFactorAuth": true

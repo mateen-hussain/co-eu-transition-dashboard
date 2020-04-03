@@ -54,10 +54,6 @@ class MissedMilestones extends Page {
     return data;
   }
 
-  formatDate(date) {
-    return moment(date, 'DD/MM/YYYY').format('D MMM YYYY');
-  }
-
   get projectFields() {
     return [{ title:'Project UID', id: 'uid' }, { title:'Project Name', id: 'title' }, { title:'Impact', id: 'impact' }, { title:'HMG Confidence', id: 'hmgConfidence' }, { title:'Citizen Readiness', id: 'citizenReadiness' }, { title:'Business Readiness', id: 'businessReadiness' }, { title:'EU Member State Delivery Confidence', id: 'euStateConfidence' }];
   }

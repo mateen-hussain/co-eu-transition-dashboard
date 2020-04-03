@@ -1,0 +1,84 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% import 'accordion-header-macro.njk' as headers %}
+{% import 'critical-milestones-macro.njk' as milestones %}
+
+{% set departmentsWithUpcomingMilestone = getDepartmentsWithUpcomingMilestones() | await  %}
+{% set upcomingMilestonesTable = [] %}
+{% set criticalMilestonesKey = [{ text:'Department' }, { text:'Upcoming Milestones' }] %}
+{% set extraField = 'Upcoming Milestones' %}
+
+{% block pageTitle %}Upcoming Milestones{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+  {{ govukWarningText({
+    text: "All data displayed here is just for projects with a 0 to 1 impact rating.",
+    iconFallbackText: "All data displayed here is just for projects with a 0 to 1 impact rating."
+  }) }}
+
+  <h1 class="govuk-heading-xl">Next 15 upcoming milestones</h1>
+
+  <canvas id="upcoming-milestones"></canvas>
+
+  {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
+    heading: {
+      html: headers.accordionHeader(criticalMilestonesKey)
+    }
+  }), upcomingMilestonesTable) %}
+
+  {% for department in departmentsWithUpcomingMilestone %}
+  {% set departmentRow %}
+    {{ govukTable({
+      rows: [
+        [
+          {
+            text: department.name
+          },
+          {
+            text: department.totalUpcomingMilestones
+          }
+        ]
+      ]
+    }) }}
+  {% endset %}
+
+  {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
+      summary: {
+        html: departmentRow
+      },
+      content: {
+        html: milestones.criticalMilestones(department.projects, projectFields, milestoneFields, extraField, config)
+      }
+    }), upcomingMilestonesTable) %}
+
+  {% endfor %}
+
+  <br><br>
+  <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
+  <br><br><br><br>
+
+  {{ govukAccordion({
+    id: "accordion-table",
+    classes: "upcoming-milestones-accordion",
+    items: upcomingMilestonesTable
+  }) }}
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    var data = {{ chartData(departmentsWithUpcomingMilestone) | dump | safe }};
+    TRANSITIONDELIVERYDASHBOARD.upcomingMilestoneChart('upcoming-milestones', data);
+  </script>
+{% endblock %}

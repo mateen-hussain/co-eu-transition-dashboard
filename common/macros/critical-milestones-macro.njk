@@ -1,11 +1,12 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 
-{% macro missedMilestones(projects, projectFields, milestoneFields, config) %}
+{% macro criticalMilestones(projects, projectFields, milestoneFields, extraField, config) %}
 
   {% set uid = '' %}
   {% set cellBlock = "cell-color-" %}
-  
+  {% set flag = '' %}
+
   {% for project in projects %}
 
     <table class="govuk-table project-info">
@@ -19,7 +20,7 @@
             <th scope="col" class="govuk-table__header">{{ projectField.title }}</th>
               {% endif %}
             {% endfor %}
-            <th scope="col" class="govuk-table__header">Missed Milestones</th>
+            <th scope="col" class="govuk-table__header">{{ extraField }}</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -59,10 +60,13 @@
             <tr class="govuk-table__row">
               {% for milestoneField in milestoneFields %}
                 {% set field = milestone.fields.get(milestoneField.id) %}
-                {% if field.id=='date' %}
-                  <td class="govuk-table__cell"><span class="red-date">{{ field.value | date("D MMM YYYY") }}</span></td>
+                {% if (field.id == 'date') and (field.value | beforeToDay) %}
+                  {% set flag = 'red-date' %}
+                {% endif %}
+                {% if (field.id=='date') %}
+                  <td class="govuk-table__cell"><span class="{{ flag }}">{{ field.value | date("D MMM YYYY") }}</span></td>
                 {% else %}
-                  <td class="govuk-table__cell">{{ field.value }}</td>
+                  <td class="govuk-table__cell">{{ field.value | default('N/A') }}</td>
                 {% endif %}
               {% endfor %}
             </tr>

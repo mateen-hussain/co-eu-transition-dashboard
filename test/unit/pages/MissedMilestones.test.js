@@ -107,12 +107,6 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
   });
 
-  describe('#formatDate', () => {
-    it('should format the date', () => {
-      expect(page.formatDate(moment(), 'DD/MM/YYYY')).to.eql(moment().format('D MMM YYYY'));
-    });
-  });
-
   describe('#chartData', () => {
     it('should return chart data when passed in department', () => {
       expect(page.chartData(department)).to.eql( { data: [3], labels: [undefined], meta: [ { totalMilestones: 5, totalMilestonesMissed: 3 }] });

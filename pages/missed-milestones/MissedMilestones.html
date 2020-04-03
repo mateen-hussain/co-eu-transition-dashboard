@@ -5,11 +5,12 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% import 'accordion-header-macro.njk' as headers %}
-{% import 'missed-milestones-macro.njk' as milestones %}
+{% import 'critical-milestones-macro.njk' as milestones %}
 
 {% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
 {% set missedMilestonesTable = [] %}
 {% set criticalMilestonesKey = [{ text:'Department' }, { text:'Missed Milestones' }] %}
+{% set extraField = 'Missed Milestones' %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
 
@@ -34,7 +35,6 @@
   }), missedMilestonesTable) %}
 
   {% for department in departmentsWithMissedMilestones %}
-
     {% set departmentRow %}
       {{ govukTable({
         rows: [
@@ -51,14 +51,13 @@
     {% endset %}
 
     {% set missedMilestonesTable = (missedMilestonesTable.push ({
-        summary: {
-          html: departmentRow
-        },
-        content: {
-          html: milestones.missedMilestones(department.projects, projectFields, milestoneFields, config)
-        }
-      }), missedMilestonesTable) %}
-
+      summary: {
+        html: departmentRow
+      },
+      content: {
+        html: milestones.criticalMilestones(department.projects, projectFields, milestoneFields, extraField, config)
+      }
+    }), missedMilestonesTable) %}
   {% endfor %}
 
   <br><br>
@@ -79,6 +78,6 @@
 {% block afterScript %}
   <script>
     var data = {{ chartData(departmentsWithMissedMilestones) | dump | safe }};
-    TRANSITIONDELIVERYDASHBOARD.missedMilestoneChart('missed-milestones', data);
+    TRANSITIONDELIVERYDASHBOARD.missedMilestonesChart('missed-milestones', data);
   </script>
 {% endblock %}

@@ -9,6 +9,7 @@ const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
+const moment = require('moment');
 
 class User extends Model {
   async getProjects (search) {
@@ -24,7 +25,7 @@ class User extends Model {
     const groupedSearch = await modelUtils.groupSearchItems(search);
     const projectsMustHaveMilestones = Object.keys(groupedSearch.milestone).length ? true : false;
 
-    return await this.getDepartments({
+    const departmentsWithProjects = await this.getDepartments({
       include: [{
         model: Project,
         where: groupedSearch.project,
@@ -53,6 +54,16 @@ class User extends Model {
         ]
       }]
     });
+
+    // sort milestones inside projects
+    departmentsWithProjects.forEach(departments => {
+      departments.projects.forEach(projects => {
+        projects.milestones = projects.milestones
+          .sort((a, b) => (moment(a.date, 'DD/MM/YYYY').isAfter(moment(b.date, 'DD/MM/YYYY'))) ? 1 : -1);
+      });
+    });
+
+    return departmentsWithProjects;
   }
 
   async getProject (projectUid) {
