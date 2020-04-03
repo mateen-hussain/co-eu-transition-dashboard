@@ -7,8 +7,8 @@
     html: "For example, 01/01/2020"
   },
     id: "fromDate",
-    name: "filters[date][]",
-    value: data.filters.date[0]
+    name: "filters[date][from]",
+    value: data.filters.date.from
 }) }}
 {{ govukInput({
   label: {
@@ -19,6 +19,6 @@
     text: "For example, 01/01/2021"
   },
     id: "toDate",
-    name: "filters[date][]",
-    value: data.filters.date[1]
+    name: "filters[date][to]",
+    value: data.filters.date.to
 }) }}

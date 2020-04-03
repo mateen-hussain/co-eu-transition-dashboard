@@ -10,7 +10,10 @@ class MissedMilestones extends Page {
   }
 
   async getDepartmentsWithMissedMilestones() {
-    const departments = await this.req.user.getDepartmentsWithProjects({ date: ['', moment().format('DD/MM/YYYY')] });
+    const departments = await this.req.user.getDepartmentsWithProjects({
+      date: { to: moment().format('DD/MM/YYYY') },
+      impact: [0, 1]
+    });
 
     for(const department of departments) {
       department.totalMilestones = await this.totalMilestones(department);

@@ -9,7 +9,7 @@
                 classes: "govuk-button--no-style"
               }) }}
             </form>
-            Between &nbsp;<span class="filter-block">{{ formatDate(data.filters.date[0]) }}</span>
+            Between &nbsp;<span class="filter-block">{{ formatDate(data.filters.date.from) }}</span>
 
         </li>
     </ul>
@@ -19,7 +19,7 @@
     <ul class="govuk-header__navigation" aria-label="Top Level Date Filters">
         <li class="govuk-header__navigation-item govuk-header__navigation-item">
         and &nbsp;
-            <span class="filter-block">{{ formatDate(data.filters.date[1])  }}</span>
+            <span class="filter-block">{{ formatDate(data.filters.date.to)  }}</span>
         </li>
     </ul>
 </div>
