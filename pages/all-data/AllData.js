@@ -3,6 +3,7 @@ const { paths } = require('config');
 const { getFilters } = require('helpers/filters');
 const moment = require('moment');
 const { removeNulls } = require('helpers/utils');
+const sequelize = require('services/sequelize');
 
 class AllData extends Page {
   get url() {
@@ -11,6 +12,19 @@ class AllData extends Page {
 
   get schema() {
     return { filters: {} };
+  }
+
+  async getLastUpdatedAt() {
+    const [result] = await sequelize.query(`
+      SELECT MAX(updated_at) AS updated_at
+      FROM (
+        SELECT updated_at
+        FROM project
+        UNION ALL SELECT updated_at FROM milestone
+        UNION ALL SELECT updated_at FROM project_field_entry
+        UNION ALL SELECT updated_at FROM milestone_field_entry
+      ) AS updated_at`);
+    return result[0].updated_at;
   }
 
   applyFormatting(attribute, value) {

@@ -8,6 +8,7 @@
 {% import 'critical-milestones-macro.njk' as milestones %}
 
 {% set departmentsWithUpcomingMilestone = getDepartmentsWithUpcomingMilestones() | await  %}
+{% set data = chartData(departmentsWithUpcomingMilestone) %}
 {% set upcomingMilestonesTable = [] %}
 {% set criticalMilestonesKey = [{ text:'Department' }, { text:'Upcoming Milestones' }] %}
 {% set extraField = 'Upcoming Milestones' %}
@@ -26,7 +27,9 @@
 
   <h1 class="govuk-heading-xl">Upcoming milestones for next 30 days</h1>
 
-  <canvas id="upcoming-milestones"></canvas>
+  <canvas id="upcoming-milestones" aria-label="This chart shows the total number of upcoming milestones in the next 30 days for projects with a 0 to 1 impact rating." role="img"> 
+    {% include "upcoming-milestones/partials/accessible-table.njk" %}
+  </canvas>
 
   {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
     heading: {
@@ -78,7 +81,7 @@
 
 {% block afterScript %}
   <script>
-    var data = {{ chartData(departmentsWithUpcomingMilestone) | dump | safe }};
+    var data = {{ data | dump | safe }};
     TRANSITIONDELIVERYDASHBOARD.upcomingMilestoneChart('upcoming-milestones', data);
   </script>
 {% endblock %}
