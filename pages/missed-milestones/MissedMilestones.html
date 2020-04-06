@@ -8,6 +8,7 @@
 {% import 'critical-milestones-macro.njk' as milestones %}
 
 {% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
+{% set data = chartData(departmentsWithMissedMilestones) %}
 {% set missedMilestonesTable = [] %}
 {% set criticalMilestonesKey = [{ text:'Department' }, { text:'Missed Milestones' }] %}
 {% set extraField = 'Missed Milestones' %}
@@ -27,9 +28,14 @@
   <h1 class="govuk-heading-xl">Missed milestones</h1>
 
   {% if not req.user.isDepartmentalViewer %}
-    <canvas id="missed-milestones" height="100"></canvas>
-    <br><br>
-  {% endif %}
+  <canvas id="missed-milestones" height="100" aria-label="This chart shows the total number of missed milestones for projects with a 0 to 1 impact rating." role="img">
+    {% for label in data.labels %}
+      {% set meta = data.meta[loop.index0] %}
+      <p>Department {{ label }} has {{ meta.totalMilestonesMissed }} missed milestones from {{ meta.totalMilestones }} total milestones. {{ ((meta.totalMilestonesMissed / meta.totalMilestones) * 100) | round }}% missed from department portfolio.</p>
+    {% endfor %}
+  </canvas>
+<br><br>
+{% endif %}
 
   {% set missedMilestonesTable = (missedMilestonesTable.push ({
     heading: {
@@ -81,7 +87,7 @@
 {% block afterScript %}
   {% if not req.user.isDepartmentalViewer %}
   <script>
-    var data = {{ chartData(departmentsWithMissedMilestones) | dump | safe }};
+    var data = {{ data | dump | safe }};
     TRANSITIONDELIVERYDASHBOARD.missedMilestonesChart('missed-milestones', data);
   </script>
   {% endif %}
