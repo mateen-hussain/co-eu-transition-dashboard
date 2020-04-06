@@ -33,7 +33,7 @@ password: password
 5. Commit any changes `git commit -a`
 6. Push the new staging branch to remote `git push origin staging`
 7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-8. Deploy `npm run dpeloy-staging`
+8. Deploy `npm run deploy-staging`
 9. Test your changes
 
 ### Research
@@ -44,7 +44,7 @@ password: password
 5. Commit any changes `git commit -a`
 6. Push the new research branch to remote `git push origin research`
 7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-8. Deploy `npm run dpeloy-research`
+8. Deploy `npm run deploy-research`
 9. Test your changes
 
 ### Production
@@ -56,5 +56,5 @@ password: password
 5. Commit any changes `git commit -a`
 6. Push the new production branch to remote `git push origin production`
 7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-8. Deploy `npm run dpeloy-production`
+8. Deploy `npm run deploy-production`
 9. Test your changes
