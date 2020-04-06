@@ -3,10 +3,11 @@ import Chart from 'chart.js';
 
 const rowHeight = 27;
 const color = '#5694CA';
+const xAxisLablesHeight = 65;
 
 export default (elementId, data) =>  {
   const ctx = document.getElementById(elementId);
-  ctx.height = (data.data.length * rowHeight) + 65;
+  ctx.height = (data.data.length * rowHeight) + xAxisLablesHeight;
 
   const addEllipsis = (string, maxLength = 30) => {
     let text = string.substr(0, maxLength);
@@ -72,7 +73,6 @@ export default (elementId, data) =>  {
         }],
         yAxes: [{
           ticks: {
-            // lineHeight: 14,
             beginAtZero: true,
             autoSkip: false,
             stepSize: 1,
