@@ -43,7 +43,7 @@ Milestone.init({
   },
   date: {
     type: DATE,
-    allowNull: false,
+    allowNull: true,
     displayName: 'Due Date',
     get() {
       if (!this.getDataValue('date')) return;

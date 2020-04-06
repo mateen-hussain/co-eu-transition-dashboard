@@ -78,15 +78,21 @@ class Import extends Page {
     for (const [databaseName, excelName] of Object.entries(databaseExcelMap)) {
 
       let value = item[excelName];
+      const isNA = String(value || '').toLowerCase().includes('n/a');
 
       if (Object.keys(model.rawAttributes).includes(databaseName)) {
+        if (isNA) {
+          if (!model.rawAttributes[databaseName].allowNull) {
+            throw Error(`Field must have a value ${excelName}`);
+          }
+          continue;
+        }
         if(model.rawAttributes[databaseName].type.toString() === 'DATETIME') {
           value = modelUtils.parseFieldEntryValue(value, 'date', true);
         }
         newItem[databaseName] = value;
       } else {
         const field = fields.find(field => field.name === databaseName);
-        const isNA = String(value || '').toLowerCase().includes('n/a');
 
         if (field) {
           if(!String(value || '').length && value !== 0) {

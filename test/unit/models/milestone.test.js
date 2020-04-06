@@ -32,7 +32,7 @@ describe('models/milestone', () => {
       },
       date: {
         type: DATE,
-        allowNull: false,
+        allowNull: true,
         displayName: 'Due Date'
       }
     }), { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
