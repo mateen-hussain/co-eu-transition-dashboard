@@ -23,27 +23,38 @@ password: password
 username: user@email.com
 password: password
 
-## Deployment
+## Deployment Workflow
 
 ### Staging
-1. Check out the branch you wish to test on staging
-2. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-3. run `npm run deploy-staging`
-4. Test your changes
+1. Make sure your repository is up to date ```git fetch --all```
+2. Check out the staging branch ```git checkout staging```
+3. Update the staging branch ```git pull origin staging```
+4. Merge master to staging ```git merge origin/master```
+5. Commit any changes ```git commit -a```
+6. Push the new staging branch to master ``git push origin staging```
+7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
+8. Deploy ```npm run dpeloy-staging```
+9. Test your changes
 
 ### Research
-1. Check out the branch you wish to test on the user research environment
-2. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-3. run `npm run deploy-research`
-4. Test your changes
+1. Make sure your repository is up to date ```git fetch --all```
+2. Check out the research branch ```git checkout research```
+3. Update the research branch ```git pull origin research```
+4. Merge master to research ```git merge origin/master```
+5. Commit any changes ```git commit -a```
+6. Push the new research branch to master ``git push origin research```
+7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
+8. Deploy ```npm run dpeloy-research```
+9. Test your changes
 
 ### Production
 :warning: **These instructions will currently bring down the live service for a minute or two**
-1. Checkout master and make sure it's up to date
-2. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-3. run `npm run release -- minor` (If you want to do a major or patch replace as appropriate)
-4. When that completes run `git checkout <version number>` where the version is the one release tag which was just created`
-5. run `npm run deploy-production`
-6. Test your release on production
-
-
+1. Make sure your repository is up to date ```git fetch --all```
+2. Check out the production branch ```git checkout production```
+3. Update the production branch ```git pull origin production```
+4. Merge staging to production ```git merge origin/staging```
+5. Commit any changes ```git commit -a```
+6. Push the new production branch to master ``git push origin production```
+7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
+8. Deploy ```npm run dpeloy-production```
+9. Test your changes
