@@ -1,13 +1,12 @@
 import moment from 'moment';
 import Chart from 'chart.js';
 
-const rowHeight = 8;
-const xAxisLablesHeight = 10;
+const rowHeight = 27;
 const color = '#5694CA';
 
 export default (elementId, data) =>  {
   const ctx = document.getElementById(elementId);
-  ctx.height = xAxisLablesHeight + (data.data.length * rowHeight);
+  ctx.height = (data.data.length * rowHeight) + 65;
 
   const addEllipsis = (string, maxLength = 30) => {
     let text = string.substr(0, maxLength);
@@ -35,7 +34,7 @@ export default (elementId, data) =>  {
           bottom: 30
         }
       },
-      responsive: true,
+      responsive: false,
       legend: {
         display: false
       },
@@ -73,6 +72,7 @@ export default (elementId, data) =>  {
         }],
         yAxes: [{
           ticks: {
+            // lineHeight: 14,
             beginAtZero: true,
             autoSkip: false,
             stepSize: 1,
