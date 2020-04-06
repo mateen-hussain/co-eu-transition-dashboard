@@ -77,7 +77,10 @@ class User extends Model {
         include: [
           {
             model: Milestone,
-            include: { all: true, nested: true }
+            include: [{
+              model: MilestoneFieldEntry,
+              include: MilestoneField
+            }]
           },
           {
             model: ProjectFieldEntry,
