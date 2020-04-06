@@ -10,6 +10,19 @@ then
   exit 1
 fi
 
+git checkout $REQUESTED_SPACE
+git pull origin $REQUESTED_SPACE
+
+if [[ `git status --porcelain` ]]; then
+  echo "Git state not clean, please fix before deploying"
+  exit 1
+fi
+
+if [[ `git log origin/$REQUESTED_SPACE..$REQUESTED_SPACE` ]]; then
+  echo "Branch has unpushed changes, please fix before deploying"
+  exit 1
+fi
+
 cf target -s $REQUESTED_SPACE && cf push --vars-file $VARS_FILE
 RETURN=$?
 cf target -s $CURRENT_SPACE
