@@ -16,7 +16,7 @@ class AllData extends Page {
 
   async getLastUpdatedAt() {
     const [result] = await sequelize.query(`
-      SELECT MAX(updated_at) as updated_at
+      SELECT MAX(updated_at) AS updated_at
       FROM (
         SELECT updated_at
         FROM project

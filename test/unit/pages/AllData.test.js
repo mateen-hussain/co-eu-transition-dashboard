@@ -57,7 +57,7 @@ describe('pages/all-data/AllData', () => {
 
       expect(date).to.eql('some date');
       sinon.assert.calledWith(sequelize.query, `
-      SELECT MAX(updated_at) as updated_at
+      SELECT MAX(updated_at) AS updated_at
       FROM (
         SELECT updated_at
         FROM project
