@@ -71,7 +71,10 @@
 {% block pageTitle %}{{ title }}{% endblock %}
 
 {% block content %}
-<h1 class="govuk-heading-xl">{{ title }}</h1>
+<h1 class="govuk-heading-xl">
+  {{ title }}
+  <span class="govuk-caption-l">Data last validated at {{ getLastUpdatedAt() | await | date('Mo MMMM YYYY') }}</span>
+</h1>
 
 <div class="govuk-grid-row" id="show">
 
