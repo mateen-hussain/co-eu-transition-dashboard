@@ -61,7 +61,8 @@ Project.init({
       if (!isNA) {
         this.setDataValue('impact', val);
       }
-    }
+    },
+    allowNull: true
   }
 }, { sequelize, modelName: 'project', tableName: 'project', createdAt: 'created_at', updatedAt: 'updated_at' });
 

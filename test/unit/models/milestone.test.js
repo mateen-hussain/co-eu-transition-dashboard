@@ -31,7 +31,7 @@ describe('models/milestone', () => {
       },
       date: {
         type: DATE,
-        allowNull: false,
+        allowNull: true,
         displayName: 'Due Date'
       }
     });
