@@ -3,6 +3,7 @@ const { paths } = require('config');
 const jwt = require('services/jwt');
 const proxyquire = require('proxyquire');
 const moment = require('moment');
+const sequelize = require('services/sequelize');
 
 let page = {};
 let filtersStub = {};
@@ -43,6 +44,27 @@ describe('pages/all-data/AllData', () => {
   describe('#schema', () => {
     it('returns the correct data schema', () => {
       expect(page.schema).to.eql({ filters: {} });
+    });
+  });
+
+  describe('#getLastUpdatedAt', () => {
+    beforeEach(() => {
+      sequelize.query.resolves([[{ updated_at: 'some date' }]]);
+    });
+
+    it('calls sequelize.query with correct query and returns date', async () => {
+      const date = await page.getLastUpdatedAt();
+
+      expect(date).to.eql('some date');
+      sinon.assert.calledWith(sequelize.query, `
+      SELECT MAX(updated_at) AS updated_at
+      FROM (
+        SELECT updated_at
+        FROM project
+        UNION ALL SELECT updated_at FROM milestone
+        UNION ALL SELECT updated_at FROM project_field_entry
+        UNION ALL SELECT updated_at FROM milestone_field_entry
+      ) AS updated_at`);
     });
   });
 

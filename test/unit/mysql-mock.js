@@ -18,6 +18,7 @@ Model.init = sinon.stub().callsFake(function() {
   this.getQueryInterface = sinon.stub();
 });
 Sequelize.getQueryInterface = sinon.stub();
+Sequelize.query = sinon.stub();
 
 s = sinon.stub().returns(Sequelize);
 
