@@ -40,6 +40,12 @@
 {% set departmentView = 'false' %}
 {% set uid = '' %}
 
+{% if req.user.isDepartmentalViewer %}
+  {% set title = req.user.departments[0].name + " project data" %}
+{% else %}
+  {% set title = "All project data" %}
+{% endif %}
+
 {% if (data.filters['date']) %}
  {{ summary.push ({
     key: {
@@ -62,11 +68,10 @@
       }), items)
     %}
 
-{% block pageTitle %}{{ index }}{% endblock %}
+{% block pageTitle %}{{ title }}{% endblock %}
 
 {% block content %}
-
-<h1 class="govuk-heading-xl">{{ index }}</h1>
+<h1 class="govuk-heading-xl">{{ title }}</h1>
 
 <div class="govuk-grid-row" id="show">
 

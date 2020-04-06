@@ -12,6 +12,10 @@ const modelUtils = require('helpers/models');
 const moment = require('moment');
 
 class User extends Model {
+  get isDepartmentalViewer () {
+    return this.departments.length === 1 ? true : false;
+  }
+
   async getProjects (search) {
     const departments = await this.getDepartmentsWithProjects(search);
 

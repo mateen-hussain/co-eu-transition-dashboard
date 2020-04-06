@@ -3,6 +3,7 @@ const jwt = require('services/jwt');
 const config = require('config');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
+const Department = require('models/department');
 const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
@@ -53,7 +54,8 @@ const authenticateUser = (jwtPayload, cb) => {
   return User.findOne({
     where: {
       id: jwtPayload.id
-    }
+    },
+    include: Department
   })
     .then(user => {
       cb(null, user);

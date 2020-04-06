@@ -4,6 +4,7 @@ const proxyquire = require('proxyquire');
 const config = require('config');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
+const Department = require('models/department');
 
 let passportLocalStrategyStub = {};
 let passportJWTStrategyStub = {};
@@ -179,7 +180,8 @@ describe('services/authentication', () => {
         await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
         sinon.assert.calledWith(User.findOne, {
-          where: { id: jwtPayload.id }
+          where: { id: jwtPayload.id },
+          include: Department
         });
 
         sinon.assert.calledWith(authenticateUserCallback, null, { id: user.id, role: user.role });
@@ -193,7 +195,8 @@ describe('services/authentication', () => {
         await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
         sinon.assert.calledWith(User.findOne, {
-          where: { id: jwtPayload.id }
+          where: { id: jwtPayload.id },
+          include: Department
         });
 
         sinon.assert.calledWith(authenticateUserCallback, error);

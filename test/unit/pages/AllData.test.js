@@ -69,7 +69,13 @@ describe('pages/all-data/AllData', () => {
 
   describe('#tableFields', () => {
     it('should not return the department if departmental view', () => {
+      page.req.user.isDepartmentalViewer = true;
       expect(page.tableFields).to.eql(['uid', 'title', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence']);
+    });
+
+    it('should not return the departmentName if not departmental view', () => {
+      page.req.user.isDepartmentalViewer = false;
+      expect(page.tableFields).to.eql(['uid', 'title', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence']);
     });
   });
 });

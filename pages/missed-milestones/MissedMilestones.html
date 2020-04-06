@@ -26,7 +26,10 @@
 
   <h1 class="govuk-heading-xl">Missed milestones</h1>
 
-  <canvas id="missed-milestones" height="100"></canvas>
+  {% if not req.user.isDepartmentalViewer %}
+    <canvas id="missed-milestones" height="100"></canvas>
+    <br><br>
+  {% endif %}
 
   {% set missedMilestonesTable = (missedMilestonesTable.push ({
     heading: {
@@ -60,7 +63,7 @@
     }), missedMilestonesTable) %}
   {% endfor %}
 
-  <br><br>
+
   <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
   <br><br><br><br>
 
@@ -76,8 +79,10 @@
 {% endblock %}
 
 {% block afterScript %}
+  {% if not req.user.isDepartmentalViewer %}
   <script>
     var data = {{ chartData(departmentsWithMissedMilestones) | dump | safe }};
     TRANSITIONDELIVERYDASHBOARD.missedMilestonesChart('missed-milestones', data);
   </script>
+  {% endif %}
 {% endblock %}

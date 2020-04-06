@@ -66,7 +66,7 @@ class AllData extends Page {
   }
 
   get tableFields() {
-    if(this.res.locals.departmentalView){
+    if(this.req.user.isDepartmentalViewer){
       return ['uid', 'title', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
     }
     return ['uid', 'title', 'departmentName', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
