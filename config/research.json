@@ -11,5 +11,9 @@
     "tfa": {
       "name": "[Research] Transition Taskforce Dashboard"
     }
+  },
+  "features": {
+    "missedMilestones": true,
+    "upcomingMilestonesChart": true
   }
 }
