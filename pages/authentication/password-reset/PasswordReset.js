@@ -77,9 +77,7 @@ class PasswordReset extends Page {
       return this.res.redirect(config.paths.authentication.passwordReset);
     }
 
-    console.log("Validate Password NOW");
     const error = this.validatePassword(password, confirmPassword);
-    console.log(error);
     if (error) {
       this.req.flash(error);
       return this.res.redirect(config.paths.authentication.passwordReset);
