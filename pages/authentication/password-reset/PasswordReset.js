@@ -62,6 +62,20 @@ class PasswordReset extends Page {
   async passwordReset() {
     const password = this.req.body.password;
     const confirmPassword = this.req.body['confirm-password'];
+    const currentPassword = this.req.body['current-password'];
+
+    let hasError = false;
+    let user = await authentication.authenticateLogin(this.req.user.email,currentPassword, (error,user) => {
+      if (!user || error) {
+        hasError = true;
+        this.req.flash(`Incorrect password entered`);
+      }
+    });
+
+    if (hasError) {
+      return this.res.redirect(config.paths.authentication.passwordReset);
+    }
+
 
     const error = this.validatePassword(password, confirmPassword);
     if (error) {
