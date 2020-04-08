@@ -57,6 +57,14 @@ table.govuk-table.table-content {
     display: none;
 }
 
+.remove-open-all button.govuk-accordion__open-all {
+    display: none;
+}
+
+.remove-open-all .govuk-accordion__controls {
+    padding-bottom: 20px;
+}
+
 #filterPanel, #hideFilter  {
     display: none;
 }
