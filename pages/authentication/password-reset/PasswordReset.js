@@ -17,11 +17,7 @@ class PasswordReset extends Page {
   }
 
   get next() {
-    if (this.req.user.role === 'admin') {
-      return config.paths.admin.import;
-    } else {
-      return config.paths.missedMilestones;
-    }
+    return config.paths.start;
   }
 
   get mode() {

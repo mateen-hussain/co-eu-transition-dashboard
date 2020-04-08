@@ -18,6 +18,10 @@ describe('core/pages/page', () => {
     jwt.saveData.restore();
   });
 
+  it('#isEnabled', () => {
+    expect(Page.isEnabled).to.be.ok;
+  });
+
   it('#router', () => {
     expect(page.router.constructor.name).to.eql('Function');
   });

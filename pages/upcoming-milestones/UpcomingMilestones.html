@@ -27,9 +27,12 @@
 
   <h1 class="govuk-heading-xl">Upcoming milestones for next 30 days</h1>
 
-  <canvas id="upcoming-milestones" aria-label="This chart shows the total number of upcoming milestones in the next 30 days for projects with a 0 to 1 impact rating." role="img"> 
-    {% include "upcoming-milestones/partials/accessible-table.njk" %}
-  </canvas>
+  {% if config.features.upcomingMilestonesChart %}
+    <canvas id="upcoming-milestones" aria-label="This chart shows the total number of upcoming milestones in the next 30 days for projects with a 0 to 1 impact rating." role="img">
+      {% include "upcoming-milestones/partials/accessible-table.njk" %}
+    </canvas>
+    <br><br>
+  {% endif %}
 
   {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
     heading: {
@@ -64,7 +67,6 @@
 
   {% endfor %}
 
-  <br><br>
   <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
   <br><br><br><br>
 

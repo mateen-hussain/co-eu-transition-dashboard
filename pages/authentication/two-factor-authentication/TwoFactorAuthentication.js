@@ -24,10 +24,8 @@ class TwoFactorAuthentication extends Page {
   next() {
     if(this.req.user.passwordReset) {
       this.res.redirect(config.paths.authentication.passwordReset);
-    } else if (this.req.user.role === 'admin') {
-      return this.res.redirect(config.paths.admin.import);
     } else {
-      return this.res.redirect(config.paths.missedMilestones);
+      return this.res.redirect(config.paths.start);
     }
   }
 

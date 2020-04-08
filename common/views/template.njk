@@ -79,9 +79,11 @@
         <nav class="navigation">
           <ul id="navigation" class="govuk-header__navigation " aria-label="Top Level Navigation">
             <li class="govuk-header__navigation-item {% if (url == config.paths.missedMilestones) or (url == config.paths.upcomingMilestones) %} govuk-header__navigation-item--active {% endif %}">
-              <a class="govuk-header__link nav" href="{{ config.paths.missedMilestones }}">
-                Milestones
-              </a>
+              {% if config.features.missedMilestones %}
+                <a class="govuk-header__link nav" href="{{ config.paths.missedMilestones }}">Milestones</a>
+              {% else %}
+                <a class="govuk-header__link nav" href="{{ config.paths.upcomingMilestones }}">Milestones</a>
+              {% endif %}
             </li>
             <li class="govuk-header__navigation-item {% if url == config.paths.allData %} govuk-header__navigation-item--active {% endif %}">
               <a class="govuk-header__link nav" href="{{ config.paths.allData }}">
@@ -91,14 +93,16 @@
           </ul>
         </nav>
 
-      {% if (url == config.paths.missedMilestones) or (url == config.paths.upcomingMilestones) %} 
+      {% if (url == config.paths.missedMilestones) or (url == config.paths.upcomingMilestones) %}
         <nav class="child-navigation">
           <ul id="childNavigation" class="govuk-header__navigation " aria-label="Second Level Navigation">
-            <li class="govuk-header__navigation-item child-item {% if url == config.paths.missedMilestones %} govuk-header__navigation-item--active {% endif %}">
-              <a class="govuk-header__link child-nav" href="{{ config.paths.missedMilestones }}">
-                Missed milestones
-              </a>
-            </li>
+            {% if config.features.missedMilestones %}
+              <li class="govuk-header__navigation-item child-item {% if url == config.paths.missedMilestones %} govuk-header__navigation-item--active {% endif %}">
+                <a class="govuk-header__link child-nav" href="{{ config.paths.missedMilestones }}">
+                  Missed milestones
+                </a>
+              </li>
+            {% endif %}
             <li class="govuk-header__navigation-item child-item {% if url == config.paths.upcomingMilestones %} govuk-header__navigation-item--active {% endif %}">
               <a class="govuk-header__link child-nav" href="{{ config.paths.upcomingMilestones }}">
                 Upcoming milestones

@@ -39,6 +39,10 @@ class Page {
     this.res = res;
   }
 
+  static get isEnabled() {
+    return true;
+  }
+
   get url() {
     return '/';
   }

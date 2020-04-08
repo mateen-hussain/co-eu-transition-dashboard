@@ -18,6 +18,7 @@
     "minimumPasswordLength": 8
   },
   "paths": {
+    "start": "/entry",
     "admin": {
       "import": "/admin/import"
     },
@@ -40,7 +41,9 @@
     "upcomingMilestones": "/upcoming-milestones"
   },
   "features": {
-    "twoFactorAuth": true
+    "twoFactorAuth": true,
+    "missedMilestones": false,
+    "upcomingMilestonesChart": false
   },
   "notify": {
     "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289"

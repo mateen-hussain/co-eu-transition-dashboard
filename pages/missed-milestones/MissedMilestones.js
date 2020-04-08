@@ -5,6 +5,10 @@ const Milestone = require('models/milestone');
 const Project = require('models/project');
 
 class MissedMilestones extends Page {
+  static get isEnabled() {
+    return config.features.missedMilestones;
+  }
+
   get url() {
     return config.paths.missedMilestones;
   }

@@ -3,6 +3,7 @@ const { paths } = require('config');
 const MissedMilestones = require('pages/missed-milestones/MissedMilestones');
 const Milestone = require('models/milestone');
 const Project = require('models/project');
+const config = require('config');
 
 const department = [{
   dataValues: {
@@ -26,6 +27,33 @@ describe('pages/missed-milestones/MissedMilestones', () => {
 
     page = new MissedMilestones('some path', req, res);
   });
+
+  describe('#isEnabled', () => {
+    let sandbox = {};
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('should be enabled if missedMilestones feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        missedMilestones: true
+      });
+
+      expect(MissedMilestones.isEnabled).to.be.ok;
+    });
+
+    it('should be enabled if missedMilestones feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        missedMilestones: false
+      });
+
+      expect(MissedMilestones.isEnabled).to.not.be.ok;
+    })
+  })
 
   describe('#url', () => {
     it('returns correct url', () => {

@@ -21,7 +21,7 @@ class Login extends Page {
     } else if(user.passwordReset) {
       this.res.redirect(config.paths.authentication.passwordReset);
     } else {
-      this.res.redirect(config.paths.missedMilestones);
+      this.res.redirect(config.paths.start);
     }
   }
 

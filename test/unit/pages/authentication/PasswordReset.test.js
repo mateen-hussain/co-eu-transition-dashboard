@@ -27,14 +27,9 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
   });
 
   describe('#next', () => {
-    it('redirects to admin page', () => {
-      page.req.user.role = 'admin';
-      expect(page.next).to.eql(config.paths.admin.import);
-    });
-
-    it('redirects to missed milestones page', () => {
+    it('redirects to start page', () => {
       page.req.user.role = 'user';
-      expect(page.next).to.eql(config.paths.missedMilestones);
+      expect(page.next).to.eql(config.paths.start);
     });
   });
 
