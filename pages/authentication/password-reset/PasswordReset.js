@@ -56,7 +56,6 @@ class PasswordReset extends Page {
       error = 'The passwords must match';
     }
 
-
     return error;
   }
 
@@ -65,14 +64,7 @@ class PasswordReset extends Page {
     const confirmPassword = this.req.body['confirm-password'];
     const currentPassword = this.req.body['current-password'];
 
-    let hasError = await authentication.authenticateLogin(this.req.user.email,currentPassword, (error,user) => {
-      if (!user || error) {
-        return true;
-      }
-      return false;
-    });
-
-    if (hasError) {
+    if (await authentication.authenticateLogin(this.req.user.email,currentPassword, error => error)) {
       this.req.flash(`Incorrect password entered`);
       return this.res.redirect(config.paths.authentication.passwordReset);
     }
