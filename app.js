@@ -6,6 +6,7 @@ const logger = require('middleware/logger');
 const helmet = require('middleware/helmet');
 const cookieParser = require('cookie-parser');
 const config = require('config');
+const startPage = require('helpers/startPage');
 
 const app = module.exports = express();
 
@@ -26,6 +27,6 @@ if (config.env === 'development') {
 logger.attachRouteLogger(app);
 
 pages.attach(app);
-app.get('/', (req, res) => res.redirect(config.paths.start));
+app.get('/', (req, res) => res.redirect(startPage()));
 
 logger.attachErrorLogger(app);

@@ -1,9 +1,10 @@
 const Page = require('core/pages/page');
 const config = require('config');
+const startPage = require('helpers/startPage');
 
 class Start extends Page {
   get url() {
-    return config.paths.start;
+    return startPage();
   }
 
   async handler(req, res) {

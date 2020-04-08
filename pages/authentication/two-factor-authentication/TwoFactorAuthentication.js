@@ -8,6 +8,7 @@ const jwt = require('services/jwt');
 const config = require('config');
 const flash = require('middleware/flash');
 const logger = require('services/logger');
+const startPage = require('helpers/startPage');
 
 class TwoFactorAuthentication extends Page {
   get url() {
@@ -25,7 +26,7 @@ class TwoFactorAuthentication extends Page {
     if(this.req.user.passwordReset) {
       this.res.redirect(config.paths.authentication.passwordReset);
     } else {
-      return this.res.redirect(config.paths.start);
+      return this.res.redirect(startPage());
     }
   }
 

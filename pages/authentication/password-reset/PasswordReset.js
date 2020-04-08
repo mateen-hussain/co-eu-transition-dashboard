@@ -3,6 +3,7 @@ const config = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const flash = require('middleware/flash');
+const startPage = require('helpers/startPage');
 
 class PasswordReset extends Page {
   get url() {
@@ -17,7 +18,7 @@ class PasswordReset extends Page {
   }
 
   get next() {
-    return config.paths.start;
+    return startPage();
   }
 
   get mode() {

@@ -5,6 +5,7 @@ const flash = require('middleware/flash');
 const config = require('config');
 const logger = require('services/logger');
 const jwt = require('services/jwt');
+const startPage = require('helpers/startPage');
 
 class Login extends Page {
   get url() {
@@ -21,7 +22,7 @@ class Login extends Page {
     } else if(user.passwordReset) {
       this.res.redirect(config.paths.authentication.passwordReset);
     } else {
-      this.res.redirect(config.paths.start);
+      this.res.redirect(startPage());
     }
   }
 
