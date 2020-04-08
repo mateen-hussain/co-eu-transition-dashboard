@@ -29,7 +29,7 @@ class Login extends Page {
   handleAuthenticationResponse(err, user) {
     if(err) {
       if (err.maximumLoginAttempts) {
-        this.req.flash(`Too many incorrect login attempts have been made, you're account is now locked, please contact us.`);
+        this.req.flash(`Too many incorrect login attempts have been made, your account is now locked, please contact us.`);
       } else {
         this.req.flash(`Incorrect username and/or password entered`);
       }

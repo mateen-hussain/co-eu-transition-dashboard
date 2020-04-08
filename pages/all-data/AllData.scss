@@ -53,6 +53,10 @@ table.govuk-table.table-content {
     font-size: 18px;
 }
 
+.remove-icon span.govuk-accordion__icon {
+    display: none;
+}
+
 #filterPanel, #hideFilter  {
     display: none;
 }

@@ -77,7 +77,7 @@ describe('pages/authentication/login/Login', () => {
     it('sets correct error and redirects to this page if user is blocked out', () => {
       const err = { maximumLoginAttempts: true };
       page.handleAuthenticationResponse(err);
-      sinon.assert.calledWith(page.req.flash, `Too many incorrect login attempts have been made, you're account is now locked, please contact us.`);
+      sinon.assert.calledWith(page.req.flash, `Too many incorrect login attempts have been made, your account is now locked, please contact us.`);
       sinon.assert.calledWith(page.res.redirect, config.paths.authentication.login);
     });
 
