@@ -64,8 +64,10 @@ export default (elementId, data) =>  {
       },
       scales: {
         xAxes: [{
+          type: 'linear',
           ticks: {
-            precision: 0,
+            min: data.min,
+            max: data.max,
             callback: function(value) {
               return moment(value, 'x').format('DD MMMM');
             }
