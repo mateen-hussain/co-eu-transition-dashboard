@@ -33,17 +33,13 @@
   <li>Upload the file below</li>
 </ol>
 
-<div class="govuk-form-group {% if error %} govuk-form-group--error {% endif %}">
-  <label class="govuk-label" for="file-upload">
-    Upload a file
-  </label>
-  {% if error %}
-  <span id="file-upload-error" class="govuk-error-message">
-    <span class="govuk-visually-hidden">Error:</span> You must upload the required file as detailed above
-  </span>
-  {% endif %}
-  <input class="govuk-file-upload {% if error %} govuk-file-upload--error {% endif %}" id="file-upload" name="file-upload" type="file" aria-describedby="file-upload">
-</div>
+{{ govukFileUpload({
+  id: "file-upload",
+  name: "file-upload",
+  label: {
+    text: "Upload a file"
+  }
+}) }}
 
 {{ govukButton({
   text: "Upload Fail",
