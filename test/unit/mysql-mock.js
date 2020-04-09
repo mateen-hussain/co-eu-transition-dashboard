@@ -19,6 +19,7 @@ Model.init = sinon.stub().callsFake(function() {
 });
 Sequelize.getQueryInterface = sinon.stub();
 Sequelize.query = sinon.stub();
+Sequelize.fn = sinon.stub();
 
 s = sinon.stub().returns(Sequelize);
 
