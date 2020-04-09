@@ -1,0 +1,40 @@
+{% extends "template.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}Add data{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+{{ govukRadios({
+  idPrefix: "add-data",
+  name: "add-data",
+  fieldset: {
+    legend: {
+      text: "How would you like to add data?",
+      isPageHeading: true,
+      classes: "govuk-fieldset__legend--xl"
+    }
+  },
+  items: [
+    {
+      value: "upload",
+      text: "Upload information from an Excel spreadsheet",
+      checked: true
+    }
+  ]
+}) }}
+
+{{ govukButton({
+  text: "Continue",
+  href: config.paths.dataEntry.bulkUpload
+}) }}
+
+ </div>
+</div>
+
+{% endblock %}
+

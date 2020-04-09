@@ -1,0 +1,31 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<h1 class="govuk-heading-xl">Has this file been signed off?</h1>
+
+<p class="govuk-body">Your file must be signed off by the Senior Reporting Officer before it can be uploaded.<p>
+
+<p class="govuk-body">Your file must also match the current MI commision template. If your file does not match this template, the upload function will not work. <p>
+
+<a class="govuk-link" href="">Download the latest template for the MI commission (last updated on 01 April 2020)</a>
+<br><br>
+
+{{ govukRadios({
+  idPrefix: "sign-off",
+  name: "sign-off",
+  items: [
+    {
+      value: "yes",
+      text: "Yes"
+    },
+    {
+      value: "no",
+      text: "No"
+    }
+  ]
+}) }}
+
+{{ govukButton({
+  text: "Continue",
+  href: config.paths.dataEntry.bulkUploadFile
+}) }}

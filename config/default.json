@@ -40,7 +40,13 @@
     "projectDetails": "/project-details/:uid",
     "privacyNotice": "/privacy-notice",
     "missedMilestones": "/missed-milestones",
-    "upcomingMilestones": "/upcoming-milestones"
+    "upcomingMilestones": "/upcoming-milestones",
+    "dataEntry": {
+      "addData": "/add-data",
+      "bulkUpload": "/bulk-upload",
+      "bulkUploadSignOff": "/bulk-upload/sign-off",
+      "bulkUploadFile": "/bulk-upload/upload-file"
+    }
   },
   "features": {
     "twoFactorAuth": true,
