@@ -1,10 +1,23 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 <div class="govuk-grid-column-two-thirds">
 
 <h1 class="govuk-heading-xl">Upload your file</h1>
+
+{% if error %}
+{{ govukErrorSummary({
+  titleText: "There is a problem",
+  errorList: [
+    {
+      text: "You must upload the MI Excel spreadsheet as explained below",
+      href: "#file-upload"
+    }
+  ]
+}) }}
+{% endif %}
 
 <p class="govuk-body">Upload the MI Excel spreadsheet with completed project and milestone information.<p>
 
@@ -20,13 +33,17 @@
   <li>Upload the file below</li>
 </ol>
 
-{{ govukFileUpload({
-  id: "file-upload",
-  name: "file-upload",
-  label: {
-    text: "Upload a file"
-  }
-}) }}
+<div class="govuk-form-group {% if error %} govuk-form-group--error {% endif %}">
+  <label class="govuk-label" for="file-upload">
+    Upload a file
+  </label>
+  {% if error %}
+  <span id="file-upload-error" class="govuk-error-message">
+    <span class="govuk-visually-hidden">Error:</span> You must upload the required file as detailed above
+  </span>
+  {% endif %}
+  <input class="govuk-file-upload {% if error %} govuk-file-upload--error {% endif %}" id="file-upload" name="file-upload" type="file" aria-describedby="file-upload">
+</div>
 
 {{ govukButton({
   text: "Upload Fail",
