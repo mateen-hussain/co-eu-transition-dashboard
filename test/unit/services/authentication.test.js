@@ -5,6 +5,7 @@ const config = require('config');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
 const Department = require('models/department');
+const sequelize = require('services/sequelize');
 
 let passportLocalStrategyStub = {};
 let passportJWTStrategyStub = {};
@@ -108,8 +109,8 @@ describe('services/authentication', () => {
           sinon.assert.calledWith(bcrypt.compare, user.password, user.password);
         });
 
-        it('updates users login attempts', () => {
-          sinon.assert.calledWith(user.update, { loginAttempts: 0 });
+        it('updates users login attempts and last login', () => {
+          sinon.assert.calledWith(user.update, { loginAttempts: 0, lastLoginAt: sequelize.fn('NOW')  });
         });
 
         it('returns user', () => {

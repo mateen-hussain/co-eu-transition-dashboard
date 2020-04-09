@@ -7,6 +7,7 @@ const Department = require('models/department');
 const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
+const sequelize = require('services/sequelize');
 const maximumLoginAttempts = 3;
 
 const hashPassphrase = passphrase => {
@@ -40,7 +41,7 @@ const authenticateLogin = async (email, password, done) => {
     return done(error);
   }
 
-  await user.update({ loginAttempts: 0 });
+  await user.update({ loginAttempts: 0, lastLoginAt: sequelize.fn('NOW') });
   done(null, user);
 };
 
