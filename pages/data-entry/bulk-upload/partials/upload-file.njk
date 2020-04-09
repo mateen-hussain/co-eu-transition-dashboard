@@ -2,6 +2,8 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
 
+<div class="govuk-grid-column-two-thirds">
+
 <h1 class="govuk-heading-xl">Upload your file</h1>
 
 <p class="govuk-body">Upload the MI Excel spreadsheet with completed project and milestone information.<p>
@@ -27,6 +29,13 @@
 }) }}
 
 {{ govukButton({
-  text: "Upload",
-  href: config.paths.dataEntry.bulkUpload
+  text: "Upload Fail",
+  href: config.paths.dataEntry.bulkUploadFailed
 }) }}
+
+{{ govukButton({
+  text: "Upload Success",
+  href: config.paths.dataEntry.bulkUploadSuccess
+}) }}
+
+</div>

@@ -1,0 +1,82 @@
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+<div class="govuk-grid-column-full">
+
+<h1 class="govuk-heading-xl">Upload failed
+<span class="govuk-caption-xl">No data has been uploaded</span>
+</h1>
+
+{{ govukErrorSummary({
+  titleText: "Please fix the errors detailed below and then re-upload the file",
+  errorList: [
+    {
+      html: "Project data errors found",
+      href: "#project-error"
+    },
+    {
+      text: "milestone data errors found",
+      href: "#milestone-error"
+    }
+  ]
+}) }}
+
+<h3 class="govuk-heading-m">Project data errors</h3>
+
+{{ govukDetails({
+  summaryText: "Where do I fix project data errors?",
+  html: "<p class='govuk-body'>To fix the Project data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Projects' tab, which is illustrated in the image below</p>"
+}) }}
+
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Project UID</th>
+      <th scope="col" class="govuk-table__header">Data</th>
+      <th scope="col" class="govuk-table__header">Error type</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">BEIS-27</td>
+      <td class="govuk-table__cell">Project title</td>
+      <td class="govuk-table__cell">Missing theme</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="govuk-heading-m">Milestone data errors</h3>
+
+{{ govukDetails({
+  summaryText: "Where do I fix milestone data errors?",
+  html: "<p class='govuk-body'>To fix the Milestone data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Milestones' tab, which is illustrated in the image below</p>"
+}) }}
+
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Milestone UID</th>
+      <th scope="col" class="govuk-table__header">Data</th>
+      <th scope="col" class="govuk-table__header">Error type</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">BEIS-33-01</td>
+      <td class="govuk-table__cell">What is your confidence in delivery of this milestone?</td>
+      <td class="govuk-table__cell">Missing value</td>
+    </tr>
+  </tbody>
+</table>
+
+{{ govukButton({
+  text: "Re-upload file",
+  href: config.paths.dataEntry.bulkUploadFile
+}) }}
+
+</div>
+
+
+
+
