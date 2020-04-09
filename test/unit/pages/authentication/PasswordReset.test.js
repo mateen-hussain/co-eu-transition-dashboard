@@ -91,12 +91,22 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
       authentication.hashPassphrase.restore();
     });
 
+    it('fails if current password does not match', async () => {
+      sinon.stub(authentication,'authenticateLogin').returns(true);
+  
+      await page.passwordReset();
+
+      sinon.assert.calledWith(page.req.flash, "Incorrect password entered");
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordReset);
+    });
+
     it('sets error if password does not pass validation', async () => {
       const notValid = 'Not valid';
-      page.validatePassword.returns(notValid);
 
+      authentication.authenticateLogin = sinon.stub();
       req.body.password = 'password';
-
+  
+      page.validatePassword.returns(notValid);
       await page.passwordReset();
 
       sinon.assert.calledWith(page.req.flash, notValid);
