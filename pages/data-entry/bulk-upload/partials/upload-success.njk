@@ -48,6 +48,21 @@
   <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
 }) }}
 
+{# Possibly to include input type hidden elements on the table or here followed by 
+the "Add data to dashboard" button? 
+
+<form action="{{ url }}" method="post">
+
+{{ govukButton({
+  text: "Add data to dashboard",
+  type: "submit",
+  preventDoubleClick: true
+  }) }}
+
+</form>
+
+#}
+
 {{ govukButton({
   text: "Add data to dashboard",
   href: config.paths.dataEntry.bulkUploadDataLive

@@ -33,6 +33,8 @@
   <li>Upload the file below</li>
 </ol>
 
+{# <form action="{{ url }}" method="post"> #}
+
 {{ govukFileUpload({
   id: "file-upload",
   name: "file-upload",
@@ -40,6 +42,14 @@
     text: "Upload a file"
   }
 }) }}
+
+{# {{ govukButton({
+  text: "Upload",
+  type: "submit",
+  preventDoubleClick: true
+}) }} #}
+
+{# </form> #}
 
 {{ govukButton({
   text: "Upload Fail",
