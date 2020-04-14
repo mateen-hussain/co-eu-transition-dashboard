@@ -1,28 +1,11 @@
-const xlsx = require('node-xlsx');
+const xlsx = require('xlsx');
 
 const parse = buffer => {
-  const sheets = xlsx.parse(buffer);
+  const workSheet = xlsx.read(buffer, {});
 
-  return sheets.map(sheet => {
-    return sheet.data.reduce((data, row, rowIndex) => {
-      const isHeaderRow = rowIndex === 0;
-      const rowHasData = row[0] && row[0].trim().length;
-
-      if (isHeaderRow || !rowHasData) {
-        return data;
-      }
-
-      const object = row.reduce((object, item, index) => {
-        object[sheet.data[0][index]] = item;
-        return object;
-      }, {});
-
-      data.push(object);
-
-      return data;
-    }, []);
+  return Object.values(workSheet.Sheets).map(sheet => {
+    return xlsx.utils.sheet_to_json(sheet, { raw: true, defval: '' });
   });
 };
 
 module.exports = { parse };
-

@@ -1,10 +1,16 @@
-const removeNulls = (obj) => {
+const removeNulls = (obj, maxDepth, currentDepth = -1) => {
+  currentDepth ++;
+
+  if(currentDepth === maxDepth) {
+    return obj;
+  }
+
   var isArray = obj instanceof Array;
 
   if(isArray) {
     for (var i = obj.length; i--;) {
       if (typeof obj[i] === "object") {
-        obj[i] = removeNulls(obj[i]);
+        obj[i] = removeNulls(obj[i], maxDepth, currentDepth);
         if(!obj[i] || !Object.keys(obj[i]).length) {
           delete obj[i];
         }
@@ -20,7 +26,7 @@ const removeNulls = (obj) => {
   } else {
     for (var k in obj){
       if (typeof obj[k] === "object") {
-        obj[k] = removeNulls(obj[k]);
+        obj[k] = removeNulls(obj[k], maxDepth, currentDepth);
         if(!obj[k] || !Object.keys(obj[k]).length) {
           delete obj[k];
         }
@@ -33,6 +39,16 @@ const removeNulls = (obj) => {
   }
 
   return obj;
-}
+};
 
-module.exports = { removeNulls };
+const pluck = (collection, key) => {
+  return collection.reduce((keys, item) => {
+    keys.push(item[key]);
+    return keys;
+  }, []);
+};
+
+module.exports = {
+  removeNulls,
+  pluck
+};

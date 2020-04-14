@@ -2,10 +2,30 @@ const { Model, STRING, INTEGER, TEXT, Op } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const ProjectField = require('./projectField');
+const ProjectFieldEntryAudit = require('./projectFieldEntryAudit');
 
 class ProjectFieldEntry extends Model {
   static includes(attributeKey) {
     return attributeKey.includes('ProjectFieldEntryFilter');
+  }
+
+  static async import(projectFieldEntry, options) {
+    if (!projectFieldEntry.value) {
+      return
+    }
+
+    const exsistingField = await ProjectFieldEntry.findOne({
+      where: {
+        projectUid: projectFieldEntry.projectUid,
+        fieldId: projectFieldEntry.fieldId
+      }
+    });
+
+    if (exsistingField) {
+      await ProjectFieldEntryAudit.create(exsistingField.toJSON(), options);
+    }
+
+    await this.upsert(projectFieldEntry, options);
   }
 
   static createSearch(projectField, options) {
@@ -50,18 +70,10 @@ ProjectFieldEntry.init({
     get() {
       if (!this.getDataValue('value')) return;
       const value = this.getDataValue('value').toString('utf8');
-      return modelUtils.parseFieldEntryValue(value, this.get('projectField').get('type'))
-    },
-    set(value) {
-      if (!this.projectField) {
-        return this.setDataValue('value', value)
-      }
-
-      return this.setDataValue('value', value);
-    },
-    validate: {
-      isValid(val) {
-        return modelUtils.validateFieldEntryValue.call(this, val);
+      if (this.get('projectField')) {
+        return modelUtils.parseFieldEntryValue(value, this.get('projectField').get('type'))
+      } else {
+        return value;
       }
     }
   }

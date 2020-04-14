@@ -10,8 +10,16 @@ ProjectField.init({
     type: BOOLEAN,
     field: "is_active",
   },
+  isRequired: {
+    type: BOOLEAN,
+    field: "is_required"
+  },
   displayName: {
     field: "display_name",
+    type: STRING(300),
+  },
+  miTemplateColumnName: {
+    field: "mi_template_column_name",
     type: STRING(300),
   }
 }, { sequelize, modelName: 'projectField', tableName: 'project_field', timestamps: false });
