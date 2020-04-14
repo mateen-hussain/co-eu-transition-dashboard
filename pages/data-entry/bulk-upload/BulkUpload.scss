@@ -8,4 +8,8 @@ h2.govuk-heading-l.validate-number {
     margin-bottom: 10px;
 }
 
+a.govuk-button.continueBtn.govuk-button--disabled {
+    pointer-events: none;
+}
+
 

@@ -20,7 +20,8 @@ const webpackSettings = () => {
       new CopyWebpackPlugin([
         { from: path.resolve(govUkPath, 'assets/images'), to: 'images' },
         { from: path.resolve(govUkPath, 'assets/fonts'), to: 'fonts' },
-        { from: path.resolve(publicPath, 'images'), to: 'images' }
+        { from: path.resolve(publicPath, 'images'), to: 'images' },
+        { from: path.resolve(publicPath, 'files'), to: 'files' }
       ]),
       new webpack.HotModuleReplacementPlugin(),
       new MiniCssExtractPlugin()
