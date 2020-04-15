@@ -41,6 +41,11 @@ const removeNulls = (obj, maxDepth, currentDepth = -1) => {
   return obj;
 };
 
+const truthy = [true, 'true', 'yes', 1, '1', 'y'];
+const falsey = ['false', 'no', '0', 'n'];
+
 module.exports = {
-  removeNulls
+  removeNulls,
+  truthy,
+  falsey
 };

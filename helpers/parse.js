@@ -10,32 +10,6 @@ const parseString = (value = '') => {
   return value;
 };
 
-const parseDateExcel = excelTimestamp => {
-  const secondsInDay = 24 * 60 * 60;
-  const excelEpoch = new Date(1899, 11, 31);
-  const excelEpochAsUnixTimestamp = excelEpoch.getTime();
-  const missingLeapYearDay = secondsInDay * 1000;
-  const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
-  const excelTimestampAsUnixTimestamp = excelTimestamp * secondsInDay * 1000;
-  const parsed = excelTimestampAsUnixTimestamp + delta;
-  return isNaN(parsed) ? null : parsed;
-};
-
-const parseDate = (value = '') => {
-  value = String(value).trim();
-
-  if (value.toLowerCase().startsWith("n/a")){
-    return;
-  }
-
-  // handle excel date
-  if (value.length === 5) {
-    value = parseDateExcel(value)
-  }
-
-  return value;
-};
-
 const parseValue = (value, definition) => {
   switch(definition.type) {
   case 'string':
@@ -43,9 +17,8 @@ const parseValue = (value, definition) => {
   case 'group':
   case 'integer':
   case 'float':
-    return parseString(value);
   case 'date':
-    return parseDate(value);
+    return parseString(value);
   }
 };
 
@@ -65,8 +38,6 @@ const parseItems = (items, itemDefinitions) => {
 
 module.exports = {
   parseString,
-  parseDateExcel,
-  parseDate,
   parseValue,
   parseItems
 };

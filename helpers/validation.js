@@ -1,9 +1,7 @@
 const moment = require('moment');
+const { truthy, falsey } = require('./utils');
 
 const validateBool = value => {
-  const truthy = ['true', 'yes', '1', 'y'];
-  const falsey = ['false', 'no', '0', 'n'];
-
   const isABoolean = [...truthy, ...falsey].includes(String(value).toLowerCase());
 
   if(!isABoolean) {

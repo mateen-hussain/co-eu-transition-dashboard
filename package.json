@@ -50,7 +50,6 @@
     "moment": "^2.24.0",
     "mysql2": "^2.1.0",
     "node-sass": "^4.13.1",
-    "node-xlsx": "^0.15.0",
     "notifications-node-client": "^4.7.2",
     "nunjucks": "^3.2.1",
     "nunjucks-await-filter": "0.0.1",
@@ -108,8 +107,6 @@
       "test/**/*",
       "services/logger.js",
       "middleware/logger.js",
-      "pages/filters-example/**/*.js",
-      "pages/admin/**/*.js",
       "migrations/**/*"
     ]
   },

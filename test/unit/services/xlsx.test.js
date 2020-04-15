@@ -17,7 +17,7 @@ describe('services/xlsx', () => {
 
   it('should convert an excel document into a collection', () => {
     const collection = xlsxService.parse(sampleDocument)
-    sinon.assert.calledOnce(xlsx.read);
+    sinon.assert.calledWith(xlsx.read, sampleDocument, { cellDates: true });
     sinon.assert.calledTwice(xlsx.utils.sheet_to_json);
     expect(collection).to.eql([{ foo: 'foo', bar: 'bar' }, { baz: 'baz' }]);
   });

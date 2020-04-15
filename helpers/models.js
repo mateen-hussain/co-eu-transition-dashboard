@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const sequelize = require('services/sequelize');
+const { truthy } = require('./utils');
 
 const groupSearchItems = async (search, overrides = {}) => {
   const groupedSearch = { project: {}, milestone: {}, projectField: [], milestoneField: {} };
@@ -44,7 +45,6 @@ const transformForView = model => {
     }, new Map());
 };
 
-const truthy = [true, 'true', 'yes', 1, '1', 'y'];
 const parseFieldEntryValue = (value, type) => {
   if(type) {
     switch(type) {
