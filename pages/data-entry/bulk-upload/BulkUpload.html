@@ -4,6 +4,7 @@
 {% block beforeContent %}
 {% include "feedback.njk" %}
 
+{% if mode == 'bulk-upload' or mode == 'sign-off' %}
 {{ govukBackLink({
   text: "Back",
   href: "#",
@@ -11,6 +12,8 @@
     onclick: "history.go(-1);"
   }
 }) }}
+{% endif %}
+
 {% endblock %}
 
 {% block pageTitle %}Bulk upload{% endblock %}

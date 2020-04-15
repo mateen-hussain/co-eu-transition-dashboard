@@ -1,10 +1,10 @@
 var continueBtn = document.getElementsByClassName('continueBtn');
-var radio = document.querySelectorAll('input[name="sign-off"]');
+var radio = document.getElementsByName('sign-off');
 
 function changeHandler() {
   if (this.value === 'yes' ) {
     continueBtn[0].classList.remove('govuk-button--disabled')
-  } else if (this.value === 'no' ){
+  } else {
     continueBtn[0].classList.add('govuk-button--disabled')
   }
 }
