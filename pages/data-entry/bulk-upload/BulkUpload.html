@@ -4,7 +4,7 @@
 {% block beforeContent %}
 {% include "feedback.njk" %}
 
-{% if mode == 'bulk-upload' or mode == 'sign-off' %}
+{% if mode == 'bulk-upload' or mode == 'sign-off' or mode == 'upload-file' %}
 {{ govukBackLink({
   text: "Back",
   href: "#",
