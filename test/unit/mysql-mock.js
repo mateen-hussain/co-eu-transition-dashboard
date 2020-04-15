@@ -7,14 +7,16 @@ class Model {}
 
 let s = {};
 
-Model.init = sinon.stub().callsFake(function() {
+Model.init = sinon.stub().callsFake(function(attributes) {
+  this.get = sinon.stub();
   this.hasMany = sinon.stub();
   this.belongsTo = sinon.stub();
   this.belongsToMany = sinon.stub();
   this.findOne = sinon.stub().resolves({});
+  this.upsert = sinon.stub().resolves();
   this.findAll = sinon.stub().resolves([]);
   this.count = sinon.stub().resolves(0);
-  this.rawAttributes = {};
+  this.rawAttributes = attributes;
   this.getQueryInterface = sinon.stub();
 });
 Sequelize.getQueryInterface = sinon.stub();

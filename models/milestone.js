@@ -4,8 +4,7 @@ const modelUtils = require('helpers/models');
 const MilestoneFieldEntry = require('./milestoneFieldEntry');
 const MilestoneField = require('./milestoneField');
 const moment = require('moment');
-const { pluck } = require('helpers/utils');
-const validation = require('helpers/validation');
+const pick = require('lodash/pick');
 
 class Milestone extends Model {
   static includes(attributeKey) {
@@ -26,20 +25,20 @@ class Milestone extends Model {
       type: 'string',
       isRequired: true,
       isUnique: true,
-      miTemplateColumnName: 'Milestone UID'
+      importColumnName: 'Milestone UID'
     },{
       name: 'projectUid',
       type: 'string',
       isRequired: true,
-      miTemplateColumnName: 'Project UID'
+      importColumnName: 'Project UID'
     },{
       name: 'description',
       type: 'string',
-      miTemplateColumnName: 'Milestone Description'
+      importColumnName: 'Milestone Description'
     },{
       name: 'date',
       type: 'date',
-      miTemplateColumnName: 'Target date for delivery'
+      importColumnName: 'Target date for delivery'
     }]);
 
     return milestoneFields;
@@ -48,11 +47,8 @@ class Milestone extends Model {
   static async import(milestone, milestoneFields, options) {
     const attributes = Object.keys(milestone);
 
-    const milestoneAttribites = attributes.filter(attribute => this.rawAttributes[attribute]);
-    const milestoneToUpsert = milestoneAttribites.reduce((milestoneToUpsert, attribute) => {
-      milestoneToUpsert[attribute] = milestone[attribute];
-      return milestoneToUpsert;
-    }, {});
+    const milestoneAttributes = attributes.filter(attribute => this.rawAttributes[attribute]);
+    const milestoneToUpsert = pick(milestone, milestoneAttributes);
 
     await this.upsert(milestoneToUpsert, options);
 
@@ -61,8 +57,6 @@ class Milestone extends Model {
 
   static async importMilestoneFieldEntries(milestone, milestoneFields, options) {
     const attributes = Object.keys(milestone);
-
-
 
     const milestoneFieldEntryAttributes = attributes.filter(attribute => !this.rawAttributes[attribute]);
     const milestoneFieldEntries = milestoneFieldEntryAttributes.map(milestoneFieldEntryAttribute => {
@@ -77,13 +71,6 @@ class Milestone extends Model {
     for (const milestoneFieldEntry of milestoneFieldEntries) {
       await MilestoneFieldEntry.import(milestoneFieldEntry, options);
     }
-  }
-
-  static async validateColumns(columns) {
-    const fieldDefintions = await this.fieldDefintions();
-
-    const milestoneRequiredColumns = pluck(fieldDefintions, 'miTemplateColumnName');
-    return validation.validateColumns(columns, milestoneRequiredColumns);
   }
 
   get fields() {

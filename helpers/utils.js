@@ -41,14 +41,6 @@ const removeNulls = (obj, maxDepth, currentDepth = -1) => {
   return obj;
 };
 
-const pluck = (collection, key) => {
-  return collection.reduce((keys, item) => {
-    keys.push(item[key]);
-    return keys;
-  }, []);
-};
-
 module.exports = {
-  removeNulls,
-  pluck
+  removeNulls
 };

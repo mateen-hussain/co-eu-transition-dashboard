@@ -10,7 +10,7 @@ const parseString = (value = '') => {
   return value;
 };
 
-const parseDateExcel = (excelTimestamp) => {
+const parseDateExcel = excelTimestamp => {
   const secondsInDay = 24 * 60 * 60;
   const excelEpoch = new Date(1899, 11, 31);
   const excelEpochAsUnixTimestamp = excelEpoch.getTime();
@@ -52,7 +52,7 @@ const parseValue = (value, definition) => {
 const parseItems = (items, itemDefinitions) => {
   const parseItem = item => {
     const parsed = itemDefinitions.reduce((parsedItem, itemDefinition) => {
-      const value = item[itemDefinition.miTemplateColumnName];
+      const value = item[itemDefinition.importColumnName];
       parsedItem[itemDefinition.name] = parseValue(value, itemDefinition);
       return parsedItem;
     }, {});

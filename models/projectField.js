@@ -18,8 +18,8 @@ ProjectField.init({
     field: "display_name",
     type: STRING(300),
   },
-  miTemplateColumnName: {
-    field: "mi_template_column_name",
+  importColumnName: {
+    field: "import_column_name",
     type: STRING(300),
   }
 }, { sequelize, modelName: 'projectField', tableName: 'project_field', timestamps: false });

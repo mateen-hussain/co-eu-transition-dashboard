@@ -1,19 +1,11 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const xlsx = require('services/xlsx');
-const Project = require('models/project');
-const ProjectField = require('models/projectField');
-const Milestone = require('models/milestone');
-const sequelize = require('services/sequelize');
 const fileUpload = require('express-fileupload');
 const flash = require('middleware/flash');
 const authentication = require('services/authentication');
-const logger = require('services/logger');
-const validation = require('helpers/validation');
-const parse = require('helpers/parse');
-const { pluck } = require('helpers/utils');
 const config = require('config');
-const TemporaryBulkImportStore = require('models/TemporaryBulkImportStore');
+const BulkImport = require('models/bulkImport');
 const uuid = require('uuid');
 
 class Upload extends Page {
@@ -32,7 +24,7 @@ class Upload extends Page {
   async importData(req) {
     const [projects, milestones] = xlsx.parse(req.files.import.data);
 
-    await TemporaryBulkImportStore.create({
+    await BulkImport.create({
       id: uuid.v4(),
       userId: req.user.id,
       data: { projects, milestones }
@@ -55,7 +47,7 @@ class Upload extends Page {
   }
 
   async getRequest(req, res) {
-    const activeImport = await TemporaryBulkImportStore.findOne({
+    const activeImport = await BulkImport.findOne({
       where: {
         userId: req.user.id
       }

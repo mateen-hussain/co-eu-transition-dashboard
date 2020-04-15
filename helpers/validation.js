@@ -1,11 +1,11 @@
 const moment = require('moment');
-const { pluck } = require('./utils');
+const pick = require('lodash/pick');
 
 const validateBool = value => {
-  const truthy = [true, 'true', 'yes', 1, '1', 'y'];
-  const falsey = [false, 'false', 'no', 0, '0', 'n'];
+  const truthy = ['true', 'yes', '1', 'y'];
+  const falsey = ['false', 'no', '0', 'n'];
 
-  const isABoolean = [...truthy, ...falsey].includes(value.toLowerCase());
+  const isABoolean = [...truthy, ...falsey].includes(String(value).toLowerCase());
 
   if(!isABoolean) {
     throw Error(`Is not a valid boolean`);
@@ -27,7 +27,7 @@ const validateDate = value => {
   }
 };
 
-const validateInGroup = (value, options) => {
+const isValueInGroup = (value, options) => {
   const valueInGroup = options.includes(value);
 
   if(!valueInGroup) {
@@ -36,8 +36,8 @@ const validateInGroup = (value, options) => {
 };
 
 const validateIsDefined = value => {
-  return value !== undefined && value !== null && Boolean(value && value.length);
-}
+  return value !== undefined && value !== null && Boolean(value && String(value).length);
+};
 
 const validateIsRequired = (value, isRequired) => {
   const isDefined = validateIsDefined(value);
@@ -54,7 +54,7 @@ const validateIsUnique = (value, allValues, isUnique) => {
       throw Error(`Must be a unique value`);
     }
   }
-}
+};
 
 const validateValue = (value, definition, allValues) => {
   const isDefined = validateIsDefined(value);
@@ -74,7 +74,7 @@ const validateValue = (value, definition, allValues) => {
   case 'date':
     return validateDate(value);
   case 'group':
-    return validateInGroup(value, definition.config.options);
+    return isValueInGroup(value, definition.config.options);
   }
 };
 
@@ -82,7 +82,7 @@ const validateItems = (items, itemDefinitions) => {
   const validateItem = (errors, item) => {
     itemDefinitions.forEach(itemDefinition => {
       const value = item[itemDefinition.name];
-      const allValues = pluck(items, itemDefinition.name);
+      const allValues = pick(items, [itemDefinition.name]);
 
       try {
         validateValue(value, itemDefinition, allValues);
@@ -119,5 +119,13 @@ const validateColumns = (columnsRecieved, requiredColumns) => {
 
 module.exports = {
   validateItems,
-  validateColumns
+  validateColumns,
+  validateBool,
+  validateNumber,
+  validateDate,
+  isValueInGroup,
+  validateIsDefined,
+  validateIsRequired,
+  validateIsUnique,
+  validateValue
 };

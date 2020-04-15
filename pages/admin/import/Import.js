@@ -9,9 +9,10 @@ const authentication = require('services/authentication');
 const logger = require('services/logger');
 const validation = require('helpers/validation');
 const parse = require('helpers/parse');
-const { pluck, removeNulls } = require('helpers/utils');
+const { removeNulls } = require('helpers/utils');
+const pick = require('lodash/pick');
 const config = require('config');
-const TemporaryBulkImportStore = require('models/TemporaryBulkImportStore');
+const BulkImport = require('models/bulkImport');
 
 class Import extends Page {
   get url() {
@@ -47,7 +48,7 @@ class Import extends Page {
   }
 
   validateItems(items, parsedItems, fields) {
-    const requiredColumns = pluck(fields, 'miTemplateColumnName');
+    const requiredColumns = pick(fields, ['importColumnName']);
     const columnErrors = validation.validateColumns(Object.keys(items[0]), requiredColumns);
 
     const itemErrors = validation.validateItems(parsedItems, fields);
@@ -69,7 +70,7 @@ class Import extends Page {
 
     // Ensure that milestone project_uid matches a project uid
     const projectUidField = milestoneFields.find(milestoneField => milestoneField.name === 'projectUid');
-    projectUidField.config = { options: pluck(parsedProjects, 'uid') };
+    projectUidField.config = { options: pick(parsedProjects, ['uid']) };
     projectUidField.type = 'group';
 
     const [
@@ -88,7 +89,7 @@ class Import extends Page {
   }
 
   async finaliseImport(importId) {
-    const activeImport = await TemporaryBulkImportStore.findOne({
+    const activeImport = await BulkImport.findOne({
       where: {
         userId: this.req.user.id,
         id: importId
@@ -118,7 +119,7 @@ class Import extends Page {
   }
 
   async removeTemporaryBulkImport(importId) {
-    await TemporaryBulkImportStore.destroy({
+    await BulkImport.destroy({
       where: {
         userId: this.req.user.id,
         id: importId
@@ -145,7 +146,7 @@ class Import extends Page {
   }
 
   async getRequest(req, res) {
-    const activeImport = await TemporaryBulkImportStore.findOne({
+    const activeImport = await BulkImport.findOne({
       where: {
         userId: req.user.id
       },

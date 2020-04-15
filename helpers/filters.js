@@ -143,10 +143,10 @@ const getProjectFields = async (search, user) => {
         type: item.type
       }
     }, { include: ProjectField });
-    const exsistingField = fields.get(item.name);
+    const existingField = fields.get(item.name);
     const value = modelUtils.parseFieldEntryValue(projectFieldEntry.value, item.type);
 
-    if(!exsistingField) {
+    if(!existingField) {
       fields.set(projectFieldEntry.projectField.name, {
         id: projectFieldEntry.projectField.name,
         name: projectFieldEntry.projectField.displayName,
@@ -156,10 +156,10 @@ const getProjectFields = async (search, user) => {
         }]
       });
     } else {
-      exsistingField.options.push({
+      existingField.options.push({
         value
       });
-      exsistingField.options.sort((a, b) => (a.value > b.value) ? 1 : -1);
+      existingField.options.sort((a, b) => (a.value > b.value) ? 1 : -1);
     }
 
     return fields;

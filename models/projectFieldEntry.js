@@ -14,15 +14,15 @@ class ProjectFieldEntry extends Model {
       return
     }
 
-    const exsistingField = await ProjectFieldEntry.findOne({
+    const existingField = await ProjectFieldEntry.findOne({
       where: {
         projectUid: projectFieldEntry.projectUid,
         fieldId: projectFieldEntry.fieldId
       }
     });
 
-    if (exsistingField) {
-      await ProjectFieldEntryAudit.create(exsistingField.toJSON(), options);
+    if (existingField) {
+      await ProjectFieldEntryAudit.create(existingField.toJSON(), options);
     }
 
     await this.upsert(projectFieldEntry, options);

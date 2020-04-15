@@ -10,15 +10,15 @@ class MilestoneFieldEntry extends Model {
       return
     }
 
-    const exsistingField = await MilestoneFieldEntry.findOne({
+    const existingField = await MilestoneFieldEntry.findOne({
       where: {
         milestoneUid: milestoneFieldEntry.milestoneUid,
         fieldId: milestoneFieldEntry.fieldId
       }
     });
 
-    if (exsistingField) {
-      await MilestoneFieldEntryAudit.create(exsistingField.toJSON(), options);
+    if (existingField) {
+      await MilestoneFieldEntryAudit.create(existingField.toJSON(), options);
     }
 
     await this.upsert(milestoneFieldEntry, options);

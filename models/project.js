@@ -4,8 +4,7 @@ const Milestone = require('./milestone');
 const ProjectFieldEntry = require('./projectFieldEntry');
 const ProjectField = require('./projectField');
 const modelUtils = require('helpers/models');
-const { pluck } = require('helpers/utils');
-const validation = require('helpers/validation');
+const pick = require('lodash/pick');
 
 class Project extends Model {
   static async fieldDefintions() {
@@ -18,31 +17,31 @@ class Project extends Model {
       type: 'string',
       isRequired: true,
       isUnique: true,
-      miTemplateColumnName: 'UID'
+      importColumnName: 'UID'
     },{
       name: 'departmentName',
       type: 'string',
       isRequired: true,
-      miTemplateColumnName: 'Dept'
+      importColumnName: 'Dept'
     },{
       name: 'title',
       type: 'string',
-      miTemplateColumnName: 'Project Title'
+      importColumnName: 'Project Title'
     },{
       name: 'sro',
       type: 'string',
-      miTemplateColumnName: 'Project SRO + email address'
+      importColumnName: 'Project SRO + email address'
     },{
       name: 'description',
       type: 'string',
-      miTemplateColumnName: 'Project Description'
+      importColumnName: 'Project Description'
     },{
       name: 'impact',
       type: 'integer',
       config: {
         options: [0,1,2,3]
       },
-      miTemplateColumnName: 'Impact Rating'
+      importColumnName: 'Impact Rating'
     }]);
 
     return projectFields;
@@ -56,21 +55,11 @@ class Project extends Model {
     return modelUtils.createFilterOptions(attributeKey, options);
   }
 
-  static async validateColumns(columns) {
-    const fieldDefintions = await this.fieldDefintions();
-
-    const requiredColumns = pluck(fieldDefintions, 'miTemplateColumnName');
-    return validation.validateColumns(columns, requiredColumns);
-  }
-
   static async import(project, projectFields, options) {
     const attributes = Object.keys(project);
 
-    const projectAttribites = attributes.filter(attribute => this.rawAttributes[attribute]);
-    const projectToUpsert = projectAttribites.reduce((projectToUpsert, attribute) => {
-      projectToUpsert[attribute] = project[attribute];
-      return projectToUpsert;
-    }, {});
+    const projectAttributes = attributes.filter(attribute => this.rawAttributes[attribute]);
+    const projectToUpsert = pick(project, projectAttributes);
 
     await this.upsert(projectToUpsert, options);
 
@@ -138,12 +127,6 @@ Project.init({
     type: INTEGER,
     displayName: 'Impact',
     searchable: true,
-    // set(val) {
-    //   const isNA = String(val || '').toLowerCase().trim() === 'n/a';
-    //   if (!isNA) {
-    //     this.setDataValue('impact', val);
-    //   }
-    // },
     allowNull: true
   }
 }, { sequelize, modelName: 'project', tableName: 'project', createdAt: 'created_at', updatedAt: 'updated_at' });

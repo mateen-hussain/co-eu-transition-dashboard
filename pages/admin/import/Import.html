@@ -44,7 +44,7 @@
       {% for error in errors.projectErrors %}
         <tr>
           <td>{{ error.item.uid }}</td>
-          <td>{{ error.itemDefinition.miTemplateColumnName }}</td>
+          <td>{{ error.itemDefinition.importColumnName }}</td>
           <td>{{ error.item[error.itemDefinition.name] }}</td>
           <td>{{ error.error }}</td>
         </tr>
@@ -65,7 +65,7 @@
       {% for error in errors.milestoneErrors %}
         <tr>
           <td>{{ error.item.uid }}</td>
-          <td>{{ error.itemDefinition.miTemplateColumnName }}</td>
+          <td>{{ error.itemDefinition.importColumnName }}</td>
           <td>{{ error.item[error.itemDefinition.name] }}</td>
           <td>{{ error.error }}</td>
         </tr>
