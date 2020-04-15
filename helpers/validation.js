@@ -1,5 +1,4 @@
 const moment = require('moment');
-const pick = require('lodash/pick');
 
 const validateBool = value => {
   const truthy = ['true', 'yes', '1', 'y'];
@@ -82,7 +81,7 @@ const validateItems = (items, itemDefinitions) => {
   const validateItem = (errors, item) => {
     itemDefinitions.forEach(itemDefinition => {
       const value = item[itemDefinition.name];
-      const allValues = pick(items, [itemDefinition.name]);
+      const allValues = items.map(item => item[itemDefinition.name]);
 
       try {
         validateValue(value, itemDefinition, allValues);
