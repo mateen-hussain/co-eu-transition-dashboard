@@ -9,6 +9,8 @@ function changeHandler() {
   }
 }
 
+// When the user clicks back, button should not be disabled - to fix
+
 Array.prototype.forEach.call(radio, function(radio) {
   radio.addEventListener('change', changeHandler);
 });
