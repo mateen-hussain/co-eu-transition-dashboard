@@ -14,5 +14,9 @@
     "googleAnalytics": {
       "id": "UA-161904342-1"
     }
+  },
+  "features": {
+    "missedMilestones": false,
+    "upcomingMilestonesChart": false
   }
 }
