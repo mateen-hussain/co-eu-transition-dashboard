@@ -7,7 +7,12 @@ const modelUtils = require('helpers/models');
 const pick = require('lodash/pick');
 
 class Project extends Model {
-  static async fieldDefintions() {
+  static async fieldDefintions(user) {
+    let validDepartments = [];
+    if (user) {
+      validDepartments = await user.getDepartments({ raw: true });
+    }
+
     const projectFields = await ProjectField.findAll({
       where: { is_active: true }
     });
@@ -20,8 +25,11 @@ class Project extends Model {
       importColumnName: 'UID'
     },{
       name: 'departmentName',
-      type: 'string',
+      type: 'group',
       isRequired: true,
+      config: {
+        options: validDepartments.map(department => department.name)
+      },
       importColumnName: 'Dept'
     },{
       name: 'title',

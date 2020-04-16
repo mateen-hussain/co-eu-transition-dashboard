@@ -56,9 +56,10 @@ describe('models/project', () => {
         importColumnName: 'UID'
       },{
         name: 'departmentName',
-        type: 'string',
+        type: 'group',
         isRequired: true,
-        importColumnName: 'Dept'
+        importColumnName: 'Dept',
+        config: { options: [] }
       },{
         name: 'title',
         type: 'string',

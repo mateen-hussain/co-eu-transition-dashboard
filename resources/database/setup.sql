@@ -230,18 +230,18 @@ UNLOCK TABLES;
 # Dump of table project_field_entry_audit
 # ------------------------------------------------------------
 
--- DROP TABLE IF EXISTS `project_field_entry_audit`;
+DROP TABLE IF EXISTS `project_field_entry_audit`;
 
--- CREATE TABLE `project_field_entry_audit` (
---   `project_field_id` int(10) unsigned NOT NULL,
---   `project_uid` varchar(32) NOT NULL,
---   `value` blob,
---   `created_at` timestamp NULL DEFAULT NULL,
---   `updated_at` timestamp NULL DEFAULT NULL,
---   `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
---   KEY `fk_project_field_entry_audit_project_field_entry_idx` (`project_field_id`,`project_uid`),
---   CONSTRAINT `fk_project_field_entry_audit_project_field_entry` FOREIGN KEY (`project_field_id`, `project_uid`) REFERENCES `project_field_entry` (`project_field_id`, `project_uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+CREATE TABLE `project_field_entry_audit` (
+  `project_field_id` int(10) unsigned NOT NULL,
+  `project_uid` varchar(32) NOT NULL,
+  `value` blob,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `fk_project_field_entry_audit_project_field_entry_idx` (`project_field_id`,`project_uid`),
+  CONSTRAINT `fk_project_field_entry_audit_project_field_entry` FOREIGN KEY (`project_field_id`, `project_uid`) REFERENCES `project_field_entry` (`project_field_id`, `project_uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 

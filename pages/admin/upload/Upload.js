@@ -7,6 +7,7 @@ const authentication = require('services/authentication');
 const config = require('config');
 const BulkImport = require('models/bulkImport');
 const uuid = require('uuid');
+const logger = require('services/logger');
 
 class Upload extends Page {
   get url() {
@@ -22,12 +23,12 @@ class Upload extends Page {
   }
 
   async importData(req) {
-    const [projects, milestones] = xlsx.parse(req.files.import.data);
+    const data = xlsx.parse(req.files.import.data);
 
     await BulkImport.create({
       id: uuid.v4(),
       userId: req.user.id,
-      data: { projects, milestones }
+      data
     });
   }
 
@@ -42,6 +43,7 @@ class Upload extends Page {
       res.redirect(config.paths.admin.import);
     } catch (error) {
       req.flash('Error parsing excel file, please check the file and try again');
+      logger.error(`Error uploading excel document: ${error}`);
       return res.redirect(this.url);
     }
   }

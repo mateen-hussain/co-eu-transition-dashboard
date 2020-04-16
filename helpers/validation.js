@@ -114,6 +114,33 @@ const validateColumns = (columnsRecieved, requiredColumns) => {
   return errors;
 };
 
+const validateSheetNames = (sheets = []) => {
+  const sheetsMap = {
+    projects: 'Projects',
+    milestones: 'Milestones'
+  };
+
+  const errors = [];
+  const data = {};
+
+  Object.keys(sheetsMap).forEach(dataName => {
+    const excelSheetName = sheetsMap[dataName];
+    const found = sheets.find(sheet => sheet.name === excelSheetName);
+
+    if(!found) {
+      errors.push({ error: `"${excelSheetName}" sheet was not found in the excel document uploaded` });
+    } else {
+      data[dataName] = found.data;
+    }
+  });
+
+  return {
+    errors,
+    projects: data.projects,
+    milestones: data.milestones
+  };
+}
+
 module.exports = {
   validateItems,
   validateColumns,
@@ -124,5 +151,6 @@ module.exports = {
   validateIsDefined,
   validateIsRequired,
   validateIsUnique,
-  validateValue
+  validateValue,
+  validateSheetNames
 };

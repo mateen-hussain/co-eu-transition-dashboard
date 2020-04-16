@@ -9,7 +9,22 @@
 {% endif %}
 
 {% if errors | length %}
+
+  {% if errors.sheetErrors %}
+    <h2>Missing sheets in excel document</h2>
+    <table width="100%">
+      {% for error in errors.sheetErrors %}
+        <tr>
+          <td>{{ error.error }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+  <br><br>
+
   {% if errors.projectColumnErrors %}
+    <h2>Errors with project columns</h2>
     <table width="100%">
       {% for error in errors.projectColumnErrors %}
         <tr>
@@ -22,6 +37,7 @@
   <br><br>
 
   {% if errors.milestoneColumnErrors %}
+    <h2>Errors with milestone columns</h2>
     <table width="100%">
       {% for error in errors.milestoneColumnErrors %}
         <tr>
@@ -34,6 +50,7 @@
   <br><br>
 
   {% if errors.projectErrors %}
+    <h2>Errors with projects</h2>
     <table width="100%">
       <tr>
         <td>Project UID</td>
@@ -55,6 +72,7 @@
   <br><br>
 
   {% if errors.milestoneErrors %}
+    <h2>Errors with milestones</h2>
     <table width="100%">
       <tr>
         <td>Milestone UID</td>

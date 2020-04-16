@@ -4,6 +4,10 @@
 
 {% block content %}
 
+{% if flash %}
+  {{ flash }}
+{% endif %}
+
 <form action='{{ url }}' method='POST' encType="multipart/form-data">
   <input type="file" name="import" />
   <input type='submit' value='Import' />

@@ -129,4 +129,37 @@ describe('helpers/validation', () => {
       expect(validation.validateColumns(columnsRecieved, requiredColumns)).to.eql([{ error: '"col4" column is not reqcognized as a valid column, please either remove or rename.' }]);
     });
   });
+
+  describe('#validateSheetNames', () => {
+    it('return error if "Projects" sheet not found in document', () => {
+      const sheets = [{
+        name: 'Milestones',
+        data: []
+      }];
+      const data = validation.validateSheetNames(sheets);
+      expect(data.errors[0].error).to.eql('"Projects" sheet was not found in the excel document uploaded')
+    });
+
+    it('return error if "Milestones" sheet not found in document', () => {
+      const sheets = [{
+        name: 'Projects',
+        data: []
+      }];
+      const data = validation.validateSheetNames(sheets);
+      expect(data.errors[0].error).to.eql('"Milestones" sheet was not found in the excel document uploaded')
+    });
+
+    it('should return projects and milestones', () => {
+      const sheets = [{
+        name: 'Projects',
+        data: []
+      },{
+        name: 'Milestones',
+        data: []
+      }];
+      const data = validation.validateSheetNames(sheets);
+      expect(data.projects).to.eql([]);
+      expect(data.milestones).to.eql([]);
+    });
+  })
 });
