@@ -10,6 +10,7 @@
 
 {% if errors | length %}
   {% if errors.projectColumnErrors %}
+  <h1>COLOUMN</h1>
     <table width="100%">
       {% for error in errors.projectColumnErrors %}
         <tr>
@@ -34,12 +35,14 @@
   <br><br>
 
   {% if errors.projectErrors %}
+    <h1>something else! </h1>
+
     <table width="100%">
       <tr>
         <td>Project UID</td>
         <td>Column Name</td>
         <td>Value</td>
-        <td>Error</td>
+        <td>Error Type</td>
       </tr>
       {% for error in errors.projectErrors %}
         <tr>
@@ -60,7 +63,7 @@
         <td>Milestone UID</td>
         <td>Column Name</td>
         <td>Value</td>
-        <td>Error</td>
+        <td>Error Type</td>
       </tr>
       {% for error in errors.milestoneErrors %}
         <tr>

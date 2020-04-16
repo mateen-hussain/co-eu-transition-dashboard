@@ -87,8 +87,76 @@
   href: config.paths.dataEntry.bulkUploadFile
 }) }}
 
-{% endif %}
+{% else %}
 
+<h1 class="govuk-heading-xl">Please check your data</h1>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <p class="govuk-body">Please check that the data in your file corresponds the number of projects and milestones 
+    successfully uploaded to the dashboard.</p>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-third validate-data">
+    <h2 class="govuk-heading-l validate-number">{{ projects | length }}</h2>
+    <p class="govuk-body-s">Projects uploaded</p>
+  </div>
+
+  <div class="govuk-grid-column-one-third validate-data">
+    <h2 class="govuk-heading-l validate-number">{{ milestones | length }}</h2>
+    <p class="govuk-body-s">Milestones uploaded</p>
+  </div>
+</div>
+
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Project UID</th>
+      <th scope="col" class="govuk-table__header">Milestone UID</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">BEIS-27</td>
+      {# {% if no milestone, display '-' else %} #}
+      <td class="govuk-table__cell">BEIS-27-07</td>
+      {# {% endif %} #}
+    </tr>
+  </tbody>
+</table>
+
+{{ govukDetails({
+  summaryText: "The data uploaded is not what I was expecting",
+  html: "<p class='govuk-body'>If the number of projects and milestones uploaded don't correspond to the number in the 
+  file you uploaded, please log the issue here.</p>
+  <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
+}) }}
+
+<form action="{{ url }}" method="post">
+
+<input type="hidden" name="importId" value="{{ importId }}" />
+
+{{ govukButton({
+  text: "Add data to dashboard",
+  name: "import",
+  type: "submit",
+  preventDoubleClick: true
+}) }}
+
+{{ govukButton({
+  text: "Cancel upload",
+  name: "cancel",
+  type: "submit",
+  classes: "govuk-button--secondary"
+}) }}
+
+</form>
+
+{% endif %}
 
 </div>
 
