@@ -32,12 +32,6 @@ class BulkUpload extends Page {
       return 'sign-off';
     case paths.dataEntry.bulkUploadFile:
       return 'upload-file';
-    // case paths.dataEntry.bulkUploadFailed:
-    //   return 'upload-failed';
-    // case paths.dataEntry.bulkUploadSuccess:
-    //   return 'upload-success';
-    // case paths.dataEntry.bulkUploadDataLive:
-    //   return 'data-live';
     default:
       return 'upload-file';
     }

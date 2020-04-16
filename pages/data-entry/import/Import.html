@@ -1,98 +1,188 @@
 {% extends "template.njk" %}
 
-{% block pageTitle %}{{ index }}{% endblock %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}Import data{% endblock %}
 
 {% block content %}
 
-{% if flash %}
-  {{ flash }}
-{% endif %}
+<div class="govuk-grid-row">
+<div class="govuk-grid-column-full">
 
 {% if errors | length %}
-  {% if errors.projectColumnErrors %}
-  <h1>COLOUMN</h1>
-    <table width="100%">
-      {% for error in errors.projectColumnErrors %}
-        <tr>
-          <td>{{ error.error }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% endif %}
 
-  <br><br>
+<h1 class="govuk-heading-xl">Upload failed
+<span class="govuk-caption-xl">No data has been uploaded</span>
+</h1>
 
-  {% if errors.milestoneColumnErrors %}
-    <table width="100%">
-      {% for error in errors.milestoneColumnErrors %}
-        <tr>
-          <td>{{ error.error }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% endif %}
+<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+  <h2 class="govuk-error-summary__title" id="error-summary-title">
+    Please fix the errors detailed below and then re-upload the file
+  </h2>
+  <div class="govuk-error-summary__body">
+    <ul class="govuk-list govuk-error-summary__list">
+    {# {% if project errors exist %} #}
+      <li>
+        <a href="#project-error">number Project data errors found</a>
+      </li>
+     {# {% endif %} #}
+     {# {% if milestone errors exist %} #}
+      <li>
+        <a href="#milestone-error">number Milestone data errors found</a>
+      </li>
+      {# {% endif %} #}
+    </ul>
+  </div>
+</div>
 
-  <br><br>
+{% if errors.projectColumnErrors %}
+<h3 class="govuk-heading-m" id="project-error">Project data errors</h3>
 
-  {% if errors.projectErrors %}
-    <h1>something else! </h1>
+{{ govukDetails({
+  summaryText: "Where do I fix project data errors?",
+  html: "<p class='govuk-body'>To fix the Project data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Projects' tab, which is illustrated in the image below.</p>"
+}) }}
 
-    <table width="100%">
-      <tr>
-        <td>Project UID</td>
-        <td>Column Name</td>
-        <td>Value</td>
-        <td>Error Type</td>
-      </tr>
-      {% for error in errors.projectErrors %}
-        <tr>
-          <td>{{ error.item.uid }}</td>
-          <td>{{ error.itemDefinition.importColumnName }}</td>
-          <td>{{ error.item[error.itemDefinition.name] }}</td>
-          <td>{{ error.error }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% endif %}
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Project UID</th>
+      <th scope="col" class="govuk-table__header">Data</th>
+      <th scope="col" class="govuk-table__header">Error type</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">BEIS-27</td>
+      <td class="govuk-table__cell">Project title</td>
+      <td class="govuk-table__cell">Missing theme</td>
+    </tr>
+  </tbody>
+</table>
+{% endif %}
 
-  <br><br>
+{# {% if milestone errors exist %} #}
+<h3 class="govuk-heading-m" id="milestone-error">Milestone data errors</h3>
 
-  {% if errors.milestoneErrors %}
-    <table width="100%">
-      <tr>
-        <td>Milestone UID</td>
-        <td>Column Name</td>
-        <td>Value</td>
-        <td>Error Type</td>
-      </tr>
-      {% for error in errors.milestoneErrors %}
-        <tr>
-          <td>{{ error.item.uid }}</td>
-          <td>{{ error.itemDefinition.importColumnName }}</td>
-          <td>{{ error.item[error.itemDefinition.name] }}</td>
-          <td>{{ error.error }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  {% endif %}
+{{ govukDetails({
+  summaryText: "Where do I fix milestone data errors?",
+  html: "<p class='govuk-body'>To fix the Milestone data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Milestones' tab, which is illustrated in the image below.</p>"
+}) }}
+
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Milestone UID</th>
+      <th scope="col" class="govuk-table__header">Data</th>
+      <th scope="col" class="govuk-table__header">Error type</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">BEIS-33-01</td>
+      <td class="govuk-table__cell">What is your confidence in delivery of this milestone?</td>
+      <td class="govuk-table__cell">Missing value</td>
+    </tr>
+  </tbody>
+</table>
+{# {% endif %} #}
 
   <form action='{{ url }}' method='POST'>
+
     <input type="hidden" name="importId" value="{{ importId }}" />
-    <input type="submit" name="cancel" value="Cancel" />
+    
+    {{ govukButton({
+    text: "Re-upload file",
+    name: "cancel",
+    value: "cancel",
+    type: "submit",
+    preventDoubleClick: true
+  }) }}
+
   </form>
+
 {% else %}
 
-  Total projects: {{ projects | length }}
-  <br><br>
-  Total milestones: {{ milestones | length }}
+<h1 class="govuk-heading-xl">Please check your data</h1>
 
-  <form action='{{ url }}' method='POST'>
-    <input type="hidden" name="importId" value="{{ importId }}" />
-    <input type="submit" name="import" value="Import" />
-    <input type="submit" name="cancel" value="Cancel" />
-  </form>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
+  <p class="govuk-body">Please check that the data in your file corresponds the number of projects and milestones 
+    successfully uploaded to the dashboard.</p>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-third validate-data">
+    <h2 class="govuk-heading-l validate-number">{{ projects | length }}</h2>
+    <p class="govuk-body-s">Projects uploaded</p>
+  </div>
+
+  <div class="govuk-grid-column-one-third validate-data">
+    <h2 class="govuk-heading-l validate-number">{{ milestones | length }}</h2>
+    <p class="govuk-body-s">Milestones uploaded</p>
+  </div>
+</div>
+
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Project UID</th>
+      <th scope="col" class="govuk-table__header">Milestone UID</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">BEIS-27</td>
+      {# {% if no milestone, display '-' else %} #}
+      <td class="govuk-table__cell">BEIS-27-07</td>
+      {# {% endif %} #}
+    </tr>
+  </tbody>
+</table>
+
+{{ govukDetails({
+  summaryText: "The data uploaded is not what I was expecting",
+  html: "<p class='govuk-body'>If the number of projects and milestones uploaded don't correspond to the number in the 
+  file you uploaded, please log the issue here.</p>
+  <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
+}) }}
+
+<form action="{{ url }}" method="post">
+
+<input type="hidden" name="importId" value="{{ importId }}" />
+
+{{ govukButton({
+  text: "Add data to dashboard",
+  name: "import",
+  value: "import",
+  type: "submit",
+  preventDoubleClick: true
+}) }}
+
+{{ govukButton({
+  text: "Cancel upload",
+  value: "cancel",
+  name: "cancel",
+  type: "submit",
+  classes: "govuk-button--secondary",
+  preventDoubleClick: true
+}) }}
+
+</form>
 
 {% endif %}
 
+</div>
+</div>
+
 {% endblock %}
+
+
+
+
+

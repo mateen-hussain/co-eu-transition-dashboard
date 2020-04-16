@@ -47,10 +47,8 @@
       "bulkUploadProjectMilestone": "/bulk-upload/project-milestone",
       "bulkUploadSignOff": "/bulk-upload/sign-off",
       "bulkUploadFile": "/bulk-upload/upload-file",
-      "bulkUploadFailed": "/bulk-upload/upload-failed",
-      "bulkUploadSuccess": "/bulk-upload/upload-success",
-      "bulkUploadDataLive": "/bulk-upload/data-live",
-      "import": "/import"
+      "import": "/import",
+      "submissionSuccess": "/submission-success"
     }
   },
   "features": {
