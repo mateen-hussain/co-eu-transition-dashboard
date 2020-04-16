@@ -1,17 +1,7 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
 const sequelize = require('services/sequelize');
-
-const parseDateExcel = (excelTimestamp) => {
-  const secondsInDay = 24 * 60 * 60;
-  const excelEpoch = new Date(1899, 11, 31);
-  const excelEpochAsUnixTimestamp = excelEpoch.getTime();
-  const missingLeapYearDay = secondsInDay * 1000;
-  const delta = excelEpochAsUnixTimestamp - missingLeapYearDay;
-  const excelTimestampAsUnixTimestamp = excelTimestamp * secondsInDay * 1000;
-  const parsed = excelTimestampAsUnixTimestamp + delta;
-  return isNaN(parsed) ? null : parsed;
-};
+const { truthy } = require('./utils');
 
 const groupSearchItems = async (search, overrides = {}) => {
   const groupedSearch = { project: {}, milestone: {}, projectField: [], milestoneField: {} };
@@ -55,44 +45,7 @@ const transformForView = model => {
     }, new Map());
 };
 
-const truthy = [true, 'true', 'yes', 1, '1', 'y'];
-const falsey = [false, 'false', 'no', 0, '0', 'n'];
-
-const isBool = value => [...truthy, ...falsey].includes(value);
-
-const validateFieldEntryValue = function(val = '') {
-  if(!this.projectField) return true;
-
-  const value = String(val).trim();
-
-  switch(this.projectField.type) {
-  case 'boolean':
-    if (!isBool(String(value || '').toLowerCase())) {
-      throw Error(`"${value}" is not a valid boolean`);
-    }
-    break;
-  case 'integer':
-  case 'float':
-    if(isNaN(value)) {
-      throw Error(`"${value}" is not a valid number`);
-    }
-    break;
-  case 'date':
-    if(!moment(value, 'YYYY-MM-DD').isValid()) {
-      throw Error(`"${value}" is not a valid date`);
-    }
-    break;
-  case 'group':
-    if(!this.projectField.config.options.includes(value)) {
-      throw Error(`"${value}" must match one of the following: ${this.projectField.config.options.join(', ')}`);
-    }
-    break;
-  }
-
-  return true;
-};
-
-const parseFieldEntryValue = (value, type, forDatabase = false) => {
+const parseFieldEntryValue = (value, type) => {
   if(type) {
     switch(type) {
     case 'boolean':
@@ -105,20 +58,7 @@ const parseFieldEntryValue = (value, type, forDatabase = false) => {
       value = parseFloat(value);
       break;
     case 'date':
-      if( forDatabase ) {
-        if (String(value || '').includes('/')) {
-          value = moment(value, 'DD/MM/YYYY').format('YYYY-MM-DD');
-        } else {
-          const date = moment(parseDateExcel(value));
-          if(date.isValid()) {
-            value = date.format('YYYY-MM-DD');
-          } else {
-            value = moment(value).format('YYYY-MM-DD');
-          }
-        }
-      } else {
-        value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
-      }
+      value = moment(value, 'YYYY-MM-DD').format('DD/MM/YYYY');
       break;
     }
   }
@@ -151,7 +91,6 @@ const createFilterOptions = (attribute, options) => {
 module.exports = {
   transformForView,
   parseFieldEntryValue,
-  validateFieldEntryValue,
   createFilterOptions,
   groupSearchItems
 };

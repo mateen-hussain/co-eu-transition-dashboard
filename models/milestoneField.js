@@ -13,6 +13,10 @@ MilestoneField.init({
   displayName: {
     field: "display_name",
     type: STRING(300),
+  },
+  importColumnName: {
+    field: "import_column_name",
+    type: STRING(300),
   }
 }, { sequelize, modelName: 'milestoneField', tableName: 'milestone_field', timestamps: false });
 

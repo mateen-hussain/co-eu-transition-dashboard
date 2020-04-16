@@ -1,20 +1,24 @@
 const { expect, sinon } = require('test/unit/util/chai');
-const xlsx = require('node-xlsx');
+const xlsx = require('xlsx');
 const xlsxService = require('services/xlsx');
 
-const sampleDocument = [{ data: [['header 1', 'header 2', 'header 3'], ['item 1', 'item 2', 'item 3']] }];
+const sampleDocument = { Sheets: { sheet1: { foo: 'foo', bar: 'bar' }, sheet2: { baz: 'baz' } } };
 
 describe('services/xlsx', () => {
   beforeEach(() => {
-    sinon.stub(xlsx, 'parse').returns(sampleDocument);
+    sinon.stub(xlsx.utils, 'sheet_to_json').returnsArg(0);
+    sinon.stub(xlsx, 'read').returns(sampleDocument);
   });
 
   afterEach(() => {
-    xlsx.parse.restore();
+    xlsx.read.restore();
+    xlsx.utils.sheet_to_json.restore();
   });
 
   it('should convert an excel document into a collection', () => {
-    const collection = xlsxService.parse(sampleDocument);
-    expect(collection[0]).to.eql([{ 'header 1': 'item 1', 'header 2': 'item 2', 'header 3': 'item 3' }]);
+    const collection = xlsxService.parse(sampleDocument)
+    sinon.assert.calledWith(xlsx.read, sampleDocument, { cellDates: true });
+    sinon.assert.calledTwice(xlsx.utils.sheet_to_json);
+    expect(collection).to.eql([{ foo: 'foo', bar: 'bar' }, { baz: 'baz' }]);
   });
 });

@@ -20,7 +20,8 @@
   "paths": {
     "start": "/entry",
     "admin": {
-      "import": "/admin/import"
+      "import": "/admin/import",
+      "upload": "/admin/upload"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",

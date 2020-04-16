@@ -2,8 +2,28 @@ const { Model, STRING, INTEGER, TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const MilestoneField = require('./milestoneField');
+const MilestoneFieldEntryAudit = require('./milestoneFieldEntryAudit');
 
 class MilestoneFieldEntry extends Model {
+  static async import(milestoneFieldEntry, options) {
+    if (!milestoneFieldEntry.value) {
+      return
+    }
+
+    const existingField = await MilestoneFieldEntry.findOne({
+      where: {
+        milestoneUid: milestoneFieldEntry.milestoneUid,
+        fieldId: milestoneFieldEntry.fieldId
+      }
+    });
+
+    if (existingField) {
+      await MilestoneFieldEntryAudit.create(existingField.toJSON(), options);
+    }
+
+    await this.upsert(milestoneFieldEntry, options);
+  }
+
   get fields() {
     const milestoneField = this.get('milestoneField');
     return new Map().set(milestoneField.name, {
@@ -31,18 +51,10 @@ MilestoneFieldEntry.init({
     get() {
       if (!this.getDataValue('value')) return;
       const value = this.getDataValue('value').toString('utf8');
-      return modelUtils.parseFieldEntryValue(value, this.get('milestoneField').get('type'))
-    },
-    set(value) {
-      if (!this.milestoneField) {
-        return this.setDataValue('value', value)
-      }
-
-      return this.setDataValue('value', value);
-    },
-    validate: {
-      isValid(val) {
-        return modelUtils.validateFieldEntryValue.call(this, val);
+      if (this.get('milestoneField')) {
+        return modelUtils.parseFieldEntryValue(value, this.get('milestoneField').get('type'));
+      } else {
+        return value;
       }
     }
   }
