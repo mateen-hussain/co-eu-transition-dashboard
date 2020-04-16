@@ -13,7 +13,7 @@
     }
   },
   "features": {
-    "missedMilestones": true,
-    "upcomingMilestonesChart": true
+    "missedMilestones": false,
+    "upcomingMilestonesChart": false
   }
 }
