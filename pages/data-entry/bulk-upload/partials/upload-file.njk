@@ -7,7 +7,7 @@
 
 <h1 class="govuk-heading-xl">Upload your file</h1>
 
-{% if error %}
+{% if flash %}
 {{ govukErrorSummary({
   titleText: "There is a problem",
   errorList: [
@@ -33,23 +33,23 @@
   <li>Upload the file below</li>
 </ol>
 
-{# <form action="{{ url }}" method="post"> #}
+<form action="{{ url }}" method="post" encType="multipart/form-data">
 
 {{ govukFileUpload({
   id: "file-upload",
-  name: "file-upload",
+  name: "import",
   label: {
     text: "Upload a file"
   }
 }) }}
 
-{# {{ govukButton({
+{{ govukButton({
   text: "Upload",
   type: "submit",
   preventDoubleClick: true
-}) }} #}
+}) }}
 
-{# </form> #}
+</form>
 
 {{ govukButton({
   text: "Upload Fail",
