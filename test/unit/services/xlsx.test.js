@@ -81,6 +81,6 @@ describe('services/xlsx', () => {
         '!meta': { foo: 'bar' }
       }
       expect(xlsxService.getRange(sheetData)).to.eql('B1:B2');
-    })
+    });
   });
 });

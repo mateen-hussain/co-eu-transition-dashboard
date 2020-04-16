@@ -161,5 +161,5 @@ describe('helpers/validation', () => {
       expect(data.projects).to.eql([]);
       expect(data.milestones).to.eql([]);
     });
-  })
+  });
 });
