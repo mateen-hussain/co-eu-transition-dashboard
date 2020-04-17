@@ -8,6 +8,7 @@ const config = require('config');
 const BulkImport = require('models/bulkImport');
 const uuid = require('uuid');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
+const logger = require('services/logger');
 
 class BulkUpload extends Page {
   get url() {
@@ -16,7 +17,7 @@ class BulkUpload extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['user']),
+      ...authentication.protect(['admin']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -38,12 +39,12 @@ class BulkUpload extends Page {
   }
 
   async importData(req) {
-    const [projects, milestones] = xlsx.parse(req.files.import.data);
+    const data = xlsx.parse(req.files.import.data);
 
     await BulkImport.create({
       id: uuid.v4(),
       userId: req.user.id,
-      data: { projects, milestones }
+      data
     });
   }
 
@@ -51,7 +52,7 @@ class BulkUpload extends Page {
     switch(this.mode) {
     case 'upload-file':
       if (!req.files) {
-        req.flash('Error no file uploaded');
+        req.flash('Please upload a completed MI Excel spreadsheet in order to continue');
         return res.redirect(this.url);
       }
       try {
@@ -59,6 +60,7 @@ class BulkUpload extends Page {
         res.redirect(config.paths.dataEntry.import);
       } catch (error) {
         req.flash('Error parsing excel file, please check the file and try again');
+        logger.error(`Error uploading excel document: ${error}`);        
         return res.redirect(this.url);
       }
       break;
@@ -67,20 +69,21 @@ class BulkUpload extends Page {
     }
   }
 
-  // async getRequest(req, res) {
-  //   const activeImport = await BulkImport.findOne({
-  //     where: {
-  //       userId: req.user.id
-  //     }
-  //   });
+  async getRequest(req, res) {
+    const activeImport = await BulkImport.findOne({
+      where: {
+        userId: req.user.id
+      }
+    });
 
-  //   if (activeImport) {
-  //     return res.redirect(config.paths.admin.import);
-  //   }
+    if (activeImport) {
+      return res.redirect(config.paths.dataEntry.import);
+    }
 
-  //   super.getRequest(req, res);
-  // }
+    super.getRequest(req, res);
+  }
 }
+
 
 module.exports = BulkUpload;
 

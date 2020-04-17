@@ -20,7 +20,7 @@ class Import extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['user']),
+      ...authentication.protect(['admin']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -55,19 +55,30 @@ class Import extends Page {
     return [columnErrors, itemErrors];
   }
 
-  async validateImport(activeImport) {
-    const projectFields = await Project.fieldDefintions();
-    const milestoneFields = await Milestone.fieldDefintions();
+  async validateProjects(projects) {
+    const projectFields = await Project.fieldDefintions(this.req.user);
 
-    const parsedProjects = parse.parseItems(activeImport.data.projects, projectFields);
-    const parsedMilestones = parse.parseItems(activeImport.data.milestones, milestoneFields);
+    const parsedProjects = parse.parseItems(projects, projectFields);
+    if (!parsedProjects.length) {
+      return {};
+    }
 
     const [
       projectColumnErrors,
       projectErrors
-    ] = this.validateItems(activeImport.data.projects, parsedProjects, projectFields);
+    ] = this.validateItems(projects, parsedProjects, projectFields);
 
-    // Ensure that milestone project_uid matches a project uid
+    return { projectErrors, projectColumnErrors, parsedProjects };
+  }
+
+  async validateMilestones(milestones, parsedProjects) {
+    const milestoneFields = await Milestone.fieldDefintions();
+
+    const parsedMilestones = parse.parseItems(milestones, milestoneFields);
+    if (!parsedMilestones.length) {
+      return {};
+    }
+
     const projectUidField = milestoneFields.find(milestoneField => milestoneField.name === 'projectUid');
     projectUidField.config = { options: parsedProjects.map(project => project['uid']) };
     projectUidField.type = 'group';
@@ -75,7 +86,32 @@ class Import extends Page {
     const [
       milestoneColumnErrors,
       milestoneErrors
-    ] = this.validateItems(activeImport.data.milestones, parsedMilestones, milestoneFields);
+    ] = this.validateItems(milestones, parsedMilestones, milestoneFields);
+
+    return { milestoneErrors, milestoneColumnErrors, parsedMilestones };
+  }
+
+  async validateImport(importData) {
+    const data = validation.validateSheetNames(importData.data);
+
+    if (data.errors.length) {
+      return {
+        errors: { sheetErrors: data.errors },
+        importId: importData.id
+      };
+    }
+
+    const {
+      projectErrors,
+      projectColumnErrors,
+      parsedProjects
+    } = await this.validateProjects(data.projects);
+
+    const {
+      milestoneErrors,
+      milestoneColumnErrors,
+      parsedMilestones
+    } = await this.validateMilestones(data.milestones, parsedProjects);
 
     const errors = { projectErrors, milestoneErrors, projectColumnErrors, milestoneColumnErrors };
 
@@ -83,7 +119,7 @@ class Import extends Page {
       errors: removeNulls(errors, 1),
       projects: parsedProjects,
       milestones: parsedMilestones,
-      importId: activeImport.id
+      importId: importData.id
     };
   }
 

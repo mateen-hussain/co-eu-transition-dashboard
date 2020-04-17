@@ -90,11 +90,13 @@
                 All data
               </a>
             </li>
+            {% if req.user.role == 'admin' %}
             <li class="govuk-header__navigation-item {% if url == config.paths.dataEntry.addData %} govuk-header__navigation-item--active {% endif %}">
               <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.addData }}">
                 Add data
               </a>
             </li>
+            {% endif %}
           </ul>
         </nav>
 

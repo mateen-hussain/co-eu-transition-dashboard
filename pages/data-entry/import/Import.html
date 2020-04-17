@@ -3,6 +3,22 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{% if errors | length %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#",
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% else %}
+  {% include "feedback.njk" %}
+{% endif %}
+{% endblock %}
 
 {% block pageTitle %}Import data{% endblock %}
 
@@ -23,6 +39,11 @@
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
+      {% if errors.sheetErrors %}
+      <li>
+        <a href="#excel-sheet-error">{{ errors.sheetErrors | length }} Excel sheet errors found</a>
+      </li>
+      {% endif %}
     {% if errors.projectErrors or errors.projectColumnErrors %}
       <li>
         <a href="#project-error">{{ errors.projectErrors | length + errors.projectColumnErrors | length }} Project data errors found</a>
@@ -37,12 +58,22 @@
   </div>
 </div>
 
+  {% if errors.sheetErrors %}
+    <h3 class="govuk-heading-m" id="excel-sheet-error">Excel sheet errors</h3>
+      <ul class="govuk-list">
+      {% for error in errors.sheetErrors %}
+        <li>{{ error.error }}</li>
+      {% endfor %}
+      </ul>
+  {% endif %}
+
 {% if errors.projectErrors or errors.projectColumnErrors %}
 <h3 class="govuk-heading-m" id="project-error">Project errors</h3>
 
 {{ govukDetails({
   summaryText: "Where do I fix project errors?",
-  html: "<p class='govuk-body'>To fix the Project data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Projects' tab, which is illustrated in the image below.</p>"
+  html: "<p class='govuk-body'>To fix the Project data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Projects' tab, which is illustrated in the image below.</p>
+  <img src='/assets/images/project-screenshot.png'>"
 }) }}
 
 {% if errors.projectErrors %}
@@ -69,7 +100,7 @@
 {% endif %}
 
   {% if errors.projectColumnErrors %}
-    <p class="govuk-body">Project coloumn errors:</p>
+    <h4 class="govuk-heading-s">Project coloumn errors:</h4>
     <ul class="govuk-list">
       {% for error in errors.projectColumnErrors %}
         <li>{{ error.error }}</li>
@@ -84,7 +115,8 @@
 
 {{ govukDetails({
   summaryText: "Where do I fix milestone data errors?",
-  html: "<p class='govuk-body'>To fix the Milestone data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Milestones' tab, which is illustrated in the image below.</p>"
+  html: "<p class='govuk-body'>To fix the Milestone data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Milestones' tab, which is illustrated in the image below.</p>
+  <img src='/assets/images/milestone-screenshot.png'>"
 }) }}
 
 {% if errors.milestoneErrors %}
@@ -111,7 +143,7 @@
 {% endif %}
 
   {% if errors.milestoneColumnErrors %}
-    <p class="govuk-body">Milestone coloumn errors:</p>
+    <h4 class="govuk-heading-s">Milestone coloumn errors:</h4>
     <ul class="govuk-list">
       {% for error in errors.milestoneColumnErrors %}
         <li>{{ error.error }}</li>

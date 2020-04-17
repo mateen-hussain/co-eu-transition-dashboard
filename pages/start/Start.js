@@ -13,7 +13,7 @@ class Start extends Page {
     }
 
     if (req.user.role === 'admin') {
-      return res.redirect(config.paths.admin.import);
+      return res.redirect(config.paths.dataEntry.addData);
     }
 
     if (config.features.missedMilestones){
