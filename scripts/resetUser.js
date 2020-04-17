@@ -31,7 +31,6 @@ authentication.hashPassphrase(passphrase).then( (hashedPassphrase) => {
   }).then( (user) => {
     user.hashedPassphrase = hashedPassphrase;
     user.mustChangePassword = true;
-    user.twofaSecret = null;
     user.loginAttempts = 0;
     user.save().then( () => {
       if (config.notify.apiKey) {
