@@ -59,7 +59,7 @@ class BulkUpload extends Page {
         await this.importData(req, res);
         res.redirect(config.paths.dataEntry.import);
       } catch (error) {
-        req.flash('Error parsing excel file, please check the file and try again');
+        req.flash('Error parsing Excel file, please check the file and try again');
         logger.error(`Error uploading excel document: ${error}`);        
         return res.redirect(this.url);
       }
