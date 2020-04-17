@@ -7,10 +7,12 @@ const helmet = require('middleware/helmet');
 const cookieParser = require('cookie-parser');
 const config = require('config');
 const startPage = require('helpers/startPage');
+const cache = require('middleware/cache');
 
 const app = module.exports = express();
 
 helmet.attach(app);
+cache.preventCache(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
