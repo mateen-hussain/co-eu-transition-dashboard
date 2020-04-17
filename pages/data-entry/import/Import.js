@@ -149,8 +149,7 @@ class Import extends Page {
       this.req.flash('Failed to import data');
       return this.res.redirect(this.url);
     }
-
-    return this.res.redirect(config.paths.dataEntry.bulkUploadFile);
+    return this.res.redirect(config.paths.dataEntry.submissionSuccess);
   }
 
   async removeTemporaryBulkImport(importId) {

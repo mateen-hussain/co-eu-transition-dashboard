@@ -201,12 +201,17 @@
     </tr>
   </thead>
   <tbody class="govuk-table__body">
+    {% for project in projects %}
+      {% set milestone = milestones[loop.index0] %}
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell">BEIS-27</td>
-      {# {% if no milestone, display '-' else %} #}
-      <td class="govuk-table__cell">BEIS-27-07</td>
-      {# {% endif %} #}
+      <td class="govuk-table__cell">{{ project.uid }}</td>
+      {% if milestone.uid %}
+      <td class="govuk-table__cell">{{ milestone.uid }}</td>
+      {% else %}
+      <td class="govuk-table__cell">-</td>
+      {% endif %}
     </tr>
+    {% endfor %}
   </tbody>
 </table>
 
@@ -228,7 +233,7 @@
   type: "submit",
   preventDoubleClick: true
 }) }}
-
+<br>
 {{ govukButton({
   text: "Cancel upload",
   value: "cancel",
