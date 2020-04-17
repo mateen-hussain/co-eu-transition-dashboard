@@ -12,7 +12,6 @@ const cache = require('middleware/cache');
 const app = module.exports = express();
 
 helmet.attach(app);
-cache.preventCache(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -28,6 +27,7 @@ if (config.env === 'development') {
 
 logger.attachRouteLogger(app);
 
+cache.preventCache(app);
 pages.attach(app);
 app.get('/', (req, res) => res.redirect(startPage()));
 
