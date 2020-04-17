@@ -6,7 +6,7 @@ let page = {};
 let res = {};
 let req = {};
 
-describe('pages/impact-definitions/ImpactDefinitions', () => {
+describe('pages/start/Start', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub(), redirect: sinon.stub() };
     req = { cookies: [], user: { role: 'user' } };
@@ -36,7 +36,7 @@ describe('pages/impact-definitions/ImpactDefinitions', () => {
     it('redirects to admin page if user is admin', async() => {
       req.user.role = 'admin';
       await page.handler(req, res);
-      sinon.assert.calledWith(res.redirect, config.paths.admin.import);
+      sinon.assert.calledWith(res.redirect, config.paths.dataEntry.addData);
     });
 
     it('redirects to missedMilestones is feature is active', async() => {

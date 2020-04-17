@@ -126,7 +126,7 @@ describe('helpers/validation', () => {
 
     it('should return errors if an extra coloumn is present', () => {
       const columnsRecieved = ['col1', 'col2', 'col3', 'col4'];
-      expect(validation.validateColumns(columnsRecieved, requiredColumns)).to.eql([{ error: '"col4" column is not reqcognized as a valid column, please either remove or rename.' }]);
+      expect(validation.validateColumns(columnsRecieved, requiredColumns)).to.eql([{ error: '"col4" column is not recognised as a valid column, please either remove or rename.' }]);
     });
   });
 
