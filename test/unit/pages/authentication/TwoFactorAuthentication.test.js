@@ -7,6 +7,7 @@ const jwt = require('services/jwt');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
+const startPage = require('helpers/startPage');
 
 let page = {};
 let req = {};
@@ -42,14 +43,6 @@ describe('pages/authentication/two-factor-authentication/TwoFactorAuthentication
   });
 
   describe('#next', () => {
-    it('redirects to password reset', () => {
-      page.req.user.passwordReset = true;
-
-      page.next();
-
-      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordReset);
-    });
-
     it('redirects to start page', () => {
       page.next();
 
@@ -202,6 +195,28 @@ describe('pages/authentication/two-factor-authentication/TwoFactorAuthentication
       sinon.assert.calledWith(QRCode.toDataURL, 'otpauth_url');
 
       expect(url).to.eql('qr code url');
+    });
+  });
+
+  describe('#handler', () => {
+    it('redirects to start page if user has 2fa and navigating to register url', async () => {
+      page.req.path = '/register';
+      page.req.user.twofaSecret = true;
+      page.req.method = 'get';
+
+      await page.handler(req, res);
+
+      sinon.assert.calledWith(res.redirect, startPage());
+    });
+
+    it('redirects to start page if user has 2fa and navigating to verified url', async () => {
+      page.req.path = '/verified';
+      page.req.user.twofaSecret = true;
+      page.req.method = 'get';
+
+      await page.handler(req, res);
+
+      sinon.assert.calledWith(res.redirect, startPage());
     });
   });
 });

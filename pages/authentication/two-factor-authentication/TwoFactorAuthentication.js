@@ -23,11 +23,7 @@ class TwoFactorAuthentication extends Page {
   }
 
   next() {
-    if(this.req.user.passwordReset) {
-      this.res.redirect(config.paths.authentication.passwordReset);
-    } else {
-      return this.res.redirect(startPage());
-    }
+    return this.res.redirect(startPage());
   }
 
   get mode() {
@@ -108,6 +104,21 @@ class TwoFactorAuthentication extends Page {
     this.saveData({ two_factor_temp_secret: secret.base32 });
 
     return await QRCode.toDataURL(secret.otpauth_url);
+  }
+
+  async handler(req, res) {
+    this.req = req;
+    this.res = res;
+
+    const userHasSetup2FA = this.req.user.twofaSecret;
+    const userIsRegistering2FA = this.mode !== 'verify';
+
+    if (userHasSetup2FA && userIsRegistering2FA) {
+      logger.error('User attempting to re-register 2FA');
+      return res.redirect(startPage());
+    }
+
+    return super.handler(req, res);
   }
 }
 

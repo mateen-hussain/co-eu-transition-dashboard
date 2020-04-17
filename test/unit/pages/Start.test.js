@@ -27,6 +27,12 @@ describe('pages/impact-definitions/ImpactDefinitions', () => {
       config.features.missedMilestones = originalMissedMilestoneFeature;
     });
 
+    it('redirects to password reset', async() => {
+      req.user.passwordReset = true;
+      await page.handler(req, res);
+      sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
+    });
+
     it('redirects to admin page if user is admin', async() => {
       req.user.role = 'admin';
       await page.handler(req, res);
