@@ -15,7 +15,7 @@ let page = {};
 let req = {};
 let res = {};
 
-describe('pages/admin/import/Import', () => {
+describe('pages/data-entry/import/Import', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub() };
     req = { cookies: [] };
