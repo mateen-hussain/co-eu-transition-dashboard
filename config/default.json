@@ -40,7 +40,16 @@
     "projectDetails": "/project-details/:uid",
     "privacyNotice": "/privacy-notice",
     "missedMilestones": "/missed-milestones",
-    "upcomingMilestones": "/upcoming-milestones"
+    "upcomingMilestones": "/upcoming-milestones",
+    "dataEntry": {
+      "addData": "/add-data",
+      "bulkUpload": "/bulk-upload",
+      "bulkUploadProjectMilestone": "/bulk-upload/project-milestone",
+      "bulkUploadSignOff": "/bulk-upload/sign-off",
+      "bulkUploadFile": "/bulk-upload/upload-file",
+      "import": "/import",
+      "submissionSuccess": "/submission-success"
+    }
   },
   "features": {
     "twoFactorAuth": true,

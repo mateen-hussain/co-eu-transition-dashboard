@@ -1,0 +1,28 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+<div class="govuk-grid-column-two-thirds">
+
+<h1 class="govuk-heading-xl">Bulk upload project and milestone data</h1>
+
+<p class="govuk-body">If you are updating multiple pieces of project and milestone information from an excel spreadsheet, upload your 
+file here to quickly submit it to the dashboard. <p>
+
+{{ govukWarningText({
+  text: "Before uploading any data to the dashboard, you must ensure it has been signed off by the Senior Reporting Officer.",
+  iconFallbackText: "Warning"
+}) }}
+
+<p class="govuk-body">Your file must match the current MI commision template. If your file does not match this template, the upload function will not work. <p>
+
+<p class="govuk-body">Make sure your document template is up to date.<p>
+
+<a class="govuk-link" href="/assets/files/OS_2020.04.09_Clean Commission Sheet (no data).xlsx" download>Download the latest template for the MI commission (last updated on 09 April 2020)</a>
+<br><br><br>
+
+{{ govukButton({
+  text: "Upload",
+  href: config.paths.dataEntry.bulkUploadSignOff
+}) }}
+
+</div>

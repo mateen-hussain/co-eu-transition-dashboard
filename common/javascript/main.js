@@ -3,11 +3,13 @@ import govukFrontend from 'govuk-frontend/govuk/all';
 import missedMilestonesChart from './missed-milestones';
 import upcomingMilestoneChart from './upcoming-milestones';
 import removeAccordionCross from './remove-accordion-cross';
+import disableButton from './disable-button';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
   upcomingMilestoneChart,
-  removeAccordionCross
+  removeAccordionCross,
+  disableButton
 };
 
 document.addEventListener('DOMContentLoaded', function() {

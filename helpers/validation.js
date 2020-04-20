@@ -111,7 +111,7 @@ const validateColumns = (columnsRecieved, requiredColumns) => {
   columnsRecieved.forEach(columnRecieved => {
     const isExtraColumn = !requiredColumns.includes(columnRecieved);
     if(isExtraColumn) {
-      errors.push({ error: `"${columnRecieved}" column is not reqcognized as a valid column, please either remove or rename.` });
+      errors.push({ error: `"${columnRecieved}" column is not recognised as a valid column, please either remove or rename.` });
     }
   });
 
