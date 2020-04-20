@@ -8,7 +8,6 @@ const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
 const sequelize = require('services/sequelize');
-const maximumLoginAttempts = 3;
 
 const hashPassphrase = passphrase => {
   try {
@@ -28,7 +27,7 @@ const authenticateLogin = async (email, password, done) => {
     return done(error);
   }
 
-  if(user.loginAttempts >= maximumLoginAttempts) {
+  if(user.loginAttempts >= config.users.maximumLoginAttempts) {
     const error = new Error('Maximum login attempts exeeded');
     error.maximumLoginAttempts = true;
     return done(error);
@@ -36,7 +35,7 @@ const authenticateLogin = async (email, password, done) => {
 
   const passwordMatches = await bcrypt.compare(password, user.hashedPassphrase);
   if (!passwordMatches) {
-    await user.increment("loginAttempts")
+    await user.increment("loginAttempts");
     const error = new Error('Password doest not match');
     return done(error);
   }
@@ -51,7 +50,11 @@ const localStrategy = new passportLocalStrategy({
 }, authenticateLogin);
 passport.use(localStrategy);
 
-const authenticateUser = (jwtPayload, cb) => {
+const authenticateUser = (jwtPayload = {}, cb) => {
+  if (!jwtPayload.id) {
+    return cb(null, false, 'User not authenticated');
+  }
+
   return User.findOne({
     where: {
       id: jwtPayload.id
@@ -110,7 +113,8 @@ const protectNo2FA = passport.authenticate('jwt', {
 
 const login = (req, res, callback) => {
   return passport.authenticate('local', {
-    session: false
+    session: false,
+    failureRedirect: config.paths.authentication.login
   }, callback)(req, res);
 };
 

@@ -15,7 +15,8 @@
     "saltRounds": 10
   },
   "users": {
-    "minimumPasswordLength": 8
+    "minimumPasswordLength": 8,
+    "maximumLoginAttempts": 3
   },
   "paths": {
     "start": "/entry",

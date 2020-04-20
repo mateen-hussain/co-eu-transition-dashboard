@@ -9,8 +9,8 @@ const flash = (req, res, next) => {
     jwt.saveData(req, res, { flash: undefined });
   }
 
-  req.flash = message => {
-    return jwt.saveData(req, res, { flash: message });
+  req.flash = (message, restoreData) => {
+    return jwt.saveData(req, res, { flash: message }, restoreData);
   };
 
   next();

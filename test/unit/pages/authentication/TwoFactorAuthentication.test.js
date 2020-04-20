@@ -82,7 +82,11 @@ describe('pages/authentication/two-factor-authentication/TwoFactorAuthentication
   describe('#verify2FA', () => {
     beforeEach(() => {
       page.req.body = { sixDigit: 'sixDigit' };
-      page.req.user = { twofaSecret: 'secret' };
+      page.req.user = {
+        twofaSecret: 'secret',
+        increment: sinon.stub(),
+        reload: sinon.stub()
+      };
       page.req.flash = sinon.stub();
       page.res.redirect = sinon.stub();
     });
@@ -110,6 +114,24 @@ describe('pages/authentication/two-factor-authentication/TwoFactorAuthentication
 
       sinon.assert.notCalled(page.req.flash);
       sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.login);
+      sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.twoFactorAuthenticationVerify);
+    });
+
+    it(`redirects and calls flash if user entered incorrect 2FA code ${config.users.maximumLoginAttempts} times`, async () => {
+      authentication.verify2FA.returns(false);
+      page.req.user.loginAttempts = 2;
+
+      page.req.user.reload.callsFake(() => {
+        page.req.user.loginAttempts = config.users.maximumLoginAttempts;
+      });
+
+      await page.verify2FA();
+
+      sinon.assert.calledWith(page.req.user.increment, 'loginAttempts');
+      sinon.assert.called(page.req.user.reload);
+
+      sinon.assert.calledWith(page.req.flash, `Too many incorrect login attempts have been made, your account is now locked, please contact us.`, false);
+      sinon.assert.calledWith(page.res.redirect, config.paths.authentication.login);
       sinon.assert.neverCalledWith(page.res.redirect, config.paths.authentication.twoFactorAuthenticationVerify);
     });
   });

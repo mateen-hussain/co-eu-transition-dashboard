@@ -57,6 +57,16 @@ class TwoFactorAuthentication extends Page {
 
     if (!verified) {
       logger.error('User entered incorrect 2FA code');
+
+      await this.req.user.increment("loginAttempts");
+      await this.req.user.reload();
+
+      if(this.req.user.loginAttempts >= config.users.maximumLoginAttempts) {
+        logger.error('Maximum 2FA attempts exeeded');
+        this.req.flash(`Too many incorrect login attempts have been made, your account is now locked, please contact us.`, false);
+        return this.res.redirect(paths.authentication.login);
+      }
+
       this.req.flash(`Incorrect code entered`);
       return this.res.redirect(config.paths.authentication.twoFactorAuthenticationVerify);
     }
