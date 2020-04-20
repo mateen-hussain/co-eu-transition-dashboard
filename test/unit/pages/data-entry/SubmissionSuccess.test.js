@@ -7,13 +7,13 @@ let page = {};
 
 describe('pages/data-entry/submission-success/SubmissionSuccess', () => {
   beforeEach(() => {
-    const AddData = require('pages/data-entry/submission-success/SubmissionSuccess');
+    const SubmissionSuccess = require('pages/data-entry/submission-success/SubmissionSuccess');
 
     const res = { cookies: sinon.stub() };
 
     const req = { cookies: [] };
 
-    page = new AddData('some path', req, res);
+    page = new SubmissionSuccess('some path', req, res);
 
     sinon.stub(jwt, 'restoreData');
 

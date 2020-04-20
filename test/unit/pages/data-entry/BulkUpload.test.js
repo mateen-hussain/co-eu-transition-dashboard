@@ -8,7 +8,7 @@ const jwt = require('services/jwt');
 const fileUploadMock = sinon.stub();
 fileUploadMock.returns(fileUploadMock);
 
-const Import = proxyquire('pages/data-entry/bulk-upload/BulkUpload', {
+const BulkUpload = proxyquire('pages/data-entry/bulk-upload/BulkUpload', {
   'express-fileupload': fileUploadMock
 });
 
@@ -21,7 +21,7 @@ describe('pages/data-entry/bulk-upload/BulkUpload', () => {
     res = { cookies: sinon.stub() };
     req = { cookies: [] };
 
-    page = new Import('some path', req, res);
+    page = new BulkUpload('some path', req, res);
 
     sinon.stub(jwt, 'restoreData');
 
