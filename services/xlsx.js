@@ -1,4 +1,5 @@
 const xlsx = require('xlsx');
+const { expectedSheets } = require('helpers/validation');
 
 const headerRowIdentifer = ['UID', 'Project UID'];
 
@@ -15,7 +16,7 @@ const getFirstHeaderCell = sheet => {
     .filter(ref => ref.indexOf('!') === -1);
 
   const firstCellWithData = cellReferences.find(cellReference => {
-    const cellValue = sheet[cellReference].v;
+    const cellValue = String(sheet[cellReference].v).trim();
     return headerRowIdentifer.includes(cellValue);
   });
 
@@ -59,25 +60,44 @@ const getRange = sheet => {
   return `${firstCellWithData}:${lastCellWithData}`;
 };
 
+const removeEmptyKeyValuePairs = data => {
+  return data.map(d => {
+    Object.keys(d).forEach(columnName => {
+      if(columnName.includes('__EMPTY')) {
+        delete d[columnName];
+      }
+    });
+    return d;
+  });
+};
+
+const cleanData = data => {
+  data = removeSubHeaderRows(data);
+  data = removeEmptyKeyValuePairs(data);
+  return data;
+};
+
 const parse = buffer => {
   const excelDocument = xlsx.read(buffer, { cellDates: true });
 
-  return Object.keys(excelDocument.Sheets).map(name => {
-    const sheet = excelDocument.Sheets[name];
-    const range = getRange(sheet);
+  return Object.keys(excelDocument.Sheets)
+    .filter(sheetName => expectedSheets.includes(sheetName))
+    .map(name => {
+      const sheet = excelDocument.Sheets[name];
+      const range = getRange(sheet);
 
-    const data = xlsx.utils.sheet_to_json(sheet, {
-      raw: true,
-      defval: '',
-      range,
-      blankrows: false
+      let data = xlsx.utils.sheet_to_json(sheet, {
+        raw: true,
+        defval: '',
+        range,
+        blankrows: false
+      });
+
+      return {
+        name,
+        data: cleanData(data)
+      };
     });
-
-    return {
-      name,
-      data: removeSubHeaderRows(data)
-    };
-  });
 };
 
 module.exports = {

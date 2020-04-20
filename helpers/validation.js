@@ -1,5 +1,9 @@
 const moment = require('moment');
 const { truthy, falsey } = require('./utils');
+const expectedSheets = [
+  'Projects',
+  'Milestones'
+];
 
 const validateBool = value => {
   const isABoolean = [...truthy, ...falsey].includes(String(value).toLowerCase());
@@ -123,14 +127,14 @@ const validateSheetNames = (sheets = []) => {
   const errors = [];
   const data = {};
 
-  Object.keys(sheetsMap).forEach(dataName => {
-    const excelSheetName = sheetsMap[dataName];
+  expectedSheets.forEach(sheetName => {
+    const excelSheetName = sheetsMap[sheetName.toLowerCase()];
     const found = sheets.find(sheet => sheet.name === excelSheetName);
 
     if(!found) {
       errors.push({ error: `"${excelSheetName}" sheet was not found in the excel document uploaded` });
     } else {
-      data[dataName] = found.data;
+      data[sheetName.toLowerCase()] = found.data;
     }
   });
 
@@ -152,5 +156,6 @@ module.exports = {
   validateIsRequired,
   validateIsUnique,
   validateValue,
-  validateSheetNames
+  validateSheetNames,
+  expectedSheets
 };

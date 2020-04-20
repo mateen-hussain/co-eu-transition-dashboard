@@ -4,50 +4,50 @@ const xlsxService = require('services/xlsx');
 
 describe('services/xlsx', () => {
   describe('#parse', () => {
-    const sampleExcelDocument = {
-      Sheets: {
-        sheet1: {
-          '!ref': 'A1:A4',
-          'A1': {
-            t: 's',
-            v: 'UID'
+    let sampleExcelDocument = {};
+    beforeEach(() => {
+      sampleExcelDocument = {
+        Sheets: {
+          Projects: {
+            '!ref': 'A1:A4',
+            'A1': {
+              t: 's',
+              v: 'UID'
+            },
+            'A2': {
+              t: 's',
+              v: '[Set by CO]'
+            },
+            'A3': {
+              t: 's',
+              v: 'unique id 1',
+            },
+            'A4': {
+              t: 's',
+              v: 'unique id 2',
+            }
           },
-          'A2': {
-            t: 's',
-            v: '[Set by CO]'
-          },
-          'A3': {
-            t: 's',
-            v: 'unique id 1',
-          },
-          'A4': {
-            t: 's',
-            v: 'unique id 2',
-          }
-        },
-        sheet2: {
-          '!ref': 'A1:A4',
-          'A1': {
-            t: 's',
-            v: 'Project UID'
-          },
-          'A2': {
-            t: 's',
-            v: 'The UID of the project these milestones cover'
-          },
-          'A3': {
-            t: 's',
-            v: 'unique id 1',
-          },
-          'A4': {
-            t: 's',
-            v: 'unique id 2',
+          Milestones: {
+            '!ref': 'A1:A4',
+            'A1': {
+              t: 's',
+              v: 'Project UID'
+            },
+            'A2': {
+              t: 's',
+              v: 'The UID of the project these milestones cover'
+            },
+            'A3': {
+              t: 's',
+              v: 'unique id 1',
+            },
+            'A4': {
+              t: 's',
+              v: 'unique id 2',
+            }
           }
         }
-      }
-    };
-
-    beforeEach(() => {
+      };
       sinon.stub(xlsx, 'read').returns(sampleExcelDocument);
     });
 
@@ -60,13 +60,29 @@ describe('services/xlsx', () => {
       sinon.assert.calledWith(xlsx.read, sampleExcelDocument, { cellDates: true });
       expect(collection).to.eql([
         {
-          name: 'sheet1',
+          name: 'Projects',
           data: [{ UID: 'unique id 1' }, { UID: 'unique id 2' }]
         }, {
-          name: 'sheet2',
+          name: 'Milestones',
           data: [{ 'Project UID': 'unique id 1' }, { 'Project UID': 'unique id 2' }]
         }
       ]);
+    });
+
+    it('only parses expected sheets', () => {
+      sampleExcelDocument.Sheets = {
+        someSheet: {
+          '!ref': 'A1:A4',
+          'A1': {
+            t: 's',
+            v: 'UID'
+          }
+        }
+      };
+
+      const collection = xlsxService.parse(sampleExcelDocument)
+      sinon.assert.calledWith(xlsx.read, sampleExcelDocument, { cellDates: true });
+      expect(collection).to.eql([]);
     });
   });
 
