@@ -113,5 +113,6 @@ Milestone.init({
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });
 
 Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilter' });
 
 module.exports = Milestone;

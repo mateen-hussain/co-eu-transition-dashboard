@@ -5,10 +5,6 @@ const ProjectField = require('./projectField');
 const ProjectFieldEntryAudit = require('./projectFieldEntryAudit');
 
 class ProjectFieldEntry extends Model {
-  static includes(attributeKey) {
-    return attributeKey.includes('ProjectFieldEntryFilter');
-  }
-
   static async import(projectFieldEntry, options) {
     if (!projectFieldEntry.value) {
       return

@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER, TEXT } = require('sequelize');
+const { Model, STRING, INTEGER, TEXT, Op } = require('sequelize');
 const sequelize = require('services/sequelize');
 const modelUtils = require('helpers/models');
 const MilestoneField = require('./milestoneField');
@@ -32,6 +32,21 @@ class MilestoneFieldEntry extends Model {
       value: this.get('value'),
       type: milestoneField.type
     });
+  }
+
+  static createSearch(milestoneField, options) {
+    const filters = options.map(option => {
+      return {
+        [Op.and]: {
+          milestone_field_id: milestoneField.id,
+          value: {
+            [Op.like]: `%${option}%`
+          }
+        }
+      }
+    });
+
+    return { [Op.or]: filters };
   }
 }
 

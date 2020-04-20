@@ -4,10 +4,16 @@ const sequelize = require('services/sequelize');
 const { truthy } = require('./utils');
 
 const groupSearchItems = async (search, overrides = {}) => {
-  const groupedSearch = { project: {}, milestone: {}, projectField: [], milestoneField: {} };
+  const groupedSearch = { project: {}, milestone: {}, projectField: [], milestoneField: [] };
   const projectFields = await sequelize.models.projectField.findAll();
+  const milestoneFields = await sequelize.models.milestoneField.findAll();
+
   const findProjectFields = attribute => {
     return projectFields.find(projectField => projectField.name === attribute);
+  };
+
+  const findMilestoneFields = attribute => {
+    return milestoneFields.find(milestoneField => milestoneField.name === attribute);
   };
 
   for (const attribute of Object.keys(search || {})) {
@@ -19,11 +25,15 @@ const groupSearchItems = async (search, overrides = {}) => {
       groupedSearch.milestone[attribute] = sequelize.models.milestone.createSearch(attribute, options, overrides.Milestone);
     } else {
       const projectField = findProjectFields(attribute);
-      if( projectField ) {
+      const milestoneField = findMilestoneFields(attribute);
+
+      if (projectField) {
         const filter = sequelize.models.projectFieldEntry.createSearch(projectField, options);
         groupedSearch.projectField.push(filter);
+      } else if (milestoneField) {
+        const filter = sequelize.models.milestoneFieldEntry.createSearch(milestoneField, options);
+        groupedSearch.milestoneField.push(filter);
       }
-
     }
   }
 

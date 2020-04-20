@@ -27,35 +27,54 @@ class User extends Model {
 
   async getDepartmentsWithProjects (search) {
     const groupedSearch = await modelUtils.groupSearchItems(search);
-    const projectsMustHaveMilestones = Object.keys(groupedSearch.milestone).length ? true : false;
+
+    const milestoneSearchCriteria = [...Object.keys(groupedSearch.milestone), ...Object.keys(groupedSearch.milestoneField)];
+    const projectsMustHaveMilestones = milestoneSearchCriteria.length ? true : false;
+
+    const milestoneInclude = [{
+      model: MilestoneFieldEntry,
+      include: MilestoneField
+    }];
+
+    if (milestoneSearchCriteria.length) {
+      milestoneInclude.push({
+        model: MilestoneFieldEntry,
+        required: true,
+        as: 'MilestoneFieldEntryFilter',
+        attributes: [],
+        where: groupedSearch.milestoneField
+      })
+    }
+
+    const include = [
+      {
+        model: Milestone,
+        include: milestoneInclude,
+        required: projectsMustHaveMilestones,
+        where: groupedSearch.milestone
+      },
+      {
+        model: ProjectFieldEntry,
+        include: ProjectField
+      }
+    ];
+
+    if (Object.keys(groupedSearch.projectField).length) {
+      include.push({
+        required: true,
+        as: 'ProjectFieldEntryFilter',
+        attributes: [],
+        model: ProjectFieldEntry,
+        where: groupedSearch.projectField
+      })
+    }
 
     const departmentsWithProjects = await this.getDepartments({
       include: [{
         model: Project,
         where: groupedSearch.project,
         required: true,
-        include: [
-          {
-            model: Milestone,
-            include: [{
-              model: MilestoneFieldEntry,
-              include: MilestoneField
-            }],
-            required: projectsMustHaveMilestones,
-            where: groupedSearch.milestone
-          },
-          {
-            model: ProjectFieldEntry,
-            include: ProjectField
-          },
-          {
-            required: true,
-            as: 'ProjectFieldEntryFilter',
-            attributes: [],
-            model: ProjectFieldEntry,
-            where: groupedSearch.projectField
-          }
-        ]
+        include
       }]
     });
 
