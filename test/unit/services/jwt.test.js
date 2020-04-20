@@ -41,6 +41,18 @@ describe('services/jwt', () => {
 
       expect(returnedData).to.eql(sampleData)
     });
+
+    it('clears jwt cookie if error with parsing', () => {
+      jsonwebtoken.verify.throws('bad jwt');
+
+      const req = { cookies: { 'jwt': {} } };
+      const res = { clearCookie: sinon.stub() };
+
+      const returnedData = jwt.restoreData(req, res);
+
+      sinon.assert.calledWith(res.clearCookie, 'jwt');
+      expect(returnedData).to.eql({});
+    });
   });
 
   describe('#token', () => {

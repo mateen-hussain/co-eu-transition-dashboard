@@ -79,7 +79,7 @@ const protect = (roles = []) => {
   });
 
   const check2fa = (req, res, next) => {
-    const data = jwt.restoreData(req) || {};
+    const data = jwt.restoreData(req, res) || {};
     if(!data.tfa && config.features.twoFactorAuth) {
       return res.redirect(config.paths.authentication.login);
     }

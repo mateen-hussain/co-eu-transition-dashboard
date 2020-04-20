@@ -1,7 +1,7 @@
 const jwt = require('services/jwt');
 
 const flash = (req, res, next) => {
-  const data = jwt.restoreData(req);
+  const data = jwt.restoreData(req, res);
 
   if (data.flash) {
     res.locals = res.locals || {};

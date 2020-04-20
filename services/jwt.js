@@ -9,7 +9,7 @@ const saveData = (req, res, data = {}, keepExisting = true) => {
     domain: config.cookie.domain
   };
 
-  const existingData = keepExisting ? restoreData(req) : {};
+  const existingData = keepExisting ? restoreData(req, res) : {};
   const dataToSave = Object.assign({}, existingData, data);
   const token = jwt.sign(dataToSave, config.cookie.secret);
   res.cookie('jwt', token, cookieOptions);
@@ -22,11 +22,12 @@ const token = req => {
   return null;
 };
 
-const restoreData = req => {
+const restoreData = (req, res) => {
   if (req && req.cookies['jwt']) {
     try {
       return jwt.verify(req.cookies['jwt'], config.cookie.secret);
     } catch (error) {
+      res.clearCookie("jwt");
       return {};
     }
   } else {

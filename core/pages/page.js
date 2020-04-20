@@ -60,7 +60,7 @@ class Page {
   }
 
   get data() {
-    const data = jwt.restoreData(this.req) || {};
+    const data = jwt.restoreData(this.req, this.res) || {};
     return data[this.constructor.name] || this.schema;
   }
 
