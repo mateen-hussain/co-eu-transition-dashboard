@@ -29,9 +29,7 @@ class ProjectFieldEntry extends Model {
       return {
         [Op.and]: {
           project_field_id: projectField.id,
-          value: {
-            [Op.like]: `%${option}%`
-          }
+          value: option
         }
       }
     });

@@ -39,9 +39,7 @@ class MilestoneFieldEntry extends Model {
       return {
         [Op.and]: {
           milestone_field_id: milestoneField.id,
-          value: {
-            [Op.like]: `%${option}%`
-          }
+          value: option
         }
       }
     });
