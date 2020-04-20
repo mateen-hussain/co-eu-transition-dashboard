@@ -48,17 +48,17 @@ describe('pages/data-entry/bulk-upload/BulkUpload', () => {
   });
 
   describe('#mode', () => {
-    it('current mode to be register', () => {
+    it('current mode to be bulk-upload', () => {
       page.req.path = '/project-milestone';
       expect(page.mode).to.eql('bulk-upload');
     });
 
-    it('current mode to be verified', () => {
+    it('current mode to be sign-off', () => {
       page.req.path = '/sign-off';
       expect(page.mode).to.eql('sign-off');
     });
 
-    it('current mode to be verify', () => {
+    it('current mode to be upload-file', () => {
       page.req.path = '/upload-file';
       expect(page.mode).to.eql('upload-file');
     });
