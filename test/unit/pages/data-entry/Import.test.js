@@ -42,4 +42,20 @@ describe('pages/data-entry/import/Import', () => {
 
     sinon.assert.calledWith(authentication.protect, ['admin']);
   });
+
+  describe('#postRequest', () => {
+    it('cancels the import if the user requests', async () => {
+      sinon.stub(page, 'cancelImport').resolves();
+      page.req.body = { cancel: 'cancel', importId: '123' };
+      await page.postRequest(req, res);
+      sinon.assert.called(page.cancelImport);  
+    });
+
+    it('imports the file to the system', async () => {
+      sinon.stub(page, 'finaliseImport').resolves();
+      page.req.body = { import: 'import', importId: '123' };
+      await page.postRequest(req, res);
+      sinon.assert.called(page.finaliseImport);  
+    });
+  });
 });
