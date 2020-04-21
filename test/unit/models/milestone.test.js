@@ -74,7 +74,7 @@ describe('models/milestone', () => {
       {
         name: 'description',
         type: 'string',
-        importColumnName: 'Milestone Description'
+        importColumnName: 'Milestone description'
       },
       {
         name: 'date',

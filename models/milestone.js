@@ -34,7 +34,7 @@ class Milestone extends Model {
     },{
       name: 'description',
       type: 'string',
-      importColumnName: 'Milestone Description'
+      importColumnName: 'Milestone description'
     },{
       name: 'date',
       type: 'date',
