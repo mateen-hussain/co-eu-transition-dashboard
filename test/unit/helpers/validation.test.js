@@ -131,30 +131,30 @@ describe('helpers/validation', () => {
   });
 
   describe('#validateSheetNames', () => {
-    it('return error if "Projects" sheet not found in document', () => {
+    it('return error if "TAB A - Baseline data" sheet not found in document', () => {
       const sheets = [{
-        name: 'Milestones',
+        name: 'TAB B - Milestones data',
         data: []
       }];
       const data = validation.validateSheetNames(sheets);
-      expect(data.errors[0].error).to.eql('"Projects" sheet was not found in the excel document uploaded')
+      expect(data.errors[0].error).to.eql('"TAB A - Baseline data" sheet was not found in the excel document uploaded')
     });
 
-    it('return error if "Milestones" sheet not found in document', () => {
+    it('return error if "TAB B - Milestones data" sheet not found in document', () => {
       const sheets = [{
-        name: 'Projects',
+        name: 'TAB A - Baseline data',
         data: []
       }];
       const data = validation.validateSheetNames(sheets);
-      expect(data.errors[0].error).to.eql('"Milestones" sheet was not found in the excel document uploaded')
+      expect(data.errors[0].error).to.eql('"TAB B - Milestones data" sheet was not found in the excel document uploaded')
     });
 
     it('should return projects and milestones', () => {
       const sheets = [{
-        name: 'Projects',
+        name: 'TAB A - Baseline data',
         data: []
       },{
-        name: 'Milestones',
+        name: 'TAB B - Milestones data',
         data: []
       }];
       const data = validation.validateSheetNames(sheets);

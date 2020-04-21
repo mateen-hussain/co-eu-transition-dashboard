@@ -81,7 +81,7 @@ const parse = buffer => {
   const excelDocument = xlsx.read(buffer, { cellDates: true });
 
   return Object.keys(excelDocument.Sheets)
-    .filter(sheetName => expectedSheets.includes(sheetName))
+    .filter(sheetName => Object.keys(expectedSheets).includes(sheetName))
     .map(name => {
       const sheet = excelDocument.Sheets[name];
       const range = getRange(sheet);

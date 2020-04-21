@@ -1,9 +1,9 @@
 const moment = require('moment');
 const { truthy, falsey } = require('./utils');
-const expectedSheets = [
-  'Projects',
-  'Milestones'
-];
+const expectedSheets = {
+  'TAB A - Baseline data': 'projects',
+  'TAB B - Milestones data': 'milestones'
+};
 
 const validateBool = value => {
   const isABoolean = [...truthy, ...falsey].includes(String(value).toLowerCase());
@@ -119,22 +119,18 @@ const validateColumns = (columnsRecieved, requiredColumns) => {
 };
 
 const validateSheetNames = (sheets = []) => {
-  const sheetsMap = {
-    projects: 'Projects',
-    milestones: 'Milestones'
-  };
-
   const errors = [];
   const data = {};
 
-  expectedSheets.forEach(sheetName => {
-    const excelSheetName = sheetsMap[sheetName.toLowerCase()];
+  Object.keys(expectedSheets).forEach(excelSheetName => {
+
+    const nameToMapTo = expectedSheets[excelSheetName];
     const found = sheets.find(sheet => sheet.name === excelSheetName);
 
     if(!found) {
       errors.push({ error: `"${excelSheetName}" sheet was not found in the excel document uploaded` });
     } else {
-      data[sheetName.toLowerCase()] = found.data;
+      data[nameToMapTo] = found.data;
     }
   });
 

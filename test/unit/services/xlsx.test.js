@@ -8,7 +8,7 @@ describe('services/xlsx', () => {
     beforeEach(() => {
       sampleExcelDocument = {
         Sheets: {
-          Projects: {
+          'TAB A - Baseline data': {
             '!ref': 'A1:A4',
             'A1': {
               t: 's',
@@ -27,7 +27,7 @@ describe('services/xlsx', () => {
               v: 'unique id 2',
             }
           },
-          Milestones: {
+          'TAB B - Milestones data': {
             '!ref': 'A1:A4',
             'A1': {
               t: 's',
@@ -60,10 +60,10 @@ describe('services/xlsx', () => {
       sinon.assert.calledWith(xlsx.read, sampleExcelDocument, { cellDates: true });
       expect(collection).to.eql([
         {
-          name: 'Projects',
+          name: 'TAB A - Baseline data',
           data: [{ UID: 'unique id 1' }, { UID: 'unique id 2' }]
         }, {
-          name: 'Milestones',
+          name: 'TAB B - Milestones data',
           data: [{ 'Project UID': 'unique id 1' }, { 'Project UID': 'unique id 2' }]
         }
       ]);
