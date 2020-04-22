@@ -16,7 +16,7 @@
 
   <a href="{{ config.paths.admin.projectFieldInput }}" class="govuk-link">Add a new field</a><br>
   <a href="{{ config.paths.admin.projectFieldInput }}" class="govuk-link">Re-order fields</a>
-  <br><br>
+  <hr class="govuk-section-break govuk-section-break--m">
 
   </div>
 </div>
@@ -25,26 +25,62 @@
   <div class="govuk-grid-column-full">
 
   <table class="govuk-table project-fields">
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header">Field Name</th>
-        <th scope="col" class="govuk-table__header">Field Type</th>
-        <th scope="col" class="govuk-table__header">Status</th>
-        <th scope="col" class="govuk-table__header"></th>
-      </tr>
-    </thead>
+    <caption class="govuk-table__caption">Department and Project Information</caption>
+    {% include "admin/project-field-list/partials/table-header.njk" %}
     <tbody class="govuk-table__body">
       {% for field in fields %}
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell">{{ field.displayName }}</td>
-        <td class="govuk-table__cell">{{ field.type }}</td>
-        {% if field.isActive == true %}
-        <td class="govuk-table__cell">Active</td>
-        {% else %}
-        <td class="govuk-table__cell">Not active</td>
-        {% endif %}
-        <td class="govuk-table__cell"><a href="#" class="govuk-link">Edit</a></td>
-      </tr>
+      {% if field.group == 'Department and Project Information' %}
+        {% include "admin/project-field-list/partials/table-rows.njk" %}
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="govuk-table project-fields">
+    <caption class="govuk-table__caption">Current Delivery status</caption>
+    {% include "admin/project-field-list/partials/table-header.njk" %}
+    <tbody class="govuk-table__body">
+      {% for field in fields %}
+      {% if field.group == 'Current Delivery status' %}
+        {% include "admin/project-field-list/partials/table-rows.njk" %}
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="govuk-table project-fields">
+    <caption class="govuk-table__caption">HMG Delivery</caption>
+    {% include "admin/project-field-list/partials/table-header.njk" %}
+    <tbody class="govuk-table__body">
+      {% for field in fields %}
+      {% if field.group == 'HMG Delivery' %}
+        {% include "admin/project-field-list/partials/table-rows.njk" %}
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="govuk-table project-fields">
+    <caption class="govuk-table__caption">Third Party Readiness</caption>
+    {% include "admin/project-field-list/partials/table-header.njk" %}
+    <tbody class="govuk-table__body">
+      {% for field in fields %}
+      {% if field.group == 'Third Party Readiness' %}
+        {% include "admin/project-field-list/partials/table-rows.njk" %}
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+  <table class="govuk-table project-fields">
+    <caption class="govuk-table__caption">Variance from Negotiated Outcomes</caption>
+    {% include "admin/project-field-list/partials/table-header.njk" %}
+    <tbody class="govuk-table__body">
+      {% for field in fields %}
+      {% if field.group == 'Variance from Negotiated Outcomes' %}
+        {% include "admin/project-field-list/partials/table-rows.njk" %}
+      {% endif %}
       {% endfor %}
     </tbody>
   </table>
