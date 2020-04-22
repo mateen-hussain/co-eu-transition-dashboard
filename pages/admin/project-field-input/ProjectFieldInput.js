@@ -14,8 +14,7 @@ class ProjectFieldInput extends Page {
   }
 
   async postRequest(req, res) {
-    if ((!req.body['field-name']) || (!req.body['field-description']) 
-    || (!req.body['column-name'])) {
+    if ((!req.body['field-name']) || (!req.body['field-description']) || (!req.body['column-name'])) {
       req.flash('You must fill in all the fields before you can review the field details');
     } else {
       console.log('Do something')
