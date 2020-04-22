@@ -5,6 +5,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block beforeContent %}
 {% include "feedback.njk" %}
@@ -26,7 +27,17 @@
 
   <h1 class="govuk-heading-xl">Add a new field</h1>
 
-  <form action='{{ url }}' method='POST'>
+{% if flash %}
+{{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [{
+        text: flash,
+        href: "#field-area"
+    }]
+}) }}
+{% endif %}
+
+<form action='{{ url }}' method='POST'>
 
 {{ govukSelect({
   id: "field-area",
@@ -34,7 +45,9 @@
   label: {
     text: "Field area"
   },
-  hint: "Which area does this input relate to?",
+  hint: {
+    text: "Which area does this input relate to?"
+  },
   items: [
     {
       text: "Department and project information",
@@ -61,14 +74,26 @@
 
 {{ govukInput({
   label: {
-    text: "Field name"
+    text: "Field display name"
   },
   id: "field-name",
   name: "field-name"
 }) }}
 
+{{ govukInput({
+  label: {
+    text: "Spreadsheet column name this fields corresponds to"
+  },
+  hint: {
+    text: "If you are expecting data to be added from an Excel spreadsheet
+  please write the name of the column this field should match with."
+  },
+  id: "column-name",
+  name: "column-name"
+}) }}
+
 {{ govukTextarea({
-  name: "Field-description",
+  name: "field-description",
   id: "field-description",
   label: {
     text: "Field description"
@@ -80,6 +105,9 @@
   name: "field-type",
   label: {
     text: "Field type"
+  },
+  hint: {
+    text: "The field type that you choose will affect how the data is validated when data is uploaded to the dashboard"
   },
   items: [
     {
@@ -109,9 +137,6 @@
   classes: "govuk-radios--inline",
   idPrefix: "field-mandatory",
   name: "field-mandatory",
-    label: {
-    text: "Field type"
-  },
   fieldset: {
     legend: {
       text: "Is this field mandatory?",
@@ -121,23 +146,14 @@
   items: [
     {
       value: "yes",
-      text: "Yes"
+      text: "Yes",
+      checked: true
     },
     {
       value: "no",
       text: "No"
     }
   ]
-}) }}
-
-{{ govukInput({
-  label: {
-    text: "Column name this fields corresponds to"
-  },
-  hint: "If you are expecting data to be added from an Excel spreadsheet, 
-  please write the name of the column this field should match with.",
-  id: "field-name",
-  name: "field-name"
 }) }}
 
 {{ govukButton({
@@ -148,8 +164,8 @@ preventDoubleClick: true
 
 </form>
 
-
  </div>
 </div>
 
 {% endblock %}
+

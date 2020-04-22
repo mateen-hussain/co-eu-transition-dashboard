@@ -7,12 +7,21 @@
 {% block content %}
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
+  <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl">Project input data</h1>
+  <h1 class="govuk-heading-xl">Manage project data input fields</h1>
+
+  <p class="govuk-body-l">Changes made to project data input fields on this page will 
+  be reflected in Bulk upload and Excel download features in the Transition Taskforce Dashboard. </p>
 
   <a href="{{ config.paths.admin.projectFieldInput }}" class="govuk-link">Add a new field</a>
   <br><br><br>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
 
   <table class="govuk-table project-fields">
     <thead class="govuk-table__head">
