@@ -2,7 +2,7 @@
 
 {% set fields = getFields() | await %}
 
-{% block pageTitle %}Impact and confidence definitions{% endblock %}
+{% block pageTitle %}Project Data Input{% endblock %}
 
 {% block content %}
 
@@ -11,7 +11,7 @@
 
   <h1 class="govuk-heading-xl">Project input data</h1>
 
-  <a href="#" class="govuk-link">Add a new field</a>
+  <a href="{{ config.paths.admin.projectFieldInput }}" class="govuk-link">Add a new field</a>
   <br><br><br>
 
   <table class="govuk-table project-fields">

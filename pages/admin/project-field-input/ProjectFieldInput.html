@@ -1,0 +1,155 @@
+{% extends "template.njk" %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{% include "feedback.njk" %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endblock %}
+
+{% block pageTitle %}Project Data Input{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">Add a new field</h1>
+
+  <form action='{{ url }}' method='POST'>
+
+{{ govukSelect({
+  id: "field-area",
+  name: "field-area",
+  label: {
+    text: "Field area"
+  },
+  hint: "Which area does this input relate to?",
+  items: [
+    {
+      text: "Department and project information",
+      value: "dept-project-info"
+    },
+    {
+      text: "Current delivery status",
+      value: "delivery-status"
+    },
+    {
+      text: "HMG delivery",
+      value: "hmg-delivery"
+    },
+    {
+      text: "Third party readiness",
+      value: "third-party-readiness"
+    },
+    {
+      text: "Variance from negotiated outcomes",
+      value: "negotiated-outcomes"
+    }
+  ]
+}) }}
+
+{{ govukInput({
+  label: {
+    text: "Field name"
+  },
+  id: "field-name",
+  name: "field-name"
+}) }}
+
+{{ govukTextarea({
+  name: "Field-description",
+  id: "field-description",
+  label: {
+    text: "Field description"
+  }
+}) }}
+
+{{ govukSelect({
+  id: "field-type",
+  name: "field-type",
+  label: {
+    text: "Field type"
+  },
+  items: [
+    {
+      text: "Dropdown",
+      value: "dropdown"
+    },
+    {
+      text: "Text input",
+      value: "text-input"
+    },
+    {
+      text: "Text area",
+      value: "text-area"
+    },
+    {
+      text: "Date input",
+      value: "date-input"
+    },
+    {
+      text: "Number input",
+      value: "number-input"
+    }
+  ]
+}) }}
+
+{{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-mandatory",
+  name: "field-mandatory",
+    label: {
+    text: "Field type"
+  },
+  fieldset: {
+    legend: {
+      text: "Is this field mandatory?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "yes",
+      text: "Yes"
+    },
+    {
+      value: "no",
+      text: "No"
+    }
+  ]
+}) }}
+
+{{ govukInput({
+  label: {
+    text: "Column name this fields corresponds to"
+  },
+  hint: "If you are expecting data to be added from an Excel spreadsheet, 
+  please write the name of the column this field should match with.",
+  id: "field-name",
+  name: "field-name"
+}) }}
+
+{{ govukButton({
+text: "Review",
+type: "submit",
+preventDoubleClick: true
+}) }}
+
+</form>
+
+
+ </div>
+</div>
+
+{% endblock %}

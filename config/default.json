@@ -23,7 +23,8 @@
     "admin": {
       "import": "/admin/import",
       "upload": "/admin/upload",
-      "projectFieldList": "/admin/project-field-list"
+      "projectFieldList": "/admin/project-field-list",
+      "projectFieldInput": "/admin/project-field-input"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
