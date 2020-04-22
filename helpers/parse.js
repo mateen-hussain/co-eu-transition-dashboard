@@ -10,15 +10,28 @@ const parseString = (value = '') => {
   return value;
 };
 
+const parseGroupItem = (value, definition) => {
+  value = parseString(value);
+
+  const matchedOption = definition.config.options.find(option => option.toLowerCase() === String(value).toLowerCase());
+
+  if (matchedOption) {
+    return matchedOption;
+  }
+
+  return value;
+}
+
 const parseValue = (value, definition) => {
   switch(definition.type) {
   case 'string':
   case 'boolean':
-  case 'group':
   case 'integer':
   case 'float':
   case 'date':
     return parseString(value);
+  case 'group':
+    return parseGroupItem(value, definition);
   }
 };
 
@@ -39,5 +52,6 @@ const parseItems = (items, itemDefinitions) => {
 module.exports = {
   parseString,
   parseValue,
-  parseItems
+  parseItems,
+  parseGroupItem
 };
