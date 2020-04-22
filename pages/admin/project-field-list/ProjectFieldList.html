@@ -1,13 +1,45 @@
 {% extends "template.njk" %}
 
-{% block pageTitle %}{{ index }}{% endblock %}
+{% set fields = getFields() | await %}
+
+{% block pageTitle %}Impact and confidence definitions{% endblock %}
 
 {% block content %}
 
-{% if flash %}
-  {{ flash }}
-{% endif %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
 
-{{ getFields() | await | dump }}
+  <h1 class="govuk-heading-xl">Project input data</h1>
+
+  <a href="#" class="govuk-link">Add a new field</a>
+  <br><br><br>
+
+  <table class="govuk-table project-fields">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Field Name</th>
+        <th scope="col" class="govuk-table__header">Field Type</th>
+        <th scope="col" class="govuk-table__header">Status</th>
+        <th scope="col" class="govuk-table__header"></th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for field in fields %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ field.displayName }}</td>
+        <td class="govuk-table__cell">{{ field.type }}</td>
+        {% if field.isActive == true %}
+        <td class="govuk-table__cell">Active</td>
+        {% else %}
+        <td class="govuk-table__cell">Not active</td>
+        {% endif %}
+        <td class="govuk-table__cell"><a href="#" class="govuk-link">Edit</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+ </div>
+</div>
 
 {% endblock %}
