@@ -2,7 +2,6 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const ProjectField = require('models/projectField');
-const { removeNulls } = require('helpers/utils');
 const flash = require('middleware/flash');
 const authentication = require('services/authentication');
 const logger = require('services/logger');
