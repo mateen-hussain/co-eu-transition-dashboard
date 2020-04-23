@@ -7,6 +7,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 {% block beforeContent %}
 {% include "feedback.njk" %}
@@ -57,6 +58,24 @@
 
   </div>
 </div>
+
+{% elseif successfulMode %}
+
+  <div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+  {{ govukPanel({
+    titleText: "Field submitted to dashboard"
+  }) }}
+
+  <h2 class="govuk-heading-m">What next</h2>
+
+  <p class="govuk-body">
+    <a href="{{ config.paths.admin.projectFieldList }}" class="govuk-link">View new field on live dashboard</a>
+  </p>
+
+  </div>
+  </div>
 
 {% else %}
 

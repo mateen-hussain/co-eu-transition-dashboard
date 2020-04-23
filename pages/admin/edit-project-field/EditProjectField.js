@@ -19,7 +19,7 @@ class EditProjectField extends Page {
   }
 
   get pathToBind() {
-    return `${this.url}/:id(\\d+)?/:summary(summary)?`;
+    return `${this.url}/:id(\\d+)?/:summary(summary)?/:successful(successful)?`;
   }
 
   get editMode() {
@@ -30,6 +30,10 @@ class EditProjectField extends Page {
     return this.req.params && this.req.params.summary;
   }
 
+  get successfulMode() {
+    return this.req.params && this.req.params.successful;
+  }
+
   async getRequest(req, res) {
     await this.setData();
 
@@ -37,15 +41,17 @@ class EditProjectField extends Page {
   }
 
   next() {
-    if(this.summaryMode) {
-      return this.res.redirect(paths.admin.projectFieldList);
-    }
+    let url = this.url;
 
     if(this.editMode) {
-      return this.res.redirect(`${this.url}/${this.req.params.id}/summary`);
+      url += `/${this.req.params.id}`;
     }
 
-    return this.res.redirect(`${this.url}/summary`);
+    if(this.summaryMode) {
+      return this.res.redirect(`${url}/successful`);
+    }
+
+    return this.res.redirect(`${url}/summary`);
   }
 
   async saveFieldToDatabase() {

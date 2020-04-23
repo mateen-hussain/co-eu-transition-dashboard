@@ -2,7 +2,8 @@ const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const authentication = require('services/authentication');
 const flash = require('middleware/flash');
-
+const ProjectField = require('models/projectField');
+const FieldEntryGroup = require('models/fieldEntryGroup');
 const EditProjectField = require('pages/admin/edit-project-field/EditProjectField');
 
 let page = {};
@@ -11,9 +12,11 @@ let req = {};
 
 describe('pages/admin/edit-project-field/EditProjectField', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub(), render: sinon.stub() };
+    res = { cookies: sinon.stub(), render: sinon.stub(), redirect: sinon.stub() };
     req = { cookies: [], user: {} };
     page = new EditProjectField('some path', req, res);
+    page.req = req;
+    page.res = res;
 
     sinon.stub(authentication, 'protect').returns([]);
   });
@@ -30,7 +33,7 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
 
   describe('#pathToBind', () => {
     it('returns correct url with params', () => {
-      expect(page.pathToBind).to.eql(`${paths.admin.projectField}/:id(\\d+)?/:summary(summary)?`);
+      expect(page.pathToBind).to.eql(`${paths.admin.projectField}/:id(\\d+)?/:summary(summary)?/:successful(successful)?`);
     });
   });
 
@@ -76,7 +79,96 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
       sinon.assert.called(page.setData)
     });
   });
+
+  describe('#next', () => {
+    it('redirects to successful page if in summary mode and new field', async () => {
+      page.req.params = { summary: 'summary' };
+      page.next();
+      sinon.assert.calledWith(res.redirect, `${page.url}/successful`);
+    });
+
+    it('redirects to successful page if in summary mode and editing field', async () => {
+      page.req.params = { summary: 'summary', id: 'someid' };
+      page.next();
+      sinon.assert.calledWith(res.redirect, `${page.url}/someid/successful`);
+    });
+
+    it('redirects to summary page if editing field', async () => {
+      page.req.params = { id: 'someid' };
+      page.next();
+      sinon.assert.calledWith(res.redirect, `${page.url}/someid/summary`);
+    });
+
+    it('redirects to summary page if adding field', async () => {
+      page.req.params = {};
+      page.next();
+      sinon.assert.calledWith(res.redirect, `${page.url}/summary`);
+    });
+  });
+
+  describe('#saveFieldToDatabase', () => {
+    it('saves any edits to database', async () => {
+      page.clearData = sinon.stub();
+      page.next = sinon.stub();
+      page.data = { id: 1, foo: 'bar' };
+      await page.saveFieldToDatabase();
+
+      sinon.assert.calledWith(ProjectField.upsert, page.data);
+      sinon.assert.calledOnce(page.next);
+      sinon.assert.calledOnce(page.clearData);
+    });
+
+    it('catches any errors and returns to user', async () => {
+      const error = new Error('some error');
+      ProjectField.upsert.throws(error);
+
+      page.req.flash = sinon.stub();
+      page.req.originalUrl = 'someurl';
+
+      await page.saveFieldToDatabase();
+
+      sinon.assert.calledWith(req.flash, `Error when creating / editing field: Error: some error`);
+      sinon.assert.calledWith(res.redirect, page.req.originalUrl);
+    });
+  });
+
+  describe('#setData', () => {
+    beforeEach(() => {
+      sinon.stub(page, 'saveData');
+      sinon.stub(page, 'clearData');
+    });
+
+    it('returns if summaryMode', async () => {
+      page.req.params = { summary: 'summary' };
+
+      await page.setData();
+
+      sinon.assert.notCalled(page.saveData);
+      sinon.assert.notCalled(page.clearData);
+    });
+
+    it('sets data if in edit mode', async () => {
+      page.req.params = { id: 'someid' };
+      ProjectField.findOne.returns({ foo: 'bar' });
+
+      await page.setData();
+
+      sinon.assert.calledWith(page.saveData, { foo: 'bar' });
+      sinon.assert.notCalled(page.clearData);
+    });
+
+    it('does not set data id is set in data', async () => {
+      await page.setData();
+
+      sinon.assert.notCalled(page.saveData);
+      sinon.assert.calledOnce(page.clearData);
+    });
+  });
+
+  describe('#getProjectGroups', () => {
+    it('gets all project groups', async () => {
+      await page.getProjectGroups();
+      sinon.assert.called(FieldEntryGroup.findAll);
+    })
+  });
 });
-
-
-
