@@ -65,12 +65,16 @@ class EditProjectField extends Page {
     }
   }
 
-  async postRequest(req) {
+  async postRequest(req, res) {
     if(this.summaryMode) {
       return await this.saveFieldToDatabase();
     }
-
-    super.postRequest(req);
+    if ((!req.body['displayName']) || (!req.body['importColumnName']) || (!req.body['description'])) {
+      req.flash('You must fill in all the fields before you can review the field details');
+      return res.redirect(this.url);
+    } else {
+      super.postRequest(req);
+    }
   }
 
   async setData() {

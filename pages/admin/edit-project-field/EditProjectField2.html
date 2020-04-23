@@ -1,0 +1,82 @@
+{% extends "template.njk" %}
+
+{% block pageTitle %}{{ index }}{% endblock %}
+
+{% block content %}
+
+{% if flash %}
+  {{ flash }}
+{% endif %}
+
+<h1>{{ "Edit field" if editMode else "New Field" }}</h1>
+
+{% if summaryMode %}
+
+  field area: {{ data.group }}<br>
+  display name: {{ data.displayName }}<br>
+  spread sheet column: {{ data.importColumnName }}<br>
+  description: {{ data.description }}<br>
+  field type: {{ data.type }}<br>
+  mandatory: {{ data.isRequired }}<br>
+
+  <form action='{{ req.originalUrl }}' method='POST'>
+    <input type="submit" value="Confirm" />
+  </form>
+
+{% else %}
+
+  <form action='{{ req.originalUrl }}' method='POST'>
+    <input type="hidden" name="id" value="{{ data.id | default('temp') }}" />
+
+    field area
+    <select name="group">
+      {% for group in getProjectGroups() | await %}
+        <option value="{{ group.name }}">{{ group.name }}</option>
+      {% endfor %}
+    </select>
+
+    <br><br>
+    display name
+    <input type="input" name="displayName" value="{{ data.displayName }}" />
+
+    <br><br>
+    spread sheet column
+    <input type="input" name="importColumnName" value="{{ data.importColumnName }}" />
+
+    <br><br>
+    description
+    <input type="input" name="description" value="{{ data.description }}" />
+
+    <br><br>
+    field type
+    <select name="type">
+      <option value="group">Drop down</option>
+      <option value="string">Text</option>
+      <option value="integer">Number</option>
+      <option value="date">Date</option>
+      <option value="boolean">Yes / No</option>
+    </select>
+
+    <br><br>
+    mandatory
+    <select name="isRequired">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <br><br>
+
+  <!--  filterable
+     <select name="is_required">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select> -->
+    <input type="submit" value="Submit" />
+  </form>
+
+{% endif %}
+
+
+</form>
+
+{% endblock %}

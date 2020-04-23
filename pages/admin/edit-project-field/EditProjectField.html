@@ -1,82 +1,211 @@
 {% extends "template.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
-{% block pageTitle %}{{ index }}{% endblock %}
+{% block beforeContent %}
+{% include "feedback.njk" %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endblock %}
+
+{% block pageTitle %}Project Data Input{% endblock %}
 
 {% block content %}
 
-{% if flash %}
-  {{ flash }}
-{% endif %}
-
-<h1>{{ "Edit field" if editMode else "New Field" }}</h1>
-
 {% if summaryMode %}
 
-  field area: {{ data.group }}<br>
-  display name: {{ data.displayName }}<br>
-  spread sheet column: {{ data.importColumnName }}<br>
-  description: {{ data.description }}<br>
-  field type: {{ data.type }}<br>
-  mandatory: {{ data.isRequired }}<br>
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">Review your new project field details</h1>
+  </div>
+</div>
+
+  {% include "admin/edit-project-field/partials/field-summary.njk" %}
 
   <form action='{{ req.originalUrl }}' method='POST'>
-    <input type="submit" value="Confirm" />
+
+  {{ govukButton({
+    text: "Add field to dashboard",
+    type: "submit",
+    preventDoubleClick: true
+  }) }}
+
   </form>
+
+  </div>
+</div>
 
 {% else %}
 
-  <form action='{{ req.originalUrl }}' method='POST'>
-    <input type="hidden" name="id" value="{{ data.id | default('temp') }}" />
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
 
-    field area
-    <select name="group">
-      {% for group in getProjectGroups() | await %}
-        <option value="{{ group.name }}">{{ group.name }}</option>
-      {% endfor %}
-    </select>
+  <h1 class="govuk-heading-xl">{{ "Edit project " + data.displayName + " field" if editMode else "Add a new field" }}</h1>
 
-    <br><br>
-    display name
-    <input type="input" name="displayName" value="{{ data.displayName }}" />
-
-    <br><br>
-    spread sheet column
-    <input type="input" name="importColumnName" value="{{ data.importColumnName }}" />
-
-    <br><br>
-    description
-    <input type="input" name="description" value="{{ data.description }}" />
-
-    <br><br>
-    field type
-    <select name="type">
-      <option value="group">Drop down</option>
-      <option value="string">Text</option>
-      <option value="integer">Number</option>
-      <option value="date">Date</option>
-      <option value="boolean">Yes / No</option>
-    </select>
-
-    <br><br>
-    mandatory
-    <select name="isRequired">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select>
-
-    <br><br>
-
-  <!--  filterable
-     <select name="is_required">
-      <option value="0">No</option>
-      <option value="1">Yes</option>
-    </select> -->
-    <input type="submit" value="Submit" />
-  </form>
-
+{% if flash %}
+{{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [{
+        text: flash,
+        href: "#field-area"
+    }]
+}) }}
 {% endif %}
 
+<form action='{{ req.originalUrl }}' method='POST'>
+
+<input type="hidden" name="id" value="{{ data.id | default('temp') }}" />
+
+<div class="govuk-form-group">
+  <label class="govuk-label" for="field-area">
+    Field area
+  </label>
+  <span id="field-area-hint" class="govuk-hint">
+    Which are does this input field relate to?
+  </span>
+  <select class="govuk-select" id="field-area" name="group">
+  {% for group in getProjectGroups() | await %}
+    <option value="{{ group.name }}">{{ group.name }}</option>
+  {% endfor %}
+  </select>
+</div>
+
+{{ govukInput({
+  label: {
+    text: "Field display name"
+  },
+  id: "field-name",
+  name: "displayName",
+  value: data.displayName
+}) }}
+
+{{ govukInput({
+  label: {
+    text: "Spreadsheet column name this fields corresponds to"
+  },
+  hint: {
+    text: "If you are expecting data to be added from an Excel spreadsheet
+  please write the name of the column this field should match with."
+  },
+  id: "column-name",
+  name: "importColumnName",
+  value: data.importColumnName
+}) }}
+
+{{ govukTextarea({
+  name: "description",
+  id: "field-description",
+  label: {
+    text: "Field description"
+  },
+  value: data.description
+}) }}
+
+{{ govukSelect({
+  id: "field-type",
+  name: "type",
+  label: {
+    text: "Field type"
+  },
+  hint: {
+    text: "The field type that you choose will affect how the data is validated when data is uploaded to the dashboard"
+  },
+  items: [
+    {
+      text: "Drop down",
+      value: "group"
+    },
+    {
+      text: "Text",
+      value: "string"
+    },
+    {
+      text: "Number",
+      value: "integer"
+    },
+    {
+      text: "Date",
+      value: "date"
+    },
+    {
+      text: "Yes / No",
+      value: "boolean"
+    }
+  ]
+}) }}
+
+{{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-mandatory",
+  name: "isRequired",
+  fieldset: {
+    legend: {
+      text: "Is this field mandatory?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "1",
+      text: "Yes",
+      checked: true
+    },
+    {
+      value: "0",
+      text: "No"
+    }
+  ]
+}) }}
+
+{# {{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-filterable",
+  name: "filterable",
+  fieldset: {
+    legend: {
+      text: "Is this field filterable on the 'All data' page of the dashboard?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "1",
+      text: "Yes",
+      checked: true
+    },
+    {
+      value: "0",
+      text: "No"
+    }
+  ]
+}) }} #}
+
+{{ govukButton({
+text: "Review",
+type: "submit",
+preventDoubleClick: true
+}) }}
 
 </form>
 
+ </div>
+</div>
+
+{% endif %}
+
 {% endblock %}
+

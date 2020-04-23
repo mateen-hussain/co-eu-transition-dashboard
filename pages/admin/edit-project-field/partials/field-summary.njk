@@ -1,0 +1,106 @@
+{{ govukSummaryList({
+  rows: [
+    {
+      key: {
+        text: "Field area"
+      },
+      value: {
+        text: data.group
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ config.paths.admin.projectField }}",
+            text: "Change",
+            visuallyHiddenText: "field area"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Field name"
+      },
+      value: {
+        text: data.displayName
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ config.paths.admin.projectField }}",
+            text: "Change",
+            visuallyHiddenText: "field name"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Spreadsheet column name this fields corresponds to"
+      },
+      value: {
+        text: data.importColumnName
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ config.paths.admin.projectField }}",
+            text: "Change",
+            visuallyHiddenText: "spreadsheet column name this fields corresponds to"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Field description"
+      },
+      value: {
+        html: data.description
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ config.paths.admin.projectField }}",
+            text: "Change",
+            visuallyHiddenText: "field description"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Field type"
+      },
+      value: {
+        text: data.type
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ config.paths.admin.projectField }}",
+            text: "Change",
+            visuallyHiddenText: "field type"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Is this field mandatory?"
+      },
+      value: {
+        text: data.isRequired
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ config.paths.admin.projectField }}",
+            text: "Change",
+            visuallyHiddenText: "is this field mandatory?"
+          }
+        ]
+      }
+    }
+  ]
+}) }}
