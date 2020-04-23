@@ -73,10 +73,18 @@ class Page {
     jwt.saveData(this.req, this.res, _data, keepExistingData);
   }
 
-  async postRequest(req, res) {
+  clearData() {
+    this.saveData();
+  }
+
+  next() {
+    this.res.redirect(this.url);
+  }
+
+  async postRequest(req) {
     this.saveData(removeNulls(req.body));
 
-    res.redirect(this.url);
+    this.next();
   }
 
   async handler(req, res) {
@@ -95,15 +103,19 @@ class Page {
     }
   }
 
+  get pathToBind() {
+    return this.url;
+  }
+
   get router() {
     this._router = Router();
     this._router.page = this;
 
     this.middleware.forEach(middleware => {
-      this._router.use(this.url, middleware.bind(this));
+      this._router.use(this.pathToBind, middleware.bind(this));
     });
 
-    this._router.use(this.url, this.handler.bind(this));
+    this._router.use(this.pathToBind, this.handler.bind(this));
 
     return this._router;
   }
