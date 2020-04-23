@@ -1,0 +1,29 @@
+{% extends "template.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block pageTitle %}Project Data Input{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+<div class="govuk-grid-column-full">
+
+{{ govukPanel({
+  titleText: "Field submitted to dashboard"
+}) }}
+
+<h2 class="govuk-heading-m">What next"</h2>
+
+<p class="govuk-body">
+  <a href="{{ config.paths.admin.projectFieldList }}" class="govuk-link">View new field on live dashboard</a>
+</p>
+
+</div>
+</div>
+
+{% endblock %}
+
+
+
+
+
