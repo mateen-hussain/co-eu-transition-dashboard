@@ -87,6 +87,23 @@
     },
     {
       key: {
+        text: "Is this field active?"
+      },
+      value: {
+        text: "Yes" if (data.isActive == true) else "No"
+      },
+      actions: {
+        items: [
+          {
+            href: "{{ editUrl }}",
+            text: "Change",
+            visuallyHiddenText: "is this field mandatory?"
+          }
+        ]
+      }
+    },
+    {
+      key: {
         text: "Is this field mandatory?"
       },
       value: {

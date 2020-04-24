@@ -49,7 +49,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-xl">Review your new project field details</h1>
+    <h1 class="govuk-heading-xl">Review your project field details</h1>
   </div>
 </div>
 
@@ -121,30 +121,6 @@
 Changes made to this project data input field will be reflected in Bulk upload and Excel download features in the Transition Taskforce Dashboard.
 </p>
 <hr class="govuk-section-break govuk-section-break--m">
-
-{{ govukRadios({
-  classes: "govuk-radios--inline",
-  idPrefix: "field-active",
-  name: "isActive",
-  fieldset: {
-    legend: {
-      text: "Is this field active?",
-      classes: "govuk-label"
-    }
-  },
-  items: [
-    {
-      value: "true",
-      text: "Yes",
-      checked: true if (data.isActive == true) else true
-    },
-    {
-      value: "false",
-      text: "No",
-      checked: true if (data.isActive == false)
-    }
-  ]
-}) }}
 {% endif %}
 
 <div class="govuk-form-group">
@@ -230,11 +206,42 @@ Changes made to this project data input field will be reflected in Bulk upload a
   ]
 }) }}
 
-{% if data.config %}
+<div id="dropDownOptions">
+  <label class="govuk-label" for="drop-down-options">Drop down options</label>
+  {% if data.config %}
   {% for groupItem in data.config.options %}
-    <input name="config[options][]" value="{{ groupItem }}" />
+  <input class="govuk-input" value="{{ groupItem }}" id="drop-down-option" name="config[options][]" type="text">
   {% endfor %}
-{% endif %}
+  {% else %}
+  <input class="govuk-input" id="drop-down-option" name="config[options][]" type="text">
+  {% endif %}
+  <a href="#" id="add-option" class="govuk-link">Add another</a>
+  <hr class="govuk-section-break govuk-section-break--m">
+</div>
+
+{{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-active",
+  name: "isActive",
+  fieldset: {
+    legend: {
+      text: "Is this field active?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "true",
+      text: "Yes",
+      checked: true if (data.isActive == true) else true
+    },
+    {
+      value: "false",
+      text: "No",
+      checked: true if (data.isActive == false)
+    }
+  ]
+}) }}
 
 {{ govukRadios({
   classes: "govuk-radios--inline",
@@ -298,3 +305,8 @@ preventDoubleClick: true
 
 {% endblock %}
 
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.groupDisplay();
+  </script>
+{% endblock %}
