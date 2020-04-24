@@ -110,7 +110,7 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
     it('saves any edits to database', async () => {
       page.clearData = sinon.stub();
       page.next = sinon.stub();
-      page.data = { id: 1, foo: 'bar' };
+      page.data = { id: 1, foo: 'bar', displayName: 'some name' };
       await page.saveFieldToDatabase();
 
       sinon.assert.calledWith(ProjectField.upsert, page.data);
@@ -136,15 +136,6 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
     beforeEach(() => {
       sinon.stub(page, 'saveData');
       sinon.stub(page, 'clearData');
-    });
-
-    it('returns if summaryMode', async () => {
-      page.req.params = { summary: 'summary' };
-
-      await page.setData();
-
-      sinon.assert.notCalled(page.saveData);
-      sinon.assert.notCalled(page.clearData);
     });
 
     it('sets data if in edit mode', async () => {

@@ -5,12 +5,12 @@
         text: "Field area"
       },
       value: {
-        text: data.group
+        text: data.group | default('') | string
       },
       actions: {
         items: [
           {
-            href: "{{ config.paths.admin.projectField }}",
+            href: "{{ editUrl }}",
             text: "Change",
             visuallyHiddenText: "field area"
           }
@@ -22,12 +22,12 @@
         text: "Field name"
       },
       value: {
-        text: data.displayName
+        text: data.displayName | default('') | string
       },
       actions: {
         items: [
           {
-            href: "{{ config.paths.admin.projectField }}",
+            href: "{{ editUrl }}",
             text: "Change",
             visuallyHiddenText: "field name"
           }
@@ -39,12 +39,12 @@
         text: "Spreadsheet column name this fields corresponds to"
       },
       value: {
-        text: data.importColumnName
+        text: data.importColumnName | default('') | string
       },
       actions: {
         items: [
           {
-            href: "{{ config.paths.admin.projectField }}",
+            href: "{{ editUrl }}",
             text: "Change",
             visuallyHiddenText: "spreadsheet column name this fields corresponds to"
           }
@@ -56,12 +56,12 @@
         text: "Field description"
       },
       value: {
-        html: data.description
+        html: data.description | default('') | string
       },
       actions: {
         items: [
           {
-            href: "{{ config.paths.admin.projectField }}",
+            href: "{{ editUrl }}",
             text: "Change",
             visuallyHiddenText: "field description"
           }
@@ -73,12 +73,12 @@
         text: "Field type"
       },
       value: {
-        text: dataType
+        text: data.type | default('') | string
       },
       actions: {
         items: [
           {
-            href: "{{ config.paths.admin.projectField }}",
+            href: "{{ editUrl }}",
             text: "Change",
             visuallyHiddenText: "field type"
           }
@@ -95,7 +95,7 @@
       actions: {
         items: [
           {
-            href: "{{ config.paths.admin.projectField }}",
+            href: "{{ editUrl }}",
             text: "Change",
             visuallyHiddenText: "is this field mandatory?"
           }

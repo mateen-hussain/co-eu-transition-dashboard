@@ -5,6 +5,7 @@ const ProjectField = require('models/projectField');
 const flash = require('middleware/flash');
 const authentication = require('services/authentication');
 const logger = require('services/logger');
+const { camelCase } = require('helpers/utils');
 
 class EditProjectField extends Page {
   get url() {
@@ -35,9 +36,26 @@ class EditProjectField extends Page {
   }
 
   async getRequest(req, res) {
-    await this.setData();
+    if (this.summaryMode) {
+      // there should be an id set now
+      if (!this.data.id) {
+        return this.res.redirect(paths.admin.projectFieldList);
+      }
+    } else if (!this.successfulMode) {
+      await this.setData();
+    }
 
     super.getRequest(req, res);
+  }
+
+  get editUrl() {
+    let url = this.url;
+
+    if(this.editMode) {
+      url += `/${this.req.params.id}`;
+    }
+
+    return url;
   }
 
   next() {
@@ -58,6 +76,10 @@ class EditProjectField extends Page {
     const field = this.data;
     if (field.id === 'temp') {
       delete field.id;
+    }
+
+    if(!field.name && field.displayName) {
+      field.name = camelCase(field.displayName);
     }
 
     try {
@@ -84,10 +106,6 @@ class EditProjectField extends Page {
   }
 
   async setData() {
-    if (this.summaryMode) {
-      return;
-    }
-
     if (this.editMode) {
       if(!this.data.id || this.data.id === 'temp') {
         const data = await ProjectField.findOne({
@@ -95,6 +113,10 @@ class EditProjectField extends Page {
             id: this.req.params.id
           }
         });
+
+        if(data.config && data.config.options) {
+          data.groupItems = data.config.options;
+        }
 
         this.saveData(data);
       }

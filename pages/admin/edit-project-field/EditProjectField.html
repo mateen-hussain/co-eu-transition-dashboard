@@ -230,6 +230,12 @@ Changes made to this project data input field will be reflected in Bulk upload a
   ]
 }) }}
 
+{% if data.config %}
+  {% for groupItem in data.config.options %}
+    <input name="config[options][]" value="{{ groupItem }}" />
+  {% endfor %}
+{% endif %}
+
 {{ govukRadios({
   classes: "govuk-radios--inline",
   idPrefix: "field-mandatory",

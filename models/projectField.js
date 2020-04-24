@@ -1,4 +1,4 @@
-const { Model, STRING, BOOLEAN, ENUM, INTEGER, JSON } = require('sequelize');
+const { Model, STRING, BOOLEAN, ENUM, INTEGER, JSON, TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class ProjectField extends Model {}
@@ -20,7 +20,7 @@ ProjectField.init({
   },
   description: {
     field: "description",
-    type: STRING(300),
+    type: TEXT
   },
   importColumnName: {
     field: "import_column_name",
