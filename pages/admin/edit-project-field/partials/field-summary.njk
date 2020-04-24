@@ -90,7 +90,7 @@
         text: "Is this field mandatory?"
       },
       value: {
-        text: data.isRequired
+        text: "Yes" if (data.isRequired == 1) else "No"
       },
       actions: {
         items: [

@@ -79,6 +79,37 @@
 
 <input type="hidden" name="id" value="{{ data.id | default('temp') }}" />
 
+{% if editMode %}
+<p class="govuk-body-l">
+Changes made to this project data input field will be reflected in Bulk upload and Excel download features in the Transition Taskforce Dashboard.
+</p>
+<hr class="govuk-section-break govuk-section-break--m">
+
+{{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-active",
+  name: "isActive",
+  fieldset: {
+    legend: {
+      text: "Is this field active?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "true",
+      text: "Yes",
+      checked: data.isActive
+    },
+    {
+      value: "false",
+      text: "No",
+      checked: true if (data.isActive == false)
+    }
+  ]
+}) }}
+{% endif %}
+
 <div class="govuk-form-group">
   <label class="govuk-label" for="field-area">
     Field area
@@ -88,7 +119,7 @@
   </span>
   <select class="govuk-select" id="field-area" name="group">
   {% for group in getProjectGroups() | await %}
-    <option value="{{ group.name }}">{{ group.name }}</option>
+    <option value="{{ group.name }}" {{ 'selected' if data.group == group.name }} >{{ group.name }}</option>
   {% endfor %}
   </select>
 </div>
@@ -136,23 +167,28 @@
   items: [
     {
       text: "Drop down",
-      value: "group"
+      value: "group",
+      selected: true if (data.type == 'group')
     },
     {
       text: "Text",
-      value: "string"
+      value: "string",
+      selected: true if (data.type == 'string')
     },
     {
       text: "Number",
-      value: "integer"
+      value: "integer",
+      selected: true if (data.type == 'integer')
     },
     {
       text: "Date",
-      value: "date"
+      value: "date",
+      selected: true if (data.type == 'date')
     },
     {
       text: "Yes / No",
-      value: "boolean"
+      value: "boolean",
+      selected: true if (data.type == 'boolean')
     }
   ]
 }) }}
@@ -171,11 +207,12 @@
     {
       value: "1",
       text: "Yes",
-      checked: true
+      checked: data.isRequired
     },
     {
       value: "0",
-      text: "No"
+      text: "No",
+      checked: true if (data.isRequired == false)
     }
   ]
 }) }}
