@@ -12,6 +12,8 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
+  {{ fieldGroups | dump }}
+
   <h1 class="govuk-heading-xl">Manage project data input fields</h1>
 
   <p class="govuk-body-l">Changes made to the data input fields will
@@ -64,7 +66,6 @@
     {% endfor %}
     </tbody>
   </table>
-
   {% endfor %}
 
  </div>

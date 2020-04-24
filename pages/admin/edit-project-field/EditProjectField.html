@@ -59,7 +59,7 @@
   </div>
 </div>
 
-{% elseif successfulMode %}
+{% elif successfulMode %}
 
   <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
@@ -68,9 +68,9 @@
     titleText: "Field submitted to dashboard"
   }) }}
 
-  <h2 class="govuk-heading-m">What next</h2>
-
+  <hr class="govuk-section-break govuk-section-break--m">
   <p class="govuk-body">
+  <strong>What next?</strong><br>
     <a href="{{ config.paths.admin.projectFieldList }}" class="govuk-link">View new field on live dashboard</a>
   </p>
 
@@ -118,7 +118,7 @@ Changes made to this project data input field will be reflected in Bulk upload a
     {
       value: "true",
       text: "Yes",
-      checked: data.isActive
+      checked: true if (data.isActive == true) else true
     },
     {
       value: "false",
@@ -226,7 +226,7 @@ Changes made to this project data input field will be reflected in Bulk upload a
     {
       value: "1",
       text: "Yes",
-      checked: data.isRequired
+      checked: true if (data.isRequired == true) else true
     },
     {
       value: "0",
