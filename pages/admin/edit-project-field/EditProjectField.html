@@ -25,6 +25,19 @@
 {% endif %}
 {% endblock %}
 
+{% set dataType = '' %}
+{% if data.type == 'group' %}
+  {% set dataType = 'Drop down' %}
+{% elif data.type == 'string' %}
+  {% set dataType = 'Free text' %}
+{% elif data.type == 'integer' %}
+  {% set dataType = 'Number' %}
+{% elif data.type == 'date' %}
+  {% set dataType = 'Date input' %}
+{% elif data.type == 'boolean' %}
+  {% set dataType = 'Yes / No' %}
+{% endif %}
+
 {% block pageTitle %}Project Data Input{% endblock %}
 
 {% block content %}
@@ -195,7 +208,7 @@ Changes made to this project data input field will be reflected in Bulk upload a
       selected: true if (data.type == 'group')
     },
     {
-      text: "Text",
+      text: "Free text",
       value: "string",
       selected: true if (data.type == 'string')
     },
@@ -205,7 +218,7 @@ Changes made to this project data input field will be reflected in Bulk upload a
       selected: true if (data.type == 'integer')
     },
     {
-      text: "Date",
+      text: "Date input",
       value: "date",
       selected: true if (data.type == 'date')
     },
