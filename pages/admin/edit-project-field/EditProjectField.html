@@ -10,14 +10,19 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 {% block beforeContent %}
-{% include "feedback.njk" %}
-{{ govukBackLink({
-  text: "Back",
-  href: "#",
-  attributes: {
-    onclick: "history.go(-1);"
-  }
-}) }}
+{% if successfulMode %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+{% else %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#",
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% endif %}
 {% endblock %}
 
 {% block pageTitle %}Project Data Input{% endblock %}
@@ -49,7 +54,7 @@
   <form action='{{ req.originalUrl }}' method='POST'>
 
   {{ govukButton({
-    text: "Add field to dashboard",
+    text: "Submit field to dashboard",
     type: "submit",
     preventDoubleClick: true
   }) }}

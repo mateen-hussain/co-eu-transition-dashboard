@@ -18,6 +18,10 @@ ProjectField.init({
     field: "display_name",
     type: STRING(300),
   },
+  description: {
+    field: "description",
+    type: STRING(300),
+  },
   importColumnName: {
     field: "import_column_name",
     type: STRING(300),
