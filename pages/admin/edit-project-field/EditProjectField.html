@@ -5,7 +5,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
@@ -233,12 +232,12 @@ Changes made to this project data input field will be reflected in Bulk upload a
     {
       value: "true",
       text: "Yes",
-      checked: true if (data.isActive == true) else true
+      checked: true if (data.isActive == "true") else true
     },
     {
       value: "false",
       text: "No",
-      checked: true if (data.isActive == false)
+      checked: true if (data.isActive == "false")
     }
   ]
 }) }}

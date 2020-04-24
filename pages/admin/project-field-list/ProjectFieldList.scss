@@ -10,6 +10,6 @@ input#drop-down-option:first-of-type {
     margin-top: 0;
 }
 
-input#drop-down-option:last-of-type {
+input#drop-down-option:last-of-type, input.govuk-input.options:last-of-type {
     margin-bottom: 5px;
 }

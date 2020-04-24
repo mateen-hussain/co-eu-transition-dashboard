@@ -28,7 +28,7 @@ export default () =>  {
     option.setAttribute('type', 'text');
     option.classList.add('govuk-input');
     option.classList.add('options');
-    dropdownOption.parentNode.insertBefore(option, dropdownOption.nextSibling);
+    dropdownOption.parentNode.insertBefore(option, dropdownOption);
     
     return false;
   }

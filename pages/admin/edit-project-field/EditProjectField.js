@@ -97,7 +97,7 @@ class EditProjectField extends Page {
     if(this.summaryMode) {
       return await this.saveFieldToDatabase();
     }
-    if ((!req.body['displayName']) || (!req.body['importColumnName']) || (!req.body['description'])) {
+    if ((!req.body.displayName) || (!req.body.importColumnName) || (!req.body.description)) {
       req.flash('You must fill in all the fields before you can review the field details');
       return res.redirect(this.req.originalUrl);
     } else {
