@@ -22,8 +22,7 @@
     "start": "/entry",
     "admin": {
       "projectFieldList": "/admin/project-field-list",
-      "projectField": "/admin/project-field",
-      "projectFieldSubmitted": "/admin/project-field-submitted"
+      "projectField": "/admin/project-field"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
