@@ -27,7 +27,7 @@ export default () =>  {
     option.setAttribute('name', 'config[options][]');
     option.setAttribute('type', 'text');
     option.classList.add('govuk-input');
-    option.classList.add('options');
+    option.classList.add('drop-down-option');
 
     var deleteLink = document.createElement('a');
     deleteLink.setAttribute('href', '#');
@@ -54,11 +54,18 @@ export default () =>  {
   const deleteOption = document.getElementsByClassName('delete-option');
 
   function deleteHander() {
+
+    if (this.nextElementSibling.nextElementSibling.nodeName != 'INPUT' && 
+    this.previousElementSibling.previousElementSibling.nodeName != 'A') {
+      return false;
+    }
+
     this.previousElementSibling.remove();
     this.nextElementSibling.remove();
     this.remove();
     return false;
   }
+  
   
   Array.prototype.forEach.call(deleteOption, function(deleteOption) {
     deleteOption.addEventListener('click', deleteHander);
@@ -67,6 +74,12 @@ export default () =>  {
   const disableOption = document.getElementsByClassName('disable-option');
 
   function disableHander() {
+
+    if (this.nextElementSibling.nodeName != 'INPUT' && 
+    this.previousElementSibling.previousElementSibling.previousElementSibling.nodeName != 'A') {
+      return false;
+    }
+
     if (this.innerHTML == 'Disable') {
       this.innerHTML = 'Enable';
       this.previousElementSibling.previousElementSibling.disabled = true;

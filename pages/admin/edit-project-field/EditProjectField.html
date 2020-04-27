@@ -88,7 +88,7 @@
   <hr class="govuk-section-break govuk-section-break--m">
   <p class="govuk-body">
   <strong>What next?</strong><br>
-    <a href="{{ config.paths.admin.projectFieldList }}" class="govuk-link">View new field on live dashboard</a>
+    <a href="{{ config.paths.admin.projectFieldList }}" class="govuk-link">View field on live dashboard</a>
   </p>
 
   </div>
@@ -216,6 +216,8 @@ Changes made to this project data input field will be reflected in Bulk upload a
   {% endfor %}
   {% else %}
       <input class="govuk-input drop-down-option" name="config[options][]" type="text">
+      <a href="#" class="govuk-link delete-option">Delete</a>
+      <a href="#" class="govuk-link disable-option">Disable</a>
   {% endif %}
     <hr class="govuk-section-break govuk-section-break--m">
 </div>
