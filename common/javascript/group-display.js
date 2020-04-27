@@ -16,8 +16,8 @@ export default () =>  {
   });
 
 
-  var addOption = document.getElementById("add-option");
-  var dropdownOption = document.getElementsByClassName("drop-down-option");
+  const addOption = document.getElementById("add-option");
+  const dropdownOption = document.getElementsByClassName("drop-down-option");
 
   addOption.onclick = function(e) { return myHandler(e); };
 
@@ -28,23 +28,56 @@ export default () =>  {
     option.setAttribute('type', 'text');
     option.classList.add('govuk-input');
     option.classList.add('options');
+
+    var deleteLink = document.createElement('a');
+    deleteLink.setAttribute('href', '#');
+    deleteLink.innerHTML = 'Delete';
+    deleteLink.classList.add('govuk-link');
+    deleteLink.classList.add('delete-option');
+
+    var disableLink = document.createElement('a');
+    disableLink.setAttribute('href', '#');
+    disableLink.innerHTML = 'Disable';
+    disableLink.classList.add('govuk-link');
+    disableLink.classList.add('disable-option');
+
+    deleteLink.addEventListener('click', deleteHander);
+    disableLink.addEventListener('click', disableHander);
+
     dropdownOption[0].parentNode.insertBefore(option, dropdownOption[0].nextSibling);
-    
+    dropdownOption[0].parentNode.insertBefore(disableLink, dropdownOption[0].nextSibling);
+    dropdownOption[0].parentNode.insertBefore(deleteLink, dropdownOption[0].nextSibling);
+
     return false;
   }
 
+  const deleteOption = document.getElementsByClassName('delete-option');
 
+  function deleteHander() {
+    this.previousElementSibling.remove();
+    this.nextElementSibling.remove();
+    this.remove();
+    return false;
+  }
+  
+  Array.prototype.forEach.call(deleteOption, function(deleteOption) {
+    deleteOption.addEventListener('click', deleteHander);
+  });
 
-  // var deleteOption = document.getElementById("delete-option");
+  const disableOption = document.getElementsByClassName('disable-option');
 
-  // deleteOption.onclick = function(e) { return deleteHandler(e); };
-
-  // function deleteHandler() {
-
-  //   deleteOption.parentNode.parentNode.remove();
-
-    
-  //   return false;
-  // }
+  function disableHander() {
+    if (this.innerHTML == 'Disable') {
+      this.innerHTML = 'Enable';
+      this.previousElementSibling.previousElementSibling.disabled = true;
+    } else {
+      this.innerHTML = 'Disable';
+      this.previousElementSibling.previousElementSibling.disabled = false;
+    }
+  }
+  
+  Array.prototype.forEach.call(disableOption, function(disableOption) {
+    disableOption.addEventListener('click', disableHander);
+  });
 
 }

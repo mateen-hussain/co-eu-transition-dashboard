@@ -206,29 +206,18 @@ Changes made to this project data input field will be reflected in Bulk upload a
 }) }}
 
 <div id="dropDownOptions">
+  <label class="govuk-label" for="drop-down-options">Drop down options
+  <a href="#" id="add-option" class="govuk-link">Add another</a></label>
   {% if data.config and data.type == 'group' %}
-  <label class="govuk-label" for="drop-down-options">Drop down options</label>
   {% for groupItem in data.config.options %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
       <input class="govuk-input drop-down-option" value="{{ groupItem }}" name="config[options][]" type="text">
-    </div>
-    <div class="govuk-grid-column-one-quarter">
-    {% if editMode %}
       <a href="#" class="govuk-link delete-option">Delete</a>
       <a href="#" class="govuk-link disable-option">Disable</a>
-    {% endif %}
-    </div>
-  </div>
   {% endfor %}
-    <a href="#" id="add-option" class="govuk-link">Add another</a>
-    <hr class="govuk-section-break govuk-section-break--m">
   {% else %}
-  <label class="govuk-label" for="drop-down-options">Drop down options</label>
-  <input class="govuk-input drop-down-option" name="config[options][]" type="text">
-  <a href="#" id="add-option" class="govuk-link">Add another</a>
-  <hr class="govuk-section-break govuk-section-break--m">
+      <input class="govuk-input drop-down-option" name="config[options][]" type="text">
   {% endif %}
+    <hr class="govuk-section-break govuk-section-break--m">
 </div>
 
 {{ govukRadios({

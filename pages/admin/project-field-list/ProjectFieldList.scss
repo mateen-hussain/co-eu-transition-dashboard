@@ -2,18 +2,19 @@
     width: 35%;
 }
 
-input.govuk-input.options, .drop-down-option {
-    margin-top: 10px;
-}
-
 .drop-down-option:first-of-type {
     margin-top: 0;
 }
 
-.drop-down-option:last-of-type, input.govuk-input.options:last-of-type {
+.drop-down-option, .options {
+    margin-top: 10px;
     margin-bottom: 5px;
 }
 
 .delete-option {
     padding-right: 10px;
+}
+
+#add-option {
+    float: right;
 }
