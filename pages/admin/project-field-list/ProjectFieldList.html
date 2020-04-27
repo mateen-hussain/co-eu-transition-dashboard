@@ -9,6 +9,20 @@
 
 {% block content %}
 
+{% if flash %}
+{{ flash }}
+{% endif %}
+
+<form action="{{ url }}/edit" method="post">
+  <input type="input" name="fields[][0][id]" value="1" />
+  <input type="input"name="fields[][0][order]" value="1" />
+
+  <input type="input" name="fields[][1][id]" value="2" />
+  <input type="input"name="fields[][1][order]" value="2" />
+
+  <input type="submit" name="submit" value="submit" />
+</form>
+
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
@@ -64,7 +78,7 @@
     {% endfor %}
     </tbody>
   </table>
-  
+
   {% endfor %}
 
  </div>
