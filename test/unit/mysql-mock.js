@@ -14,6 +14,7 @@ Model.init = sinon.stub().callsFake(function(attributes) {
   this.belongsToMany = sinon.stub();
   this.findOne = sinon.stub().resolves({});
   this.upsert = sinon.stub().resolves();
+  this.create = sinon.stub().resolves();
   this.findAll = sinon.stub().resolves([]);
   this.count = sinon.stub().resolves(0);
   this.rawAttributes = attributes;

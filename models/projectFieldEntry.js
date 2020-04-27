@@ -17,6 +17,10 @@ class ProjectFieldEntry extends Model {
       }
     });
 
+    if (existingField && String(existingField.value) === String(projectFieldEntry.value)) {
+      return;
+    }
+
     if (existingField) {
       await ProjectFieldEntryAudit.create(existingField.toJSON(), options);
     }

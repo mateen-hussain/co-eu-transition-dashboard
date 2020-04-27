@@ -25,10 +25,10 @@
 <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
   <h2 class="govuk-error-summary__title" id="error-summary-title">
   {% if flash %}
-   {{ flash }} 
-   {% else %} 
+   {{ flash }}
+   {% else %}
   Please fix the errors detailed below and then re-upload the file
-  {% endif %} 
+  {% endif %}
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
@@ -61,36 +61,13 @@
   {% endif %}
 
 {% if errors.projectErrors or errors.projectColumnErrors %}
-<h3 class="govuk-heading-m" id="project-error">Project errors</h3>
+  <h3 class="govuk-heading-m" id="project-error">Project errors</h3>
 
-{{ govukDetails({
-  summaryText: "Where do I fix project errors?",
-  html: "<p class='govuk-body'>To fix the Project data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Projects' tab, which is illustrated in the image below.</p>
-  <img src='/assets/images/project-screenshot.png'>"
-}) }}
-
-{% if errors.projectErrors %}
-<table class="govuk-table">
-  <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header">Project UID</th>
-      <th scope="col" class="govuk-table__header">Column Name</th>
-      <th scope="col" class="govuk-table__header">Value</th>
-      <th scope="col" class="govuk-table__header">Error</th>
-    </tr>
-  </thead>
-  <tbody class="govuk-table__body">
-    {% for error in errors.projectErrors %}
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">{{ error.item.uid }}</td>
-      <td class="govuk-table__cell">{{ error.itemDefinition.importColumnName }}</td>
-      <td class="govuk-table__cell">{{ error.item[error.itemDefinition.name] }}</td>
-      <td class="govuk-table__cell">{{ error.error }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endif %}
+  {{ govukDetails({
+    summaryText: "Where do I fix project errors?",
+    html: "<p class='govuk-body'>To fix the Project data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Projects' tab, which is illustrated in the image below.</p>
+    <img src='/assets/images/project-screenshot.png'>"
+  }) }}
 
   {% if errors.projectColumnErrors %}
     <h4 class="govuk-heading-s">Project coloumn errors:</h4>
@@ -101,39 +78,38 @@
     </ul>
   {% endif %}
 
+  {% if errors.projectErrors %}
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Project UID</th>
+        <th scope="col" class="govuk-table__header">Column Name</th>
+        <th scope="col" class="govuk-table__header">Value</th>
+        <th scope="col" class="govuk-table__header">Error</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for error in errors.projectErrors %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ error.item.uid }}</td>
+        <td class="govuk-table__cell">{{ error.itemDefinition.importColumnName }}</td>
+        <td class="govuk-table__cell">{{ error.item[error.itemDefinition.name] }}</td>
+        <td class="govuk-table__cell">{{ error.error }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
 {% endif %}
 
 {% if errors.milestoneErrors or errors.milestoneColumnErrors %}
-<h3 class="govuk-heading-m" id="milestone-error">Milestone errors</h3>
+  <h3 class="govuk-heading-m" id="milestone-error">Milestone errors</h3>
 
-{{ govukDetails({
-  summaryText: "Where do I fix milestone data errors?",
-  html: "<p class='govuk-body'>To fix the Milestone data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Milestones' tab, which is illustrated in the image below.</p>
-  <img src='/assets/images/milestone-screenshot.png'>"
-}) }}
-
-{% if errors.milestoneErrors %}
-<table class="govuk-table">
-  <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header">Milestone UID</th>
-      <th scope="col" class="govuk-table__header">Column Name</th>
-      <th scope="col" class="govuk-table__header">Value</th>
-      <th scope="col" class="govuk-table__header">Error</th>
-    </tr>
-  </thead>
-  <tbody class="govuk-table__body">
-    {% for error in errors.milestoneErrors %}
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">{{ error.item.uid }}</td>
-      <td class="govuk-table__cell">{{ error.itemDefinition.importColumnName }}</td>
-      <td class="govuk-table__cell">{{ error.item[error.itemDefinition.name] }}</td>
-      <td class="govuk-table__cell">{{ error.error }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% endif %}
+  {{ govukDetails({
+    summaryText: "Where do I fix milestone data errors?",
+    html: "<p class='govuk-body'>To fix the Milestone data errors you will need to open the spreadsheet you have tried to upload and navigate to the 'Milestones' tab, which is illustrated in the image below.</p>
+    <img src='/assets/images/milestone-screenshot.png'>"
+  }) }}
 
   {% if errors.milestoneColumnErrors %}
     <h4 class="govuk-heading-s">Milestone coloumn errors:</h4>
@@ -144,6 +120,28 @@
     </ul>
   {% endif %}
 
+  {% if errors.milestoneErrors %}
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Milestone UID</th>
+        <th scope="col" class="govuk-table__header">Column Name</th>
+        <th scope="col" class="govuk-table__header">Value</th>
+        <th scope="col" class="govuk-table__header">Error</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for error in errors.milestoneErrors %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ error.item.uid }}</td>
+        <td class="govuk-table__cell">{{ error.itemDefinition.importColumnName }}</td>
+        <td class="govuk-table__cell">{{ error.item[error.itemDefinition.name] }}</td>
+        <td class="govuk-table__cell">{{ error.error }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
 {% endif %}
 
   <form action='{{ url }}' method='POST'>
@@ -164,7 +162,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-  <p class="govuk-body">Please check that the data in your file corresponds the number of projects and milestones 
+  <p class="govuk-body">Please check that the data in your file corresponds the number of projects and milestones
     successfully uploaded to the dashboard.</p>
 
   </div>
@@ -206,7 +204,7 @@
 
 {{ govukDetails({
   summaryText: "The data uploaded is not what I was expecting",
-  html: "<p class='govuk-body'>If the number of projects and milestones uploaded don't correspond to the number in the 
+  html: "<p class='govuk-body'>If the number of projects and milestones uploaded don't correspond to the number in the
   file you uploaded, please log the issue here.</p>
   <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
 }) }}

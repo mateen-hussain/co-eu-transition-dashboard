@@ -17,6 +17,10 @@ class MilestoneFieldEntry extends Model {
       }
     });
 
+    if (existingField && String(existingField.value) === String(milestoneFieldEntry.value)) {
+      return;
+    }
+
     if (existingField) {
       await MilestoneFieldEntryAudit.create(existingField.toJSON(), options);
     }
