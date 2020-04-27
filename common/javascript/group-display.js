@@ -52,7 +52,6 @@ export default () =>  {
 
   // Delete button
   function deleteHander() {
-
     if (this.nextElementSibling.nextElementSibling.nodeName != 'INPUT' && 
     this.previousElementSibling.previousElementSibling.nodeName != 'A') {
       return false;
