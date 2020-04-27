@@ -207,17 +207,17 @@ Changes made to this project data input field will be reflected in Bulk upload a
 
 <div id="dropDownOptions">
   <label class="govuk-label" for="drop-down-options">Drop down options
-  <a href="#" id="add-option" class="govuk-link">Add another</a></label>
+  <a href="#/" id="add-option" class="govuk-link">Add another</a></label>
   {% if data.config and data.type == 'group' %}
   {% for groupItem in data.config.options %}
       <input class="govuk-input drop-down-option" value="{{ groupItem }}" name="config[options][]" type="text">
-      <a href="#" class="govuk-link delete-option">Delete</a>
-      <a href="#" class="govuk-link disable-option">Disable</a>
+      <a href="#/" class="govuk-link delete-option">Delete</a>
+      <a href="#/" class="govuk-link disable-option">Disable</a>
   {% endfor %}
   {% else %}
       <input class="govuk-input drop-down-option" name="config[options][]" type="text">
-      <a href="#" class="govuk-link delete-option">Delete</a>
-      <a href="#" class="govuk-link disable-option">Disable</a>
+      <a href="#/" class="govuk-link delete-option">Delete</a>
+      <a href="#/" class="govuk-link disable-option">Disable</a>
   {% endif %}
     <hr class="govuk-section-break govuk-section-break--m">
 </div>
