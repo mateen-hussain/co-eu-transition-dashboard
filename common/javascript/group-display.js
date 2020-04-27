@@ -11,6 +11,9 @@ export default () =>  {
   }
   
   const type = document.getElementsByName('type');
+  if (type[0].options[type[0].selectedIndex].value !== 'group') {
+    dropDownOptions.style.display = 'none'
+  }
   Array.prototype.forEach.call(type, function(type) {
     type.addEventListener('change', changeHandler);
   });
