@@ -1,6 +1,9 @@
 {% extends "template.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 {% set fields = getFields() | await %}
+{% set fieldGroups = getProjectGroups() | await %}
+{% set fieldType = '' %}
 
 {% block pageTitle %}Project Data Input{% endblock %}
 
@@ -11,9 +14,12 @@
 
   <h1 class="govuk-heading-xl">Manage project data input fields</h1>
 
-  <p class="govuk-body-l">Changes made to project data input fields on this page will 
-  be reflected in Bulk upload and Excel download features in the Transition Taskforce Dashboard. </p>
+  <p class="govuk-body-l">Changes made to the data input fields will
+  be reflected in the downloadable template for the MI commision. </p>
 
+  <p class="govuk-body">
+    <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Add a new field</a><br>
+  </p>
   <hr class="govuk-section-break govuk-section-break--m">
 
   </div>
@@ -22,66 +28,44 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
 
-  <table class="govuk-table project-fields">
-    <caption class="govuk-table__caption">Department and Project Information</caption>
-    {% include "admin/project-field-list/partials/table-header.njk" %}
-    <tbody class="govuk-table__body">
-      {% for field in fields %}
-      {% if field.group == 'Department and Project Information' %}
-        {% include "admin/project-field-list/partials/table-rows.njk" %}
-      {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
+  {% for fieldGroup in fieldGroups %}
 
   <table class="govuk-table project-fields">
-    <caption class="govuk-table__caption">Current Delivery status</caption>
-    {% include "admin/project-field-list/partials/table-header.njk" %}
+    <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Field Name</th>
+      <th scope="col" class="govuk-table__header">Field Type</th>
+      <th scope="col" class="govuk-table__header">Status</th>
+      <th scope="col" class="govuk-table__header"></th>
+      </tr>
+    </thead>
     <tbody class="govuk-table__body">
-      {% for field in fields %}
-      {% if field.group == 'Current Delivery status' %}
-        {% include "admin/project-field-list/partials/table-rows.njk" %}
+    {% for field in fields %}
+      {% if field.group == fieldGroup.name %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
+        {% if field.type == 'group' %}
+          {% set fieldType = 'Drop down' %}
+        {% elif field.type == 'string' %}
+          {% set fieldType = 'Free text' %}
+        {% elif field.type == 'integer' %}
+          {% set fieldType = 'Number' %}
+        {% elif field.type == 'date' %}
+          {% set fieldType = 'Date input' %}
+        {% elif field.type == 'boolean' %}
+          {% set fieldType = 'Yes / No' %}
+        {% endif %}
+        <td class="govuk-table__cell">{{ fieldType }}</td>
+        <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
+        <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
+      </tr>
       {% endif %}
-      {% endfor %}
+    {% endfor %}
     </tbody>
   </table>
-
-  <table class="govuk-table project-fields">
-    <caption class="govuk-table__caption">HMG Delivery</caption>
-    {% include "admin/project-field-list/partials/table-header.njk" %}
-    <tbody class="govuk-table__body">
-      {% for field in fields %}
-      {% if field.group == 'HMG Delivery' %}
-        {% include "admin/project-field-list/partials/table-rows.njk" %}
-      {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <table class="govuk-table project-fields">
-    <caption class="govuk-table__caption">Third Party Readiness</caption>
-    {% include "admin/project-field-list/partials/table-header.njk" %}
-    <tbody class="govuk-table__body">
-      {% for field in fields %}
-      {% if field.group == 'Third Party Readiness' %}
-        {% include "admin/project-field-list/partials/table-rows.njk" %}
-      {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
-
-
-  <table class="govuk-table project-fields">
-    <caption class="govuk-table__caption">Variance from Negotiated Outcomes</caption>
-    {% include "admin/project-field-list/partials/table-header.njk" %}
-    <tbody class="govuk-table__body">
-      {% for field in fields %}
-      {% if field.group == 'Variance from Negotiated Outcomes' %}
-        {% include "admin/project-field-list/partials/table-rows.njk" %}
-      {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
+  
+  {% endfor %}
 
  </div>
 </div>
