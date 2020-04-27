@@ -17,7 +17,7 @@ export default () =>  {
 
 
   var addOption = document.getElementById("add-option");
-  var dropdownOption = document.getElementById("drop-down-option");
+  var dropdownOption = document.getElementsByClassName("drop-down-option");
 
   addOption.onclick = function(e) { return myHandler(e); };
 
@@ -28,9 +28,23 @@ export default () =>  {
     option.setAttribute('type', 'text');
     option.classList.add('govuk-input');
     option.classList.add('options');
-    dropdownOption.parentNode.insertBefore(option, dropdownOption);
+    dropdownOption[0].parentNode.insertBefore(option, dropdownOption[0].nextSibling);
     
     return false;
   }
+
+
+
+  // var deleteOption = document.getElementById("delete-option");
+
+  // deleteOption.onclick = function(e) { return deleteHandler(e); };
+
+  // function deleteHandler() {
+
+  //   deleteOption.parentNode.parentNode.remove();
+
+    
+  //   return false;
+  // }
 
 }
