@@ -8,9 +8,6 @@ module.exports = {
           type: Sequelize.DataTypes.STRING(50),
           primaryKey: true
         }
-      },
-      {
-        charset: 'utf8'
       }
     );
 
