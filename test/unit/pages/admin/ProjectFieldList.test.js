@@ -8,7 +8,7 @@ let page = {};
 let req = {};
 let res = {};
 
-describe.only('pages/admin/project-field-list/ProjectFieldList', () => {
+describe('pages/admin/project-field-list/ProjectFieldList', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub() };
     req = { cookies: [], user: { getDepartmentsWithProjects: sinon.stub() } };
