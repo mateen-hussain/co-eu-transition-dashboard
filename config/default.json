@@ -21,7 +21,8 @@
   "paths": {
     "start": "/entry",
     "admin": {
-      "projectFieldList": "/admin/project-field-list"
+      "projectFieldList": "/admin/project-field-list",
+      "projectField": "/admin/project-field"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",

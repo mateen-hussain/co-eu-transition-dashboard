@@ -53,6 +53,7 @@ describe('core/pages/page', () => {
   describe('#postRequest', () => {
     it('#postRequest', async () => {
       const res = { redirect: sinon.stub() };
+      page.res = res;
 
       await page.postRequest({}, res);
 

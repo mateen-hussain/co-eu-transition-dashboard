@@ -1,3 +1,21 @@
 .project-fields .govuk-table__cell {
     width: 35%;
 }
+
+.drop-down-option:first-of-type {
+    margin-top: 0;
+}
+
+.drop-down-option {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.delete-option {
+    padding-right: 10px;
+}
+
+#add-option {
+    float: right;
+}
+

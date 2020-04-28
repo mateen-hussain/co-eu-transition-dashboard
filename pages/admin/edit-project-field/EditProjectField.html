@@ -1,0 +1,270 @@
+{% extends "template.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block beforeContent %}
+{% if successfulMode %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+{% else %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#",
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% endif %}
+{% endblock %}
+
+{% set dataType = '' %}
+{% if data.type == 'group' %}
+  {% set dataType = 'Drop down' %}
+{% elif data.type == 'string' %}
+  {% set dataType = 'Free text' %}
+{% elif data.type == 'integer' %}
+  {% set dataType = 'Number' %}
+{% elif data.type == 'date' %}
+  {% set dataType = 'Date input' %}
+{% elif data.type == 'boolean' %}
+  {% set dataType = 'Yes / No' %}
+{% endif %}
+
+{% block pageTitle %}Project Data Input{% endblock %}
+
+{% block content %}
+
+{% if summaryMode %}
+
+  {% include "admin/edit-project-field/partials/field-summary.njk" %}
+
+{% elif successfulMode %}
+
+  {% include "admin/edit-project-field/partials/field-success.njk" %}
+
+{% else %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">{{ "Edit project '" + data.displayName + "' field" if editMode else "Add a new field" }}</h1>
+
+{% if flash %}
+{{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [{
+        text: flash,
+        href: "#field-area"
+    }]
+}) }}
+{% endif %}
+
+<form action='{{ req.originalUrl }}' method='POST'>
+
+<input type="hidden" name="id" value="{{ data.id | default('temp') }}" />
+
+{% if editMode %}
+<p class="govuk-body-l">
+Changes made to this project data input field will be reflected in Bulk upload and Excel download features in the Transition Taskforce Dashboard.
+</p>
+<hr class="govuk-section-break govuk-section-break--m">
+{% endif %}
+
+<div class="govuk-form-group">
+  <label class="govuk-label" for="field-area">
+    Field area
+  </label>
+  <span id="field-area-hint" class="govuk-hint">
+    Which are does this input field relate to?
+  </span>
+  <select class="govuk-select" id="field-area" name="group">
+  {% for group in getProjectGroups() | await %}
+    <option value="{{ group.name }}" {{ 'selected' if data.group == group.name }} >{{ group.name }}</option>
+  {% endfor %}
+  </select>
+</div>
+
+{{ govukInput({
+  label: {
+    text: "Field display name"
+  },
+  id: "field-name",
+  name: "displayName",
+  value: data.displayName
+}) }}
+
+{{ govukInput({
+  label: {
+    text: "Spreadsheet column name this fields corresponds to"
+  },
+  hint: {
+    text: "If you are expecting data to be added from an Excel spreadsheet
+  please write the name of the column this field should match with."
+  },
+  id: "column-name",
+  name: "importColumnName",
+  value: data.importColumnName
+}) }}
+
+{{ govukTextarea({
+  name: "description",
+  id: "field-description",
+  label: {
+    text: "Field description"
+  },
+  value: data.description
+}) }}
+
+{{ govukSelect({
+  id: "field-type",
+  name: "type",
+  label: {
+    text: "Field type"
+  },
+  hint: {
+    text: "The field type that you choose will affect how the data is validated when data is uploaded to the dashboard"
+  },
+  items: [
+    {
+      text: "Drop down",
+      value: "group",
+      selected: true if (data.type == 'group')
+    },
+    {
+      text: "Free text",
+      value: "string",
+      selected: true if (data.type == 'string')
+    },
+    {
+      text: "Number",
+      value: "integer",
+      selected: true if (data.type == 'integer')
+    },
+    {
+      text: "Date input",
+      value: "date",
+      selected: true if (data.type == 'date')
+    },
+    {
+      text: "Yes / No",
+      value: "boolean",
+      selected: true if (data.type == 'boolean')
+    }
+  ]
+}) }}
+
+<div id="dropDownOptions">
+  <label class="govuk-label" for="drop-down-options">Drop down options
+  <a href="#/" id="add-option" class="govuk-link">Add another</a></label>
+  {% if data.config and data.type == 'group' %}
+  {% for groupItem in data.config.options %}
+      <input class="govuk-input drop-down-option" value="{{ groupItem }}" name="config[options][]" type="text">
+      <a href="#/" class="govuk-link delete-option">Delete</a>
+      <a href="#/" class="govuk-link disable-option">Disable</a>
+  {% endfor %}
+  {% else %}
+      <input class="govuk-input drop-down-option" name="config[options][]" type="text">
+      <a href="#/" class="govuk-link delete-option">Delete</a>
+      <a href="#/" class="govuk-link disable-option">Disable</a>
+  {% endif %}
+    <hr class="govuk-section-break govuk-section-break--m">
+</div>
+
+{{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-active",
+  name: "isActive",
+  fieldset: {
+    legend: {
+      text: "Is this field active?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "true",
+      text: "Yes",
+      checked: true if (data.isActive == "true") else true
+    },
+    {
+      value: "false",
+      text: "No",
+      checked: true if (data.isActive == "false")
+    }
+  ]
+}) }}
+
+{{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-mandatory",
+  name: "isRequired",
+  fieldset: {
+    legend: {
+      text: "Is this field mandatory?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "1",
+      text: "Yes",
+      checked: true if (data.isRequired == true) else true
+    },
+    {
+      value: "0",
+      text: "No",
+      checked: true if (data.isRequired == false)
+    }
+  ]
+}) }}
+
+{# {{ govukRadios({
+  classes: "govuk-radios--inline",
+  idPrefix: "field-filterable",
+  name: "filterable",
+  fieldset: {
+    legend: {
+      text: "Is this field filterable on the 'All data' page of the dashboard?",
+      classes: "govuk-label"
+    }
+  },
+  items: [
+    {
+      value: "1",
+      text: "Yes",
+      checked: true
+    },
+    {
+      value: "0",
+      text: "No"
+    }
+  ]
+}) }} #}
+
+{{ govukButton({
+text: "Review changes" if editMode else "Review",
+type: "submit",
+preventDoubleClick: true
+}) }}
+
+</form>
+
+ </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.groupDisplay();
+  </script>
+{% endblock %}

@@ -13,6 +13,9 @@ const saveData = (req, res, data = {}, keepExisting = true) => {
   const dataToSave = Object.assign({}, existingData, data);
   const token = jwt.sign(dataToSave, config.cookie.secret);
   res.cookie('jwt', token, cookieOptions);
+  if (req && req.cookies['jwt']) {
+    req.cookies['jwt'] = token;
+  }
 };
 
 const token = req => {
