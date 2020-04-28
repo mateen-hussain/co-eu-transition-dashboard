@@ -5,7 +5,7 @@ const ProjectField = require('models/projectField');
 const flash = require('middleware/flash');
 const authentication = require('services/authentication');
 const logger = require('services/logger');
-const { camelCase } = require('helpers/utils');
+const { camelCase, removeNulls } = require('helpers/utils');
 
 class EditProjectField extends Page {
   get url() {
@@ -93,13 +93,22 @@ class EditProjectField extends Page {
     }
   }
 
+  isValid(body) {
+    const isValidGroup = body.type == 'group' ? body.config.options && body.config.options.length : true;
+    const hasDisplayName = body.displayName && body.displayName.length;
+    const hasImportColumnName = body.importColumnName && body.importColumnName.length;
+    const hasDescription = body.description && body.description.length;
+
+    return isValidGroup && hasDisplayName && hasImportColumnName && hasDescription;
+  }
+
   async postRequest(req, res) {
     if(this.summaryMode) {
       return await this.saveFieldToDatabase();
     }
-    if ((!req.body.displayName || !req.body.importColumnName || !req.body.description) || 
-    (req.body.type == 'group' && req.body.config.options == '')) {
+    if (!this.isValid(req.body)) {
       req.flash('You must fill in all the fields before you can review the field details');
+      this.saveData(removeNulls(req.body));
       return res.redirect(this.req.originalUrl);
     } else {
       super.postRequest(req);
