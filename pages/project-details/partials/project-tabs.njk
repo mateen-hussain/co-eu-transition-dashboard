@@ -13,6 +13,13 @@
       panel: {
         html: "<p class='govuk-body'>" + project.fields.get('solution').value| default('N/A') + "</p>"
       }
+    },
+    {
+      label: "Contact details",
+      id: "contact-details",
+      panel: {
+        html: "<p class='govuk-body'>" + project.fields.get('sro').value| default('N/A') + "</p>"
+      }
     }
   ]
 }) }}
