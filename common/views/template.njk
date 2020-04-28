@@ -96,6 +96,11 @@
                 Add data
               </a>
             </li>
+            <li class="govuk-header__navigation-item {% if url == config.paths.admin.projectFieldList %} govuk-header__navigation-item--active {% endif %}">
+              <a class="govuk-header__link nav" href="{{ config.paths.admin.projectFieldList }}">
+                Manage data input
+              </a>
+            </li>
             {% endif %}
           </ul>
         </nav>
@@ -118,6 +123,19 @@
           </ul>
         </nav>
       {% endif %}
+
+      {% if (url == config.paths.admin.projectFieldList) %}
+        <nav class="child-navigation">
+          <ul id="childNavigation" class="govuk-header__navigation " aria-label="Second Level Navigation">
+            <li class="govuk-header__navigation-item child-item {% if url == config.paths.admin.projectFieldList %} govuk-header__navigation-item--active {% endif %}">
+              <a class="govuk-header__link child-nav" href="{{ config.paths.admin.projectFieldList }}">
+                Project data
+              </a>
+            </li>
+          </ul>
+        </nav>
+      {% endif %}
+
     </div>
     {% include "feedback.njk" %}
 

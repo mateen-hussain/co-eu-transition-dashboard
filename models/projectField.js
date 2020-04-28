@@ -1,4 +1,4 @@
-const { Model, STRING, BOOLEAN, ENUM, JSON } = require('sequelize');
+const { Model, STRING, BOOLEAN, ENUM, INTEGER, JSON } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class ProjectField extends Model {}
@@ -21,6 +21,12 @@ ProjectField.init({
   importColumnName: {
     field: "import_column_name",
     type: STRING(300),
+  },
+  order: {
+    type: INTEGER
+  },
+  group: {
+    type: STRING(50),
   }
 }, { sequelize, modelName: 'projectField', tableName: 'project_field', timestamps: false });
 

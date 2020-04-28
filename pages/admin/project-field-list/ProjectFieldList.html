@@ -1,0 +1,73 @@
+{% extends "template.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% set fields = getFields() | await %}
+{% set fieldGroups = getProjectGroups() | await %}
+{% set fieldType = '' %}
+
+{% block pageTitle %}Project Data Input{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">Manage project data input fields</h1>
+
+  <p class="govuk-body-l">Changes made to the data input fields will
+  be reflected in the downloadable template for the MI commision. </p>
+
+  <p class="govuk-body">
+    <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Add a new field</a><br>
+  </p>
+  <hr class="govuk-section-break govuk-section-break--m">
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+  {% for fieldGroup in fieldGroups %}
+
+  <table class="govuk-table project-fields">
+    <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Field Name</th>
+      <th scope="col" class="govuk-table__header">Field Type</th>
+      <th scope="col" class="govuk-table__header">Status</th>
+      <th scope="col" class="govuk-table__header"></th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    {% for field in fields %}
+      {% if field.group == fieldGroup.name %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
+        {% if field.type == 'group' %}
+          {% set fieldType = 'Drop down' %}
+        {% elif field.type == 'string' %}
+          {% set fieldType = 'Free text' %}
+        {% elif field.type == 'integer' %}
+          {% set fieldType = 'Number' %}
+        {% elif field.type == 'date' %}
+          {% set fieldType = 'Date input' %}
+        {% elif field.type == 'boolean' %}
+          {% set fieldType = 'Yes / No' %}
+        {% endif %}
+        <td class="govuk-table__cell">{{ fieldType }}</td>
+        <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
+        <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
+      </tr>
+      {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+  
+  {% endfor %}
+
+ </div>
+</div>
+
+{% endblock %}
