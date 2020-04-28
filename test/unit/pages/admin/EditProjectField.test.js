@@ -12,7 +12,7 @@ let req = {};
 
 describe('pages/admin/edit-project-field/EditProjectField', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub(), render: sinon.stub(), redirect: sinon.stub() };
+    res = { cookies: sinon.stub(), render: sinon.stub(), redirect: sinon.stub(), cookie: sinon.stub() };
     req = { cookies: [], user: {} };
     page = new EditProjectField('some path', req, res);
     page.req = req;
@@ -78,6 +78,15 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
 
       sinon.assert.called(page.setData)
     });
+
+    it('clears data on successful page', async () => {
+      page.clearData = sinon.stub();
+      page.successfulMode = true;
+
+      await page.getRequest(req, res);
+
+      sinon.assert.calledOnce(page.clearData);
+    });
   });
 
   describe('#next', () => {
@@ -115,7 +124,6 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
 
       sinon.assert.calledWith(ProjectField.upsert, page.data);
       sinon.assert.calledOnce(page.next);
-      sinon.assert.calledOnce(page.clearData);
     });
 
     it('catches any errors and returns to user', async () => {
@@ -132,7 +140,7 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
     });
   });
 
-  describe.only('#isValid', () => {
+  describe('#isValid', () => {
     let body = {};
 
     beforeEach(() => {

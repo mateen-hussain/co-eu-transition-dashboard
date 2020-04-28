@@ -2,7 +2,7 @@
     <div class="govuk-grid-column-full">
 
     {{ govukPanel({
-    titleText: "Project data field updated" if editMode else "Project data field added to dashboard"
+    titleText: data.displayName + " data field updated" if editMode else data.displayName + " data field added to dashboard"
     }) }}
 
     {% if not editMode %}

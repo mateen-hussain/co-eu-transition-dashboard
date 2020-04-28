@@ -36,7 +36,7 @@ class EditProjectField extends Page {
   }
 
   async getRequest(req, res) {
-    if (this.summaryMode) {
+    if (this.summaryMode || this.successfulMode) {
       // there should be an id set now
       if (!this.data.id) {
         return this.res.redirect(paths.admin.projectFieldList);
@@ -46,6 +46,10 @@ class EditProjectField extends Page {
     }
 
     super.getRequest(req, res);
+
+    if (this.successfulMode) {
+      this.clearData();
+    }
   }
 
   get editUrl() {
@@ -84,7 +88,6 @@ class EditProjectField extends Page {
 
     try {
       await ProjectField.upsert(field);
-      this.clearData();
       this.next();
     } catch (error) {
       logger.error(error);
