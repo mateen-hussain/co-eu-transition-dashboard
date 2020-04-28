@@ -249,7 +249,7 @@ Changes made to this project data input field will be reflected in Bulk upload a
 }) }} #}
 
 {{ govukButton({
-text: "Review",
+text: "Review changes" if editMode else "Review",
 type: "submit",
 preventDoubleClick: true
 }) }}
