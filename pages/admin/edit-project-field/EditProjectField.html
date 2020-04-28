@@ -54,7 +54,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl">{{ "Edit project " + data.displayName + " field" if editMode else "Add a new field" }}</h1>
+  <h1 class="govuk-heading-xl">{{ "Edit project '" + data.displayName + "' field" if editMode else "Add a new field" }}</h1>
 
 {% if flash %}
 {{ govukErrorSummary({
