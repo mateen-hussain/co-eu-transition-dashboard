@@ -94,10 +94,15 @@ class EditProjectField extends Page {
   }
 
   isValid(body) {
-    const isValidGroup = body.type == 'group' ? body.config.options && body.config.options.length : true;
-    const hasDisplayName = body.displayName && body.displayName.length;
-    const hasImportColumnName = body.importColumnName && body.importColumnName.length;
-    const hasDescription = body.description && body.description.length;
+    let isValidGroup = true;
+    if (body.type === 'group') {
+      body.config = removeNulls(body.config);
+      isValidGroup = body.config && body.config.options && body.config.options.length > 0;
+    }
+
+    const hasDisplayName = body.displayName && String(body.displayName).trim().length > 0;
+    const hasImportColumnName = body.importColumnName && String(body.importColumnName).trim().length > 0;
+    const hasDescription = body.description && String(body.description).trim().length > 0;
 
     return isValidGroup && hasDisplayName && hasImportColumnName && hasDescription;
   }

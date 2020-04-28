@@ -132,6 +132,50 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
     });
   });
 
+  describe.only('#isValid', () => {
+    let body = {};
+
+    beforeEach(() => {
+      body = {
+        type: 'some text',
+        displayName: 'some text',
+        importColumnName: 'some text',
+        description: 'some text'
+      }
+    });
+
+    it('returns true if all valid', () => {
+      expect(page.isValid(body)).to.be.ok;
+    });
+
+    it('returns false if no display name', () => {
+      body.displayName = '';
+      expect(page.isValid(body)).to.not.be.ok;
+    });
+
+    it('returns false if no importColumnName', () => {
+      body.importColumnName = '';
+      expect(page.isValid(body)).to.not.be.ok;
+    });
+
+    it('returns false if no description', () => {
+      body.description = '';
+      expect(page.isValid(body)).to.not.be.ok;
+    });
+
+    it('returns true if type is group and valid options', () => {
+      body.type = 'group';
+      body.config = { options: ['1', '2', '3'] };
+      expect(page.isValid(body)).to.be.ok;
+    });
+
+    it('returns false if type is group no valid options', () => {
+      body.type = 'group';
+      body.config = { options: [''] };
+      expect(page.isValid(body)).to.not.be.ok;
+    });
+  })
+
   describe('#setData', () => {
     beforeEach(() => {
       sinon.stub(page, 'saveData');
