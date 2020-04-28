@@ -131,11 +131,6 @@
 
 <form action='{{ req.originalUrl }}' method='POST'>
 
-{% set submitText = 'Submit field to dashboard' %}
-{% if editMode %}
-  {% set submitText = 'Edit field' %}
-{% endif %}
-
 {{ govukButton({
   text: "Submit changes to dashboard" if editMode else "Add field to dashboard",
   type: "submit",

@@ -2,14 +2,16 @@
     <div class="govuk-grid-column-full">
 
     {{ govukPanel({
-    titleText: "Field submitted to dashboard"
+    titleText: "Project data field updated" if editMode else "Project data field added to dashboard"
     }) }}
 
+    {% if not editMode %}
     <hr class="govuk-section-break govuk-section-break--m">
     <p class="govuk-body">
     <strong>What next?</strong><br>
     <a href="{{ config.paths.admin.projectFieldList }}" class="govuk-link">View field on live dashboard</a>
     </p>
+    {% endif %}
 
     </div>
 </div>
