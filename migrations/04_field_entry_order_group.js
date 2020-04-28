@@ -1,68 +1,72 @@
-const Sequelize = require('sequelize')
+const Sequelize = require('sequelize');
+const logger = require('services/logger');
 
 module.exports = {
   up: async (query) => {
-    await query.createTable('field_entry_group',
-      {
-        name: {
-          type: Sequelize.DataTypes.STRING(50),
-          primaryKey: true
+    try{
+      await query.createTable('field_entry_group',
+        {
+          name: {
+            type: Sequelize.DataTypes.STRING(50),
+            primaryKey: true
+          }
+        },
+        {
+          charset: 'utf8'
         }
-      },
-      {
-        charset: 'utf8'
-      }
-    );
+      );
 
-    await query.bulkInsert('field_entry_group', [
-      {
-        name: "Department and Project Information"
-      },{
-        name: "Current Delivery status"
-      },{
-        name: "HMG Delivery"
-      },{
-        name: "Third Party Readiness"
-      },{
-        name: "Variance from Negotiated Outcomes"
-      }
-    ]);
+      await query.bulkInsert('field_entry_group', [
+        {
+          name: "Department and Project Information"
+        },{
+          name: "Current Delivery status"
+        },{
+          name: "HMG Delivery"
+        },{
+          name: "Third Party Readiness"
+        },{
+          name: "Variance from Negotiated Outcomes"
+        }
+      ]);
 
-    await query.addColumn(
-      'project_field',
-      'group',
-      {
-        type: Sequelize.DataTypes.STRING(50)
-      }
-    );
+      await query.addColumn(
+        'project_field',
+        'group',
+        {
+          type: Sequelize.DataTypes.STRING(50)
+        }
+      );
 
-    await query.addConstraint('project_field', ['group'], {
-      type: 'FOREIGN KEY',
-      name: 'fk_project_field_group',
-      references: {
-        table: 'field_entry_group',
-        field: 'name',
-      },
-      onDelete: 'no action',
-      onUpdate: 'no action'
-    });
+      await query.addConstraint('project_field', ['group'], {
+        type: 'FOREIGN KEY',
+        name: 'fk_project_field_group',
+        references: {
+          table: 'field_entry_group',
+          field: 'name',
+        },
+        onDelete: 'no action',
+        onUpdate: 'no action'
+      });
 
-    await query.addColumn(
-      'project_field',
-      'order',
-      {
-        type: Sequelize.DataTypes.INTEGER(10)
-      }
-    );
+      await query.addColumn(
+        'project_field',
+        'order',
+        {
+          type: Sequelize.DataTypes.INTEGER(10)
+        }
+      );
 
-    await query.addColumn(
-      'milestone_field',
-      'order',
-      {
-        type: Sequelize.DataTypes.INTEGER(10)
-      }
-    );
-
+      await query.addColumn(
+        'milestone_field',
+        'order',
+        {
+          type: Sequelize.DataTypes.INTEGER(10)
+        }
+      );
+    } catch (error) {
+      logger.error(error);
+    }
   },
 
   down: async (query) => {

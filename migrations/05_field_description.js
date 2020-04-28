@@ -1,23 +1,28 @@
-const Sequelize = require('sequelize')
+const Sequelize = require('sequelize');
+const logger = require('services/logger');
 
 module.exports = {
   up: async (query) => {
-    // logic for transforming into the new state
-    await query.addColumn(
-      'project_field',
-      'description',
-      {
-        type: Sequelize.DataTypes.TEXT
-      }
-    );
+    try{
+      // logic for transforming into the new state
+      await query.addColumn(
+        'project_field',
+        'description',
+        {
+          type: Sequelize.DataTypes.TEXT
+        }
+      );
 
-    await query.addColumn(
-      'milestone_field',
-      'description',
-      {
-        type: Sequelize.DataTypes.TEXT
-      }
-    )
+      await query.addColumn(
+        'milestone_field',
+        'description',
+        {
+          type: Sequelize.DataTypes.TEXT
+        }
+      );
+    } catch (error) {
+      logger.error(error);
+    }
   },
 
   down: async (query) => {
