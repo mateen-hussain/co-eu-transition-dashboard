@@ -176,6 +176,8 @@
 
   {% set projectFields = (projectFields.push(projectValue), projectFields) %}
 
+  {% set contentHtml %}{% endset  %}
+
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
 
