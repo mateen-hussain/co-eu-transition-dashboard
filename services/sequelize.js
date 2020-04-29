@@ -7,6 +7,9 @@ const path = require('path');
 // Something in cloudfoundry is replacing mysql:// with mysql2:// which is causing some issues
 const sequelize = new Sequelize(services.mysql.uri.replace(/^mysql2:\/\//,'mysql://'),{
   dialect: 'mysql',
+  define: {
+    charset: services.mysql.charset
+  },
   dialectOptions: {
     ssl: services.mysql.sslCertificate
   },
@@ -24,7 +27,11 @@ const umzug = new Umzug({
 });
 
 sequelize.runMigrations = async () => {
-  return await umzug.up();
+  try {
+    return await umzug.up();
+  } catch (error) {
+    return error;
+  }
 };
 
 sequelize.testConnection = async () => {

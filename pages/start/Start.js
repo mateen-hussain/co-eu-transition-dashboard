@@ -9,7 +9,7 @@ class Start extends Page {
 
   async handler(req, res) {
     if(req.user.passwordReset) {
-      res.redirect(config.paths.authentication.passwordReset);
+      return res.redirect(config.paths.authentication.passwordReset);
     }
 
     if (req.user.role === 'admin') {
