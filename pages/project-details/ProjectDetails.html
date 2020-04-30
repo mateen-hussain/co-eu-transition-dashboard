@@ -38,7 +38,7 @@
     {% set field = project.fields.get(tableFieldId) %}
 
     {% set projectValue = (projectValue.push({html:
-    "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
+    "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" | safe }), projectValue) %}
   {% endfor %}
 
   {% for milestone in project.milestones %}
@@ -52,8 +52,8 @@
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.id == 'date' else
-      "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>" | safe if field.id == 'date' else
+      "<span>" + field.value | default('N/A') + "</span>" | safe }), milestoneValue) %}
 
     {% endfor %}
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
@@ -61,8 +61,8 @@
   {% endfor %}
 
 {% set projectValue = (projectValue.push({
-      html: "<span>" + missedMilestonesCount + "</span>" }, {
-      html: "<span>" + project.fields.get('deliveryTheme').value| default('N/A') + "</span>" }),
+      html: "<span>" + missedMilestonesCount + "</span>" | safe }, {
+      html: "<span>" + project.fields.get('deliveryTheme').value| default('N/A') + "</span>" | safe }),
     projectValue) %}
 
 {% set milestonesHtml %}

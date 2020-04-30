@@ -165,9 +165,9 @@
     {% set projectValue = (projectValue.push({html:
 
     "<a href=" + config.paths.projectDetails | replace(":uid", uid | replace(" ", "%20"))  + " class='govuk-link project-link'>" +
-    "<div class='scrollable'>" + field.value + "</div></a>"
+    "<div class='scrollable'>" + field.value + "</div></a>" | safe
       if field.id == 'title'
-        else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
+        else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" | safe
     }), projectValue) %}
 
   {% endif %}
@@ -188,8 +188,8 @@
         {% set flag = 'red-date' %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>"  if field.type == 'date' else
-      "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>" | safe if field.type == 'date' else
+      "<span>" + field.value | default('N/A') + "</span>" | safe }), milestoneValue) %}
 
     {% endfor %}
 
@@ -244,7 +244,7 @@
                     <input type="hidden" name="optionValue" value="{{ option.value }}" />
 
                     {{ govukButton({
-                      html: "<img src='/assets/images/cross.png' class='cross' alt='delete-filter' />" + applyFormatting(filter, option.value),
+                      html: "<img src='/assets/images/cross.png' class='cross' alt='delete-filter' />" + applyFormatting(filter, option.value) | safe,
                       classes: "govuk-button--secondary filterBtn"
                     }) }}
                   </form>
@@ -259,7 +259,7 @@
       {% if filter.id in filterNames %}
             {% set summary = (summary.push ({
             key: {
-              html: "<span class='filter-name'>" + filter.name + "</span>"
+              html: "<span class='filter-name'>" + filter.name + "</span>" | safe
             },
             value: {
               html: filterSummary
