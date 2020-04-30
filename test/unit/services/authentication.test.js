@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const User = require('models/user');
 const Department = require('models/department');
 const sequelize = require('services/sequelize');
+const { Op } = require('sequelize');
 
 let passportLocalStrategyStub = {};
 let passportJWTStrategyStub = {};
@@ -181,7 +182,7 @@ describe('services/authentication', () => {
         await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
         sinon.assert.calledWith(User.findOne, {
-          where: { id: jwtPayload.id },
+          where: { id: jwtPayload.id, loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts } },
           include: Department
         });
 
@@ -196,7 +197,7 @@ describe('services/authentication', () => {
         await authentication.authenticateUser(jwtPayload, authenticateUserCallback);
 
         sinon.assert.calledWith(User.findOne, {
-          where: { id: jwtPayload.id },
+          where: { id: jwtPayload.id, loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts } },
           include: Department
         });
 
