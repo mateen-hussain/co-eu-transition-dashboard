@@ -143,6 +143,17 @@ Project.hasMany(Milestone, { foreignKey: 'projectUid' });
 Milestone.belongsTo(Project, { foreignKey: 'projectUid' });
 Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid' });
 Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilter' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterA' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterB' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterC' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterD' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterE' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterF' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterG' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterH' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterI' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterJ' });
+Project.hasMany(ProjectFieldEntry, { foreignKey: 'projectUid', as: 'ProjectFieldEntryFilterK' });
 ProjectFieldEntry.belongsTo(Project, { foreignKey: 'projectUid' });
 Project.hasMany(Project, { as: 'projects_count', foreignKey: 'uid' });
 

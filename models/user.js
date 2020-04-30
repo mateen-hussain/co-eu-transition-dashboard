@@ -1,4 +1,4 @@
-const { Model, STRING, ENUM, DATE, INTEGER, BOOLEAN } = require('sequelize');
+const { Model, STRING, ENUM, DATE, INTEGER, BOOLEAN, Op } = require('sequelize');
 const sequelize = require('services/sequelize');
 const Project = require('./project');
 const Milestone = require('./milestone');
@@ -36,15 +36,15 @@ class User extends Model {
       include: MilestoneField
     }];
 
-    if (milestoneSearchCriteria.length) {
-      milestoneInclude.push({
-        model: MilestoneFieldEntry,
+    groupedSearch.milestoneField.forEach((milestoneFieldQuery, index) => {
+      include.push({
         required: true,
-        as: 'MilestoneFieldEntryFilter',
+        as: `MilestoneFieldEntryFilter${String.fromCharCode('A'.charCodeAt() + index)}`,
         attributes: [],
-        where: groupedSearch.milestoneField
-      })
-    }
+        model: MilestoneFieldEntry,
+        where: milestoneFieldQuery
+      });
+    });
 
     const include = [
       {
@@ -59,15 +59,15 @@ class User extends Model {
       }
     ];
 
-    if (Object.keys(groupedSearch.projectField).length) {
+    groupedSearch.projectField.forEach((projectFieldQuery, index) => {
       include.push({
         required: true,
-        as: 'ProjectFieldEntryFilter',
+        as: `ProjectFieldEntryFilter${String.fromCharCode('A'.charCodeAt() + index)}`,
         attributes: [],
         model: ProjectFieldEntry,
-        where: groupedSearch.projectField
-      })
-    }
+        where: projectFieldQuery
+      });
+    });
 
     const departmentsWithProjects = await this.getDepartments({
       include: [{

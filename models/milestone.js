@@ -114,5 +114,16 @@ Milestone.init({
 
 Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid' });
 Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilter' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterA' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterB' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterC' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterD' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterE' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterF' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterG' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterH' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterI' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterJ' });
+Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilterK' });
 
 module.exports = Milestone;
