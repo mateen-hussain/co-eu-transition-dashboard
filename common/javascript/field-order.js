@@ -48,4 +48,8 @@ export default () =>  {
     });
   });
 
+//   document.getElementById('reorder-fields').addEventListener("click", function(){
+//     document.querySelectorAll('.reorder-row').style.display = 'block';
+//   });
+
 }

@@ -1,5 +1,6 @@
 {% extends "template.njk" %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% set fields = getFields() | await %}
 {% set fieldGroups = getProjectGroups() | await %}
@@ -13,15 +14,15 @@
 {{ flash }}
 {% endif %}
 
-<form action="{{ url }}/edit" method="post">
-  <input type="input" name="fields[][0][id]" value="1" />
-  <input type="input"name="fields[][0][order]" value="1" />
+{# <form action="{{ url }}/edit" method="post">
+  <input type="text" name="fields[][0][id]" value="1" />
+  <input type="text"name="fields[][0][order]" value="1" />
 
-  <input type="input" name="fields[][1][id]" value="2" />
-  <input type="input"name="fields[][1][order]" value="2" />
+  <input type="text" name="fields[][1][id]" value="2" />
+  <input type="text"name="fields[][1][order]" value="2" />
 
   <input type="submit" name="submit" value="submit" />
-</form>
+</form> #}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -33,7 +34,7 @@
 
   <p class="govuk-body">
     <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Add a new field</a><br>
-    <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Re-order fields</a><br>
+    <a href="#" id="reorder-fields" class="govuk-link">Re-order fields</a><br>
   </p>
   <hr class="govuk-section-break govuk-section-break--m">
 
@@ -43,14 +44,17 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
 
-  {% for fieldGroup in fieldGroups %}
+  <form action="{{ url }}/edit" method="post">
 
+  {% for fieldGroup in fieldGroups %}
   <table class="govuk-table project-fields">
     <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header"></th>
-      <th scope="col" class="govuk-table__header"></th>
+      <div class="reorder-row">
+        <th scope="col" class="govuk-table__header"></th>
+        <th scope="col" class="govuk-table__header"></th>
+      </div>
       <th scope="col" class="govuk-table__header">Field Name</th>
       <th scope="col" class="govuk-table__header">Field Type</th>
       <th scope="col" class="govuk-table__header">Status</th>
@@ -60,9 +64,12 @@
     <tbody class="govuk-table__body">
     {% for field in fields %}
       {% if field.group == fieldGroup.name %}
+      {% set order = ( order | default(0) ) + 1 %}
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell"><button class="move-up">&#8679;</button></td>
-        <td class="govuk-table__cell"><button class="move-down">&#8681;</button></td>
+        <div class="reorder-row">
+          <td class="govuk-table__cell"><button type="button" class="move-up">&#8679;</button></td>
+          <td class="govuk-table__cell"><button type="button" class="move-down">&#8681;</button></td>
+        </div>
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
           {% set fieldType = 'Drop down' %}
@@ -75,7 +82,9 @@
         {% elif field.type == 'boolean' %}
           {% set fieldType = 'Yes / No' %}
         {% endif %}
-        <td class="govuk-table__cell">{{ fieldType }}</td>
+        <td class="govuk-table__cell">{{ fieldType }}          
+          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
+          <input type="text"name="fields[][0][order]" value="{{ order }}" /></td>
         <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
         <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
       </tr>
@@ -83,8 +92,15 @@
     {% endfor %}
     </tbody>
   </table>
-
   {% endfor %}
+
+  {{ govukButton({
+    text: "Apply changes",
+    type: "submit",
+    preventDoubleClick: true
+  }) }}
+
+  </form>
 
  </div>
 </div>

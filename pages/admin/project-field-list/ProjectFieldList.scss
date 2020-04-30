@@ -1,5 +1,5 @@
 .project-fields .govuk-table__cell {
-    width: 35%;
+    width: 15%;
 }
 
 .drop-down-option:first-of-type {
@@ -19,3 +19,6 @@
     float: right;
 }
 
+.reorder-row {
+    display: none;
+}
