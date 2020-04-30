@@ -6,59 +6,49 @@ const milestone = require('models/milestone');
 const milestoneField = require('models/milestoneField');
 const milestoneFieldEntry = require('models/milestoneFieldEntry');
 
-function generateMatch(fieldName,value) {
-  if (Array.isArray(value)) {
-    return `IN (:${fieldName})`;
-  }
-
-  return `= :${fieldName}`;
+function quoteIdentifier(value) {
+  return sequelize.getQueryInterface().QueryGenerator.quoteIdentifier(value);
 }
 
-function generateJoinNames(type,field,value) {
-  const aliasFieldIdName = `${type}_field_id_${field}`;
-  const aliasValueName = `${type}_field_${field}`;
-  let binds = {};
-  binds[aliasFieldIdName] = field;
-  binds[aliasValueName] = value;
+function generateMatch(table,field,value) {
+  return sequelize.getQueryInterface().QueryGenerator.getWhereConditions({
+    [field]: value
+  },table);
+}
 
-  return [aliasFieldIdName,aliasValueName,binds];
+function generateFilterAlias(type,field) {
+  return `${type}_field_id_${field}`
 }
 
 function generateProjectProjectFieldFilter(field,value) {
-  const [aliasFieldIdName,aliasValueName,binds] = generateJoinNames("project",field,value);
-  return [
-    `
-      INNER JOIN project_field_entry AS ${aliasFieldIdName} ON (
-        project.uid = ${aliasFieldIdName}.project_uid
-        AND ${aliasFieldIdName}.project_field_id = :${aliasFieldIdName}
-        AND ${aliasFieldIdName}.value ${generateMatch(aliasValueName,value)}
-      )
-    `,
-    binds
-  ];
+  const aliasName = generateFilterAlias("project",field);
+  return `
+    INNER JOIN project_field_entry AS ${aliasName} ON (
+      project.uid = ${quoteIdentifier(aliasName)}.project_uid
+      AND ${generateMatch(aliasName,"project_field_id",field)}
+      AND ${generateMatch(aliasName,"value",value)}
+    )
+  `;
 }
 
 function generateProjectMilestoneFieldFilter(field,value) {
-  const [aliasFieldIdName,aliasValueName,binds] = generateJoinNames("milestone",field,value);
-  return [
-    `
-      JOIN (
-          SELECT project.uid
-          FROM
-              project INNER JOIN milestone ON (project.uid = milestone.project_uid)
-              INNER JOIN milestone_field_entry ON (
-                milestone.uid = milestone_field_entry.milestone_uid
-                AND milestone_field_entry.milestone_field_id = :${aliasFieldIdName}
-              )
-          WHERE
-              milestone.project_uid = project.uid
-              AND milestone_field_entry.value ${generateMatch(aliasValueName,value)}
-          GROUP BY
-              project.uid
-      ) AS ${aliasFieldIdName} ON (${aliasFieldIdName}.uid = project.uid)
-    `,
-    binds
-  ];
+  const aliasName = generateFilterAlias("milestone",field);
+  return `
+    JOIN (
+        SELECT project.uid
+        FROM
+            project INNER JOIN milestone ON (project.uid = milestone.project_uid)
+            INNER JOIN milestone_field_entry ON (
+              milestone.uid = milestone_field_entry.milestone_uid
+              AND ${generateMatch("milestone_field_entry","milestone_field_id",field)}
+            )
+        WHERE
+            milestone.project_uid = project.uid
+            AND ${generateMatch("milestone_field_entry","value",value)}
+        GROUP BY
+            project.uid
+    ) AS ${quoteIdentifier(aliasName)} ON (${quoteIdentifier(aliasName)}.uid = project.uid)
+  `;
 }
 
 function generateProjectQuery(userId, projectFilters = [],milestoneFilters = []) {
@@ -97,70 +87,51 @@ function generateProjectQuery(userId, projectFilters = [],milestoneFilters = [])
   `;
 
   projectFilters.forEach( filter => {
-    const [sql,newBinds] = generateProjectProjectFieldFilter(filter.id,filter.value);
-    query += `
-      ${sql}
-    `;
-    Object.assign(binds,newBinds);
+    query += generateProjectProjectFieldFilter(filter.id,filter.value);
   });
 
   milestoneFilters.forEach( filter => {
-    const [sql,newBinds] = generateProjectMilestoneFieldFilter(filter.id,filter.value);
-    query += `
-      ${sql}
-    `;
-    Object.assign(binds,newBinds);
+    query += generateProjectMilestoneFieldFilter(filter.id,filter.value);
   });
 
   query += `
     WHERE
-      user.id = :userId
+      ${generateMatch("user","id",userId)}
   `;
 
-  return [query,binds];
+  return [query,{}];
 }
 
 function generateMilestoneMilestoneFieldFilter(field,value) {
-  const [aliasFieldIdName,aliasValueName,binds] = generateJoinNames("milestone",field,value);
-  return [
-    `
-      INNER JOIN milestone_field_entry AS ${aliasFieldIdName} ON (
-        milestones.uid = ${aliasFieldIdName}.milestone_uid
-        AND ${aliasFieldIdName}.milestone_field_id = :${aliasFieldIdName}
-        AND ${aliasFieldIdName}.value ${generateMatch(aliasValueName,value)}
-      )
-    `,
-    binds
-  ];
+  const aliasName = generateFilterAlias("milestone",field);
+  return `
+    INNER JOIN milestone_field_entry AS ${aliasName} ON (
+      milestones.uid = ${quoteIdentifier(aliasName)}.milestone_uid
+      AND ${generateMatch(aliasName,"milestone_field_id",field)}
+      AND ${generateMatch(aliasName,"value",value)}
+    )
+  `;
 }
 
 function generateMilestoneProjectFieldFilter(field,value) {
-  const [aliasFieldIdName,aliasValueName,binds] = generateJoinNames("project",field,value);
-  return [
-    `
-      JOIN (
-          SELECT project.uid
-          FROM
-              project INNER JOIN project_field_entry ON (
-                project.uid = project_field_entry.project_uid
-                AND project_field_entry.project_field_id = :${aliasFieldIdName}
-              )
-          WHERE
-              project_field_entry.value ${generateMatch(aliasValueName,value)}
-          GROUP BY
-              project.uid
-      ) AS ${aliasFieldIdName} ON (${aliasFieldIdName}.uid = project.uid)
-    `,
-    binds
-  ];
+  const aliasName = generateFilterAlias("project",field);
+  return `
+    JOIN (
+        SELECT project.uid
+        FROM
+            project INNER JOIN project_field_entry ON (
+              project.uid = project_field_entry.project_uid
+              AND ${generateMatch("project_field_entry","project_field_id",field)}
+            )
+        WHERE
+            ${generateMatch("project_field_entry","value",value)}
+        GROUP BY
+            project.uid
+    ) AS ${quoteIdentifier(aliasName)} ON (${quoteIdentifier(aliasName)}.uid = project.uid)
+  `;
 }
 
-
 function generateMilestoneQuery(userId, projectFilters = [],milestoneFilters = []) {
-  let binds = {
-    "userId": userId,
-  };
-
   let query = `
     SELECT
       project.uid, project.department_name, project.title, project.impact, project.is_completed,
@@ -199,27 +170,18 @@ function generateMilestoneQuery(userId, projectFilters = [],milestoneFilters = [
   `;
 
   projectFilters.forEach( filter => {
-    const [sql,newBinds] = generateMilestoneProjectFieldFilter(filter.id,filter.value);
-    query += `
-      ${sql}
-    `;
-    Object.assign(binds,newBinds);
+    query += generateMilestoneProjectFieldFilter(filter.id,filter.value);
   });
 
   milestoneFilters.forEach( filter => {
-    const [sql,newBinds] = generateMilestoneMilestoneFieldFilter(filter.id,filter.value);
-    query += `
-      ${sql}
-    `;
-    Object.assign(binds,newBinds);
+    query += generateMilestoneMilestoneFieldFilter(filter.id,filter.value);
   });
 
   query += `
     WHERE
-      user.id = :userId
+      ${generateMatch("user","id",userId)}
   `;
-
-  return [query,binds];
+  return [query,{}];
 }
 
 const getProjectFields = async (userId, projectFilters = [],milestoneFilters = []) => {
