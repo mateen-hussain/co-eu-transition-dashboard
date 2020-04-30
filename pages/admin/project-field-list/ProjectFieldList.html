@@ -33,6 +33,7 @@
 
   <p class="govuk-body">
     <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Add a new field</a><br>
+    <a href="{{ config.paths.admin.projectField }}" + "/edit" class="govuk-link">Re-order fields</a><br>
   </p>
   <hr class="govuk-section-break govuk-section-break--m">
 
@@ -48,6 +49,8 @@
     <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header"></th>
+      <th scope="col" class="govuk-table__header"></th>
       <th scope="col" class="govuk-table__header">Field Name</th>
       <th scope="col" class="govuk-table__header">Field Type</th>
       <th scope="col" class="govuk-table__header">Status</th>
@@ -58,6 +61,8 @@
     {% for field in fields %}
       {% if field.group == fieldGroup.name %}
       <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><button class="move-up">&#8679;</button></td>
+        <td class="govuk-table__cell"><button class="move-down">&#8681;</button></td>
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
           {% set fieldType = 'Drop down' %}
@@ -84,4 +89,10 @@
  </div>
 </div>
 
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.fieldOrder();
+  </script>
 {% endblock %}
