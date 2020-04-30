@@ -1,4 +1,5 @@
-const Sequelize = require('sequelize')
+const Sequelize = require('sequelize');
+const { services } = require('config');
 
 module.exports = {
   up: async (query) => {
@@ -20,7 +21,7 @@ module.exports = {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
       }
-    });
+    }, { charset: services.mysql.charset });
 
     await query.addConstraint('bulk_import', ['user_id'], {
       type: 'FOREIGN KEY',

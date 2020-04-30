@@ -8,7 +8,8 @@
   "services": {
     "mysql": {
       "uri": "mysql://root:password@127.0.0.1:3306/dashboard",
-      "sslCertificate": null
+      "sslCertificate": null,
+      "charset": "utf8mb4"
     },
     "tfa": {
       "name": "[Development] Transition Taskforce Dashboard"

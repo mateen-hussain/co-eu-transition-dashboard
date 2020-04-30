@@ -41,11 +41,23 @@ const removeNulls = (obj, maxDepth, currentDepth = -1) => {
   return obj;
 };
 
+const camelCase = (str = '') => {
+  return str
+    .replace(/\s(.)/g, function(a) {
+      return a.toUpperCase();
+    })
+    .replace(/\s/g, '')
+    .replace(/^(.)/, function(b) {
+      return b.toLowerCase();
+    });
+} ;
+
 const truthy = [true, 'true', 'yes', 1, '1', 'y'];
 const falsey = ['false', 'no', '0', 'n'];
 
 module.exports = {
   removeNulls,
   truthy,
-  falsey
+  falsey,
+  camelCase
 };

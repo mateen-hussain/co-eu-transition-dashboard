@@ -4,12 +4,14 @@ import missedMilestonesChart from './missed-milestones';
 import upcomingMilestoneChart from './upcoming-milestones';
 import removeAccordionCross from './remove-accordion-cross';
 import disableButton from './disable-button';
+import groupDisplay from './group-display';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
   upcomingMilestoneChart,
   removeAccordionCross,
-  disableButton
+  disableButton,
+  groupDisplay
 };
 
 document.addEventListener('DOMContentLoaded', function() {
