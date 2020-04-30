@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const logger = require('services/logger');
 const { services } = require('config');
 
-const up = async (query, transaction) => {
+const up = async (query) => {
   await query.createTable('field_entry_group',
     {
       name: {
@@ -10,7 +10,7 @@ const up = async (query, transaction) => {
         primaryKey: true
       }
     },
-    { transaction, charset: services.mysql.charset }
+    { charset: services.mysql.charset }
   );
 
   await query.bulkInsert('field_entry_group', [
@@ -25,15 +25,14 @@ const up = async (query, transaction) => {
     },{
       name: "Variance from Negotiated Outcomes"
     }
-  ], { transaction });
+  ]);
 
   await query.addColumn(
     'project_field',
     'group',
     {
       type: Sequelize.DataTypes.STRING(50)
-    },
-    { transaction }
+    }
   );
 
   await query.addConstraint('project_field', ['group'], {
@@ -44,8 +43,7 @@ const up = async (query, transaction) => {
       field: 'name',
     },
     onDelete: 'no action',
-    onUpdate: 'no action',
-    transaction
+    onUpdate: 'no action'
   });
 
   await query.addColumn(
@@ -53,8 +51,7 @@ const up = async (query, transaction) => {
     'order',
     {
       type: Sequelize.DataTypes.INTEGER(10)
-    },
-    { transaction }
+    }
   );
 
   await query.addColumn(
@@ -62,8 +59,7 @@ const up = async (query, transaction) => {
     'order',
     {
       type: Sequelize.DataTypes.INTEGER(10)
-    },
-    { transaction }
+    }
   );
 };
 
@@ -111,15 +107,11 @@ const down = async (query) => {
 
 module.exports = {
   up: async (query) => {
-    const transaction = await query.sequelize.transaction();
-
     try {
-      await up(query, transaction);
-      await transaction.commit();
+      await up(query);
     } catch (error) {
       logger.error(`Error migrating ${error}`);
       logger.error(`Rolling back changes`);
-      await transaction.rollback();
       await down(query);
       throw error;
     }

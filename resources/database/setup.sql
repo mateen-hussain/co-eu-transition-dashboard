@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `department`;
 CREATE TABLE `department` (
   `name` varchar(10) NOT NULL,
   PRIMARY KEY (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `department` WRITE;
 /*!40000 ALTER TABLE `department` DISABLE KEYS */;
@@ -54,7 +54,7 @@ CREATE TABLE `department_user` (
   KEY `fk_department_user_department` (`department_name`),
   KEY `fk_department_user_user_idx` (`user_id`),
   CONSTRAINT `fk_department_user_department` FOREIGN KEY (`department_name`) REFERENCES `department` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `department_user` WRITE;
 /*!40000 ALTER TABLE `department_user` DISABLE KEYS */;
@@ -94,7 +94,7 @@ CREATE TABLE `project` (
   PRIMARY KEY (`uid`),
   KEY `fk_project_department_idx` (`department_name`),
   CONSTRAINT `fk_project_department` FOREIGN KEY (`department_name`) REFERENCES `department` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `project` WRITE;
 /*!40000 ALTER TABLE `project` DISABLE KEYS */;
@@ -130,7 +130,7 @@ CREATE TABLE `project_field` (
   `is_active` tinyint(4) DEFAULT NULL,
   `is_required` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `project_field` WRITE;
 /*!40000 ALTER TABLE `project_field` DISABLE KEYS */;
@@ -178,7 +178,7 @@ CREATE TABLE `project_field_entry` (
   KEY `fk_project_field_entry_project_field_idx` (`project_field_id`),
   CONSTRAINT `fk_project_field_entry_milestone` FOREIGN KEY (`project_uid`) REFERENCES `project` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_project_field_entry_milestone_field` FOREIGN KEY (`project_field_id`) REFERENCES `project_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `project_field_entry` (`project_field_id`, `project_uid`, `value`, `created_at`, `updated_at`)
 VALUES
@@ -241,7 +241,7 @@ CREATE TABLE `project_field_entry_audit` (
   `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `fk_project_field_entry_audit_project_field_entry_idx` (`project_field_id`,`project_uid`),
   CONSTRAINT `fk_project_field_entry_audit_project_field_entry` FOREIGN KEY (`project_field_id`, `project_uid`) REFERENCES `project_field_entry` (`project_field_id`, `project_uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -253,7 +253,7 @@ DROP TABLE IF EXISTS `project_rag_rating`;
 CREATE TABLE `project_rag_rating` (
   `rag_rating` varchar(32) NOT NULL,
   PRIMARY KEY (`rag_rating`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -265,7 +265,7 @@ DROP TABLE IF EXISTS `project_reprofiling_category`;
 CREATE TABLE `project_reprofiling_category` (
   `reprofiling_category` varchar(128) NOT NULL,
   PRIMARY KEY (`reprofiling_category`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 # Dump of table milestone
 # ------------------------------------------------------------
@@ -282,7 +282,7 @@ CREATE TABLE `milestone` (
   PRIMARY KEY (`uid`),
   KEY `fk_milestone_project_idx` (`project_uid`),
   CONSTRAINT `fk_milestone_project` FOREIGN KEY (`project_uid`) REFERENCES `project` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `milestone` WRITE;
 /*!40000 ALTER TABLE `milestone` DISABLE KEYS */;
@@ -313,7 +313,7 @@ DROP TABLE IF EXISTS `milestone_category`;
 CREATE TABLE `milestone_category` (
   `category` varchar(32) NOT NULL,
   PRIMARY KEY (`category`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -325,7 +325,7 @@ DROP TABLE IF EXISTS `milestone_complete`;
 CREATE TABLE `milestone_complete` (
   `complete` varchar(32) NOT NULL,
   PRIMARY KEY (`complete`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -341,7 +341,7 @@ CREATE TABLE `milestone_department` (
   KEY `milestone_department_milestone_idx` (`milestone_uid`),
   CONSTRAINT `milestone_department_department` FOREIGN KEY (`department_name`) REFERENCES `department` (`name`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `milestone_department_milestone` FOREIGN KEY (`milestone_uid`) REFERENCES `milestone` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -359,7 +359,7 @@ CREATE TABLE `milestone_field` (
   `is_active` tinyint(4) DEFAULT NULL,
   `is_required` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `milestone_field` (`id`, `name`, `display_name`, `type`, `is_active`, `is_required`)
 VALUES
@@ -387,7 +387,7 @@ CREATE TABLE `milestone_field_entry` (
   KEY `fk_milestone_field_entry_milestone_field_idx` (`milestone_field_id`),
   CONSTRAINT `fk_milestone_field_entry_milestone` FOREIGN KEY (`milestone_uid`) REFERENCES `milestone` (`uid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_milestone_field_entry_milestone_field` FOREIGN KEY (`milestone_field_id`) REFERENCES `milestone_field` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -403,7 +403,7 @@ CREATE TABLE `milestone_field_entry_audit` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `archived_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -415,7 +415,7 @@ DROP TABLE IF EXISTS `milestone_readiness`;
 CREATE TABLE `milestone_readiness` (
   `readiness` varchar(32) NOT NULL,
   PRIMARY KEY (`readiness`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -427,7 +427,7 @@ DROP TABLE IF EXISTS `milestone_type`;
 CREATE TABLE `milestone_type` (
   `type` varchar(32) NOT NULL,
   PRIMARY KEY (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -445,7 +445,7 @@ CREATE TABLE `toolbox_user` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -462,7 +462,7 @@ CREATE TABLE `user` (
   `role` varchar(64) DEFAULT NULL,
   `twofa_secret` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
@@ -489,7 +489,7 @@ CREATE TABLE `user_actions` (
   `comment` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `fk_department_user_user_idx` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
