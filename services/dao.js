@@ -9,8 +9,8 @@ const MilestoneFieldEntry = require('models/milestoneFieldEntry');
 
 class DAO {
   sequelize;
-  projectFields;
-  milestoneFields;
+  #projectFields;
+  #milestoneFields;
 
   constructor(options = {}) {
     if (options.sequelize) {
@@ -20,11 +20,18 @@ class DAO {
     }
   }
 
+  generateFieldMap(fields) {
+    return fields.reduce( (acc,field) => {
+      acc[field.name] = field.id;
+      return acc;
+    },{});
+  }
+
   async getProjectFieldMap() {
     if (this.projectFields) {
       return this.projectFields;
     }
-    this.projectFields = await ProjectField.findAll();
+    this.projectFields = this.generateFieldMap(await ProjectField.findAll());
     return this.projectFields;
   }
 
@@ -32,7 +39,7 @@ class DAO {
     if (this.milestoneFields) {
       return this.milestoneFields;
     }
-    this.milestoneFields = await MilestoneField.findAll();
+    this.milestoneFields = this.generateFieldMap(await MilestoneField.findAll());
     return this.milestoneFields;
   }
 
@@ -40,9 +47,9 @@ class DAO {
     if (filter.id) {
       return filter.id;
     } else if (filter.name) {
-      const field = fieldMap[filter.name];
-      if (field) {
-        return field.id;
+      const fieldId = fieldMap[filter.name];
+      if (fieldId) {
+        return fieldId;
       }
     }
     throw(`Could not find field ${JSON.stringify(filter)}`);
@@ -70,19 +77,19 @@ class DAO {
     return `${type}_field_id_${field}`
   }
 
-  generateProjectProjectFieldFilter(field,value) {
-    const aliasName = this.generateFilterAlias("project",field);
+  generateProjectProjectFieldFilter(fieldId,value) {
+    const aliasName = this.generateFilterAlias("project",fieldId);
     return `
       INNER JOIN project_field_entry AS ${aliasName} ON (
         project.uid = ${this.quoteIdentifier(aliasName)}.project_uid
-        AND ${this.generateMatch(aliasName,"project_field_id",field)}
+        AND ${this.generateMatch(aliasName,"project_field_id",fieldId)}
         AND ${this.generateMatch(aliasName,"value",value)}
       )
     `;
   }
 
-  generateProjectMilestoneFieldFilter(field,value) {
-    const aliasName = this.generateFilterAlias("milestone",field);
+  generateProjectMilestoneFieldFilter(fieldId,value) {
+    const aliasName = this.generateFilterAlias("milestone",fieldId);
     return `
       JOIN (
           SELECT project.uid
@@ -90,7 +97,7 @@ class DAO {
               project INNER JOIN milestone ON (project.uid = milestone.project_uid)
               INNER JOIN milestone_field_entry ON (
                 milestone.uid = milestone_field_entry.milestone_uid
-                AND ${this.generateMatch("milestone_field_entry","milestone_field_id",field)}
+                AND ${this.generateMatch("milestone_field_entry","milestone_field_id",fieldId)}
               )
           WHERE
               milestone.project_uid = project.uid
@@ -102,6 +109,8 @@ class DAO {
   }
 
   async generateProjectQuery(userId, projectFilters = [],milestoneFilters = []) {
+    const dao = this;
+
     let query = `
       SELECT
         project.uid, project.department_name, project.title, project.impact, project.is_completed,
@@ -133,12 +142,12 @@ class DAO {
     `;
 
     projectFilters.forEach( async(filter) => {
-      const fieldId = await this.getProjectFieldId(filter);
+      const fieldId = await dao.getProjectFieldId(filter);
       query += this.generateProjectProjectFieldFilter(fieldId,filter.value);
     });
 
     milestoneFilters.forEach( async(filter) => {
-      const fieldId = await this.getMilestoneFieldId(filter);
+      const fieldId = await dao.getMilestoneFieldId(filter);
       query += this.generateProjectMilestoneFieldFilter(fieldId,filter.value);
     });
 
@@ -151,26 +160,26 @@ class DAO {
     return [query,{}];
   }
 
-  generateMilestoneMilestoneFieldFilter(field,value) {
-    const aliasName = this.generateFilterAlias("milestone",field);
+  generateMilestoneMilestoneFieldFilter(fieldId,value) {
+    const aliasName = this.generateFilterAlias("milestone",fieldId);
     return `
       INNER JOIN milestone_field_entry AS ${aliasName} ON (
         milestones.uid = ${this.quoteIdentifier(aliasName)}.milestone_uid
-        AND ${this.generateMatch(aliasName,"milestone_field_id",field)}
+        AND ${this.generateMatch(aliasName,"milestone_field_id",fieldId)}
         AND ${this.generateMatch(aliasName,"value",value)}
       )
     `;
   }
 
-  generateMilestoneProjectFieldFilter(field,value) {
-    const aliasName = this.generateFilterAlias("project",field);
+  generateMilestoneProjectFieldFilter(fieldId,value) {
+    const aliasName = this.generateFilterAlias("project",fieldId);
     return `
       JOIN (
           SELECT project.uid
           FROM
               project INNER JOIN project_field_entry ON (
                 project.uid = project_field_entry.project_uid
-                AND ${this.generateMatch("project_field_entry","project_field_id",field)}
+                AND ${this.generateMatch("project_field_entry","project_field_id",fieldId)}
               )
           WHERE
               ${this.generateMatch("project_field_entry","value",value)}
@@ -280,6 +289,26 @@ class DAO {
     const result = await this.sequelize.query(query,options);
     return result;
   }
+
+  async getAllFields(userId, projectFilters = [],milestoneFilters = []) {
+    let projects = await this.getProjectFields(userId,projectFilters,milestoneFilters);
+    const milestoneFields = await this.getMilestoneFields(userId,projectFilters,milestoneFilters);
+    const milestoneMap = milestoneFields.reduce( (acc,project) => {
+      acc[project.uid] = project.milestones;
+      return acc;
+    }, {});
+
+    
+    projects.forEach( (project,index) => {
+      const milestones =  milestoneMap[project.uid];
+      projects[index].dataValues.milestones = milestones;
+      projects[index].milestones = milestones;
+    });
+
+    return projects;
+  }
+
+
 }
 
 module.exports = DAO;
