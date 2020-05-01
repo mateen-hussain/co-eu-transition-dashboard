@@ -14,15 +14,15 @@
 {{ flash }}
 {% endif %}
 
-{# <form action="{{ url }}/edit" method="post">
-  <input type="text" name="fields[][0][id]" value="1" />
-  <input type="text"name="fields[][0][order]" value="1" />
+<form action="{{ url }}/edit" method="post">
+  <input type="text" name="fields[][0][id]" value="{{ fields[0].id }}" />
+  <input type="text"name="fields[][0][order]" value="{{ fields[0].order }}" />
 
-  <input type="text" name="fields[][1][id]" value="2" />
-  <input type="text"name="fields[][1][order]" value="2" />
+  <input type="text" name="fields[][1][id]" value="{{ fields[1].id }}" />
+  <input type="text"name="fields[][1][order]" value="{{ fields[1].order }}" />
 
   <input type="submit" name="submit" value="submit" />
-</form> #}
+</form>
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
@@ -62,14 +62,14 @@
       </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for field in fields %}
+    {% for field in fields | sort(attribute='order') %}
       {% if field.group == fieldGroup.name %}
-      {% set order = ( order | default(0) ) + 1 %}
       <tr class="govuk-table__row">
-        <div class="reorder-row">
-          <td class="govuk-table__cell"><button type="button" class="move-up">&#8679;</button></td>
+          <td class="govuk-table__cell">
+          <input type="text"name="fields[][0][order]" value="{{ field.order }}" />
+          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
+          <button type="button" class="move-up">&#8679;</button></td>
           <td class="govuk-table__cell"><button type="button" class="move-down">&#8681;</button></td>
-        </div>
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
           {% set fieldType = 'Drop down' %}
@@ -82,9 +82,7 @@
         {% elif field.type == 'boolean' %}
           {% set fieldType = 'Yes / No' %}
         {% endif %}
-        <td class="govuk-table__cell">{{ fieldType }}          
-          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
-          <input type="text"name="fields[][0][order]" value="{{ order }}" /></td>
+        <td class="govuk-table__cell">{{ fieldType }}</td>          
         <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
         <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
       </tr>
@@ -97,6 +95,7 @@
   {{ govukButton({
     text: "Apply changes",
     type: "submit",
+    name: "submit",
     preventDoubleClick: true
   }) }}
 

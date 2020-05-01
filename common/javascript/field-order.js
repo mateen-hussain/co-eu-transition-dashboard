@@ -1,19 +1,20 @@
 export default () =>  {
 
-  function get_previoussibling(n){
-    let x = n.previousSibling;
-    while (x.nodeType != 1){
-      x = x.previousSibling;
+  function getPreviousSibling(n) {
+    let prev = n.previousSibling;
+    while (prev.nodeType != 1) {
+      prev = prev.previousSibling;
     }
-    return x;
+    prev.firstElementChild.children[0].value++;
+    return prev;
   } 
     
-  function get_nextsibling(n) {
-    let x = n.nextSibling;
-    while (x != null && x.nodeType != 1) {
-      x = x.nextSibling;
+  function getSibling(n) {
+    let next = n.nextSibling;
+    while (next != null && next.nodeType != 1) {
+      next = next.nextSibling;
     }
-    return x;
+    return next;
   }
 
   [...document.querySelectorAll('.move-up')].forEach(function(moveUpBtn) {
@@ -27,8 +28,14 @@ export default () =>  {
         }
         row = row.parentNode;
       }
+
+      if (row == table.rows[1]) {
+        return false;
+      }
+
       table = row.parentNode;
-      table.insertBefore(row, get_previoussibling(row));
+      row.firstElementChild.children[0].value--;
+      table.insertBefore(row, getPreviousSibling(row));
     });
   });
 
@@ -44,7 +51,15 @@ export default () =>  {
         row = row.parentNode;
       }
       table = row.parentNode;
-      table.insertBefore (row, get_nextsibling(get_nextsibling(row)));
+
+      if (row == table.rows[table.rows.length-1]) {
+        return false;
+      }
+
+      row.firstElementChild.children[0].value++;
+      const prevSib = getSibling(row);
+      prevSib.firstElementChild.children[0].value--;
+      table.insertBefore(row, getSibling(prevSib));
     });
   });
 
