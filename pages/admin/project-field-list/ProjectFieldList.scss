@@ -1,5 +1,9 @@
 .project-fields .govuk-table__cell {
-    width: 15%;
+    width: 35%;
+}
+
+.order-fields .govuk-table__cell {
+    width: 29%;
 }
 
 .drop-down-option:first-of-type {
@@ -20,5 +24,24 @@
 }
 
 .reorder-row {
+    display: none;
+}
+
+.move-up, .move-down {
+    cursor: pointer;
+}
+
+.reorder-link {
+    color: inherit;
+    text-decoration: inherit; 
+    pointer-events: none; 
+}
+
+.order-cell {
+    display: none;
+    border: none;
+}
+
+.order-form {
     display: none;
 }

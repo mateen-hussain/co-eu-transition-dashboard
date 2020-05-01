@@ -63,8 +63,17 @@ export default () =>  {
     });
   });
 
-//   document.getElementById('reorder-fields').addEventListener("click", function(){
-//     document.querySelectorAll('.reorder-row').style.display = 'block';
-//   });
+  document.getElementById('reorder-fields').addEventListener("click", function(){
+    document.getElementById('project-list-info').style.display = 'none';
+    document.getElementById('project-list-title').innerHTML = 'Project input data';
+    this.classList.remove('govuk-link');
+    this.classList.add('reorder-link');
+    document.querySelectorAll('.project-fields').forEach(el => el.classList.add('order-fields'));
+    document.querySelectorAll('.order-cell').forEach(el => el.style.display = 'inline-block');
+    document.querySelectorAll('.edit-cell').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.order-form').forEach(el => el.style.display = 'block');
+
+    return false;
+  });
 
 }

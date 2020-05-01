@@ -14,7 +14,7 @@
 {{ flash }}
 {% endif %}
 
-<form action="{{ url }}/edit" method="post">
+{# <form action="{{ url }}/edit" method="post">
   <input type="text" name="fields[][0][id]" value="{{ fields[0].id }}" />
   <input type="text"name="fields[][0][order]" value="{{ fields[0].order }}" />
 
@@ -22,14 +22,14 @@
   <input type="text"name="fields[][1][order]" value="{{ fields[1].order }}" />
 
   <input type="submit" name="submit" value="submit" />
-</form>
+</form> #}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl">Manage project data input fields</h1>
+  <h1 class="govuk-heading-xl" id="project-list-title">Manage project data input fields</h1>
 
-  <p class="govuk-body-l">Changes made to the data input fields will
+  <p class="govuk-body-l" id="project-list-info">Changes made to the data input fields will
   be reflected in the downloadable template for the MI commision. </p>
 
   <p class="govuk-body">
@@ -44,32 +44,32 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
 
+<div class="order-form">
   <form action="{{ url }}/edit" method="post">
+</div>
 
   {% for fieldGroup in fieldGroups %}
   <table class="govuk-table project-fields">
     <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
-      <div class="reorder-row">
-        <th scope="col" class="govuk-table__header"></th>
-        <th scope="col" class="govuk-table__header"></th>
-      </div>
+      <th scope="col" class="govuk-table__header order-cell"></th>
+      <th scope="col" class="govuk-table__header order-cell"></th>
       <th scope="col" class="govuk-table__header">Field Name</th>
       <th scope="col" class="govuk-table__header">Field Type</th>
       <th scope="col" class="govuk-table__header">Status</th>
-      <th scope="col" class="govuk-table__header"></th>
+      <th scope="col" class="govuk-table__header edit-cell"></th>
       </tr>
     </thead>
     <tbody class="govuk-table__body">
     {% for field in fields | sort(attribute='order') %}
       {% if field.group == fieldGroup.name %}
       <tr class="govuk-table__row">
-          <td class="govuk-table__cell">
-          <input type="text"name="fields[][0][order]" value="{{ field.order }}" />
-          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
-          <button type="button" class="move-up">&#8679;</button></td>
-          <td class="govuk-table__cell"><button type="button" class="move-down">&#8681;</button></td>
+          <td class="govuk-table__cell order-cell">
+          <input type="hidden" name="fields[][0][order]" value="{{ field.order }}" />
+          <input type="hidden" name="fields[][0][id]" value="{{ field.id }}" />
+          <img class="move-up" src='/assets/images/up.png'/></td>
+          <td class="govuk-table__cell order-cell"><img class="move-down" src='/assets/images/down.png'/></td>
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
           {% set fieldType = 'Drop down' %}
@@ -84,7 +84,7 @@
         {% endif %}
         <td class="govuk-table__cell">{{ fieldType }}</td>          
         <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
-        <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
+        <td class="govuk-table__cell edit-cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
       </tr>
       {% endif %}
     {% endfor %}
@@ -92,6 +92,7 @@
   </table>
   {% endfor %}
 
+<div class="order-form">
   {{ govukButton({
     text: "Apply changes",
     type: "submit",
@@ -100,6 +101,8 @@
   }) }}
 
   </form>
+
+</div>
 
  </div>
 </div>
