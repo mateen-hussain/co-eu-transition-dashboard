@@ -58,10 +58,17 @@ class ProjectFieldList extends Page {
   }
 
   async postRequest(req, res) {
-    if (this.editMode) {
-      await this.saveFieldOrder(req.body);
+    const orderValues = req.body, fields = {}, key = 'fields';
+    fields[key] = [];
+    for (var i=0; i<orderValues.fields[0].id.length; i++) {
+      fields[key].push({ 
+        'id' : orderValues.fields[0].id[i], 
+        'order' : orderValues.fields[0].order[i] 
+      });
     }
-
+    if (this.editMode) {
+      await this.saveFieldOrder(fields);
+    }
     res.redirect(this.url);
   }
 }

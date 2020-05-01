@@ -66,8 +66,8 @@
       {% if field.group == fieldGroup.name %}
       <tr class="govuk-table__row">
           <td class="govuk-table__cell order-cell">
-          <input type="hidden" name="fields[][0][order]" value="{{ field.order }}" />
-          <input type="hidden" name="fields[][0][id]" value="{{ field.id }}" />
+          <input type="text" name="fields[][0][order]" value="{{ field.order }}" />
+          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
           <img class="move-up" src='/assets/images/up.png'/></td>
           <td class="govuk-table__cell order-cell"><img class="move-down" src='/assets/images/down.png'/></td>
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
