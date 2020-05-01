@@ -1,14 +1,16 @@
 const sequelize = require('services/sequelize');
-const project = require('models/project');
-const projectField = require('models/projectField');
-const projectFieldEntry = require('models/projectFieldEntry');
-const milestone = require('models/milestone');
-const milestoneField = require('models/milestoneField');
-const milestoneFieldEntry = require('models/milestoneFieldEntry');
+const Project = require('models/project');
+const ProjectField = require('models/projectField');
+const ProjectFieldEntry = require('models/projectFieldEntry');
+const Milestone = require('models/milestone');
+const MilestoneField = require('models/milestoneField');
+const MilestoneFieldEntry = require('models/milestoneFieldEntry');
 
 
 class DAO {
   sequelize;
+  projectFields;
+  milestoneFields;
 
   constructor(options = {}) {
     if (options.sequelize) {
@@ -16,6 +18,42 @@ class DAO {
     } else {
       this.sequelize = sequelize;
     }
+  }
+
+  async getProjectFieldMap() {
+    if (this.projectFields) {
+      return this.projectFields;
+    }
+    this.projectFields = await ProjectField.findAll();
+    return this.projectFields;
+  }
+
+  async getMilestoneFieldMap() {
+    if (this.milestoneFields) {
+      return this.milestoneFields;
+    }
+    this.milestoneFields = await MilestoneField.findAll();
+    return this.milestoneFields;
+  }
+
+  getFieldId(fieldMap,filter) {
+    if (filter.id) {
+      return filter.id;
+    } else if (filter.name) {
+      const field = fieldMap[filter.name];
+      if (field) {
+        return field.id;
+      }
+    }
+    throw(`Could not find field ${JSON.stringify(filter)}`);
+  }
+
+  async getProjectFieldId(filter) {
+    return this.getFieldId(await this.getProjectFieldMap(),filter);
+  }
+
+  async getMilestoneFieldId(filter) {
+    return this.getFieldId(await this.getMilestoneFieldMap(),filter);
   }
 
   quoteIdentifier(value) {
@@ -63,11 +101,7 @@ class DAO {
     `;
   }
 
-  generateProjectQuery(userId, projectFilters = [],milestoneFilters = []) {
-    let binds = {
-      "userId": userId,
-    };
-
+  async generateProjectQuery(userId, projectFilters = [],milestoneFilters = []) {
     let query = `
       SELECT
         project.uid, project.department_name, project.title, project.impact, project.is_completed,
@@ -98,18 +132,21 @@ class DAO {
         LEFT OUTER JOIN project_field AS \`projectFieldEntries->projectField\` ON (\`projectFieldEntries->projectField\`.id = \`projectFieldEntries\`.project_field_id)
     `;
 
-    projectFilters.forEach( filter => {
-      query += this.generateProjectProjectFieldFilter(filter.id,filter.value);
+    projectFilters.forEach( async(filter) => {
+      const fieldId = await this.getProjectFieldId(filter);
+      query += this.generateProjectProjectFieldFilter(fieldId,filter.value);
     });
 
-    milestoneFilters.forEach( filter => {
-      query += this.generateProjectMilestoneFieldFilter(filter.id,filter.value);
+    milestoneFilters.forEach( async(filter) => {
+      const fieldId = await this.getMilestoneFieldId(filter);
+      query += this.generateProjectMilestoneFieldFilter(fieldId,filter.value);
     });
 
     query += `
       WHERE
         ${this.generateMatch("user","id",userId)}
     `;
+
 
     return [query,{}];
   }
@@ -143,7 +180,9 @@ class DAO {
     `;
   }
 
-  generateMilestoneQuery(userId, projectFilters = [],milestoneFilters = []) {
+  async generateMilestoneQuery(userId, projectFilters = [],milestoneFilters = []) {
+    const dao = this;
+
     let query = `
       SELECT
         project.uid, project.department_name, project.title, project.impact, project.is_completed,
@@ -181,52 +220,55 @@ class DAO {
         LEFT OUTER JOIN milestone_field AS \`milestones->milestoneFieldEntries->milestoneField\` ON (\`milestones->milestoneFieldEntries->milestoneField\`.id = \`milestones->milestoneFieldEntries\`.milestone_field_id)
     `;
 
-    projectFilters.forEach( filter => {
-      query += this.generateMilestoneProjectFieldFilter(filter.id,filter.value);
+    projectFilters.forEach( async(filter) => {
+      const fieldId = await dao.getProjectFieldId(filter);
+      query += this.generateMilestoneProjectFieldFilter(fieldId,filter.value);
     });
 
-    milestoneFilters.forEach( filter => {
-      query += this.generateMilestoneMilestoneFieldFilter(filter.id,filter.value);
+    milestoneFilters.forEach( async(filter) => {
+      const fieldId = await dao.getMilestoneFieldId(filter);
+      query += this.generateMilestoneMilestoneFieldFilter(fieldId,filter.value);
     });
 
     query += `
       WHERE
         ${this.generateMatch("user","id",userId)}
     `;
+
     return [query,{}];
   }
 
   async getProjectFields(userId, projectFilters = [],milestoneFilters = []) {
-    const [query,binds] = this.generateProjectQuery(userId,projectFilters,milestoneFilters);
+    const [query,binds] = await this.generateProjectQuery(userId,projectFilters,milestoneFilters);
 
     const options = {
       "hasJoin": true,
       "include": [{
-        "model": projectFieldEntry,
+        "model": ProjectFieldEntry,
         "include": {
-          "model": projectField
+          "model": ProjectField
         }
       }],
       "replacements": binds,
       "type": this.sequelize.QueryTypes.SELECT
     };
 
-    project._validateIncludedElements(options);
+    Project._validateIncludedElements(options);
     const result = await this.sequelize.query(query,options);
     return result;
   }
 
   async getMilestoneFields(userId, projectFilters = [],milestoneFilters = []) {
-    const [query,binds] = this.generateMilestoneQuery(userId,projectFilters,milestoneFilters);
+    const [query,binds] = await this.generateMilestoneQuery(userId,projectFilters,milestoneFilters);
 
     const options = {
       "hasJoin": true,
       "include": [{
-        "model": milestone,
+        "model": Milestone,
         "include": {
-          "model": milestoneFieldEntry,
+          "model": MilestoneFieldEntry,
           "include": {
-            "model": milestoneField
+            "model": MilestoneField
           }
         }
       }],
@@ -234,7 +276,7 @@ class DAO {
       "type": this.sequelize.QueryTypes.SELECT
     };
 
-    project._validateIncludedElements(options);
+    Project._validateIncludedElements(options);
     const result = await this.sequelize.query(query,options);
     return result;
   }
