@@ -3,9 +3,9 @@
 
 {% macro criticalMilestones(projects, projectFields, milestoneFields, extraField, config) %}
 
-  {% set uid = '' %}
-  {% set cellBlock = "cell-color-" %}
-  {% set flag = '' %}
+  {% set uid = '' | escape %}
+  {% set cellBlock = "cell-color-" | escape %}
+  {% set flag = '' | escape %}
 
   {% for project in projects %}
 
@@ -28,7 +28,7 @@
             {% for projectField in projectFields %}
               {% set field = project.fields.get(projectField.id) %}
             {% if (field.id == 'uid')%}
-                {% set uid = field.value %}
+                {% set uid = field.value | escape %}
             {% else %}
               {% if field.id == 'title' %}
                 <td class="govuk-table__cell">
@@ -61,7 +61,7 @@
               {% for milestoneField in milestoneFields %}
                 {% set field = milestone.fields.get(milestoneField.id) %}
                 {% if (field.id == 'date') and (field.value | beforeToDay) %}
-                  {% set flag = 'red-date' %}
+                  {% set flag = 'red-date' | escape %}
                 {% endif %}
                 {% if (field.id=='date') %}
                   <td class="govuk-table__cell"><span class="{{ flag }}">{{ field.value | date("D MMM YYYY") }}</span></td>

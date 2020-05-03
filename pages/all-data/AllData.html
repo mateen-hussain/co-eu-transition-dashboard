@@ -7,8 +7,8 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set cellBlock = "cell-color-"  %}
-{% set flag = '' %}
+{% set cellBlock = "cell-color-" | escape %}
+{% set flag = '' | escape %}
 {% set filtersExist = 'false' %}
 
 {% set dates  %}
@@ -38,7 +38,7 @@
 {% set filters = filters() | await %}
 {% set projects = projects() | await %}
 {% set departmentView = 'false' %}
-{% set uid = '' %}
+{% set uid = '' | escape %}
 
 {% if req.user.isDepartmentalViewer %}
   {% set title = req.user.departments[0].name + " project data" %}
@@ -158,16 +158,16 @@
     {% set field = project.fields.get(tableFieldId) %}
 
     {% if (field.id == 'uid')%}
-    {% set uid = field.value %}
+    {% set uid = field.value | escape %}
     {% elif (field.id == 'departmentName') and (departmentView == 'true') %}
     {% else %}
 
     {% set projectValue = (projectValue.push({html:
 
     "<a href=" + config.paths.projectDetails | replace(":uid", uid | replace(" ", "%20"))  + " class='govuk-link project-link'>" +
-    "<div class='scrollable'>" + field.value + "</div></a>" | safe
+    "<div class='scrollable'>" + field.value + "</div></a>"
       if field.id == 'title'
-        else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" | safe
+        else "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>"
     }), projectValue) %}
 
   {% endif %}
@@ -182,14 +182,14 @@
     {% set milestoneValue = [] %}
 
     {% for tableFieldId in milestoneTableFields %}
-    {% set flag = '' %}
+    {% set flag = '' | escape %}
     {% set field = milestone.fields.get(tableFieldId) %}
       {% if (field.id == 'date') and (field.value | beforeToDay) %}
-        {% set flag = 'red-date' %}
+        {% set flag = 'red-date' | escape %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>" | safe if field.type == 'date' else
-      "<span>" + field.value | default('N/A') + "</span>" | safe }), milestoneValue) %}
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>" if field.type == 'date' else
+      "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
 
     {% endfor %}
 
@@ -244,7 +244,7 @@
                     <input type="hidden" name="optionValue" value="{{ option.value }}" />
 
                     {{ govukButton({
-                      html: "<img src='/assets/images/cross.png' class='cross' alt='delete-filter' />" + applyFormatting(filter, option.value) | safe,
+                      html: "<img src='/assets/images/cross.png' class='cross' alt='delete-filter' />" + applyFormatting(filter, option.value),
                       classes: "govuk-button--secondary filterBtn"
                     }) }}
                   </form>
@@ -259,7 +259,7 @@
       {% if filter.id in filterNames %}
             {% set summary = (summary.push ({
             key: {
-              html: "<span class='filter-name'>" + filter.name + "</span>" | safe
+              html: "<span class='filter-name'>" + filter.name + "</span>"
             },
             value: {
               html: filterSummary

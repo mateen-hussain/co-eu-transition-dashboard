@@ -1,10 +1,10 @@
     
     {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
-    {% set feedbackLink = "https://docs.google.com/forms/d/19Ymg-262uTXzVW8C8bAKxX9cn3TMh-ItZH69C3mmIe0/edit?ts=5da6e72e" %}
+    {% set feedbackLink = "https://docs.google.com/forms/d/19Ymg-262uTXzVW8C8bAKxX9cn3TMh-ItZH69C3mmIe0/edit?ts=5da6e72e" | escape %}
 
     {{ govukPhaseBanner({
       tag: {
         text: "beta"
       },
-      html: "This is a new service – your <a class='govuk-link' href='" + feedbackLink + "'>feedback</a> will help us to improve it." | safe
+      html: "This is a new service – your <a class='govuk-link' href='" + feedbackLink + "'>feedback</a> will help us to improve it."
     }) }}

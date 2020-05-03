@@ -4,14 +4,14 @@
       label: "Project description",
       id: "project-description",
       panel: {
-        html: "<p class='govuk-body'>" + project.description | default('N/A') + "</p>" | safe
+        html: "<p class='govuk-body'>" + project.description | default('N/A') + "</p>"
       }
     },
     {
       label: "Project solution",
       id: "project-solution",
       panel: {
-        html: "<p class='govuk-body'>" + project.fields.get('solution').value| default('N/A') + "</p>" | safe
+        html: "<p class='govuk-body'>" + project.fields.get('solution').value | default('N/A') + "</p>"
       }
     },
     {
