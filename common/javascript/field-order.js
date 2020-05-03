@@ -34,7 +34,12 @@ export default () =>  {
       }
 
       table = row.parentNode;
+
       row.firstElementChild.children[0].value--;
+
+      // table.rows[row.rowIndex].children[0].children[0].value--;
+
+
       table.insertBefore(row, getPreviousSibling(row));
     });
   });

@@ -10,7 +10,7 @@
 
 {% block content %}
 
-{% if flash %}
+{% if editMode %}
 {{ flash }}
 {% endif %}
 
@@ -47,7 +47,7 @@
 <div class="order-form">
   <form action="{{ url }}/edit" method="post">
 </div>
-
+    {% set count = 0 %}
   {% for fieldGroup in fieldGroups %}
   <table class="govuk-table project-fields">
     <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
@@ -63,7 +63,10 @@
     </thead>
     <tbody class="govuk-table__body">
     {% for field in fields | sort(attribute='order') %}
+
       {% if field.group == fieldGroup.name %}
+              {% set count = count + 1 %}
+
       <tr class="govuk-table__row">
           <td class="govuk-table__cell order-cell">
           <input type="text" name="fields[][0][order]" value="{{ field.order }}" />
