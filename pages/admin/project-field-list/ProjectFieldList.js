@@ -66,7 +66,6 @@ class ProjectFieldList extends Page {
         'order' : orderValues.fields[0].order[i] 
       });
     }
-    console.log(fields)
 
     if (this.editMode) {
       await this.saveFieldOrder(fields);
