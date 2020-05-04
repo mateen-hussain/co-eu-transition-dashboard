@@ -167,7 +167,7 @@
     "<a href=" + config.paths.projectDetails | replace(":uid", uid | escape | replace(" ", "%20"))  + " class='govuk-link project-link'>" +
     "<div class='scrollable'>" + field.value | escape + "</div></a>"
       if field.id == 'title'
-        else "<span class=" + cellBlock + field.value | escape + ">" + field.value | default('N/A') | escape  + "</span>"
+        else "<span class=" + (cellBlock + field.value) | escape + ">" + field.value | default('N/A') | escape  + "</span>"
     }), projectValue) %}
 
   {% endif %}
@@ -188,7 +188,7 @@
         {% set flag = 'red-date' %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.type == 'date' else
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag | escape + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.type == 'date' else
       "<span>" + field.value | default('N/A') | escape + "</span>" }), milestoneValue) %}
 
     {% endfor %}

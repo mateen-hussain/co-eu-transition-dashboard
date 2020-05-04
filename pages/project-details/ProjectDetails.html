@@ -38,7 +38,7 @@
     {% set field = project.fields.get(tableFieldId) %}
 
     {% set projectValue = (projectValue.push({html:
-    "<span class=" + cellBlock + field.value | escape + ">" + field.value | default('N/A') | escape + "</span>" }), projectValue) %}
+    "<span class=" + (cellBlock + field.value) | escape + ">" + field.value | default('N/A') | escape + "</span>" }), projectValue) %}
   {% endfor %}
 
   {% for milestone in project.milestones %}
@@ -52,7 +52,7 @@
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.id == 'date' else
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag | escape + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.id == 'date' else
       "<span>" + field.value | default('N/A') | escape + "</span>" }), milestoneValue) %}
 
     {% endfor %}
