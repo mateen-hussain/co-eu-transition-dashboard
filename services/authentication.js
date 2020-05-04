@@ -8,6 +8,7 @@ const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
 const sequelize = require('services/sequelize');
+const { Op } = require('sequelize');
 
 const hashPassphrase = passphrase => {
   try {
@@ -57,7 +58,8 @@ const authenticateUser = (jwtPayload = {}, cb) => {
 
   return User.findOne({
     where: {
-      id: jwtPayload.id
+      id: jwtPayload.id,
+      loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts }
     },
     include: Department
   })

@@ -13,7 +13,7 @@ const parseString = (value = '') => {
 const parseGroupItem = (value, definition) => {
   value = parseString(value);
 
-  const matchedOption = definition.config.options.find(option => option.toLowerCase() === String(value).toLowerCase());
+  const matchedOption = definition.config.options.find(option => String(option).toLowerCase() === String(value).toLowerCase());
 
   if (matchedOption) {
     return matchedOption;
