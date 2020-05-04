@@ -9,8 +9,8 @@
 {% set milestoneValue = [] %}
 {% set milestoneFields = [] %}
 
-{% set cellBlock = "cell-color-" | escape %}
-{% set flag = '' | escape %}
+{% set cellBlock = "cell-color-" %}
+{% set flag = '' %}
 {% set missedMilestonesCount = 0 %}
 
 {% set project = project() | await %}
@@ -38,22 +38,22 @@
     {% set field = project.fields.get(tableFieldId) %}
 
     {% set projectValue = (projectValue.push({html:
-    "<span class=" + cellBlock + field.value + ">" + field.value | default('N/A') + "</span>" }), projectValue) %}
+    "<span class=" + cellBlock + field.value | escape + ">" + field.value | default('N/A') | escape + "</span>" }), projectValue) %}
   {% endfor %}
 
   {% for milestone in project.milestones %}
     {% set milestoneValue = [] %}
-    {% set flag = '' | escape %}
+    {% set flag = '' %}
     {% for tableFieldId in milestoneTableFields %}
       {% set field = milestone.fields.get(tableFieldId) %}
 
       {% if (field.id == 'date') and (field.value | beforeToDay) %}
-        {% set flag = 'red-date' | escape %}
+        {% set flag = 'red-date' %}
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") + "</span>" if field.id == 'date' else
-      "<span>" + field.value | default('N/A') + "</span>" }), milestoneValue) %}
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | escape | date("D MMM YYYY") + "</span>" if field.id == 'date' else
+      "<span>" + field.value | default('N/A') | escape + "</span>" }), milestoneValue) %}
 
     {% endfor %}
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
@@ -61,8 +61,8 @@
   {% endfor %}
 
 {% set projectValue = (projectValue.push({
-      html: "<span>" + missedMilestonesCount | escape + "</span>" }, {
-      html: "<span>" + project.fields.get('deliveryTheme').value| default('N/A') + "</span>" }),
+      html: "<span>" + missedMilestonesCount + "</span>" }, {
+      html: "<span>" + project.fields.get('deliveryTheme').value | default('N/A') | escape + "</span>" }),
     projectValue) %}
 
 {% set milestonesHtml %}
