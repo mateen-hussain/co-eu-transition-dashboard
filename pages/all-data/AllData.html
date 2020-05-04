@@ -188,7 +188,7 @@
         {% set flag = 'red-date' %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | escape | date("D MMM YYYY") + "</span>" if field.type == 'date' else
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.type == 'date' else
       "<span>" + field.value | default('N/A') | escape + "</span>" }), milestoneValue) %}
 
     {% endfor %}

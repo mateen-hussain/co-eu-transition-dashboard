@@ -52,7 +52,7 @@
         {% set missedMilestonesCount = missedMilestonesCount + 1 %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | escape | date("D MMM YYYY") + "</span>" if field.id == 'date' else
+      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.id == 'date' else
       "<span>" + field.value | default('N/A') | escape + "</span>" }), milestoneValue) %}
 
     {% endfor %}
