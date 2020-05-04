@@ -61,7 +61,7 @@
   {% endfor %}
 
 {% set projectValue = (projectValue.push({
-      html: "<span>" + missedMilestonesCount + "</span>" }, {
+      html: "<span>" + missedMilestonesCount | escape + "</span>" }, {
       html: "<span>" + project.fields.get('deliveryTheme').value | default('N/A') | escape + "</span>" }),
     projectValue) %}
 
