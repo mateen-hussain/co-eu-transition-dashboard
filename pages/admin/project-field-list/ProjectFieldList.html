@@ -11,28 +11,30 @@
 
 {% block content %}
 
-{% if flash %}
-{{ govukErrorSummary({
-  titleText: "There is a problem",
-  errorList: [
-    {
-      text: flash
-    }
-  ]
-}) }}
-{% endif %}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl" id="project-list-title">Manage project data input fields</h1>
+  <h1 class="govuk-heading-xl">{{ "Project input data" if editMode else "Manage project data input fields" }}</h1>
 
-  <p class="govuk-body-l" id="project-list-info">Changes made to the data input fields will
+  {% if editMode and flash %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [
+      {
+        text: flash
+      }
+    ]
+  }) }}
+  {% endif %}
+
+  {% if not editMode %}
+  <p class="govuk-body-l">Changes made to the data input fields will
   be reflected in the downloadable template for the MI commision. </p>
+  {% endif %}
 
   <p class="govuk-body">
     <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Add a new field</a><br>
-    <a href="#" id="reorder-fields" class="govuk-link">Re-order fields</a><br>
+    <a href="{{ config.paths.admin.projectFieldList }}/edit" class="{{ 'reorder-link' if editMode else 'govuk-link' }}">Re-order fields</a><br>
   </p>
   <hr class="govuk-section-break govuk-section-break--m">
 
@@ -42,21 +44,26 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
 
-<div class="order-form">
+  {% if editMode %}
   <form action="{{ url }}/edit" method="post">
-</div>
+  {% endif %}
+
   {% for fieldGroup in fieldGroups %}
   {% set count = 0 %}
-  <table class="govuk-table project-fields">
+  <table class="govuk-table {{ 'order-fields' if editMode else 'project-fields' }}">
     <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
+      {% if editMode %}
       <th scope="col" class="govuk-table__header order-cell"></th>
       <th scope="col" class="govuk-table__header order-cell"></th>
+      {% endif %}
       <th scope="col" class="govuk-table__header">Field Name</th>
       <th scope="col" class="govuk-table__header">Field Type</th>
       <th scope="col" class="govuk-table__header">Status</th>
+      {% if not editMode %}
       <th scope="col" class="govuk-table__header edit-cell"></th>
+      {% endif %}
       </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -64,15 +71,13 @@
       {% if field.group == fieldGroup.name %}
       {% set count = count + 1 %}
       <tr class="govuk-table__row">
+        {% if editMode %}
           <td class="govuk-table__cell order-cell">
-          {# will be hidden fields #}
-          <input type="text" name="fields[][0][order]" value="{{ count }}" />
-          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
-          {{ field.order }}
-          <br>
-          {{ field.id }}
+          <input type="hidden" name="fields[][order]" value="{{ count }}" />
+          <input type="hidden" name="fields[][id]" value="{{ field.id }}" />
           <img class="move-up" src='/assets/images/up.png'/></td>
           <td class="govuk-table__cell order-cell"><img class="move-down" src='/assets/images/down.png'/></td>
+        {% endif %}
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
           {% set fieldType = 'Drop down' %}
@@ -87,7 +92,9 @@
         {% endif %}
         <td class="govuk-table__cell">{{ fieldType }}</td>          
         <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
-        <td class="govuk-table__cell edit-cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
+        {% if not editMode %}
+        <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
+        {% endif %}
       </tr>
       {% endif %}
     {% endfor %}
@@ -95,7 +102,7 @@
   </table>
   {% endfor %}
 
-<div class="order-form">
+{% if editMode %}
   {{ govukButton({
     text: "Apply changes",
     type: "submit",
@@ -111,8 +118,7 @@
   }) }} 
 
   </form>
-
-</div>
+{% endif %}
 
  </div>
 </div>

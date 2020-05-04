@@ -5,7 +5,6 @@ export default () =>  {
     while (prev.nodeType != 1) {
       prev = prev.previousSibling;
     }
-    // This works fine and does a plus 1 on submit 
     prev.firstElementChild.children[0].value++;
     return prev;
   } 
@@ -35,15 +34,7 @@ export default () =>  {
       }
 
       table = row.parentNode;
-
-      // console.log(row.sectionRowIndex)
-      // console.log(row.rowIndex)
-      // console.log(row.rowIndex)
-
-      // The current row fails to do a minus 1 on the count on submit, tried both ways below
-      // row.firstElementChild.children[0].value--;
-      table.rows[row.sectionRowIndex].children[0].children[0].value--;
-
+      row.firstElementChild.children[0].value--;
 
       table.insertBefore(row, getPreviousSibling(row));
     });
@@ -66,27 +57,11 @@ export default () =>  {
         return false;
       }
 
-      // The current row fails to do a plus 1 on the count on submit
       row.firstElementChild.children[0].value++;
       const prevSib = getSibling(row);
-
-      // This works fine and does a minus 1 on the previous
       prevSib.firstElementChild.children[0].value--;
       table.insertBefore(row, getSibling(prevSib));
     });
-  });
-
-  document.getElementById('reorder-fields').addEventListener("click", function(){
-    document.getElementById('project-list-info').style.display = 'none';
-    document.getElementById('project-list-title').innerHTML = 'Project input data';
-    this.classList.remove('govuk-link');
-    this.classList.add('reorder-link');
-    document.querySelectorAll('.project-fields').forEach(el => el.classList.add('order-fields'));
-    document.querySelectorAll('.order-cell').forEach(el => el.style.display = 'inline-block');
-    document.querySelectorAll('.edit-cell').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.order-form').forEach(el => el.style.display = 'block');
-
-    return false;
   });
 
 }
