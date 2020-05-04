@@ -15,6 +15,7 @@ Model.init = sinon.stub().callsFake(function(attributes) {
   this.findOne = sinon.stub().resolves({});
   this.upsert = sinon.stub().resolves();
   this.create = sinon.stub().resolves();
+  this.destroy = sinon.stub().resolves();
   this.findAll = sinon.stub().resolves([]);
   this.count = sinon.stub().resolves(0);
   this.rawAttributes = attributes;
@@ -23,6 +24,14 @@ Model.init = sinon.stub().callsFake(function(attributes) {
 Sequelize.getQueryInterface = sinon.stub();
 Sequelize.query = sinon.stub();
 Sequelize.fn = sinon.stub();
+
+const transaction = {
+  rollback: sinon.stub(),
+  commit: sinon.stub()
+};
+Sequelize.transaction = sinon.stub().returns(transaction);
+Sequelize.transaction.rollback = transaction.rollback;
+Sequelize.transaction.commit = transaction.commit;
 
 s = sinon.stub().returns(Sequelize);
 
