@@ -5,6 +5,7 @@ export default () =>  {
     while (prev.nodeType != 1) {
       prev = prev.previousSibling;
     }
+    // This works fine and does a plus 1 on submit 
     prev.firstElementChild.children[0].value++;
     return prev;
   } 
@@ -35,9 +36,13 @@ export default () =>  {
 
       table = row.parentNode;
 
-      row.firstElementChild.children[0].value--;
+      // console.log(row.sectionRowIndex)
+      // console.log(row.rowIndex)
+      // console.log(row.rowIndex)
 
-      // table.rows[row.rowIndex].children[0].children[0].value--;
+      // The current row fails to do a minus 1 on the count on submit, tried both ways below
+      // row.firstElementChild.children[0].value--;
+      table.rows[row.sectionRowIndex].children[0].children[0].value--;
 
 
       table.insertBefore(row, getPreviousSibling(row));
@@ -61,8 +66,11 @@ export default () =>  {
         return false;
       }
 
+      // The current row fails to do a plus 1 on the count on submit
       row.firstElementChild.children[0].value++;
       const prevSib = getSibling(row);
+
+      // This works fine and does a minus 1 on the previous
       prevSib.firstElementChild.children[0].value--;
       table.insertBefore(row, getSibling(prevSib));
     });

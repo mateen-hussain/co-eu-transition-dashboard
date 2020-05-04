@@ -65,8 +65,12 @@
       {% set count = count + 1 %}
       <tr class="govuk-table__row">
           <td class="govuk-table__cell order-cell">
-          <input type="hidden" name="fields[][0][order]" value="{{ count }}" />
-          <input type="hidden" name="fields[][0][id]" value="{{ field.id }}" />
+          {# will be hidden fields #}
+          <input type="text" name="fields[][0][order]" value="{{ count }}" />
+          <input type="text" name="fields[][0][id]" value="{{ field.id }}" />
+          {{ field.order }}
+          <br>
+          {{ field.id }}
           <img class="move-up" src='/assets/images/up.png'/></td>
           <td class="govuk-table__cell order-cell"><img class="move-down" src='/assets/images/down.png'/></td>
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
@@ -98,7 +102,7 @@
     name: "submit",
     preventDoubleClick: true
   }) }}
-
+  &nbsp; 
   {{ govukButton({
     text: "Cancel",
     href: config.paths.projectFieldList,
