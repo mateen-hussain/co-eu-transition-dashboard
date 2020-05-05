@@ -2,9 +2,23 @@
     width: 35%;
 }
 
+.order-cell {
+    border: none;
+    padding-top: 10px;
+}
+
 .order-fields .govuk-table__cell {
-    width: 3%;
+    width: 45%;
     padding-right: 0;
+}
+
+.order-fields .govuk-table__cell:first-child, 
+.order-fields .govuk-table__cell:first-child + .govuk-table__cell  {
+    width: 5%;
+}
+
+.govuk-table__header.order-cell {
+    width: 5%
 }
 
 .drop-down-option:first-of-type {
@@ -34,10 +48,5 @@
     pointer-events: none; 
 }
 
-.order-cell {
-    border: none;
-    padding-top: 10px;
-    width: 3%;
-}
 
 
