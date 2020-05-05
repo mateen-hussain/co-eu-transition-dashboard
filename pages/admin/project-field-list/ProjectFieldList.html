@@ -1,5 +1,7 @@
 {% extends "template.njk" %}
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% set fields = getFields() | await %}
 {% set fieldGroups = getProjectGroups() | await %}
@@ -12,13 +14,27 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl">Manage project data input fields</h1>
+  <h1 class="govuk-heading-xl">{{ "Project input data" if editMode else "Manage project data input fields" }}</h1>
 
+  {% if editMode and flash %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [
+      {
+        text: flash
+      }
+    ]
+  }) }}
+  {% endif %}
+
+  {% if not editMode %}
   <p class="govuk-body-l">Changes made to the data input fields will
   be reflected in the downloadable template for the MI commision. </p>
+  {% endif %}
 
   <p class="govuk-body">
     <a href="{{ config.paths.admin.projectField }}" class="govuk-link">Add a new field</a><br>
+    <a href="{{ config.paths.admin.projectFieldList }}/edit" class="{{ 'reorder-link' if editMode else 'govuk-link' }}">Re-order fields</a><br>
   </p>
   <hr class="govuk-section-break govuk-section-break--m">
 
@@ -28,22 +44,40 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
 
-  {% for fieldGroup in fieldGroups %}
+  {% if editMode %}
+  <form action="{{ url }}/edit" method="post">
+  {% endif %}
 
-  <table class="govuk-table project-fields">
+  {% for fieldGroup in fieldGroups %}
+  {% set count = 0 %}
+  <table class="govuk-table {{ 'order-fields' if editMode else 'project-fields' }}">
     <caption class="govuk-table__caption">{{ fieldGroup.name }}</caption>
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
+      {% if editMode %}
+      <th scope="col" class="govuk-table__header order-cell"></th>
+      <th scope="col" class="govuk-table__header order-cell"></th>
+      {% endif %}
       <th scope="col" class="govuk-table__header">Field Name</th>
       <th scope="col" class="govuk-table__header">Field Type</th>
       <th scope="col" class="govuk-table__header">Status</th>
-      <th scope="col" class="govuk-table__header"></th>
+      {% if not editMode %}
+      <th scope="col" class="govuk-table__header edit-cell"></th>
+      {% endif %}
       </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for field in fields %}
+    {% for field in fields | sort(attribute='order') %}
       {% if field.group == fieldGroup.name %}
+      {% set count = count + 1 %}
       <tr class="govuk-table__row">
+        {% if editMode %}
+          <td class="govuk-table__cell order-cell">
+          <input type="hidden" name="fields[][order]" value="{{ count }}" />
+          <input type="hidden" name="fields[][id]" value="{{ field.id }}" />
+          <img class="move-up" src='/assets/images/up.png'/></td>
+          <td class="govuk-table__cell order-cell"><img class="move-down" src='/assets/images/down.png'/></td>
+        {% endif %}
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
           {% set fieldType = 'Drop down' %}
@@ -56,18 +90,43 @@
         {% elif field.type == 'boolean' %}
           {% set fieldType = 'Yes / No' %}
         {% endif %}
-        <td class="govuk-table__cell">{{ fieldType }}</td>
+        <td class="govuk-table__cell">{{ fieldType }}</td>          
         <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
+        {% if not editMode %}
         <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
+        {% endif %}
       </tr>
       {% endif %}
     {% endfor %}
     </tbody>
   </table>
-  
   {% endfor %}
+
+{% if editMode %}
+  {{ govukButton({
+    text: "Apply changes",
+    type: "submit",
+    name: "submit",
+    preventDoubleClick: true
+  }) }}
+  &nbsp; 
+  {{ govukButton({
+    text: "Cancel",
+    href: config.paths.projectFieldList,
+    preventDoubleClick: true,
+    classes: "govuk-button--secondary"
+  }) }} 
+
+  </form>
+{% endif %}
 
  </div>
 </div>
 
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.fieldOrder();
+  </script>
 {% endblock %}
