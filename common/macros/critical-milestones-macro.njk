@@ -32,7 +32,7 @@
             {% else %}
               {% if field.id == 'title' %}
                 <td class="govuk-table__cell">
-                  <a href="{{ config.paths.projectDetails | replace( ':uid', uid | replace(' ', '%20')) }}" class='govuk-link project-link'>
+                  <a href="{{ config.paths.projectDetails | replace(':uid', uid | urlencode) }}" class='govuk-link project-link'>
                     <div class='scrollable'>{{ field.value }}</div>
                   </a>
                 </td>

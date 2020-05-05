@@ -2,6 +2,11 @@
     width: 35%;
 }
 
+.order-fields .govuk-table__cell {
+    width: 3%;
+    padding-right: 0;
+}
+
 .drop-down-option:first-of-type {
     margin-top: 0;
 }
@@ -18,4 +23,21 @@
 #add-option {
     float: right;
 }
+
+.move-up, .move-down {
+    cursor: pointer;
+}
+
+.reorder-link {
+    color: inherit;
+    text-decoration: inherit; 
+    pointer-events: none; 
+}
+
+.order-cell {
+    border: none;
+    padding-top: 10px;
+    width: 3%;
+}
+
 

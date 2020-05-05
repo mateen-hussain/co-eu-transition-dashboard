@@ -5,13 +5,15 @@ import upcomingMilestoneChart from './upcoming-milestones';
 import removeAccordionCross from './remove-accordion-cross';
 import disableButton from './disable-button';
 import groupDisplay from './group-display';
+import fieldOrder from './field-order';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
   upcomingMilestoneChart,
   removeAccordionCross,
   disableButton,
-  groupDisplay
+  groupDisplay,
+  fieldOrder
 };
 
 document.addEventListener('DOMContentLoaded', function() {
