@@ -34,6 +34,7 @@
     "copy-webpack-plugin": "^5.1.1",
     "css-hot-loader": "^1.4.4",
     "css-loader": "^3.5.3",
+    "excel4node": "^1.7.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
     "express-nunjucks": "^2.2.5",

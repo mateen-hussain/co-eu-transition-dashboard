@@ -56,34 +56,53 @@ describe('models/milestone', () => {
 
   it('#fieldDefintions', async () => {
     const definitions = await Milestone.fieldDefintions();
-
+    const config = {
+      exportOptions: {
+        header: {
+          fill: "B7E1CE"
+        },
+        description: {
+          fill: "CEEBDF"
+        }
+      }
+    };
     expect(definitions).to.eql([
-      {
-        name: 'uid',
-        type: 'string',
-        isRequired: true,
-        isUnique: true,
-        importColumnName: 'Milestone UID'
-      },
       {
         name: 'projectUid',
         type: 'string',
         isRequired: true,
-        importColumnName: 'Project UID'
-      },
-      {
+        importColumnName: 'Project UID',
+        config,
+        description: 'The UID of the project these milestones cover'
+      },{
+        name: 'uid',
+        type: 'string',
+        isRequired: true,
+        isUnique: true,
+        importColumnName: 'Milestone UID',
+        config,
+        description: 'Please leave this column blank. CO will assign a permanent UID for each milestone.'
+      },{
         name: 'description',
         type: 'string',
-        importColumnName: 'Milestone description'
-      },
-      {
+        importColumnName: 'Milestone description',
+        config,
+        description: 'Name and short description of the milestone, covering what it is, who owns it, what form it takes and why it is required.'
+      },{
         name: 'date',
         type: 'date',
-        importColumnName: 'Target date for delivery'
+        importColumnName: 'Target date for delivery',
+        config: {
+          exportOptions: {
+            header: { fill: "6C9EE9" },
+            description: { fill: "A4C2F2" }
+          }
+        },
+        description: 'When is the date your are currently aiming to deliver this milestone?'
       }
     ])
 
-    sinon.assert.calledWith(MilestoneField.findAll, { where: { is_active: true } });
+    sinon.assert.calledWith(MilestoneField.findAll, { where: { is_active: true }, order: ['order'] });
   });
 
   describe('#import', () => {

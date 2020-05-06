@@ -3,6 +3,8 @@ const { paths } = require('config');
 const jwt = require('services/jwt');
 const proxyquire = require('proxyquire');
 const moment = require('moment');
+const ProjectField = require('models/projectField');
+const FieldEntryGroup = require('models/fieldEntryGroup');
 
 let page = {};
 let getProject = {};
@@ -48,5 +50,19 @@ describe('pages/project-details/ProjectDetails', () => {
       const project = await page.project();
       expect(project).to.eql('some response');
     });
+  });
+
+  describe('#getFields', () => {
+    it('gets all project fields', async () => {
+      await page.getFields();
+      sinon.assert.called(ProjectField.findAll);
+    });
+  });
+
+  describe('#getProjectGroups', () => {
+    it('gets all project groups', async () => {
+      await page.getProjectGroups();
+      sinon.assert.called(FieldEntryGroup.findAll);
+    })
   });
 });

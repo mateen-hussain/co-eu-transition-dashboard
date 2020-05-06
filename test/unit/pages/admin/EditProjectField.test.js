@@ -200,6 +200,28 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
       sinon.assert.notCalled(page.clearData);
     });
 
+    it('sets data if in edit mode and no id set', async () => {
+      page.req.params = { id: 1 };
+      page.data = {};
+      ProjectField.findOne.returns({ foo: 'bar' });
+
+      await page.setData();
+
+      sinon.assert.calledWith(page.saveData, { foo: 'bar' });
+      sinon.assert.notCalled(page.clearData);
+    });
+
+    it('sets data if in edit mode and id set but does not match param', async () => {
+      page.req.params = { id: 1 };
+      page.data = { id: 2 };
+      ProjectField.findOne.returns({ foo: 'bar' });
+
+      await page.setData();
+
+      sinon.assert.calledWith(page.saveData, { foo: 'bar' });
+      sinon.assert.notCalled(page.clearData);
+    });
+
     it('does not set data id is set in data', async () => {
       await page.setData();
 

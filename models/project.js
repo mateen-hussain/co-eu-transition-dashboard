@@ -22,7 +22,10 @@ class Project extends Model {
       type: 'string',
       isRequired: true,
       isUnique: true,
-      importColumnName: 'UID'
+      importColumnName: 'UID',
+      group: 'Department and Project Information',
+      order: 1,
+      description: 'Project UID. Please leave this column blank. CO will assign a permanent UID for each project.'
     },{
       name: 'departmentName',
       type: 'group',
@@ -30,26 +33,41 @@ class Project extends Model {
       config: {
         options: validDepartments.map(department => department.name)
       },
-      importColumnName: 'Dept'
+      importColumnName: 'Dept',
+      group: 'Department and Project Information',
+      order: 2,
+      description: 'Please provide the name of your department.'
     },{
       name: 'title',
       type: 'string',
-      importColumnName: 'Project Title'
+      importColumnName: 'Project Title',
+      group: 'Department and Project Information',
+      order: 4,
+      description: 'Please set out a clear title to describe this project'
     },{
       name: 'sro',
       type: 'string',
-      importColumnName: 'Project SRO + email address'
+      importColumnName: 'Project SRO + email address',
+      group: 'Department and Project Information',
+      order: 6,
+      description: 'Please provide the name + email of the SRO per project.'
     },{
       name: 'description',
       type: 'string',
-      importColumnName: 'Project Description'
+      importColumnName: 'Project Description',
+      group: 'Department and Project Information',
+      order: 5,
+      description: 'What is the problem this project will address, and why does it need addressing? What will change or be different as a result of departure? How is this new or different to existing arrangements?'
     },{
       name: 'impact',
       type: 'integer',
       config: {
         options: [0,1,2,3]
       },
-      importColumnName: 'Impact Rating'
+      importColumnName: 'Impact Rating',
+      group: 'Department and Project Information',
+      order: 6,
+      description: 'Please indicate the severity of impact if project is not resolved in the transition period.'
     }]);
 
     return projectFields;
