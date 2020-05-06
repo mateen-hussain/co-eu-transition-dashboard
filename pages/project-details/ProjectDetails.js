@@ -1,6 +1,8 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const moment = require('moment');
+const ProjectField = require('models/projectField');
+const FieldEntryGroup = require('models/fieldEntryGroup');
 
 class ProjectDetails extends Page {
   get url() {
@@ -9,6 +11,14 @@ class ProjectDetails extends Page {
 
   async project() {
     return await this.req.user.getProject(this.req.params.uid);
+  }
+
+  async getFields() {
+    return await ProjectField.findAll();
+  }
+
+  async getProjectGroups() {
+    return await FieldEntryGroup.findAll();
   }
 
   get tableFields() {
