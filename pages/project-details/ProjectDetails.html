@@ -12,8 +12,11 @@
 {% set cellBlock = "cell-color-" %}
 {% set flag = '' %}
 {% set missedMilestonesCount = 0 %}
+{% set count = 0 %}
 
 {% set project = project() | await %}
+{% set fields = getFields() | await %}
+{% set fieldGroups = getProjectGroups() | await %}
 
 {% block beforeContent %}
 {% include "feedback.njk" %}
@@ -65,30 +68,6 @@
       html: "<span>" + project.fields.get('deliveryTheme').value | default('N/A') | escape + "</span>" }),
     projectValue) %}
 
-{% set milestonesHtml %}
- {% include "project-details/partials/accordion-info/milestones-table.njk" %}
-{% endset %}
-
-{% set deliveryStatusHtml %}
- {% include "project-details/partials/accordion-info/current-delivery-status.njk" %}
-{% endset %}
-
-{% set HMGdeliveryHTML %}
- {% include "project-details/partials/accordion-info/hmg-delivery.njk" %}
-{% endset %}
-
-{% set citizenReadinessHtml %}
- {% include "project-details/partials/accordion-info/citizen-readiness.njk" %}
-{% endset %}
-
-{% set businessReadinessHtml %}
- {% include "project-details/partials/accordion-info/business-readiness.njk" %}
-{% endset %}
-
-{% set EUmemberStateHtml %}
- {% include "project-details/partials/accordion-info/eu-member-state.njk" %}
-{% endset %}
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-xl project-name">{{ project.title }}</h1>
@@ -100,7 +79,56 @@
 
 <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
 
-{% include "project-details/partials/accordion-details.njk" %}
+<div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+
+{% for fieldGroup in fieldGroups %}
+ {% set count = count + 1 %}
+  <div class="govuk-accordion__section">
+    <div class="govuk-accordion__section-header">
+      <h2 class="govuk-accordion__section-heading">
+        <span class="govuk-accordion__section-button" id="accordion-default-heading-{{count}}">
+          {{ fieldGroup.name }}
+        </span>
+      </h2>
+    </div>
+
+  <div id="accordion-default-content-{{ count }}" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-{{ count }}">
+    <dl class="govuk-summary-list project-summary">
+      {% for field in fields %}
+        {% if field.group == fieldGroup.name %}
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">
+            {{ field.displayName | default('N/A') | string }}
+          </dt>
+          <dd class="govuk-summary-list__value">
+            {{ project.fields.get(field.name).value| default('N/A') }}
+          </dd>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </dl>
+  </div>
+  </div>
+
+{% endfor %}
+
+  <div class="govuk-accordion__section">
+    <div class="govuk-accordion__section-header">
+      <h2 class="govuk-accordion__section-heading">
+        <span class="govuk-accordion__section-button" id="accordion-default-heading-{{ count + 1 }}">
+          All milestones
+        </span>
+      </h2>
+    </div>
+      <div id="accordion-default-content-{{ count + 1 }}" class="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-{{ count + 1}}">
+      {{ govukTable({
+        classes: "milestones-table",
+        head: milestoneKey,
+        rows: milestoneFields
+      }) }}
+      </div>
+    </div>
+  </div>
 
  </div>
 </div>
