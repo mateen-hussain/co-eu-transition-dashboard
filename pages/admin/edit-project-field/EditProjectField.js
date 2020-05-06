@@ -125,7 +125,9 @@ class EditProjectField extends Page {
 
   async setData() {
     if (this.editMode) {
-      if(!this.data.id || this.data.id === 'temp') {
+      const noIdSet = !this.data.id;
+      const differentId = this.data.id != this.req.params.id;
+      if(noIdSet || differentId) {
         const data = await ProjectField.findOne({
           where: {
             id: this.req.params.id
