@@ -43,7 +43,6 @@ const groupSearchItems = async (search, overrides = {}) => {
 const transformForView = model => {
   return Object.keys(model.rawAttributes)
     .map(attributeKey => Object.assign({}, model.rawAttributes[attributeKey], { value: model[attributeKey] }))
-    .filter(attribute => attribute.displayName)
     .reduce((_map, attribute) => {
       _map.set(attribute.fieldName, {
         id: attribute.fieldName,
@@ -59,7 +58,7 @@ const parseFieldEntryValue = (value, type) => {
   if(type) {
     switch(type) {
     case 'boolean':
-      value = truthy.includes(value);
+      value = truthy.includes(value.toLowerCase());
       break;
     case 'integer':
       value = parseInt(value);
