@@ -5,6 +5,8 @@ const ProjectFieldEntry = require('./projectFieldEntry');
 const ProjectField = require('./projectField');
 const modelUtils = require('helpers/models');
 const pick = require('lodash/pick');
+const { pad } = require('helpers/utils');
+const logger = require('services/logger');
 
 class Project extends Model {
   static async fieldDefintions(user) {
@@ -13,14 +15,9 @@ class Project extends Model {
       validDepartments = await user.getDepartments({ raw: true });
     }
 
-    const projectFields = await ProjectField.findAll({
-      where: { is_active: true }
-    });
-
-    projectFields.push(...[{
+    const projectFields = [{
       name: 'uid',
       type: 'string',
-      isRequired: true,
       isUnique: true,
       importColumnName: 'UID',
       group: 'Department and Project Information',
@@ -68,7 +65,13 @@ class Project extends Model {
       group: 'Department and Project Information',
       order: 6,
       description: 'Please indicate the severity of impact if project is not resolved in the transition period.'
-    }]);
+    }];
+
+    const fields = await ProjectField.findAll({
+      where: { is_active: true }
+    });
+
+    projectFields.push(...fields);
 
     return projectFields;
   }
@@ -86,6 +89,16 @@ class Project extends Model {
 
     const projectAttributes = attributes.filter(attribute => this.rawAttributes[attribute]);
     const projectToUpsert = pick(project, projectAttributes);
+
+    if (!projectToUpsert.uid) {
+      try {
+        projectToUpsert.uid = await Project.getNextIDIncrement(projectToUpsert.departmentName);
+        project.uid = projectToUpsert.uid;
+      } catch (error) {
+        logger.error('Unable to generate next project uid');
+        throw error;
+      }
+    }
 
     await this.upsert(projectToUpsert, options);
 
@@ -120,6 +133,20 @@ class Project extends Model {
     }
 
     return fields;
+  }
+
+  static async getNextIDIncrement(departmentName) {
+    const project = await Project.findOne({
+      where: { departmentName },
+      order: [['uid', 'DESC']]
+    });
+
+    if(!project) {
+      return `${departmentName}-01`;
+    }
+
+    const current = parseInt(project.uid.split('-')[1]);
+    return `${departmentName}-${pad(current+1)}`;
   }
 }
 

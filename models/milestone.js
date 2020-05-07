@@ -5,6 +5,8 @@ const MilestoneFieldEntry = require('./milestoneFieldEntry');
 const MilestoneField = require('./milestoneField');
 const moment = require('moment');
 const pick = require('lodash/pick');
+const { pad } = require('helpers/utils');
+const logger = require('services/logger');
 
 class Milestone extends Model {
   static includes(attributeKey) {
@@ -36,7 +38,6 @@ class Milestone extends Model {
     },{
       name: 'uid',
       type: 'string',
-      isRequired: true,
       isUnique: true,
       importColumnName: 'Milestone UID',
       config,
@@ -76,6 +77,16 @@ class Milestone extends Model {
     const milestoneAttributes = attributes.filter(attribute => this.rawAttributes[attribute]);
     const milestoneToUpsert = pick(milestone, milestoneAttributes);
 
+    if (!milestoneToUpsert.uid) {
+      try {
+        milestoneToUpsert.uid = await Milestone.getNextIDIncrement(milestoneToUpsert.projectUid);
+        milestone.uid = milestoneToUpsert.uid;
+      } catch (error) {
+        logger.error('Unable to generate next milestone uid');
+        throw error;
+      }
+    }
+
     await this.upsert(milestoneToUpsert, options);
 
     await this.importMilestoneFieldEntries(milestone, milestoneFields, options);
@@ -109,6 +120,20 @@ class Milestone extends Model {
     }
 
     return fields;
+  }
+
+  static async getNextIDIncrement(projectUid) {
+    const milestone = await Milestone.findOne({
+      where: { projectUid },
+      order: [['uid', 'DESC']]
+    });
+
+    if(!milestone) {
+      return `${projectUid}-01`;
+    }
+
+    const current = parseInt(milestone.uid.split('-')[2]);
+    return `${projectUid}-${pad(current+1)}`;
   }
 }
 

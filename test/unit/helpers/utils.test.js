@@ -30,4 +30,14 @@ describe('helpers/utils', () => {
       expect(utils.removeNulls(test)).to.eql([{ a: 'a', e: ['a'] }, { b: [1] }]);
     });
   });
+
+  describe('#pad', () => {
+    it('returns number padded with 0', () => {
+      expect(utils.pad(4)).to.eql('04');
+    });
+
+    it('returns number not padding with 0', () => {
+      expect(utils.pad(10)).to.eql(10);
+    });
+  })
 });

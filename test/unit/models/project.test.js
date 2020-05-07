@@ -51,7 +51,6 @@ describe('models/project', () => {
       {
         name: 'uid',
         type: 'string',
-        isRequired: true,
         isUnique: true,
         importColumnName: 'UID',
         group: 'Department and Project Information',
@@ -108,10 +107,12 @@ describe('models/project', () => {
   describe('#import', () => {
     beforeEach(() => {
       sinon.stub(Project, 'importProjectFieldEntries').resolves();
+      sinon.stub(Project, 'getNextIDIncrement').resolves('new-id');
     });
 
     afterEach(() => {
       Project.importProjectFieldEntries.restore();
+      Project.getNextIDIncrement.restore();
     });
 
     it('only calls upsert with core fields', async () => {
@@ -123,6 +124,17 @@ describe('models/project', () => {
 
       sinon.assert.calledWith(Project.upsert, { departmentName: 'name', uid: 1 }, options);
       sinon.assert.calledWith(Project.importProjectFieldEntries, project, projectFields, options);
+    });
+
+    it('assigns uid if none given', async () => {
+      const project = { departmentName: 'name', customField: 'custom field' };
+      const options = { someoption: 1 };
+      const projectFields = [];
+
+      await Project.import(project, projectFields, options);
+
+      sinon.assert.calledWith(Project.upsert, { departmentName: 'name', uid: 'new-id' }, options);
+      sinon.assert.calledWith(Project.importProjectFieldEntries, { departmentName: 'name', customField: 'custom field', uid: 'new-id' }, projectFields, options);
     });
   });
 
@@ -176,6 +188,34 @@ describe('models/project', () => {
       const fields = instance.fields;
       expect(fields.get('field1').value).to.eql('value 1');
       expect(fields.get('field2').value).to.eql('value 2');
+    });
+  });
+
+  describe('#getNextIDIncrement', () => {
+    it('gets next uid', async () => {
+      Project.findOne.returns({ uid: 'MIL-01' });
+
+      const newId = await Project.getNextIDIncrement('MIL');
+
+      sinon.assert.calledWith(Project.findOne, {
+        where: { departmentName: 'MIL' },
+        order: [['uid', 'DESC']]
+      });
+
+      expect(newId).to.eql('MIL-02');
+    });
+
+    it('creates first project id if none returned', async () => {
+      Project.findOne.returns();
+
+      const newId = await Project.getNextIDIncrement('PRO');
+
+      sinon.assert.calledWith(Project.findOne, {
+        where: { departmentName: 'PRO' },
+        order: [['uid', 'DESC']]
+      });
+
+      expect(newId).to.eql('PRO-01');
     });
   });
 });

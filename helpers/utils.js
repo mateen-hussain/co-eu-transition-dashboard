@@ -50,14 +50,22 @@ const camelCase = (str = '') => {
     .replace(/^(.)/, function(b) {
       return b.toLowerCase();
     });
-} ;
+};
 
 const truthy = [true, 'true', 'yes', 1, '1', 'y'];
 const falsey = ['false', 'no', '0', 'n'];
+
+const pad = n => {
+  if (n < 10) {
+    return "0" + n;
+  }
+  return n;
+};
 
 module.exports = {
   removeNulls,
   truthy,
   falsey,
-  camelCase
+  camelCase,
+  pad
 };

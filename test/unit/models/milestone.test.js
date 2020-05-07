@@ -77,7 +77,6 @@ describe('models/milestone', () => {
       },{
         name: 'uid',
         type: 'string',
-        isRequired: true,
         isUnique: true,
         importColumnName: 'Milestone UID',
         config,
@@ -108,10 +107,12 @@ describe('models/milestone', () => {
   describe('#import', () => {
     beforeEach(() => {
       sinon.stub(Milestone, 'importMilestoneFieldEntries').resolves();
+      sinon.stub(Milestone, 'getNextIDIncrement').resolves('new-id');
     });
 
     afterEach(() => {
       Milestone.importMilestoneFieldEntries.restore();
+      Milestone.getNextIDIncrement.restore();
     });
 
     it('only calls upsert with core fields', async () => {
@@ -123,6 +124,18 @@ describe('models/milestone', () => {
 
       sinon.assert.calledWith(Milestone.upsert, { date: "some date", description: "test", projectUid: 1, uid: 1 }, options);
       sinon.assert.calledWith(Milestone.importMilestoneFieldEntries, milestone, milestoneFields, options);
+    });
+
+    it('assigns uid if none given', async () => {
+      const milestone = { projectUid: 1, description: 'test', date: 'some date', customField: 'custom field' };
+      const options = { someoption: 1 };
+      const milestoneFields = [];
+
+      await Milestone.import(milestone, milestoneFields, options);
+
+      sinon.assert.calledWith(Milestone.getNextIDIncrement, 1);
+      sinon.assert.calledWith(Milestone.upsert, { date: "some date", description: "test", projectUid: 1, uid: 'new-id' }, options);
+      sinon.assert.calledWith(Milestone.importMilestoneFieldEntries, { projectUid: 1, description: 'test', date: 'some date', customField: 'custom field', uid: 'new-id' }, milestoneFields, options);
     });
   });
 
@@ -176,6 +189,34 @@ describe('models/milestone', () => {
       const fields = instance.fields;
       expect(fields.get('field1').value).to.eql('value 1');
       expect(fields.get('field2').value).to.eql('value 2');
+    });
+  });
+
+  describe('#getNextIDIncrement', () => {
+    it('gets next uid', async () => {
+      Milestone.findOne.returns({ uid: 'MIL-01-05' });
+
+      const newId = await Milestone.getNextIDIncrement('MIL-01');
+
+      sinon.assert.calledWith(Milestone.findOne, {
+        where: { projectUid: 'MIL-01' },
+        order: [['uid', 'DESC']]
+      });
+
+      expect(newId).to.eql('MIL-01-06');
+    });
+
+    it('creates first milestone id if none returned', async () => {
+      Milestone.findOne.returns();
+
+      const newId = await Milestone.getNextIDIncrement('MIL-01');
+
+      sinon.assert.calledWith(Milestone.findOne, {
+        where: { projectUid: 'MIL-01' },
+        order: [['uid', 'DESC']]
+      });
+
+      expect(newId).to.eql('MIL-01-01');
     });
   });
 });
