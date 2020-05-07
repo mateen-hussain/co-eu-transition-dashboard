@@ -217,5 +217,23 @@ describe('models/project', () => {
 
       expect(newId).to.eql('PRO-01');
     });
+
+    it('uses transaction and lock if passed in', async () => {
+      Project.findOne.returns();
+      const options = {
+        transaction: {
+          LOCK: 'some lock'
+        }
+      };
+
+      const newId = await Project.getNextIDIncrement('PRO', options);
+
+      sinon.assert.calledWith(Project.findOne, {
+        where: { departmentName: 'PRO' },
+        order: [['uid', 'DESC']]
+      }, { transaction: options.transaction, lock: options.transaction.LOCK });
+
+      expect(newId).to.eql('PRO-01');
+    });
   });
 });

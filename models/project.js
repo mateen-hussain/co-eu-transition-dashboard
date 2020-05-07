@@ -135,7 +135,11 @@ class Project extends Model {
     return fields;
   }
 
-  static async getNextIDIncrement(departmentName, options) {
+  static async getNextIDIncrement(departmentName, options = {}) {
+    if (options.transaction) {
+      options.lock = options.transaction.LOCK
+    }
+
     const project = await Project.findOne({
       where: { departmentName },
       order: [['uid', 'DESC']]

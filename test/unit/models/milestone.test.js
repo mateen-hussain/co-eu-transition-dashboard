@@ -218,5 +218,23 @@ describe('models/milestone', () => {
 
       expect(newId).to.eql('MIL-01-01');
     });
+
+    it('uses transaction and lock if passed in', async () => {
+      Milestone.findOne.returns();
+      const options = {
+        transaction: {
+          LOCK: 'some lock'
+        }
+      };
+
+      const newId = await Milestone.getNextIDIncrement('MIL-01', options);
+
+      sinon.assert.calledWith(Milestone.findOne, {
+        where: { projectUid: 'MIL-01' },
+        order: [['uid', 'DESC']]
+      }, { transaction: options.transaction, lock: options.transaction.LOCK });
+
+      expect(newId).to.eql('MIL-01-01');
+    });
   });
 });
