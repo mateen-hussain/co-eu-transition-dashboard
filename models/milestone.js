@@ -5,8 +5,8 @@ const MilestoneFieldEntry = require('./milestoneFieldEntry');
 const MilestoneField = require('./milestoneField');
 const moment = require('moment');
 const pick = require('lodash/pick');
-const { pad } = require('helpers/utils');
 const logger = require('services/logger');
+const sprintf = require('sprintf-js').sprintf;
 
 class Milestone extends Model {
   static includes(attributeKey) {
@@ -79,7 +79,7 @@ class Milestone extends Model {
 
     if (!milestoneToUpsert.uid) {
       try {
-        milestoneToUpsert.uid = await Milestone.getNextIDIncrement(milestoneToUpsert.projectUid);
+        milestoneToUpsert.uid = await Milestone.getNextIDIncrement(milestoneToUpsert.projectUid, options);
         milestone.uid = milestoneToUpsert.uid;
       } catch (error) {
         logger.error('Unable to generate next milestone uid');
@@ -122,18 +122,18 @@ class Milestone extends Model {
     return fields;
   }
 
-  static async getNextIDIncrement(projectUid) {
+  static async getNextIDIncrement(projectUid, options) {
     const milestone = await Milestone.findOne({
       where: { projectUid },
       order: [['uid', 'DESC']]
-    });
+    }, options);
 
     if(!milestone) {
       return `${projectUid}-01`;
     }
 
     const current = parseInt(milestone.uid.split('-')[2]);
-    return `${projectUid}-${pad(current+1)}`;
+    return sprintf("%s-%02d", projectUid, current+1);
   }
 }
 

@@ -5,8 +5,8 @@ const ProjectFieldEntry = require('./projectFieldEntry');
 const ProjectField = require('./projectField');
 const modelUtils = require('helpers/models');
 const pick = require('lodash/pick');
-const { pad } = require('helpers/utils');
 const logger = require('services/logger');
+const sprintf = require('sprintf-js').sprintf;
 
 class Project extends Model {
   static async fieldDefintions(user) {
@@ -92,7 +92,7 @@ class Project extends Model {
 
     if (!projectToUpsert.uid) {
       try {
-        projectToUpsert.uid = await Project.getNextIDIncrement(projectToUpsert.departmentName);
+        projectToUpsert.uid = await Project.getNextIDIncrement(projectToUpsert.departmentName, options);
         project.uid = projectToUpsert.uid;
       } catch (error) {
         logger.error('Unable to generate next project uid');
@@ -135,18 +135,18 @@ class Project extends Model {
     return fields;
   }
 
-  static async getNextIDIncrement(departmentName) {
+  static async getNextIDIncrement(departmentName, options) {
     const project = await Project.findOne({
       where: { departmentName },
       order: [['uid', 'DESC']]
-    });
+    }, options);
 
     if(!project) {
       return `${departmentName}-01`;
     }
 
     const current = parseInt(project.uid.split('-')[1]);
-    return `${departmentName}-${pad(current+1)}`;
+    return sprintf("%s-%02d", departmentName, current+1);
   }
 }
 
