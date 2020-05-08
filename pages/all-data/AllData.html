@@ -182,15 +182,24 @@
     {% set milestoneValue = [] %}
 
     {% for tableFieldId in milestoneTableFields %}
-    {% set flag = '' %}
+
     {% set field = milestone.fields.get(tableFieldId) %}
+      {% set flag = '' %}
       {% if (field.id == 'date') and (field.value | beforeToDay) %}
         {% set flag = 'red-date' %}
       {% endif %}
 
-      {% set milestoneValue = (milestoneValue.push({html: "<span class=" + flag | escape + ">" + field.value | date("D MMM YYYY") | escape + "</span>" if field.type == 'date' else
-      "<span>" + field.value | default('N/A') | escape + "</span>" }), milestoneValue) %}
+      {% set html %}
+        {% if field.id === 'uid' %}
+          <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link project-link'>{{ field.value | escape }}</a>
+        {% elseif field.type == 'date' %}
+          <span class="{{ flag | escape }}">{{ field.value | date("D MMM YYYY") | escape }}</span>
+        {% else %}
+          <span>{{ field.value | default('N/A') | escape }}</span>
+        {% endif %}
+      {% endset %}
 
+      {% set milestoneValue = (milestoneValue.push({html: html}), milestoneValue) %}
     {% endfor %}
 
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}

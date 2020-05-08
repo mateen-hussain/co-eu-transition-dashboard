@@ -46,12 +46,14 @@ class Milestone extends Model {
       name: 'description',
       type: 'string',
       importColumnName: 'Milestone description',
+      displayName: 'Description',
       config,
       description: 'Name and short description of the milestone, covering what it is, who owns it, what form it takes and why it is required.'
     },{
       name: 'date',
       type: 'date',
       importColumnName: 'Target date for delivery',
+      displayName: 'Target date for delivery',
       config: {
         exportOptions: {
           header: { fill: "6C9EE9" },
@@ -164,6 +166,13 @@ Milestone.init({
     get() {
       if (!this.getDataValue('date')) return;
       return moment(this.getDataValue('date'), 'YYYY-MM-DD').format('DD/MM/YYYY');
+    }
+  },
+  updatedAt: {
+    type: DATE,
+    field: "updated_at",
+    get() {
+      return moment(this.getDataValue('updatedAt'), 'YYYY-MM-DD').format('DD/MM/YYYY');
     }
   }
 }, { sequelize, modelName: 'milestone', tableName: 'milestone', createdAt: 'created_at', updatedAt: 'updated_at' });

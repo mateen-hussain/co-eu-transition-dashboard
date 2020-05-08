@@ -37,6 +37,7 @@ class Project extends Model {
     },{
       name: 'title',
       type: 'string',
+      displayName: 'Project Name',
       importColumnName: 'Project Title',
       group: 'Department and Project Information',
       order: 4,
@@ -44,6 +45,7 @@ class Project extends Model {
     },{
       name: 'sro',
       type: 'string',
+      displayName: 'SRO name',
       importColumnName: 'Project SRO + email address',
       group: 'Department and Project Information',
       order: 6,
@@ -58,6 +60,7 @@ class Project extends Model {
     },{
       name: 'impact',
       type: 'integer',
+      displayName: 'Impact',
       config: {
         options: [0,1,2,3]
       },

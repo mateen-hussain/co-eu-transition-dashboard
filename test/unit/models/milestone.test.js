@@ -86,7 +86,8 @@ describe('models/milestone', () => {
         type: 'string',
         importColumnName: 'Milestone description',
         config,
-        description: 'Name and short description of the milestone, covering what it is, who owns it, what form it takes and why it is required.'
+        description: 'Name and short description of the milestone, covering what it is, who owns it, what form it takes and why it is required.',
+        displayName: 'Description'
       },{
         name: 'date',
         type: 'date',
@@ -97,7 +98,8 @@ describe('models/milestone', () => {
             description: { fill: "A4C2F2" }
           }
         },
-        description: 'When is the date your are currently aiming to deliver this milestone?'
+        description: 'When is the date your are currently aiming to deliver this milestone?',
+        displayName: 'Target date for delivery'
       }
     ])
 

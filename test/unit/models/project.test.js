@@ -73,14 +73,16 @@ describe('models/project', () => {
         importColumnName: 'Project Title',
         group: 'Department and Project Information',
         order: 4,
-        description: 'Please set out a clear title to describe this project'
+        description: 'Please set out a clear title to describe this project',
+        displayName: "Project Name"
       },{
         name: 'sro',
         type: 'string',
         importColumnName: 'Project SRO + email address',
         group: 'Department and Project Information',
         order: 6,
-        description: 'Please provide the name + email of the SRO per project.'
+        description: 'Please provide the name + email of the SRO per project.',
+        displayName: "SRO name"
       },{
         name: 'description',
         type: 'string',
@@ -97,7 +99,8 @@ describe('models/project', () => {
         importColumnName: 'Impact Rating',
         group: 'Department and Project Information',
         order: 6,
-        description: 'Please indicate the severity of impact if project is not resolved in the transition period.'
+        description: 'Please indicate the severity of impact if project is not resolved in the transition period.',
+        displayName: "Impact"
       }
     ])
 

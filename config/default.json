@@ -38,6 +38,7 @@
       "passwordResetComplete": "/password-reset/reset-complete"
     },
     "projectDetails": "/project-details/:uid",
+    "milestoneDetails": "/milestone-details/:uid",
     "privacyNotice": "/privacy-notice",
     "missedMilestones": "/missed-milestones",
     "upcomingMilestones": "/upcoming-milestones",
