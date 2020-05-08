@@ -122,9 +122,10 @@ class Milestone extends Model {
     return fields;
   }
 
-  static async getNextIDIncrement(projectUid, options = {}) {
-    if (options.transaction) {
-      options.lock = options.transaction.LOCK
+  static async getNextIDIncrement(projectUid, { transaction } = {}) {
+    const options = { transaction };
+    if (transaction) {
+      options.lock = transaction.LOCK
     }
 
     const milestone = await Milestone.findOne({
