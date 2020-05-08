@@ -78,12 +78,13 @@ class EditProjectField extends Page {
 
   async saveFieldToDatabase() {
     const field = this.data;
+
     if (field.id === 'temp') {
       delete field.id;
     }
 
     if(!field.name && field.displayName) {
-      field.name = camelCase(field.displayName);
+      field.name = camelCase(field.displayName.replace(/[^A-Za-z0-9_]/gm, ''));
     }
 
     try {
