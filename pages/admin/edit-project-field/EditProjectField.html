@@ -69,6 +69,7 @@
 <form action='{{ req.originalUrl }}' method='POST'>
 
 <input type="hidden" name="id" value="{{ data.id | default('temp') }}" />
+<input type="hidden" name="name" value="{{ data.name }}" />
 
 {% if editMode %}
 <p class="govuk-body-l">

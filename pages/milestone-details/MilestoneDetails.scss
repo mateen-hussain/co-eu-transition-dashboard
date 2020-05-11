@@ -1,0 +1,20 @@
+.project-name {
+    margin-bottom: 0;
+}
+
+.dept-name {
+    margin-bottom: 50px;
+}
+
+.milestones-table tbody > tr:last-child > td {
+    border-bottom: 0;
+}
+
+.project-summary > .govuk-summary-list__row:last-child > dd,
+.project-summary > .govuk-summary-list__row:last-child > dt {
+    border-bottom: 0;
+}
+
+.project-summary > .govuk-summary-list__row > .govuk-summary-list__key {
+    width: 50%;
+}

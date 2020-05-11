@@ -2,7 +2,7 @@
   "env": "development",
   "port": "3000",
   "cookie": {
-    "expires": 900000
+    "expires": 3600000
   },
   "services": {
     "mysql": {},
@@ -38,6 +38,7 @@
       "passwordResetComplete": "/password-reset/reset-complete"
     },
     "projectDetails": "/project-details/:uid",
+    "milestoneDetails": "/milestone-details/:uid",
     "privacyNotice": "/privacy-notice",
     "missedMilestones": "/missed-milestones",
     "upcomingMilestones": "/upcoming-milestones",

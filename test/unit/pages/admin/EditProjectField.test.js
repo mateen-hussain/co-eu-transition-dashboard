@@ -5,6 +5,7 @@ const flash = require('middleware/flash');
 const ProjectField = require('models/projectField');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const EditProjectField = require('pages/admin/edit-project-field/EditProjectField');
+const jwt = require('services/jwt');
 
 let page = {};
 let res = {};
@@ -19,10 +20,12 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
     page.res = res;
 
     sinon.stub(authentication, 'protect').returns([]);
+    sinon.stub(jwt, 'restoreData').returns();
   });
 
   afterEach(() => {
     authentication.protect.restore();
+    jwt.restoreData.restore();
   });
 
   describe('#url', () => {
@@ -123,6 +126,17 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
       await page.saveFieldToDatabase();
 
       sinon.assert.calledWith(ProjectField.upsert, page.data);
+      sinon.assert.calledOnce(page.next);
+    });
+
+    it('santizes field name', async () => {
+      page.clearData = sinon.stub();
+      page.next = sinon.stub();
+      jwt.restoreData.returns({ EditProjectField: { id: 1, foo: 'bar', displayName: 'some name (&(&(FS^%$%@&' } });
+
+      await page.saveFieldToDatabase();
+
+      sinon.assert.calledWith(ProjectField.upsert, { id: 1, foo: 'bar', displayName: 'some name (&(&(FS^%$%@&', name: 'somenameFS' });
       sinon.assert.calledOnce(page.next);
     });
 

@@ -1,6 +1,7 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const ProjectField = require('models/projectField');
+const Project = require('models/project');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
@@ -17,11 +18,13 @@ class ProjectFieldList extends Page {
   }
 
   async getFields() {
-    return await ProjectField.findAll();
+    return await Project.fieldDefintions();
   }
 
   async getProjectGroups() {
-    return await FieldEntryGroup.findAll();
+    return await FieldEntryGroup.findAll({
+      order: ['order']
+    });
   }
 
   get editMode() {
@@ -39,7 +42,10 @@ class ProjectFieldList extends Page {
     const transaction = await sequelize.transaction();
     try {
       for(const field of body.fields) {
-        if(!field.order || !field.id) {
+        if(!field.id || !field.id.length) {
+          // means its not part of the project fields but a column of the project table
+          continue;
+        } else if(!field.order) {
           throw new Error('Field missing order or id');
         }
         const values = { order: field.order };
@@ -58,17 +64,8 @@ class ProjectFieldList extends Page {
   }
 
   async postRequest(req, res) {
-    const orderValues = req.body, fields = {}, key = 'fields';
-    fields[key] = [];
-    for (var i=0; i<orderValues.fields[0].id.length; i++) {
-      fields[key].push({ 
-        'id' : orderValues.fields[0].id[i], 
-        'order' : orderValues.fields[0].order[i] 
-      });
-    }
-
     if (this.editMode) {
-      await this.saveFieldOrder(fields);
+      await this.saveFieldOrder(req.body);
     }
     res.redirect(this.url);
   }

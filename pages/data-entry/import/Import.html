@@ -189,15 +189,27 @@
   </thead>
   <tbody class="govuk-table__body">
     {% for project in projects %}
-      {% set milestone = milestones[loop.index0] %}
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">{{ project.uid }}</td>
-      {% if milestone.uid %}
-      <td class="govuk-table__cell">{{ milestone.uid }}</td>
+      {% set projectMilestones = [] %}
+      {% for milestone in milestones %}
+        {% if milestone.projectUid === project.uid %}
+          {% set projectMilestones = (projectMilestones.push(milestone), projectMilestones) %}
+        {% endif %}
+      {% endfor %}
+
+      {% if (projectMilestones | length) %}
+        {% for milestone in projectMilestones %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ project.uid | default('[Auto generated]') }}</td>
+            <td class="govuk-table__cell">{{ milestone.uid | default('[Auto generated]') }}</td>
+          </tr>
+        {% endfor %}
       {% else %}
-      <td class="govuk-table__cell">-</td>
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">{{ project.uid | default('[Auto generated]') }}</td>
+          <td class="govuk-table__cell">-</td>
+        </tr>
       {% endif %}
-    </tr>
+
     {% endfor %}
   </tbody>
 </table>

@@ -1,6 +1,7 @@
 const { Model, STRING, INTEGER, TEXT, DATE, NOW } = require('sequelize');
 const sequelize = require('services/sequelize');
 const MilestoneField = require('./milestoneField');
+const moment = require('moment');
 
 class MilestoneFieldEntryAudit extends Model {}
 
@@ -21,7 +22,10 @@ MilestoneFieldEntryAudit.init({
   archivedAt: {
     type: DATE,
     field: 'archived_at',
-    defaultValue: NOW
+    defaultValue: NOW,
+    get() {
+      return moment(this.getDataValue('archivedAt'), 'YYYY-MM-DD').format('DD/MM/YYYY');
+    }
   }
 }, { sequelize, modelName: 'milestoneFieldEntryAudit', tableName: 'milestone_field_entry_audit', createdAt: 'created_at', updatedAt: 'updated_at' });
 
