@@ -177,7 +177,7 @@ User.init({
     field: "last_login_at"
   },
   role: {
-    type: ENUM('admin', 'user')
+    type: ENUM('uploader', 'viewer', 'administrator')
   },
   twofaSecret: {
     type: STRING(128),

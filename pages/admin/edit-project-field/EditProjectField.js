@@ -14,7 +14,7 @@ class EditProjectField extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['administrator']),
       flash
     ];
   }

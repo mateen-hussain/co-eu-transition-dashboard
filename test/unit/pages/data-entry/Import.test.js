@@ -55,12 +55,12 @@ describe('pages/data-entry/import/Import', () => {
   describe('#middleware', () => {
     it('only admins are alowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['admin']),
+        ...authentication.protect(['uploader', 'administrator']),
         fileUploadMock,
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['admin']);
+      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
     });
   });
 

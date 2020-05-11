@@ -61,11 +61,11 @@ describe('pages/admin/project-field-list/ProjectFieldList', () => {
   describe('#middleware', () => {
     it('only admins are alowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['admin']),
+        ...authentication.protect(['administrator']),
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['admin']);
+      sinon.assert.calledWith(authentication.protect, ['administrator']);
     });
   });
 });
