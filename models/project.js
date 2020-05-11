@@ -22,7 +22,9 @@ class Project extends Model {
       importColumnName: 'UID',
       group: 'Department and Project Information',
       order: 1,
-      description: 'Project UID. Please leave this column blank. CO will assign a permanent UID for each project.'
+      description: 'Project UID. Please leave this column blank. CO will assign a permanent UID for each project.',
+      displayName: 'UID',
+      isActive: true
     },{
       name: 'departmentName',
       type: 'group',
@@ -33,7 +35,9 @@ class Project extends Model {
       importColumnName: 'Dept',
       group: 'Department and Project Information',
       order: 2,
-      description: 'Please provide the name of your department.'
+      description: 'Please provide the name of your department.',
+      displayName: 'Department',
+      isActive: true
     },{
       name: 'title',
       type: 'string',
@@ -41,7 +45,8 @@ class Project extends Model {
       importColumnName: 'Project Title',
       group: 'Department and Project Information',
       order: 4,
-      description: 'Please set out a clear title to describe this project'
+      description: 'Please set out a clear title to describe this project',
+      isActive: true
     },{
       name: 'sro',
       type: 'string',
@@ -49,14 +54,17 @@ class Project extends Model {
       importColumnName: 'Project SRO + email address',
       group: 'Department and Project Information',
       order: 6,
-      description: 'Please provide the name + email of the SRO per project.'
+      description: 'Please provide the name + email of the SRO per project.',
+      isActive: true
     },{
       name: 'description',
       type: 'string',
+      displayName: 'Description',
       importColumnName: 'Project Description',
       group: 'Department and Project Information',
       order: 5,
-      description: 'What is the problem this project will address, and why does it need addressing? What will change or be different as a result of departure? How is this new or different to existing arrangements?'
+      description: 'What is the problem this project will address, and why does it need addressing? What will change or be different as a result of departure? How is this new or different to existing arrangements?',
+      isActive: true
     },{
       name: 'impact',
       type: 'integer',
@@ -67,7 +75,8 @@ class Project extends Model {
       importColumnName: 'Impact Rating',
       group: 'Department and Project Information',
       order: 6,
-      description: 'Please indicate the severity of impact if project is not resolved in the transition period.'
+      description: 'Please indicate the severity of impact if project is not resolved in the transition period.',
+      isActive: true
     }];
 
     const fields = await ProjectField.findAll({

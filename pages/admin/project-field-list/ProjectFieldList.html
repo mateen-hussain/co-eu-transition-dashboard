@@ -48,6 +48,7 @@
   <form action="{{ url }}/edit" method="post">
   {% endif %}
 
+  {% set totalCount = -1 %}
   {% for fieldGroup in fieldGroups %}
   {% set count = 0 %}
   <table class="govuk-table {{ 'order-fields' if editMode else 'project-fields' }}">
@@ -70,13 +71,21 @@
     {% for field in fields | sort(attribute='order') %}
       {% if field.group == fieldGroup.name %}
       {% set count = count + 1 %}
+      {% set totalCount = totalCount + 1 %}
       <tr class="govuk-table__row">
         {% if editMode %}
           <td class="govuk-table__cell order-cell">
-          <input type="hidden" name="fields[][order]" value="{{ count }}" />
-          <input type="hidden" name="fields[][id]" value="{{ field.id }}" />
-          <img class="move-up" src='/assets/images/up.png'/></td>
-          <td class="govuk-table__cell order-cell"><img class="move-down" src='/assets/images/down.png'/></td>
+            <input type="hidden" name="fields[][{{totalCount}}][order]" value="{{ count }}" />
+            <input type="hidden" name="fields[][{{totalCount}}][id]" value="{{ field.id }}" />
+            {% if field.id %}
+              <img class="move-up" src='/assets/images/up.png'/>
+            {% endif %}
+          </td>
+          <td class="govuk-table__cell order-cell">
+            {% if field.id %}
+              <img class="move-down" src='/assets/images/down.png'/>
+            {% endif %}
+          </td>
         {% endif %}
         <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
         {% if field.type == 'group' %}
@@ -90,9 +99,9 @@
         {% elif field.type == 'boolean' %}
           {% set fieldType = 'Yes / No' %}
         {% endif %}
-        <td class="govuk-table__cell">{{ fieldType }}</td>          
+        <td class="govuk-table__cell">{{ fieldType }}</td>
         <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
-        {% if not editMode %}
+        {% if not editMode and field.id %}
         <td class="govuk-table__cell"><a href="{{ config.paths.admin.projectField + '/' + field.id }}" class="govuk-link">Edit</a></td>
         {% endif %}
       </tr>
@@ -109,13 +118,13 @@
     name: "submit",
     preventDoubleClick: true
   }) }}
-  &nbsp; 
+  &nbsp;
   {{ govukButton({
     text: "Cancel",
     href: config.paths.projectFieldList,
     preventDoubleClick: true,
     classes: "govuk-button--secondary"
-  }) }} 
+  }) }}
 
   </form>
 {% endif %}
