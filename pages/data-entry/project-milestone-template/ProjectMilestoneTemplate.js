@@ -8,6 +8,7 @@ const xl = require('excel4node');
 const moment = require('moment');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const get = require('lodash/get');
+const logger = require('services/logger');
 
 class ProjectMilestoneTemplate extends Page {
   get url() {
@@ -219,9 +220,11 @@ class ProjectMilestoneTemplate extends Page {
       cell.number(parseFloat(value));
       break;
     case 'date':
-      cell
-        .date(moment(value, 'DD/MM/YYYY').toDate())
-        .style({ numberFormat: 'd/mm/yy' });
+      if(moment(value, 'DD/MM/YYYY').isValid()) {
+        cell
+          .date(moment('', 'DD/MM/YYYY').toDate())
+          .style({ numberFormat: 'd/mm/yy' });
+      }
       break;
     case 'boolean':
       cell.string(value === true ? 'Yes' : 'No');
@@ -318,13 +321,17 @@ class ProjectMilestoneTemplate extends Page {
 
   async createExcelTemplate(req, res) {
     const workbook = new xl.Workbook();
-
-    await this.createProjectSheet(workbook);
-    await this.createMilestoneSheet(workbook);
-
     const name = `OS_${moment().format('YYYY.MM.DD')}_Commission Sheet.xlsx`;
 
-    workbook.write(name, res);
+    try {
+      await this.createProjectSheet(workbook);
+      await this.createMilestoneSheet(workbook);
+
+      workbook.write(name, res);
+    } catch (error) {
+      logger.error(`Error exporting project milestone template: ${error}`);
+      res.send(`Error exporting project milestone template: ${error}`);
+    }
   }
 }
 
