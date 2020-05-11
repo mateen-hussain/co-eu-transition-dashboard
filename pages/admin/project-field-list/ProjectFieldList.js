@@ -1,6 +1,7 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const ProjectField = require('models/projectField');
+const Project = require('models/project');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
@@ -17,7 +18,7 @@ class ProjectFieldList extends Page {
   }
 
   async getFields() {
-    return await ProjectField.findAll();
+    return await Project.fieldDefintions();
   }
 
   async getProjectGroups() {
@@ -61,9 +62,9 @@ class ProjectFieldList extends Page {
     const orderValues = req.body, fields = {}, key = 'fields';
     fields[key] = [];
     for (var i=0; i<orderValues.fields[0].id.length; i++) {
-      fields[key].push({ 
-        'id' : orderValues.fields[0].id[i], 
-        'order' : orderValues.fields[0].order[i] 
+      fields[key].push({
+        'id' : orderValues.fields[0].id[i],
+        'order' : orderValues.fields[0].order[i]
       });
     }
 
