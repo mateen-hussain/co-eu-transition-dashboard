@@ -222,7 +222,7 @@ class ProjectMilestoneTemplate extends Page {
     case 'date':
       if(moment(value, 'DD/MM/YYYY').isValid()) {
         cell
-          .date(moment('', 'DD/MM/YYYY').toDate())
+          .date(moment(value, 'DD/MM/YYYY').toDate())
           .style({ numberFormat: 'd/mm/yy' });
       }
       break;
