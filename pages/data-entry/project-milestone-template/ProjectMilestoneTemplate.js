@@ -7,6 +7,7 @@ const Milestone = require('models/milestone');
 const xl = require('excel4node');
 const moment = require('moment');
 const FieldEntryGroup = require('models/fieldEntryGroup');
+const get = require('lodash/get');
 
 class ProjectMilestoneTemplate extends Page {
   get url() {
@@ -78,14 +79,14 @@ class ProjectMilestoneTemplate extends Page {
       font: {
         bold: true,
         italics: true,
-        color: group.config.exportOptions.group.color,
+        color: get(group, 'config.exportOptions.group.color'),
         name: 'Arial',
         size: 10
       },
       fill: {
         type: 'pattern',
         patternType: 'solid',
-        fgColor: group.config.exportOptions.group.fill
+        fgColor: get(group, 'config.exportOptions.group.fill')
       }
     });
 
@@ -220,7 +221,7 @@ class ProjectMilestoneTemplate extends Page {
     case 'date':
       cell
         .date(moment(value, 'DD/MM/YYYY').toDate())
-        .style({ numberFormat: 'DD/MM/YYYY' });
+        .style({ numberFormat: 'd/mm/yy' });
       break;
     case 'boolean':
       cell.string(value === true ? 'Yes' : 'No');
@@ -264,8 +265,8 @@ class ProjectMilestoneTemplate extends Page {
 
         projectSheet.column(columnIndex).setWidth(15);
 
-        this.createHeaderCell(workbook, projectSheet, group.config.exportOptions.header, columnIndex, 2, field);
-        this.createDescriptionCell(workbook, projectSheet, group.config.exportOptions.description, columnIndex, 3, field);
+        this.createHeaderCell(workbook, projectSheet, get(group, 'config.exportOptions.header'), columnIndex, 2, field);
+        this.createDescriptionCell(workbook, projectSheet, get(group, 'config.exportOptions.description'), columnIndex, 3, field);
         this.createTypeCell(workbook, projectSheet, columnIndex, 4, field);
         this.addGroupValidation(workbook, projectSheet, columnIndex, 5, field);
 
@@ -301,8 +302,8 @@ class ProjectMilestoneTemplate extends Page {
 
       milestoneSheet.column(columnIndex).setWidth(15);
 
-      this.createHeaderCell(workbook, milestoneSheet, field.config.exportOptions.header, columnIndex, 1, field);
-      this.createDescriptionCell(workbook, milestoneSheet, field.config.exportOptions.description, columnIndex, 2, field);
+      this.createHeaderCell(workbook, milestoneSheet, get(field.config, 'exportOptions.header'), columnIndex, 1, field);
+      this.createDescriptionCell(workbook, milestoneSheet, get(field.config, 'exportOptions.description'), columnIndex, 2, field);
       this.createTypeCell(workbook, milestoneSheet, columnIndex, 3, field);
       this.addGroupValidation(workbook, milestoneSheet, columnIndex, 4, field);
 
