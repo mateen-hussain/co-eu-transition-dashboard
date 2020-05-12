@@ -74,7 +74,7 @@ class ProjectMilestoneTemplate extends Page {
   }
 
   createGroupHeaderCell(workbook, group, sheet, columnIndexStart, rowIndex, columnIndexEnd) {
-    const style = workbook.createStyle({
+    const style = {
       border: this.excelDefaultStyles.border,
       alignment: this.excelDefaultStyles.alignment,
       font: {
@@ -83,21 +83,25 @@ class ProjectMilestoneTemplate extends Page {
         color: get(group, 'config.exportOptions.group.color'),
         name: 'Arial',
         size: 10
-      },
-      fill: {
+      }
+    };
+
+    const fgColor = get(group, 'config.exportOptions.group.fill');
+    if (fgColor) {
+      style.fill = {
         type: 'pattern',
         patternType: 'solid',
-        fgColor: get(group, 'config.exportOptions.group.fill')
+        fgColor
       }
-    });
+    }
 
     sheet.cell(rowIndex, columnIndexStart, rowIndex, columnIndexEnd, true)
       .string(group.name || '')
-      .style(style);
+      .style(workbook.createStyle(style));
   }
 
   createHeaderCell(workbook, sheet, options = {}, columnIndex, rowIndex, field) {
-    const opts = {
+    const style = {
       border: this.excelDefaultStyles.border,
       alignment: this.excelDefaultStyles.alignment,
       font: {
@@ -109,21 +113,20 @@ class ProjectMilestoneTemplate extends Page {
     };
 
     if(options.fill) {
-      opts.fill = {
+      style.fill = {
         type: 'pattern',
         patternType: 'solid',
         fgColor: options.fill
       };
     }
 
-    const style = workbook.createStyle(opts);
     sheet.cell(rowIndex, columnIndex)
       .string(field.importColumnName || '')
-      .style(style);
+      .style(workbook.createStyle(style));
   }
 
   createDescriptionCell(workbook, sheet, options = {}, columnIndex, rowIndex, field) {
-    const opts = {
+    const style = {
       border: this.excelDefaultStyles.border,
       alignment: this.excelDefaultStyles.alignment,
       font: {
@@ -135,17 +138,16 @@ class ProjectMilestoneTemplate extends Page {
     };
 
     if(options.fill) {
-      opts.fill = {
+      style.fill = {
         type: 'pattern',
         patternType: 'solid',
         fgColor: options.fill
       };
     }
 
-    const style = workbook.createStyle(opts);
     sheet.cell(rowIndex, columnIndex)
       .string(field.description || '')
-      .style(style);
+      .style(workbook.createStyle(style));
   }
 
   createTypeCell(workbook, sheet, columnIndex, rowIndex, field) {
@@ -164,12 +166,23 @@ class ProjectMilestoneTemplate extends Page {
       .style(style);
   }
 
-  addGroupValidation(workbook, sheet, columnIndex, rowIndex, field) {
+  addGroupValidation(workbook, validationSheet, sheet, columnIndex, rowIndex, field) {
     const firstCellRef = xl.getExcelCellRef(rowIndex, columnIndex);
     const lastCellRef = xl.getExcelCellRef(1000, columnIndex);
 
+    let validationSheetCurrentColumn = 1;
+    let cell = validationSheet.cell(1, validationSheetCurrentColumn);
+
+    while (get(cell, 'cells[0].v') !== null) {
+      validationSheetCurrentColumn ++;
+      cell = validationSheet.cell(1,validationSheetCurrentColumn);
+      if (validationSheetCurrentColumn > 100000) {
+        throw new Error('Unable to find next validation sheet column');
+      }
+    }
+
     if (field.type === 'group' || field.type === 'boolean') {
-      const options = [];
+      let options = [];
       if(!field.isRequired) {
         options.push('N/A');
       }
@@ -180,13 +193,24 @@ class ProjectMilestoneTemplate extends Page {
         options.push(...field.config.options);
       }
 
+      validationSheet
+        .cell(1, validationSheetCurrentColumn)
+        .string(`${field.displayName} Options`);
+
+      options.forEach((option, validationRowIndex) => {
+        validationSheet
+          .cell(validationRowIndex + 2, validationSheetCurrentColumn)
+          .string(String(option) || '');
+      });
+
+      const validationFirstCellRef = `$${xl.getExcelAlpha(validationSheetCurrentColumn)}$2`;
+      const validationLastCellRef = `$${xl.getExcelAlpha(validationSheetCurrentColumn)}$${options.length + 1}`;
+
       sheet.addDataValidation({
         type: 'list',
-        allowBlank: true,
-        error: 'Input must fall within specified range',
-        showDropDown: true,
+        allowBlank: 1,
         sqref: `${firstCellRef}:${lastCellRef}`,
-        formulas: [options.join(',')],
+        formulas: [`='FOR INFO drop down data'!${validationFirstCellRef}:${validationLastCellRef}`],
       });
     }
   }
@@ -236,7 +260,7 @@ class ProjectMilestoneTemplate extends Page {
     }
   }
 
-  async createProjectSheet(workbook) {
+  async createProjectSheet(workbook, projectSheet, validationSheet) {
     const projectGroups = await FieldEntryGroup.findAll({
       order: ['order']
     });
@@ -244,9 +268,8 @@ class ProjectMilestoneTemplate extends Page {
     const projects = await this.req.user.getProjects();
     const projectFields = await Project.fieldDefintions(this.req.user);
 
-    const projectSheet = workbook.addWorksheet('TAB A - Baseline data');
-
     let currentColumnIndex = 1;
+    const rowIndex = 1;
 
     projectSheet.row(1).setHeight(28);
     projectSheet.row(2).setHeight(70);
@@ -261,7 +284,10 @@ class ProjectMilestoneTemplate extends Page {
         return;
       }
 
-      this.createGroupHeaderCell(workbook, group, projectSheet, currentColumnIndex, 1, currentColumnIndex + (fieldsForGroup.length - 1));
+      const startColumnIndex = currentColumnIndex;
+      const endColumnIndex = currentColumnIndex + (fieldsForGroup.length - 1);
+
+      this.createGroupHeaderCell(workbook, group, projectSheet, startColumnIndex, rowIndex, endColumnIndex);
 
       fieldsForGroup.forEach((field, columnIndex) => {
         columnIndex += currentColumnIndex;
@@ -271,7 +297,7 @@ class ProjectMilestoneTemplate extends Page {
         this.createHeaderCell(workbook, projectSheet, get(group, 'config.exportOptions.header'), columnIndex, 2, field);
         this.createDescriptionCell(workbook, projectSheet, get(group, 'config.exportOptions.description'), columnIndex, 3, field);
         this.createTypeCell(workbook, projectSheet, columnIndex, 4, field);
-        this.addGroupValidation(workbook, projectSheet, columnIndex, 5, field);
+        this.addGroupValidation(workbook, validationSheet, projectSheet, columnIndex, 5, field);
 
         projects.forEach((project, rowIndex) => {
           rowIndex += 5;
@@ -285,15 +311,13 @@ class ProjectMilestoneTemplate extends Page {
     });
   }
 
-  async createMilestoneSheet(workbook) {
+  async createMilestoneSheet(workbook, milestoneSheet, validationSheet) {
     const projects = await this.req.user.getProjects();
 
     const milestones = projects.reduce((milestones, project) => {
       return [...milestones, ...project.milestones];
     }, []);
     const milestoneFields = await Milestone.fieldDefintions();
-
-    const milestoneSheet = workbook.addWorksheet('TAB B - Milestones data');
 
     let currentColumnIndex = 1;
 
@@ -308,7 +332,7 @@ class ProjectMilestoneTemplate extends Page {
       this.createHeaderCell(workbook, milestoneSheet, get(field.config, 'exportOptions.header'), columnIndex, 1, field);
       this.createDescriptionCell(workbook, milestoneSheet, get(field.config, 'exportOptions.description'), columnIndex, 2, field);
       this.createTypeCell(workbook, milestoneSheet, columnIndex, 3, field);
-      this.addGroupValidation(workbook, milestoneSheet, columnIndex, 4, field);
+      this.addGroupValidation(workbook, validationSheet, milestoneSheet, columnIndex, 4, field);
 
       milestones.forEach((milestone, rowIndex) => {
         rowIndex += 4;
@@ -324,8 +348,12 @@ class ProjectMilestoneTemplate extends Page {
     const name = `OS_${moment().format('YYYY.MM.DD')}_Commission Sheet.xlsx`;
 
     try {
-      await this.createProjectSheet(workbook);
-      await this.createMilestoneSheet(workbook);
+      const projectSheet = workbook.addWorksheet('TAB A - Baseline data');
+      const milestoneSheet = workbook.addWorksheet('TAB B - Milestones data');
+      const validationSheet = workbook.addWorksheet('FOR INFO drop down data');
+
+      await this.createProjectSheet(workbook, projectSheet, validationSheet);
+      await this.createMilestoneSheet(workbook, milestoneSheet, validationSheet);
 
       workbook.write(name, res);
     } catch (error) {
