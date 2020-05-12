@@ -170,6 +170,18 @@ describe('pages/data-entry/import/Import', () => {
 
       expect(response).to.eql({ milestoneErrors, milestoneColumnErrors, parsedMilestones });
     });
+
+    it('uses project priorityTheme as default', async () => {
+      const parsedMilestones = [{ id: 1, projectUid: 1 }];
+      const parsedProjects = [{ uid: 1, deliveryTheme: 'some theme' }];
+
+      page.validateItems = () => [null, null];
+      parse.parseItems.returns(parsedMilestones);
+
+      const response = await page.validateMilestones([], parsedProjects);
+
+      expect(response.parsedMilestones).to.eql([{ id: 1, priorityTheme: 'some theme', projectUid: 1 }]);
+    });
   });
 
   describe('#validateImport', () => {

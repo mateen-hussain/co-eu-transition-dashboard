@@ -84,6 +84,15 @@ class Import extends Page {
     projectUidField.config = { options: parsedProjects.map(project => project['uid']) };
     projectUidField.type = 'group';
 
+    for(const milestone of parsedMilestones) {
+      if(!milestone.priorityTheme) {
+        const project = parsedProjects.find(project => project.uid === milestone.projectUid);
+        if (project) {
+          milestone.priorityTheme = project.deliveryTheme;
+        }
+      }
+    }
+
     const [
       milestoneColumnErrors,
       milestoneErrors
