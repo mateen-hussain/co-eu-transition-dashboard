@@ -12,8 +12,6 @@ export default () =>  {
       information.style.display = 'none';
       this.innerHTML = 'See more';
     }
-
-    return false;
   }
   
   Array.prototype.forEach.call(seeMore, function(seeMore) {
