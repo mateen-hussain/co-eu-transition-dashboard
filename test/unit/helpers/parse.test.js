@@ -4,11 +4,11 @@ const { expect } = require('test/unit/util/chai');
 describe('helpers/parse', () => {
   describe('#parseString', () => {
     it('parses string', () => {
-      expect(parse.parseString(' some string ')).to.eql('some string');
+      expect(parse.parseString(' some string ', {})).to.eql('some string');
     });
 
     it('returns undefined if value starts with n/a', () => {
-      expect(parse.parseString('N/A - some reason')).to.eql(undefined);
+      expect(parse.parseString('N/A - some reason', { isRequried: true })).to.eql(undefined);
     });
   });
 

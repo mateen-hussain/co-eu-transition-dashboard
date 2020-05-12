@@ -15,7 +15,7 @@ let req = {};
 
 describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub(), sendStatus: sinon.stub() };
+    res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub() };
     req = { cookies: [] };
 
     page = new ProjectMilestoneTemplate('some path', req, res);
@@ -117,6 +117,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
   describe('cell creation', () => {
     let workbook = {};
     let sheet = {};
+    let validationSheet = {};
     let group = {};
 
     beforeEach(() => {
@@ -136,6 +137,15 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
       sheet.string.returns(sheet);
       sheet.style.returns(sheet);
       sheet.date.returns(sheet);
+
+      validationSheet = {
+        cell: sinon.stub().returns({
+          cells: [{ v: null }],
+          string: sinon.stub()
+        }),
+        string: sinon.stub()
+      };
+      validationSheet.string.returns(validationSheet);
 
       const styleOptions = {
         color: '123',
@@ -255,7 +265,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
 
     describe('#addGroupValidation', () => {
       it('does nothing if type is not group or boolean', () => {
-        page.addGroupValidation(workbook, sheet, 1, 1, { type: 'string' });
+        page.addGroupValidation(workbook, validationSheet, sheet, 1, 1, { type: 'string' });
 
         sinon.assert.notCalled(sheet.addDataValidation);
       });
@@ -268,15 +278,13 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
             options: ['1', '2', '3']
           }
         }
-        page.addGroupValidation(workbook, sheet, 1, 1, field);
+        page.addGroupValidation(workbook, validationSheet, sheet, 1, 1, field);
 
         sinon.assert.calledWith(sheet.addDataValidation, {
           type: 'list',
-          allowBlank: true,
-          error: 'Input must fall within specified range',
-          showDropDown: true,
+          allowBlank: 1,
           sqref: 'A1:A1000',
-          formulas: [field.config.options.join(',')]
+          formulas: ["='FOR INFO drop down data'!$A$2:$A$4"]
         });
       });
 
@@ -286,15 +294,13 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
           type: 'group',
           config: { options: [] }
         }
-        page.addGroupValidation(workbook, sheet, 1, 1, field);
+        page.addGroupValidation(workbook, validationSheet, sheet, 1, 1, field);
 
         sinon.assert.calledWith(sheet.addDataValidation, {
           type: 'list',
-          allowBlank: true,
-          error: 'Input must fall within specified range',
-          showDropDown: true,
+          allowBlank: 1,
           sqref: 'A1:A1000',
-          formulas: ['N/A']
+          formulas: ["='FOR INFO drop down data'!$A$2:$A$2"]
         });
       });
 
@@ -303,15 +309,13 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
           isRequired: false,
           type: 'boolean'
         }
-        page.addGroupValidation(workbook, sheet, 1, 1, field);
+        page.addGroupValidation(workbook, validationSheet, sheet, 1, 1, field);
 
         sinon.assert.calledWith(sheet.addDataValidation, {
           type: 'list',
-          allowBlank: true,
-          error: 'Input must fall within specified range',
-          showDropDown: true,
+          allowBlank: 1,
           sqref: 'A1:A1000',
-          formulas: ['N/A,Yes,No']
+          formulas: ["='FOR INFO drop down data'!$A$2:$A$4"]
         });
       });
 
@@ -320,15 +324,13 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
           isRequired: true,
           type: 'boolean'
         }
-        page.addGroupValidation(workbook, sheet, 1, 1, field);
+        page.addGroupValidation(workbook, validationSheet, sheet, 1, 1, field);
 
         sinon.assert.calledWith(sheet.addDataValidation, {
           type: 'list',
-          allowBlank: true,
-          error: 'Input must fall within specified range',
-          showDropDown: true,
+          allowBlank: 1,
           sqref: 'A1:A1000',
-          formulas: ['Yes,No']
+          formulas: ["='FOR INFO drop down data'!$A$2:$A$3"]
         });
       });
     });
@@ -481,9 +483,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
     });
 
     it('creates project sheet', async () => {
-      await page.createProjectSheet(workbook);
-
-      sinon.assert.calledWith(workbook.addWorksheet, 'TAB A - Baseline data');
+      await page.createProjectSheet(workbook, projectSheet);
 
       sinon.assert.calledWith(projectSheet.row, 1);
       sinon.assert.calledWith(projectSheet.row, 2);
@@ -523,8 +523,6 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
         getProjects: sinon.stub().returns(projects)
       };
 
-      // FieldEntryGroup.findAll.returns(groups);
-
       Milestone.fieldDefintions.returns([{ config: { exportOptions: {} } }]);
 
       milestoneSheet = {
@@ -546,9 +544,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
     });
 
     it('creates milestone sheet', async () => {
-      await page.createMilestoneSheet(workbook);
-
-      sinon.assert.calledWith(workbook.addWorksheet, 'TAB B - Milestones data');
+      await page.createMilestoneSheet(workbook, milestoneSheet);
 
       sinon.assert.calledWith(milestoneSheet.row, 1);
       sinon.assert.calledWith(milestoneSheet.row, 2);
@@ -568,10 +564,12 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
 
   describe('#createExcelTemplate', () => {
     let workbook = {};
+    const sheet = 'sheet';
 
     beforeEach(() => {
       workbook = {
-        write: sinon.stub()
+        write: sinon.stub(),
+        addWorksheet: sinon.stub().returns(sheet)
       };
 
       sinon.stub(xl, 'Workbook').callsFake(() => workbook);
@@ -582,12 +580,13 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
 
     afterEach(() => {
       xl.Workbook.restore();
-    })
+    });
+
     it('creates and writes excel file to res', async () => {
       await page.createExcelTemplate(req, res)
 
-      sinon.assert.calledWith(page.createProjectSheet, workbook);
-      sinon.assert.calledWith(page.createMilestoneSheet, workbook);
+      sinon.assert.calledWith(page.createProjectSheet, workbook, sheet, sheet);
+      sinon.assert.calledWith(page.createMilestoneSheet, workbook, sheet, sheet);
 
       const name = `OS_${moment().format('YYYY.MM.DD')}_Commission Sheet.xlsx`;
       sinon.assert.calledWith(workbook.write, name, res);
