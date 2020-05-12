@@ -1,11 +1,48 @@
-.upcoming-milestones-accordion button.govuk-accordion__open-all {
-    top: -20px !important;
+// .upcoming-milestones-accordion button.govuk-accordion__open-all {
+//     top: -20px !important;
+// }
+
+// .upcoming-milestones-accordion button.govuk-accordion__open-all:after {
+//     content: ' upcoming milestones';
+// }
+
+// #upcoming-milestones {
+//   width: 100%;
+// }
+
+.milestones {
+  background-color: #f3f2f1;
 }
 
-.upcoming-milestones-accordion button.govuk-accordion__open-all:after {
-    content: ' upcoming milestones';
+.milestone-count {
+  height: 25px;
+  width: 25px;
+  background-color: #5694ca;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  color: white;
+  font-weight: normal;
+  margin-left: 10px;
+  margin-top: 5px;
 }
 
-#upcoming-milestones {
-  width: 100%;
+.milestone-count.department {
+  height: 30px;
+  width: 30px;
+  background-color: #1d70b8;
+}
+
+#timeline {
+  border-left: 6px solid #1d70b8;
+}
+
+.milestone-date:before {
+  background-color: #1d70b8;
+  content: "";
+  display: inline-block;
+  height: 5px;
+  vertical-align: middle;
+  width: 10px;
+  margin-right: 5px;
 }

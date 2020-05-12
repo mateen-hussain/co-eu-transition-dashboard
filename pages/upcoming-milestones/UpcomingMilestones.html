@@ -9,38 +9,57 @@
 
 {% set departmentsWithUpcomingMilestone = getDepartmentsWithUpcomingMilestones() | await  %}
 {% set data = chartData(departmentsWithUpcomingMilestone) %}
-{% set upcomingMilestonesTable = [] %}
+{# {% set upcomingMilestonesTable = [] %}
 {% set criticalMilestonesKey = [{ text:'Department' }, { text:'Upcoming Milestones' }] %}
-{% set extraField = 'Upcoming Milestones' %}
+{% set extraField = 'Upcoming Milestones' %} #}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
 {% block content %}
 
 <div class="govuk-grid-row">
+{# change width depending on whether filters is shown or not #}
   <div class="govuk-grid-column-full">
 
-  {{ govukWarningText({
-    text: "All data displayed here is just for projects with a 0 to 1 impact rating.",
-    iconFallbackText: "All data displayed here is just for projects with a 0 to 1 impact rating."
-  }) }}
+  <h1 class="govuk-heading-xl">Upcoming milestones</h1>
 
-  <h1 class="govuk-heading-xl">Upcoming milestones for next 30 days</h1>
+<div id="timeline">
+{# Loop through dates #}
+  <h3 class="govuk-heading-m milestone-date">17 April 2020 <span class="milestone-count department">3</span></h3>
+  <p class="govuk-body-s"><a href="#" class="govuk-link">See more</a></p>
 
-  {% if config.features.upcomingMilestonesChart %}
+{# Loop through all departments #}
+  <div class="upcoming-milestones">
+    <hr class="govuk-section-break govuk-section-break--visible">
+    <h4 class="govuk-heading-s">Department <span class="milestone-count">3</span> </h4> 
+    {# Loop for a department #}
+      <p class="govuk-body"><a href="{{ config.paths.projectDetails }}" class="govuk-link">Project Title</a> Theme</p>
+      <div class="milestones">
+        <p class="govuk-body"><a href="{{ config.paths.milestoneDetails }}" class="govuk-link">Milestone UID</a></p>
+        <span class="govuk-caption-m">Milestone delivery confidence: 0</span>
+        <p class="govuk-body">Milestone description</p>
+      </div>
+    {# Loop for a department #}
+  </div>
+{# Loop through all departments #}
+{# Loop through dates #}
+</div>
+
+
+  {# {% if config.features.upcomingMilestonesChart %}
     <canvas id="upcoming-milestones" aria-label="This chart shows the total number of upcoming milestones in the next 30 days for projects with a 0 to 1 impact rating." role="img">
       {% include "upcoming-milestones/partials/accessible-table.njk" %}
     </canvas>
     <br><br>
-  {% endif %}
+  {% endif %} #}
 
-  {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
+  {# {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
     heading: {
       html: headers.accordionHeader(criticalMilestonesKey)
     }
-  }), upcomingMilestonesTable) %}
+  }), upcomingMilestonesTable) %} #}
 
-  {% for department in departmentsWithUpcomingMilestone %}
+  {# {% for department in departmentsWithUpcomingMilestone %}
   {% set departmentRow %}
     {{ govukTable({
       rows: [
@@ -54,9 +73,9 @@
         ]
       ]
     }) }}
-  {% endset %}
+  {% endset %} #}
 
-  {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
+  {# {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
       summary: {
         html: departmentRow
       },
@@ -65,25 +84,25 @@
       }
     }), upcomingMilestonesTable) %}
 
-  {% endfor %}
+  {% endfor %} #}
 
-  <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
-  <br><br><br><br>
+  {# <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
+  <br><br><br><br> #}
 
-  {{ govukAccordion({
+  {# {{ govukAccordion({
     id: "accordion-table",
     classes: "upcoming-milestones-accordion",
     items: upcomingMilestonesTable
-  }) }}
+  }) }} #}
 
   </div>
 </div>
 
 {% endblock %}
 
-{% block afterScript %}
+{# {% block afterScript %}
   <script>
     var data = {{ data | dump | safe }};
     TRANSITIONDELIVERYDASHBOARD.upcomingMilestoneChart('upcoming-milestones', data);
   </script>
-{% endblock %}
+{% endblock %} #}
