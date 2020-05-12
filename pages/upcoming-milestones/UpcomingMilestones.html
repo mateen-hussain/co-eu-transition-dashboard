@@ -4,14 +4,7 @@
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 
-{% import 'accordion-header-macro.njk' as headers %}
-{% import 'critical-milestones-macro.njk' as milestones %}
-
 {% set departmentsWithUpcomingMilestone = getDepartmentsWithUpcomingMilestones() | await  %}
-{% set data = chartData(departmentsWithUpcomingMilestone) %}
-{# {% set upcomingMilestonesTable = [] %}
-{% set criticalMilestonesKey = [{ text:'Department' }, { text:'Upcoming Milestones' }] %}
-{% set extraField = 'Upcoming Milestones' %} #}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
@@ -49,56 +42,6 @@
 {# Loop through all departments #}
 {# Loop through dates #}
 </div>
-
-
-  {# {% if config.features.upcomingMilestonesChart %}
-    <canvas id="upcoming-milestones" aria-label="This chart shows the total number of upcoming milestones in the next 30 days for projects with a 0 to 1 impact rating." role="img">
-      {% include "upcoming-milestones/partials/accessible-table.njk" %}
-    </canvas>
-    <br><br>
-  {% endif %} #}
-
-  {# {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
-    heading: {
-      html: headers.accordionHeader(criticalMilestonesKey)
-    }
-  }), upcomingMilestonesTable) %} #}
-
-  {# {% for department in departmentsWithUpcomingMilestone %}
-  {% set departmentRow %}
-    {{ govukTable({
-      rows: [
-        [
-          {
-            text: department.name
-          },
-          {
-            text: department.totalUpcomingMilestones
-          }
-        ]
-      ]
-    }) }}
-  {% endset %} #}
-
-  {# {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
-      summary: {
-        html: departmentRow
-      },
-      content: {
-        html: milestones.criticalMilestones(department.projects, projectFields, milestoneFields, extraField, config)
-      }
-    }), upcomingMilestonesTable) %}
-
-  {% endfor %} #}
-
-  {# <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
-  <br><br><br><br> #}
-
-  {# {{ govukAccordion({
-    id: "accordion-table",
-    classes: "upcoming-milestones-accordion",
-    items: upcomingMilestonesTable
-  }) }} #}
 
   </div>
 </div>
