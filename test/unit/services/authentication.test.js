@@ -17,7 +17,7 @@ const user = {
   email: 'email',
   password: 'password',
   hashedPassphrase: 'password',
-  role: 'user',
+  role: 'viewer',
   id: 1,
   increment: sinon.stub().resolves(),
   update: sinon.stub().resolves()
@@ -223,8 +223,8 @@ describe('services/authentication', () => {
 
     describe('handle roles', () => {
       it('allows defined role', () => {
-        const middleware = authentication.protect(['user']);
-        const req = { user: { role: 'user' } };
+        const middleware = authentication.protect(['viewer']);
+        const req = { user: { role: 'viewer' } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -234,8 +234,8 @@ describe('services/authentication', () => {
       });
 
       it('allows mulitple defined roles', () => {
-        const middleware = authentication.protect(['admin', 'user']);
-        const req = { user: { role: 'user' } };
+        const middleware = authentication.protect(['uploader', 'administrator', 'viewer']);
+        const req = { user: { role: 'viewer' } };
         const next = sinon.stub();
 
         middleware[2](req, {}, next);
@@ -244,7 +244,7 @@ describe('services/authentication', () => {
       });
 
       it('redirects to login if no user assigned to req', () => {
-        const middleware = authentication.protect(['user']);
+        const middleware = authentication.protect(['viewer']);
         const req = { };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
@@ -255,8 +255,8 @@ describe('services/authentication', () => {
       });
 
       it('redirects to login if user role does not match', () => {
-        const middleware = authentication.protect(['admin']);
-        const req = { user: { role: 'user' } };
+        const middleware = authentication.protect(['uploader', 'administrator']);
+        const req = { user: { role: 'viewer' } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -278,8 +278,8 @@ describe('services/authentication', () => {
       it('allow if 2fa passed', () => {
         jwt.restoreData.returns({ tfa: true });
 
-        const middleware = authentication.protect(['user']);
-        const req = { user: { role: 'user' } };
+        const middleware = authentication.protect(['viewer']);
+        const req = { user: { role: 'viewer' } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -291,8 +291,8 @@ describe('services/authentication', () => {
       it('redirects if no tfa ', () => {
         jwt.restoreData.returns({ tfa: false });
 
-        const middleware = authentication.protect(['user']);
-        const req = { user: { role: 'user' } };
+        const middleware = authentication.protect(['viewer']);
+        const req = { user: { role: 'viewer' } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -306,8 +306,8 @@ describe('services/authentication', () => {
     it('update cookie expiration', () => {
       sinon.stub(jwt, 'saveData');
 
-      const middleware = authentication.protect(['user']);
-      const req = { user: { role: 'user' } };
+      const middleware = authentication.protect(['viewer']);
+      const req = { user: { role: 'viewer' } };
       const res = { redirect: sinon.stub() };
       const next = sinon.stub();
 

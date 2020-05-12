@@ -16,7 +16,7 @@ class BulkUpload extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['uploader', 'administrator']),
       fileUpload({ safeFileNames: true }),
       flash
     ];

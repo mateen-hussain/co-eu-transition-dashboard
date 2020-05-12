@@ -39,12 +39,12 @@ describe('pages/data-entry/bulk-upload/BulkUpload', () => {
 
   it('only admins are alowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['uploader', 'administrator']),
       fileUploadMock,
       flash
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['admin']);
+    sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
   });
 
   describe('#mode', () => {
@@ -79,7 +79,7 @@ describe('pages/data-entry/bulk-upload/BulkUpload', () => {
       sinon.stub(page, 'importData').resolves();
       page.req.files = {};
       await page.postRequest(req, res);
-      sinon.assert.called(page.importData);  
+      sinon.assert.called(page.importData);
     });
   });
 });

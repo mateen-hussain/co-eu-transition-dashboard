@@ -27,10 +27,10 @@ describe('pages/data-entry/submission-success/SubmissionSuccess', () => {
 
   it('only admins are alowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['admin'])
+      ...authentication.protect(['uploader', 'administrator'])
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['admin']);
+    sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
   });
 
   describe('#url', () => {

@@ -12,10 +12,6 @@ class Start extends Page {
       return res.redirect(config.paths.authentication.passwordReset);
     }
 
-    if (req.user.role === 'admin') {
-      return res.redirect(config.paths.dataEntry.addData);
-    }
-
     if (config.features.missedMilestones){
       return res.redirect(config.paths.missedMilestones);
     }

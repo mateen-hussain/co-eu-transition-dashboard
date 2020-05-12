@@ -9,7 +9,7 @@ let req = {};
 describe('pages/start/Start', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub(), redirect: sinon.stub() };
-    req = { cookies: [], user: { role: 'user' } };
+    req = { cookies: [], user: { role: 'viewer' } };
 
     page = new Start('some path', req, res);
   });
@@ -31,12 +31,6 @@ describe('pages/start/Start', () => {
       req.user.passwordReset = true;
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
-    });
-
-    it('redirects to admin page if user is admin', async() => {
-      req.user.role = 'admin';
-      await page.handler(req, res);
-      sinon.assert.calledWith(res.redirect, config.paths.dataEntry.addData);
     });
 
     it('redirects to missedMilestones is feature is active', async() => {
