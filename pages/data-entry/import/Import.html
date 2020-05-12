@@ -17,12 +17,11 @@
 <div class="govuk-grid-column-full">
 
 {% if errors | length %}
-
+<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
 <h1 class="govuk-heading-xl">Upload failed
-<span class="govuk-caption-xl">No data has been uploaded</span>
+  <span class="govuk-caption-xl">No data has been uploaded</span>
 </h1>
 
-<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
   <h2 class="govuk-error-summary__title" id="error-summary-title">
   {% if flash %}
    {{ flash }}
@@ -34,7 +33,7 @@
     <ul class="govuk-list govuk-error-summary__list">
       {% if errors.sheetErrors %}
       <li>
-        <a href="#excel-sheet-error">{{ errors.sheetErrors | length }} Excel sheet errors found</a>
+        <a href="#excel-sheet-error">{{ errors.sheetErrors | length }} Excel sheet errors found</a></div>
       </li>
       {% endif %}
     {% if errors.projectErrors or errors.projectColumnErrors %}
@@ -179,6 +178,22 @@
     <p class="govuk-body-s">Milestones uploaded</p>
   </div>
 </div>
+{{ govukButton({
+  text: "Add data to dashboard",
+  name: "import",
+  value: "import",
+  type: "submit",
+  preventDoubleClick: true
+}) }}
+<br>
+{{ govukButton({
+  text: "Cancel upload",
+  value: "cancel",
+  name: "cancel",
+  type: "submit",
+  classes: "govuk-button--secondary",
+  preventDoubleClick: true
+}) }}
 
 <table class="govuk-table">
   <thead class="govuk-table__head">
@@ -225,7 +240,7 @@
 
 <input type="hidden" name="importId" value="{{ importId }}" />
 
-{{ govukButton({
+<!-- {{ govukButton({
   text: "Add data to dashboard",
   name: "import",
   value: "import",
@@ -240,7 +255,7 @@
   type: "submit",
   classes: "govuk-button--secondary",
   preventDoubleClick: true
-}) }}
+}) }} -->
 
 </form>
 
