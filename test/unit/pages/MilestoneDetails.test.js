@@ -55,7 +55,7 @@ describe('pages/milestone-details/MilestoneDetails', () => {
         title: 'title',
         sro: 'sro',
         impact: 'impact',
-        hMGConfidence: 'hMGConfidence',
+        hmgConfidence: 'hmgConfidence',
         citizenReadiness: 'citizenReadiness',
         businessReadiness: 'businessReadiness',
         euStateConfidence: 'euStateConfidence',
@@ -66,7 +66,7 @@ describe('pages/milestone-details/MilestoneDetails', () => {
         { name: 'title', displayName: 'title' },
         { name: 'sro', displayName: 'sro' },
         { name: 'impact', displayName: 'impact' },
-        { name: 'hMGConfidence', displayName: 'hMG Confidence' },
+        { name: 'hmgConfidence', displayName: 'hMG Confidence' },
         { name: 'citizenReadiness', displayName: 'citizen Readiness' },
         { name: 'businessReadiness', displayName: 'business Readiness' },
         { name: 'euStateConfidence', displayName: 'euState Confidence' },
@@ -87,7 +87,7 @@ describe('pages/milestone-details/MilestoneDetails', () => {
           value: "impact"
         },{
           name: "hMG Confidence",
-          value: "hMGConfidence"
+          value: "hmgConfidence"
         },{
           name: "citizen Readiness",
           value: "citizenReadiness"

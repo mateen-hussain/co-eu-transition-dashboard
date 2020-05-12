@@ -31,7 +31,7 @@ class MilestoneDetails extends Page {
   }
 
   async projectInformation(project) {
-    const fieldsToShow = ['title', 'sro', 'impact', 'hMGConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
+    const fieldsToShow = ['title', 'sro', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
 
     let fields = await Project.fieldDefintions();
     fields = fields.filter(field => fieldsToShow.includes(field.name));

@@ -6,7 +6,7 @@ const ProjectFieldEntryAudit = require('./projectFieldEntryAudit');
 
 class ProjectFieldEntry extends Model {
   static async import(projectFieldEntry, options) {
-    if (!projectFieldEntry.value) {
+    if (projectFieldEntry.value === undefined) {
       return
     }
 
