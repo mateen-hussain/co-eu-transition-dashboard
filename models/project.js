@@ -5,6 +5,8 @@ const ProjectFieldEntry = require('./projectFieldEntry');
 const ProjectField = require('./projectField');
 const modelUtils = require('helpers/models');
 const pick = require('lodash/pick');
+const logger = require('services/logger');
+const sprintf = require('sprintf-js').sprintf;
 
 class Project extends Model {
   static async fieldDefintions(user) {
@@ -13,16 +15,16 @@ class Project extends Model {
       validDepartments = await user.getDepartments({ raw: true });
     }
 
-    const projectFields = await ProjectField.findAll({
-      where: { is_active: true }
-    });
-
-    projectFields.push(...[{
+    const projectFields = [{
       name: 'uid',
       type: 'string',
-      isRequired: true,
       isUnique: true,
-      importColumnName: 'UID'
+      importColumnName: 'UID',
+      group: 'Department and Project Information',
+      order: 1,
+      description: 'Project UID. Please leave this column blank. CO will assign a permanent UID for each project.',
+      displayName: 'UID',
+      isActive: true
     },{
       name: 'departmentName',
       type: 'group',
@@ -30,27 +32,58 @@ class Project extends Model {
       config: {
         options: validDepartments.map(department => department.name)
       },
-      importColumnName: 'Dept'
+      importColumnName: 'Dept',
+      group: 'Department and Project Information',
+      order: 2,
+      description: 'Please provide the name of your department.',
+      displayName: 'Department',
+      isActive: true
     },{
       name: 'title',
       type: 'string',
-      importColumnName: 'Project Title'
+      displayName: 'Project Name',
+      importColumnName: 'Project Title',
+      group: 'Department and Project Information',
+      order: 4,
+      description: 'Please set out a clear title to describe this project',
+      isActive: true
     },{
       name: 'sro',
       type: 'string',
-      importColumnName: 'Project SRO + email address'
+      displayName: 'SRO name',
+      importColumnName: 'Project SRO + email address',
+      group: 'Department and Project Information',
+      order: 6,
+      description: 'Please provide the name + email of the SRO per project.',
+      isActive: true
     },{
       name: 'description',
       type: 'string',
-      importColumnName: 'Project Description'
+      displayName: 'Description',
+      importColumnName: 'Project Description',
+      group: 'Department and Project Information',
+      order: 5,
+      description: 'What is the problem this project will address, and why does it need addressing? What will change or be different as a result of departure? How is this new or different to existing arrangements?',
+      isActive: true
     },{
       name: 'impact',
       type: 'integer',
+      displayName: 'Impact',
       config: {
         options: [0,1,2,3]
       },
-      importColumnName: 'Impact Rating'
-    }]);
+      importColumnName: 'Impact Rating',
+      group: 'Department and Project Information',
+      order: 6,
+      description: 'Please indicate the severity of impact if project is not resolved in the transition period.',
+      isActive: true
+    }];
+
+    const fields = await ProjectField.findAll({
+      where: { is_active: true }
+    });
+
+    projectFields.push(...fields);
 
     return projectFields;
   }
@@ -68,6 +101,16 @@ class Project extends Model {
 
     const projectAttributes = attributes.filter(attribute => this.rawAttributes[attribute]);
     const projectToUpsert = pick(project, projectAttributes);
+
+    if (!projectToUpsert.uid) {
+      try {
+        projectToUpsert.uid = await Project.getNextIDIncrement(projectToUpsert.departmentName, options);
+        project.uid = projectToUpsert.uid;
+      } catch (error) {
+        logger.error('Unable to generate next project uid');
+        throw error;
+      }
+    }
 
     await this.upsert(projectToUpsert, options);
 
@@ -102,6 +145,25 @@ class Project extends Model {
     }
 
     return fields;
+  }
+
+  static async getNextIDIncrement(departmentName, { transaction } = {}) {
+    const options = { transaction };
+    if (transaction) {
+      options.lock = transaction.LOCK
+    }
+
+    const project = await Project.findOne({
+      where: { departmentName },
+      order: [['uid', 'DESC']]
+    }, options);
+
+    if(!project) {
+      return `${departmentName}-01`;
+    }
+
+    const current = parseInt(project.uid.split('-')[1]);
+    return sprintf("%s-%02d", departmentName, current+1);
   }
 }
 

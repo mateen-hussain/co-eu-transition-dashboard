@@ -4,6 +4,7 @@ const jwt = require('services/jwt');
 const { protect } = require('services/authentication');
 const config = require('config');
 const { removeNulls } = require('helpers/utils');
+const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 
 const notLocals = [
   '_router',
@@ -48,7 +49,7 @@ class Page {
   }
 
   get middleware() {
-    return [...protect(['admin', 'user'])];
+    return [...protect(['uploader', 'viewer', 'administrator'])];
   }
 
   get template() {
@@ -98,8 +99,10 @@ class Page {
       await this.postRequest(req, res);
       break;
     case 'get':
-    default:
       await this.getRequest(req, res);
+      break;
+    default:
+      res.sendStatus(METHOD_NOT_ALLOWED);
     }
   }
 

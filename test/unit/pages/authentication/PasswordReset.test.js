@@ -20,7 +20,7 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
   describe('#middleware', () => {
     it('loads correct middleware', () => {
       expect(page.middleware.toString()).to.eql([
-        ...authentication.protect(['admin', 'user']),
+        ...authentication.protect(['uploader', 'administrator', 'viewer']),
         flash
       ].toString());
     });
@@ -28,7 +28,7 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
 
   describe('#next', () => {
     it('redirects to start page', () => {
-      page.req.user.role = 'user';
+      page.req.user.role = 'viewer';
       expect(page.next).to.eql(config.paths.start);
     });
   });
@@ -93,7 +93,7 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
 
     it('fails if current password does not match', async () => {
       sinon.stub(authentication,'authenticateLogin').returns(true);
-  
+
       await page.passwordReset();
 
       sinon.assert.calledWith(page.req.flash, "Incorrect password entered");
@@ -105,7 +105,7 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
 
       authentication.authenticateLogin = sinon.stub();
       req.body.password = 'password';
-  
+
       page.validatePassword.returns(notValid);
       await page.passwordReset();
 

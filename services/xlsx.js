@@ -6,6 +6,8 @@ const headerRowIdentifer = ['UID', 'Project UID'];
 const subHeaderRowIdentifers = [
   'Project UID',
   '[Set by CO]',
+  '[Free text]',
+  '[Drop down]',
   'The UID of the project these milestones cover'
 ];
 

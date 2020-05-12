@@ -5,6 +5,7 @@ const flash = require('middleware/flash');
 const ProjectField = require('models/projectField');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const EditProjectField = require('pages/admin/edit-project-field/EditProjectField');
+const jwt = require('services/jwt');
 
 let page = {};
 let res = {};
@@ -19,10 +20,12 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
     page.res = res;
 
     sinon.stub(authentication, 'protect').returns([]);
+    sinon.stub(jwt, 'restoreData').returns();
   });
 
   afterEach(() => {
     authentication.protect.restore();
+    jwt.restoreData.restore();
   });
 
   describe('#url', () => {
@@ -40,11 +43,11 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
   describe('#middleware', () => {
     it('only admins are aloud to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['admin']),
+        ...authentication.protect(['administrator']),
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['admin']);
+      sinon.assert.calledWith(authentication.protect, ['administrator']);
     });
   });
 
@@ -126,6 +129,17 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
       sinon.assert.calledOnce(page.next);
     });
 
+    it('santizes field name', async () => {
+      page.clearData = sinon.stub();
+      page.next = sinon.stub();
+      jwt.restoreData.returns({ EditProjectField: { id: 1, foo: 'bar', displayName: 'some name (&(&(FS^%$%@&' } });
+
+      await page.saveFieldToDatabase();
+
+      sinon.assert.calledWith(ProjectField.upsert, { id: 1, foo: 'bar', displayName: 'some name (&(&(FS^%$%@&', name: 'somenameFS' });
+      sinon.assert.calledOnce(page.next);
+    });
+
     it('catches any errors and returns to user', async () => {
       const error = new Error('some error');
       ProjectField.upsert.throws(error);
@@ -192,6 +206,28 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
 
     it('sets data if in edit mode', async () => {
       page.req.params = { id: 'someid' };
+      ProjectField.findOne.returns({ foo: 'bar' });
+
+      await page.setData();
+
+      sinon.assert.calledWith(page.saveData, { foo: 'bar' });
+      sinon.assert.notCalled(page.clearData);
+    });
+
+    it('sets data if in edit mode and no id set', async () => {
+      page.req.params = { id: 1 };
+      page.data = {};
+      ProjectField.findOne.returns({ foo: 'bar' });
+
+      await page.setData();
+
+      sinon.assert.calledWith(page.saveData, { foo: 'bar' });
+      sinon.assert.notCalled(page.clearData);
+    });
+
+    it('sets data if in edit mode and id set but does not match param', async () => {
+      page.req.params = { id: 1 };
+      page.data = { id: 2 };
       ProjectField.findOne.returns({ foo: 'bar' });
 
       await page.setData();

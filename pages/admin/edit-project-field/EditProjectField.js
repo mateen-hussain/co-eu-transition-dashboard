@@ -14,7 +14,7 @@ class EditProjectField extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['administrator']),
       flash
     ];
   }
@@ -78,12 +78,13 @@ class EditProjectField extends Page {
 
   async saveFieldToDatabase() {
     const field = this.data;
+
     if (field.id === 'temp') {
       delete field.id;
     }
 
     if(!field.name && field.displayName) {
-      field.name = camelCase(field.displayName);
+      field.name = camelCase(field.displayName.replace(/[^A-Za-z0-9_]/gm, ''));
     }
 
     try {
@@ -125,7 +126,9 @@ class EditProjectField extends Page {
 
   async setData() {
     if (this.editMode) {
-      if(!this.data.id || this.data.id === 'temp') {
+      const noIdSet = !this.data.id;
+      const differentId = this.data.id != this.req.params.id;
+      if(noIdSet || differentId) {
         const data = await ProjectField.findOne({
           where: {
             id: this.req.params.id

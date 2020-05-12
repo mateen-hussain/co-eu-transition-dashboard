@@ -20,7 +20,7 @@ class Import extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['uploader', 'administrator']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -60,7 +60,8 @@ class Import extends Page {
 
     const parsedProjects = parse.parseItems(projects, projectFields);
     if (!parsedProjects.length) {
-      return {};
+      const projectColumnErrors = [{ error: 'No projects found' }];
+      return { projectColumnErrors };
     }
 
     const [
@@ -71,7 +72,7 @@ class Import extends Page {
     return { projectErrors, projectColumnErrors, parsedProjects };
   }
 
-  async validateMilestones(milestones, parsedProjects) {
+  async validateMilestones(milestones, parsedProjects = []) {
     const milestoneFields = await Milestone.fieldDefintions();
 
     const parsedMilestones = parse.parseItems(milestones, milestoneFields);

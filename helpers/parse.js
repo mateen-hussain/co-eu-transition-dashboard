@@ -1,9 +1,9 @@
 const { removeNulls } = require('./utils');
 
-const parseString = (value = '') => {
+const parseString = (value = '', definition = {}) => {
   value = String(value).trim();
 
-  if (value.toLowerCase().startsWith("n/a")){
+  if (definition.isRequried && value.toLowerCase().startsWith("n/a")){
     return;
   }
 
@@ -13,7 +13,7 @@ const parseString = (value = '') => {
 const parseGroupItem = (value, definition) => {
   value = parseString(value);
 
-  const matchedOption = definition.config.options.find(option => option.toLowerCase() === String(value).toLowerCase());
+  const matchedOption = definition.config.options.find(option => String(option).toLowerCase() === String(value).toLowerCase());
 
   if (matchedOption) {
     return matchedOption;
@@ -29,7 +29,7 @@ const parseValue = (value, definition) => {
   case 'integer':
   case 'float':
   case 'date':
-    return parseString(value);
+    return parseString(value, definition);
   case 'group':
     return parseGroupItem(value, definition);
   }

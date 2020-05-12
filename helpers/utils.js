@@ -50,7 +50,7 @@ const camelCase = (str = '') => {
     .replace(/^(.)/, function(b) {
       return b.toLowerCase();
     });
-} ;
+};
 
 const truthy = [true, 'true', 'yes', 1, '1', 'y'];
 const falsey = ['false', 'no', '0', 'n'];

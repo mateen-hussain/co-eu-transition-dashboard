@@ -4,14 +4,21 @@
       label: "Project description",
       id: "project-description",
       panel: {
-        html: "<p class='govuk-body'>" + project.description | default('N/A') + "</p>"
+        html: "<p class='govuk-body'>" + project.description | default('N/A') | escape + "</p>"
       }
     },
     {
       label: "Project solution",
       id: "project-solution",
       panel: {
-        html: "<p class='govuk-body'>" + project.fields.get('solution').value| default('N/A') + "</p>"
+        html: "<p class='govuk-body'>" + project.fields.get('solution').value | default('N/A') | escape + "</p>"
+      }
+    },
+    {
+      label: "Contact details",
+      id: "contact-details",
+      panel: {
+        html: "<p class='govuk-body'>" + project.sro | default('N/A') | escape + "</p>"
       }
     }
   ]

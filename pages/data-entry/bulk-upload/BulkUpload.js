@@ -4,7 +4,6 @@ const xlsx = require('services/xlsx');
 const fileUpload = require('express-fileupload');
 const flash = require('middleware/flash');
 const authentication = require('services/authentication');
-const config = require('config');
 const BulkImport = require('models/bulkImport');
 const uuid = require('uuid');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
@@ -17,7 +16,7 @@ class BulkUpload extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['uploader', 'administrator']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -57,10 +56,10 @@ class BulkUpload extends Page {
       }
       try {
         await this.importData(req, res);
-        res.redirect(config.paths.dataEntry.import);
+        res.redirect(paths.dataEntry.import);
       } catch (error) {
         req.flash('Error parsing Excel file, please check the file and try again');
-        logger.error(`Error uploading excel document: ${error}`);        
+        logger.error(`Error uploading excel document: ${error}`);
         return res.redirect(this.url);
       }
       break;
@@ -77,7 +76,7 @@ class BulkUpload extends Page {
     });
 
     if (activeImport) {
-      return res.redirect(config.paths.dataEntry.import);
+      return res.redirect(paths.dataEntry.import);
     }
 
     super.getRequest(req, res);

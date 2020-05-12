@@ -6,7 +6,7 @@ const MilestoneFieldEntryAudit = require('./milestoneFieldEntryAudit');
 
 class MilestoneFieldEntry extends Model {
   static async import(milestoneFieldEntry, options) {
-    if (!milestoneFieldEntry.value) {
+    if (milestoneFieldEntry.value === undefined) {
       return
     }
 

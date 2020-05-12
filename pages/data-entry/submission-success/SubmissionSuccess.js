@@ -9,7 +9,7 @@ class SubmissionSuccess extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin'])
+      ...authentication.protect(['uploader', 'administrator'])
     ];
   }
 }

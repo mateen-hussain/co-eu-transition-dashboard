@@ -12,12 +12,14 @@
         All data
         </a>
     </li>
-    {% if req.user.role == 'admin' %}
+    {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
     <li class="govuk-header__navigation-item {% if (url == config.paths.dataEntry.addData) or (url == config.paths.dataEntry.submissionSuccess) %} govuk-header__navigation-item--active {% endif %}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.addData }}">
         Add data
         </a>
     </li>
+    {% endif %}
+    {% if req.user.role == 'administrator' %}
     <li class="govuk-header__navigation-item {% if (url == config.paths.admin.projectFieldList) or (url == config.paths.admin.projectField) %} govuk-header__navigation-item--active {% endif %}">
         <a class="govuk-header__link nav" href="{{ config.paths.admin.projectFieldList }}">
         Manage data input

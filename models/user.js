@@ -120,6 +120,45 @@ class User extends Model {
 
     return projects.length ? projects[0] : undefined;
   }
+
+  async getProjectMilestone(milestoneUid) {
+    const departments = await this.getDepartments({
+      attributes: [],
+      include: [{
+        model: Project,
+        include: [
+          {
+            model: Milestone,
+            where: { uid: milestoneUid },
+            include: [{
+              model: MilestoneFieldEntry,
+              include: MilestoneField
+            }],
+            required: true
+          },
+          {
+            model: ProjectFieldEntry,
+            include: ProjectField
+          }
+        ],
+        required: true
+      }]
+    });
+
+    const projects = departments.reduce((projects, department) => {
+      projects.push(...department.get('projects'));
+      return projects;
+    }, []);
+
+    if(!projects.length) {
+      return {};
+    }
+
+    return {
+      project: projects[0],
+      milestone: projects[0].milestones[0]
+    };
+  }
 }
 
 User.init({
@@ -138,7 +177,7 @@ User.init({
     field: "last_login_at"
   },
   role: {
-    type: ENUM('admin', 'user')
+    type: ENUM('uploader', 'viewer', 'administrator')
   },
   twofaSecret: {
     type: STRING(128),

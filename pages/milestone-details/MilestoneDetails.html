@@ -1,0 +1,205 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% set projectInformationRows = [] %}
+
+{% set cellBlock = "cell-color-" %}
+{% set projectKey = [] %}
+
+{% set projectMilestone = getProjectMilestone() | await %}
+{% set project = projectMilestone.project %}
+{% set milestone = projectMilestone.milestone %}
+{% set projectInformationTable = projectInformation(project) | await %}
+
+{% set milestonefields = getMilestoneFields() | await %}
+{% set historicalComments = getAuditRecords(milestone.uid, 'comments') | await %}
+{% set historicalReprofileReasons = getAuditRecords(milestone.uid, 'reprofiledReason') | await %}
+
+{% block beforeContent %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#",
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% endblock %}
+
+{% block pageTitle %}Milestone Details{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl project-name">{{ milestone.uid }}</h1>
+
+      {% if milestone.fields.get('complete').value %}
+        {{govukTag({
+          text: "Complete"
+        })}}
+      {% endif %}
+
+      <br><br><br>
+
+      {% for projectInfo in projectInformationTable %}
+        {% set projectKey = (projectKey.push({ text:projectInfo.name }), projectKey) %}
+        {% set projectInformationRows = (projectInformationRows.push({html:
+          "<span class=" + (cellBlock + projectInfo.value) | escape + ">" + projectInfo.value | default('N/A') | escape + "</span>" }), projectInformationRows) %}
+      {% endfor %}
+
+      {% set projectTable %}
+        {{ govukTable({
+          head: projectKey,
+          rows: [
+            projectInformationRows
+          ]
+        }) }}
+      {% endset %}
+
+      {{ govukTabs({
+        items: [
+          {
+            label: "Milestone description",
+            id: "milestone-description",
+            panel: {
+              html: "<p class='govuk-body'>" + milestone.description | default('N/A') | escape + "</p>"
+            }
+          },
+          {
+            label: "Project information",
+            id: "project-solution",
+            panel: {
+              html: projectTable
+            }
+          }
+        ]
+      }) }}
+    </div>
+  </div>
+
+  <br>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l project-name">Milestone details</h1>
+      <dl class="govuk-summary-list project-summary">
+        <br>
+        {% for field in milestonefields %}
+          {% if field.displayName and field.name != 'description' and field.name != 'comments' and field.name != 'reprofiledReason' %}
+            <div class="govuk-summary-list__row">
+              <dt class="govuk-summary-list__key">
+                {{ field.displayName }}
+              </dt>
+              <dd class="govuk-summary-list__value">
+                {% if (field.type == 'date') %}
+                  {{ milestone.fields.get(field.name).value | date("D MMM YYYY") }}
+                {% elseif (field.type == 'boolean') %}
+                  {{ 'Yes' if milestone.fields.get(field.name).value else 'No' }}
+                {% elseif (field.name === 'deliveryConfidence') %}
+                  {{ transformDeliveryConfidenceValue(milestone.fields.get(field.name).value) }}
+                {% else %}
+                  {{ milestone.fields.get(field.name).value }}
+                {% endif %}
+              </dd>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </dl>
+    </div>
+  </div>
+
+  {% if milestone.fields.get('reprofiledReason').value or milestone.fields.get('comments').value %}
+    <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+      {% if milestone.fields.get('reprofiledReason').value %}
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="target-date-change">
+                Reasons for target date change
+              </span>
+            </h2>
+          </div>
+
+          <div id="target-date-change" class="govuk-accordion__section-content" aria-labelledby="target-date-change">
+            <dl class="govuk-summary-list project-summary">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Date
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Reason
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  {{ milestone.updatedAt | date("D MMM YYYY") }}
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ milestone.fields.get('reprofiledReason').value }}
+                </dd>
+              </div>
+              {% for reprofileReason in historicalReprofileReasons %}
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    {{ reprofileReason.archivedAt | date("D MMM YYYY") }}
+                  </dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ reprofileReason.value }}
+                  </dd>
+                </div>
+              {% endfor %}
+            </dl>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if milestone.fields.get('comments').value %}
+        <div class="govuk-accordion__section">
+          <div class="govuk-accordion__section-header">
+            <h2 class="govuk-accordion__section-heading">
+              <span class="govuk-accordion__section-button" id="target-date-change">
+                Comments
+              </span>
+            </h2>
+          </div>
+
+          <div id="target-date-change" class="govuk-accordion__section-content" aria-labelledby="target-date-change">
+            <dl class="govuk-summary-list project-summary">
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  Date
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  Comments
+                </dd>
+              </div>
+              <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                  {{ milestone.updatedAt | date("D MMM YYYY") }}
+                </dt>
+                <dd class="govuk-summary-list__value">
+                  {{ milestone.fields.get('comments').value }}
+                </dd>
+              </div>
+              {% for comments in historicalComments %}
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    {{ comments.archivedAt | date("D MMM YYYY") }}
+                  </dt>
+                  <dd class="govuk-summary-list__value">
+                    {{ comments.value }}
+                  </dd>
+                </div>
+              {% endfor %}
+            </dl>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
+{% endblock %}
