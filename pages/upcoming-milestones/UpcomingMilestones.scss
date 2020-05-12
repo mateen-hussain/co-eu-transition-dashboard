@@ -28,7 +28,7 @@
 
 #timeline {
   border-left: 6px solid #1d70b8;
-  padding-left: 10px; 
+  padding-left: 15px; 
 }
 
 .milestone-date:before {
@@ -39,6 +39,7 @@
   vertical-align: middle;
   width: 15px;
   margin-right: 5px;
+  margin-left: -15px;
 }
 
 .upcoming-milestones {
