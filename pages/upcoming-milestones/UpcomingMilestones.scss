@@ -15,8 +15,8 @@
 }
 
 .milestone-count {
-  height: 25px;
-  width: 25px;
+  height: 28px;
+  width: 28px;
   background-color: #5694ca;
   border-radius: 50%;
   display: inline-block;
@@ -24,17 +24,23 @@
   color: white;
   font-weight: normal;
   margin-left: 10px;
-  margin-top: 5px;
+  margin-top: 2px;
+  font-size: 18px;
+  padding: 4px 3px 0 3px;
 }
 
 .milestone-count.department {
-  height: 30px;
-  width: 30px;
   background-color: #1d70b8;
+}
+
+.milestone-count.milestone {
+  margin-bottom: -9px;
+  margin-left: 3px;
 }
 
 #timeline {
   border-left: 6px solid #1d70b8;
+  padding-left: 10px; 
 }
 
 .milestone-date:before {
@@ -43,6 +49,10 @@
   display: inline-block;
   height: 5px;
   vertical-align: middle;
-  width: 10px;
+  width: 15px;
   margin-right: 5px;
+}
+
+.upcoming-milestones {
+  display: none;
 }

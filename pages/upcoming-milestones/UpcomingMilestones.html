@@ -25,8 +25,13 @@
 
 <div id="timeline">
 {# Loop through dates #}
-  <h3 class="govuk-heading-m milestone-date">17 April 2020 <span class="milestone-count department">3</span></h3>
-  <p class="govuk-body-s"><a href="#" class="govuk-link">See more</a></p>
+  <h3 class="govuk-heading-m milestone-date">17 April 2020 
+  <span class="milestone-count department">30</span>
+{# Loop through and display depending on milestone count -1 #}
+  <span class="milestone-count milestone"></span>
+{# Loop through and display depending on milestone count -1 #}
+  </h3>
+  <p class="govuk-body-s"><a href="#" class="govuk-link see-more">See more</a></p>
 
 {# Loop through all departments #}
   <div class="upcoming-milestones">
@@ -100,9 +105,8 @@
 
 {% endblock %}
 
-{# {% block afterScript %}
+{% block afterScript %}
   <script>
-    var data = {{ data | dump | safe }};
-    TRANSITIONDELIVERYDASHBOARD.upcomingMilestoneChart('upcoming-milestones', data);
+    TRANSITIONDELIVERYDASHBOARD.seeMore();
   </script>
-{% endblock %} #}
+{% endblock %}

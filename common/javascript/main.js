@@ -6,6 +6,7 @@ import removeAccordionCross from './remove-accordion-cross';
 import disableButton from './disable-button';
 import groupDisplay from './group-display';
 import fieldOrder from './field-order';
+import seeMore from './see-more';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
@@ -13,7 +14,8 @@ window.TRANSITIONDELIVERYDASHBOARD = {
   removeAccordionCross,
   disableButton,
   groupDisplay,
-  fieldOrder
+  fieldOrder,
+  seeMore
 };
 
 document.addEventListener('DOMContentLoaded', function() {
