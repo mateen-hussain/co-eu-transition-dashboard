@@ -37,7 +37,7 @@
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-xl project-name">{{ milestone.uid }}</h1>
 
-      {% if milestone.fields.get('complete').value %}
+      {% if milestone.fields.get('complete').value == 'Yes' %}
         {{govukTag({
           text: "Complete"
         })}}
