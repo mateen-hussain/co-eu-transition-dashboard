@@ -118,7 +118,6 @@ class EditMilestone extends Page {
   }
 
   async setData() {
-    console.log(this.data,  this.req.params)
     const editingDifferentMilestone = this.data && this.data.uid != this.req.params.uid;
     if (editingDifferentMilestone) {
       this.clearData();
