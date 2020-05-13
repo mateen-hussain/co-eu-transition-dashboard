@@ -11,7 +11,6 @@
 {% block content %}
 
 <div class="govuk-grid-row">
-{# change width depending on whether filters is shown or not #}
   <div class="govuk-grid-column-full">
 
   <h1 class="govuk-heading-xl">Upcoming milestones</h1>
@@ -20,12 +19,14 @@
 {% for department in departmentsWithUpcomingMilestone %}
   {# Should be grouped by date  #}
   <h3 class="govuk-heading-m milestone-date">17 April 2020
+
   {# Total milestones for each date   #}
   <span class="milestone-count department">30</span>
 
   {# Loop for each milestone count - 1  #}
   <span class="milestone-count milestone"></span>
   {# end loop   #}
+  
   </h3>
 
   <p class="govuk-body"><a href="#" class="govuk-link see-more" onclick="return false;">See more</a></p>
