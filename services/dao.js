@@ -10,11 +10,11 @@ const modelUtils = require('helpers/models');
 
 
 class DAO {
-  #sequelize;
-  #projectFields;
-  #milestoneFields;
-
   constructor(options = {}) {
+    this.sequelize = null;
+    this.projectFields = null;
+    this.milestoneFields = null;
+
     if (options.sequelize) {
       this.sequelize = options.sequelize;
     } else {
