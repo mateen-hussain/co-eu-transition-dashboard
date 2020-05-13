@@ -1,0 +1,114 @@
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+<div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">Edit milestone details</h1>
+
+  {% if flash %}
+    {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [{
+          html: flash,
+          href: "#"
+        }]
+    }) }}
+  {% endif %}
+
+<form action='{{ editModeUrl }}' method='POST'>
+
+  {% for field in milestonefields %}
+
+  {% if (field.name == 'uid') %}
+    <input type="hidden" name="uid" value="{{ data.uid }}" />
+  {% elseif (field.type == 'string') %}
+
+  {{ govukTextarea({
+    id: field.name,
+    name: field.name,
+    label: {
+      text: field.importColumnName
+    },
+    hint: {
+      text: field.description
+    },
+    value: data[field.name]
+  }) }}
+
+  {% elseif (field.type == 'integer' or field.type == 'date')  %}
+
+  {% set value = data[field.name] | date("DD/MM/YYYY") if field.type == 'date' else data[field.name] %}
+
+  {% if field.type == 'date' and value == 'Invalid date' %}
+    {% set value = data[field.name] %}
+  {% endif %}
+
+  {{ govukInput({
+    id: field.name,
+    name: field.name,
+    label: {
+      text: field.importColumnName
+    },
+    hint: {
+      text: field.description
+    },
+    value: value | string
+  }) }}
+
+  {% elseif field.type == 'boolean' %}
+
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="{{ field.name }}">
+      {{ field.importColumnName }}
+    </label>
+    <span id="{{ field.name }}-hint" class="govuk-hint">
+      {{ field.description }}
+    </span>
+    <div class="govuk-radios govuk-radios--inline">
+      {% for option in field.config.options %}
+      <div class="govuk-radios__item">
+        <input class="govuk-radios__input" id="{{ field.name }}" name="{{ field.name }}" type="radio" value="{{ option }}" {{ 'checked' if data[field.name] == option }}>
+        <label class="govuk-label govuk-radios__label" for="{{ field.name }}">
+          {{ option }}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% elseif field.type == 'group'%}
+
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="{{ field.name }}">
+      {{ field.importColumnName }}
+    </label>
+    <span id="{{ field.name }}-hint" class="govuk-hint">
+      {{ field.description }}
+    </span>
+    <select class="govuk-select" id="{{ field.name }}" name="{{ field.name }}">
+      {% for option in field.config.options %}
+        <option value="{{ option }}" {{ 'selected' if data[field.name] == option }} >{{ transformDeliveryConfidenceValue(option) if field.name == 'deliveryConfidence' else option }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  {% endif %}
+
+  {% endfor %}
+
+  {{ govukButton({
+  text: "Submit changes to dashboard",
+  type: "submit",
+  preventDoubleClick: true
+  }) }}
+
+  </form>
+
+
+</div>

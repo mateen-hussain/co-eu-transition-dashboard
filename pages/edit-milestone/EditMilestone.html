@@ -1,0 +1,49 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% set projectMilestone = getProjectMilestone() | await %}
+{% set milestone = projectMilestone.milestone %}
+{% set milestonefields = getMilestoneFields() | await %}
+
+{% block beforeContent %}
+{% if successfulMode %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+{% else %}
+{% include "feedback.njk" %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endif %}
+{% endblock %}
+
+{% block pageTitle %}Edit Milestone{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+
+    {% if signOffMode %}
+      {% include "edit-milestone/partials/sign-off.njk" %}
+    {% elseif successfulMode %}
+      <div class="govuk-grid-column-full">
+        {{ govukPanel({
+          titleText: "Your data is now live on the dashboard"
+        }) }}
+      </div>
+    {% elseif editMode %}
+      {% include "edit-milestone/partials/edit.njk" %}
+    {% endif  %}
+    
+  </div>
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.disableButton();
+  </script>
+{% endblock %}
