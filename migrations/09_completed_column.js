@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const logger = require('services/logger');
 
 const up = async (query) => {
   await query.removeColumn(
