@@ -58,7 +58,7 @@
     hint: {
       text: field.description
     },
-    value: value | string
+    value: value | default('') | string
   }) }}
 
   {% elseif field.type == 'boolean' %}
