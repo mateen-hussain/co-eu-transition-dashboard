@@ -11,7 +11,6 @@ const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
 const moment = require('moment');
 const DAO = require('services/dao');
-const diff = require('deep-diff');
 
 class User extends Model {
   get isDepartmentalViewer () {
