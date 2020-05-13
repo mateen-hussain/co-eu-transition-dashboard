@@ -34,8 +34,18 @@
 {% block content %}
 
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-three-quarters">
       <h1 class="govuk-heading-xl project-name">{{ milestone.uid }}</h1>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+      {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
+        <a href="{{ config.paths.editMilestone }}/{{ milestone.uid | urlencode }}" class="govuk-link edit-link">Edit milestone data</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
 
       {% if milestone.fields.get('complete').value == 'Yes' %}
         {{govukTag({

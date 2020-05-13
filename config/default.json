@@ -51,7 +51,8 @@
       "bulkUploadFile": "/bulk-upload/upload-file",
       "import": "/import",
       "submissionSuccess": "/submission-success"
-    }
+    },
+    "editMilestone": "/edit-milestone"
   },
   "features": {
     "twoFactorAuth": true,

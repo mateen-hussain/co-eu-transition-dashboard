@@ -47,6 +47,7 @@ class Milestone extends Model {
       type: 'string',
       importColumnName: 'Milestone description',
       displayName: 'Description',
+      isRequired: true,
       config,
       description: 'Name and short description of the milestone, covering what it is, who owns it, what form it takes and why it is required.'
     },{
@@ -60,7 +61,8 @@ class Milestone extends Model {
           description: { fill: "A4C2F2" }
         }
       },
-      description: 'When is the date your are currently aiming to deliver this milestone?'
+      description: 'When is the date your are currently aiming to deliver this milestone?',
+      isRequired: true
     }];
 
     const fields = await MilestoneField.findAll({
