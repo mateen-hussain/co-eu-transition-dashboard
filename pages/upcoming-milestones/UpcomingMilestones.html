@@ -8,8 +8,8 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% set departmentsWithUpcomingMilestone = getDepartmentsWithUpcomingMilestones() | await  %}
 {% set filters = filters() | await %}
+{% set dates = getDepartmentsWithUpcomingMilestones() | await  %}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
@@ -35,37 +35,39 @@
 
   {% include "all-data/partials/filters/filter-summary.njk" %}
 
-<div id="timeline">
-{% for department in departmentsWithUpcomingMilestone %}
-  {# Should be grouped by date  #}
-  <h3 class="govuk-heading-m milestone-date">17 April 2020
+  <div id="timeline">
+    {% for date in dates %}
+      {# Should be grouped by date  #}
+      <h3 class="govuk-heading-m milestone-date">{{ date.date }}
 
-  {# Total milestones for each date   #}
-  <span class="milestone-count department">30</span>
+      {# Total milestones for each date   #}
+      <span class="milestone-count department">{{ date.totalMilestones }}</span>
 
-  {# Loop for each milestone count - 1  #}
-  <span class="milestone-count milestone"></span>
-  {# end loop   #}
+      {% for i in range(1, date.totalMilestones) -%}
+        <span class="milestone-count milestone"></span>
+      {%- endfor %}
 
-  </h3>
+      </h3>
 
-  <p class="govuk-body"><a href="#" class="govuk-link see-more" onclick="return false;">See more</a></p>
-  <div class="upcoming-milestones">
-    <hr class="govuk-section-break govuk-section-break--visible">
-    <h4 class="govuk-heading-s">{{ department.name }} <span class="milestone-count">{{ department.totalUpcomingMilestones }}</span> </h4> 
-    {% for project in department.projects %}
-      <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a> {{ project.fields.get('deliveryTheme').value }}</p>
-    {% for milestone in project.milestones %}  
-      <div class="milestones">
-        <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
-        <span class="govuk-caption-m">Milestone delivery confidence: 0</span>
-        <p class="govuk-body">{{ milestone.description }}</p>
+      <p class="govuk-body"><a href="#" class="govuk-link see-more" onclick="return false;">See more</a></p>
+      <div class="upcoming-milestones">
+        <hr class="govuk-section-break govuk-section-break--visible">
+        {% for department in date.departments %}
+          <h4 class="govuk-heading-s">{{ department.name }} <span class="milestone-count">{{ department.totalMilestones }}</span> </h4>
+          {% for project in department.projects %}
+            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a> {{ project.fields.get('deliveryTheme').value }}</p>
+            {% for milestone in project.milestones %}
+              <div class="milestones">
+                <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
+                <span class="govuk-caption-m">Milestone delivery confidence: 0</span>
+                <p class="govuk-body">{{ milestone.description }}</p>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
       </div>
-      {% endfor %}
     {% endfor %}
   </div>
-{% endfor %}
-</div>
 
   </div>
 </div>

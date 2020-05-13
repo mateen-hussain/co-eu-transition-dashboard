@@ -2,6 +2,7 @@ const Page = require('core/pages/page');
 const config = require('config');
 const moment = require('moment');
 const { getFilters } = require('helpers/filters');
+const cloneDeep = require('lodash/cloneDeep');
 
 const showMilstonesDaysFromNow = 30;
 
@@ -11,17 +12,49 @@ class UpcomingMilestones extends Page {
   }
 
   async getDepartmentsWithUpcomingMilestones() {
+    const today = moment();
     const thirtyDaysFromNow = moment().add(showMilstonesDaysFromNow, 'days');
 
-    const departments = await this.req.user.getDepartmentsWithProjects();
+    const departments = await this.req.user.getDepartmentsWithProjects({
+      date: {
+        from: today.format('DD/MM/YYYY'),
+        to: thirtyDaysFromNow.format('DD/MM/YYYY')
+      },
+      impact: [0, 1]
+    });
 
-    for(const department of departments) {
-      department.totalUpcomingMilestones = department.projects.reduce((total, project) => {
-        return total + project.milestones.length;
-      }, 0);
+    const dates = [];
+
+    for (let m = moment(today); m.isBefore(thirtyDaysFromNow); m.add(1, 'days')) {
+      let totalMilestones = 0;
+      const departmentsCloned = cloneDeep(departments);
+      const _departments = departmentsCloned.map(department => {
+        department.totalMilestones = 0;
+
+        department.projects = department.projects.map(project => {
+          project.milestones = project.milestones
+            .filter(milestone => milestone.date === m.format('DD/MM/YYYY'));
+          totalMilestones += project.milestones.length;
+          department.totalMilestones += project.milestones.length;
+          return project;
+        });
+
+        department.projects = department.projects.filter(project => project.milestones.length);
+
+        return department;
+      })
+        .filter(department => department.projects.length);
+
+      if(_departments.length) {
+        dates.push({
+          date: m.format('DD/MM/YYYY'),
+          departments: _departments,
+          totalMilestones
+        });
+      }
     }
 
-    return departments
+    return dates;
   }
 
   getProjectsFromDepartments(departments) {
