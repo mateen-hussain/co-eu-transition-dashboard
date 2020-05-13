@@ -13,6 +13,7 @@
 {% set flag = '' %}
 {% set missedMilestonesCount = 0 %}
 {% set count = 0 %}
+{% set uid = '' %}
 
 {% set project = project() | await %}
 {% set fields = getFields() | await %}
@@ -34,7 +35,7 @@
 {% block content %}
 
 {% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Themes' }] %}
-{% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
+{% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }, { text: '' }] %}
 
   {% for tableFieldId in tableFields %}
 
@@ -66,7 +67,13 @@
 
       {% set milestoneValue = (milestoneValue.push({html: html}), milestoneValue) %}
 
+      {% if (field.id == 'uid') %}
+      {% set uid = field.value %}
+      {% endif %}
+
     {% endfor %}
+
+    {% set milestoneValue = (milestoneValue.push({html: '<a href="' + config.paths.editMilestone + '/' + uid | urlencode + '" class="govuk-link edit-link">Edit</a>' }), milestoneValue) %}
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
 
   {% endfor %}

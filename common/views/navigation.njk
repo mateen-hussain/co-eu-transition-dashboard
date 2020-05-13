@@ -13,7 +13,7 @@
         </a>
     </li>
     {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
-    <li class="govuk-header__navigation-item {% if (url == config.paths.dataEntry.addData) or (url == config.paths.dataEntry.submissionSuccess) %} govuk-header__navigation-item--active {% endif %}">
+    <li class="govuk-header__navigation-item {% if (url == config.paths.dataEntry.addData) or (url == config.paths.dataEntry.submissionSuccess) or (url == config.paths.editMilestone) %} govuk-header__navigation-item--active {% endif %}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.addData }}">
         Add data
         </a>
