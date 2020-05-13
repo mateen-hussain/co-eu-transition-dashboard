@@ -18,8 +18,8 @@ class User extends Model {
   }
 
   async getProjects (search) {
-    let dao = new DAO({
-        sequelize: sequelize
+    const dao = new DAO({
+      sequelize: sequelize
     });
     return await dao.getAllData(this.id,search);
   }

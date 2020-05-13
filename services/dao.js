@@ -10,7 +10,7 @@ const modelUtils = require('helpers/models');
 
 
 class DAO {
-  sequelize;
+  #sequelize;
   #projectFields;
   #milestoneFields;
 
