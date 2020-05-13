@@ -28,10 +28,10 @@ describe('helpers/validation', () => {
       invalids: ['not date', '2020-02-50']
     },{
       type: 'group',
-      valids: ['foo', 'bar'],
+      valids: ['foo', 'bar', '0'],
       invalids: ['baz'],
       config: {
-        options: ['foo', 'bar']
+        options: ['foo', 'bar', '0']
       }
     }];
 

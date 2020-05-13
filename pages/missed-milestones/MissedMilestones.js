@@ -3,7 +3,6 @@ const config = require('config');
 const moment = require('moment');
 const Milestone = require('models/milestone');
 const Project = require('models/project');
-const { truthy } = require('helpers/utils');
 
 class MissedMilestones extends Page {
   static get isEnabled() {
@@ -17,7 +16,7 @@ class MissedMilestones extends Page {
   async getDepartmentsWithMissedMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects({
       date: { to: moment().format('DD/MM/YYYY') },
-      complete: truthy,
+      complete: ['No'],
       impact: [0, 1]
     });
 

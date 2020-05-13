@@ -37,7 +37,7 @@ const isValueInGroup = (value, options) => {
 };
 
 const validateIsDefined = value => {
-  return value !== undefined && value !== null && Boolean(value && String(value).length);
+  return value !== undefined && value !== null && String(value).length;
 };
 
 const validateIsRequired = (value, isRequired) => {
