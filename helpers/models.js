@@ -94,7 +94,11 @@ const createFilterOptions = (attribute, options) => {
     }
   }
 
-  return { [Op.or]: options };
+  if (Array.isArray(options)) {
+    return { [Op.or]: options };
+  }
+
+  return options;
 };
 
 module.exports = {
