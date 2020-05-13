@@ -132,7 +132,7 @@ class DAO {
 
     let query = `
       SELECT
-        project.uid, project.department_name, project.title, project.impact, project.is_completed,
+        project.uid, project.department_name, project.title, project.impact,
         project.sro, project.description, project.created_at, project.updated_at,
 
         \`department\`.name AS \`department.name\`,
@@ -225,7 +225,7 @@ class DAO {
 
     let query = `
       SELECT
-        project.uid, project.department_name, project.title, project.impact, project.is_completed,
+        project.uid, project.department_name, project.title, project.impact,
         project.sro, project.description, project.created_at, project.updated_at,
 
         \`department\`.name AS \`department.name\`,
