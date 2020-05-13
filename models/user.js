@@ -10,6 +10,8 @@ const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const modelUtils = require('helpers/models');
 const moment = require('moment');
+const DAO = require('services/dao');
+const diff = require('deep-diff');
 
 class User extends Model {
   get isDepartmentalViewer () {
@@ -17,12 +19,10 @@ class User extends Model {
   }
 
   async getProjects (search) {
-    const departments = await this.getDepartmentsWithProjects(search);
-
-    return departments.reduce((projects, department) => {
-      projects.push(...department.get('projects'));
-      return projects;
-    }, []);
+    let dao = new DAO({
+        sequelize: sequelize
+    });
+    return await dao.getAllData(this.id,search);
   }
 
   async getDepartmentsWithProjects (search) {

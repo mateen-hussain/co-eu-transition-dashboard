@@ -1,10 +1,12 @@
 const sequelize = require('services/sequelize');
+const Department = require('models/department');
 const Project = require('models/project');
 const ProjectField = require('models/projectField');
 const ProjectFieldEntry = require('models/projectFieldEntry');
 const Milestone = require('models/milestone');
 const MilestoneField = require('models/milestoneField');
 const MilestoneFieldEntry = require('models/milestoneFieldEntry');
+const modelUtils = require('helpers/models');
 
 
 class DAO {
@@ -68,8 +70,9 @@ class DAO {
   }
 
   generateMatch(table,field,value) {
+    const translatedValue = modelUtils.createFilterOptions(field,value);
     return this.sequelize.getQueryInterface().QueryGenerator.getWhereConditions({
-      [field]: value
+      [field]: translatedValue
     },table);
   }
 
@@ -108,7 +111,23 @@ class DAO {
     `;
   }
 
-  async generateProjectQuery(userId, projectFilters = [],milestoneFilters = []) {
+  generateProjectMilestoneFilter(field,value) {
+    const aliasName = this.generateFilterAlias("milestones",field);
+    return `
+      JOIN (
+          SELECT project.uid
+          FROM
+              project INNER JOIN milestone ON (project.uid = milestone.project_uid)
+          WHERE
+              milestone.project_uid = project.uid
+              AND ${this.generateMatch("milestone",field,value)}
+          GROUP BY
+              project.uid
+      ) AS ${this.quoteIdentifier(aliasName)} ON (${this.quoteIdentifier(aliasName)}.uid = project.uid)
+    `;
+  }
+
+  async generateProjectQuery(userId, projectFilters = [],projectFieldFilters = [], milestoneFilters = [], milestoneFieldFilters = []) {
     const dao = this;
 
     let query = `
@@ -116,7 +135,9 @@ class DAO {
         project.uid, project.department_name, project.title, project.impact, project.is_completed,
         project.sro, project.description, project.created_at, project.updated_at,
 
-        \`projectFieldEntries\`.project_field_id AS \`projectFieldEntries.projectFieldId\`,
+        \`department\`.name AS \`department.name\`,
+
+        \`projectFieldEntries\`.project_field_id AS \`projectFieldEntries.fieldId\`,
         \`projectFieldEntries\`.project_uid AS \`projectFieldEntries.projectUid\`,
         \`projectFieldEntries\`.created_at AS \`projectFieldEntries.created_at\`,
         \`projectFieldEntries\`.updated_at AS \`projectFieldEntries.updated_at\`,
@@ -137,18 +158,23 @@ class DAO {
       FROM
         user INNER JOIN department_user ON (user.id = department_user.user_id)
         INNER JOIN project ON (department_user.department_name = project.department_name)
+        INNER JOIN department ON (project.department_name = department.name) 
         LEFT OUTER JOIN project_field_entry AS \`projectFieldEntries\` ON (project.uid = \`projectFieldEntries\`.project_uid)
         LEFT OUTER JOIN project_field AS \`projectFieldEntries->projectField\` ON (\`projectFieldEntries->projectField\`.id = \`projectFieldEntries\`.project_field_id)
     `;
 
-    projectFilters.forEach( async(filter) => {
+    projectFieldFilters.forEach( async(filter) => {
       const fieldId = await dao.getProjectFieldId(filter);
       query += this.generateProjectProjectFieldFilter(fieldId,filter.value);
     });
 
-    milestoneFilters.forEach( async(filter) => {
+    milestoneFieldFilters.forEach( async(filter) => {
       const fieldId = await dao.getMilestoneFieldId(filter);
       query += this.generateProjectMilestoneFieldFilter(fieldId,filter.value);
+    });
+
+    milestoneFilters.forEach( async(filter) => {
+      query += this.generateProjectMilestoneFilter(filter.name,filter.value);
     });
 
     query += `
@@ -156,6 +182,11 @@ class DAO {
         ${this.generateMatch("user","id",userId)}
     `;
 
+    projectFilters.forEach( async(filter) => {
+      query += `
+        AND ${this.generateMatch("project",filter.name,filter.value)}
+      `;
+    });
 
     return [query,{}];
   }
@@ -189,13 +220,15 @@ class DAO {
     `;
   }
 
-  async generateMilestoneQuery(userId, projectFilters = [],milestoneFilters = []) {
+  async generateMilestoneQuery(userId, projectFilters = [], projectFieldFilters = [], milestoneFilters = [], milestoneFieldFilters = []) {
     const dao = this;
 
     let query = `
       SELECT
         project.uid, project.department_name, project.title, project.impact, project.is_completed,
         project.sro, project.description, project.created_at, project.updated_at,
+
+        \`department\`.name AS \`department.name\`,
 
         \`milestones\`.uid AS \`milestones.uid\`,
         \`milestones\`.project_uid AS \`milestones.projectUid\`,
@@ -204,7 +237,7 @@ class DAO {
         \`milestones\`.created_at AS \`milestones.created_at\`,
         \`milestones\`.updated_at AS \`milestones.updated_at\`,
 
-        \`milestones->milestoneFieldEntries\`.milestone_field_id AS \`milestones.milestoneFieldEntries.milestoneFieldId\`,
+        \`milestones->milestoneFieldEntries\`.milestone_field_id AS \`milestones.milestoneFieldEntries.fieldId\`,
         \`milestones->milestoneFieldEntries\`.milestone_uid AS \`milestones.milestoneFieldEntries.milestoneUid\`,
         \`milestones->milestoneFieldEntries\`.value AS \`milestones.milestoneFieldEntries.value\`,
         \`milestones->milestoneFieldEntries\`.created_at AS \`milestones.milestoneFieldEntries.created_at\`,
@@ -224,17 +257,18 @@ class DAO {
       FROM
         user INNER JOIN department_user ON (user.id = department_user.user_id)
         INNER JOIN project ON (department_user.department_name = project.department_name)
+        INNER JOIN department ON (project.department_name = department.name)
         LEFT OUTER JOIN milestone AS milestones ON (project.uid = milestones.project_uid)
         LEFT OUTER JOIN milestone_field_entry AS \`milestones->milestoneFieldEntries\` ON (milestones.uid = \`milestones->milestoneFieldEntries\`.milestone_uid)
         LEFT OUTER JOIN milestone_field AS \`milestones->milestoneFieldEntries->milestoneField\` ON (\`milestones->milestoneFieldEntries->milestoneField\`.id = \`milestones->milestoneFieldEntries\`.milestone_field_id)
     `;
 
-    projectFilters.forEach( async(filter) => {
+    projectFieldFilters.forEach( async(filter) => {
       const fieldId = await dao.getProjectFieldId(filter);
       query += this.generateMilestoneProjectFieldFilter(fieldId,filter.value);
     });
 
-    milestoneFilters.forEach( async(filter) => {
+    milestoneFieldFilters.forEach( async(filter) => {
       const fieldId = await dao.getMilestoneFieldId(filter);
       query += this.generateMilestoneMilestoneFieldFilter(fieldId,filter.value);
     });
@@ -244,22 +278,41 @@ class DAO {
         ${this.generateMatch("user","id",userId)}
     `;
 
+    projectFilters.forEach( async(filter) => {
+      query += `
+        AND ${this.generateMatch("project",filter.name,filter.value)}
+      `;
+    });
+
+    milestoneFilters.forEach( async(filter) => {
+      query += `
+        AND ${this.generateMatch("milestones",filter.name,filter.value)}
+      `;
+    });
+
     return [query,{}];
   }
 
-  async getProjectFields(userId, projectFilters = [],milestoneFilters = []) {
-    const [query,binds] = await this.generateProjectQuery(userId,projectFilters,milestoneFilters);
+  async getProjectFields(userId, projectFilters = [], projectFieldFilters = [], milestoneFilters = [], milestoneFieldFilters = []) {
+    const [query,binds] = await this.generateProjectQuery(userId,projectFilters,projectFieldFilters,milestoneFilters,milestoneFieldFilters);
 
     const options = {
       "hasJoin": true,
-      "include": [{
-        "model": ProjectFieldEntry,
-        "include": {
-          "model": ProjectField
+      "include": [
+        {
+          "model": ProjectFieldEntry,
+          "include": {
+            "model": ProjectField
+          }
+        },
+        {
+          "model": Department
         }
-      }],
+      ],
       "replacements": binds,
-      "type": this.sequelize.QueryTypes.SELECT
+      "type": this.sequelize.QueryTypes.SELECT,
+      "model": Project,
+      "mapToModel": true
     };
 
     Project._validateIncludedElements(options);
@@ -267,22 +320,29 @@ class DAO {
     return result;
   }
 
-  async getMilestoneFields(userId, projectFilters = [],milestoneFilters = []) {
-    const [query,binds] = await this.generateMilestoneQuery(userId,projectFilters,milestoneFilters);
+  async getMilestoneFields(userId, projectFilters = [], projectFieldFilters = [], milestoneFilters = [], milestoneFieldFilters = []) {
+    const [query,binds] = await this.generateMilestoneQuery(userId,projectFilters,projectFieldFilters,milestoneFilters,milestoneFieldFilters);
 
     const options = {
       "hasJoin": true,
-      "include": [{
-        "model": Milestone,
-        "include": {
-          "model": MilestoneFieldEntry,
+      "include": [
+        {
+          "model": Milestone,
           "include": {
-            "model": MilestoneField
+            "model": MilestoneFieldEntry,
+            "include": {
+              "model": MilestoneField
+            }
           }
+        },
+        {
+          "model": Department
         }
-      }],
+      ],
       "replacements": binds,
-      "type": this.sequelize.QueryTypes.SELECT
+      "type": this.sequelize.QueryTypes.SELECT,
+      "model": Project,
+      "mapToModel": true
     };
 
     Project._validateIncludedElements(options);
@@ -293,6 +353,69 @@ class DAO {
   async getAllFields(userId, projectFilters = [],milestoneFilters = []) {
     let projects = await this.getProjectFields(userId,projectFilters,milestoneFilters);
     const milestoneFields = await this.getMilestoneFields(userId,projectFilters,milestoneFilters);
+    const milestoneMap = milestoneFields.reduce( (acc,project) => {
+      acc[project.uid] = project.milestones;
+      return acc;
+    }, {});
+
+    
+    projects.forEach( (project,index) => {
+      const milestones =  milestoneMap[project.uid];
+      projects[index].dataValues.milestones = milestones;
+      projects[index].milestones = milestones;
+    });
+
+    return projects;
+  }
+
+  async collateFilters(filters = {}) {
+    let projectFieldFilters = [];
+    let projectFilters = [];
+    let milestoneFilters = [];
+    let milestoneFieldFilters = [];
+
+    const projectFieldMap = await this.getProjectFieldMap();
+    const milestoneFieldMap = await this.getMilestoneFieldMap();
+
+    Object.keys(filters).forEach( filter => {
+      if (projectFieldMap[filter]) {
+        projectFieldFilters.push({
+          "name": filter,
+          "value": filters[filter]
+        });
+      } else if (milestoneFieldMap[filter]) {
+        milestoneFieldFilters.push({
+          "name": filter,
+          "value": filters[filter]
+        });
+      } else if (Project.rawAttributes[filter]) {
+        projectFilters.push({
+          "name": Project.rawAttributes[filter].field,
+          "value": filters[filter]
+        });
+      } else if (Milestone.rawAttributes[filter]) {
+        milestoneFilters.push({
+          "name": Milestone.rawAttributes[filter].field,
+          "value": filters[filter]
+        });
+      } else {
+        throw(`Could not determine filter type for ${filter}`);
+      }
+    });
+
+    return [projectFilters,projectFieldFilters,milestoneFilters,milestoneFieldFilters];
+  }
+
+  async getAllData(userId, filters = {}) {
+    const [projectFilters,projectFieldFilters,milestoneFilters,milestoneFieldFilters] = await this.collateFilters(filters);
+    /*
+    console.log(JSON.stringify(projectFilters));
+    console.log(JSON.stringify(projectFieldFilters));
+    console.log(JSON.stringify(milestoneFilters));
+    console.log(JSON.stringify(milestoneFieldFilters));
+    */
+    let projects = await this.getProjectFields(userId,projectFilters,projectFieldFilters,milestoneFilters,milestoneFieldFilters);
+    const milestoneFields = await this.getMilestoneFields(userId,projectFilters,projectFieldFilters,milestoneFilters,milestoneFieldFilters);
     const milestoneMap = milestoneFields.reduce( (acc,project) => {
       acc[project.uid] = project.milestones;
       return acc;
