@@ -84,6 +84,7 @@ describe('models/milestone', () => {
       },{
         name: 'description',
         type: 'string',
+        isRequired: true,
         importColumnName: 'Milestone description',
         config,
         description: 'Name and short description of the milestone, covering what it is, who owns it, what form it takes and why it is required.',
@@ -91,6 +92,7 @@ describe('models/milestone', () => {
       },{
         name: 'date',
         type: 'date',
+        isRequired: true,
         importColumnName: 'Target date for delivery',
         config: {
           exportOptions: {
