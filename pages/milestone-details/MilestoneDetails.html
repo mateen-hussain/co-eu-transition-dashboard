@@ -38,7 +38,9 @@
       <h1 class="govuk-heading-xl project-name">{{ milestone.uid }}</h1>
     </div>
     <div class="govuk-grid-column-one-quarter">
-      <a href="{{ config.paths.editMilestone }}/{{ milestone.uid | urlencode }}" class="govuk-link edit-link">Edit milestone data</a>
+      {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
+        <a href="{{ config.paths.editMilestone }}/{{ milestone.uid | urlencode }}" class="govuk-link edit-link">Edit milestone data</a>
+      {% endif %}
     </div>
   </div>
 

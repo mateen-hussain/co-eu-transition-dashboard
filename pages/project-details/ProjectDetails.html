@@ -35,7 +35,10 @@
 {% block content %}
 
 {% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Themes' }] %}
-{% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }, { text: '' }] %}
+{% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Latest Comments' }] %}
+{% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
+  {% set milestoneKey = (milestoneKey.push( { text: '' }), milestoneKey) %}
+{% endif %}
 
   {% for tableFieldId in tableFields %}
 
@@ -73,7 +76,9 @@
 
     {% endfor %}
 
+    {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
     {% set milestoneValue = (milestoneValue.push({html: '<a href="' + config.paths.editMilestone + '/' + uid | urlencode + '" class="govuk-link edit-link">Edit</a>' }), milestoneValue) %}
+    {% endif %}
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
 
   {% endfor %}
