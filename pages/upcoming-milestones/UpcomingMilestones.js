@@ -24,32 +24,55 @@ class UpcomingMilestones extends Page {
       impact: [0, 1]
     });
 
+    return this.groupDataByDate(departments, today, thirtyDaysFromNow);
+  }
+
+  projectsWithMilestonesForDate(projects, date) {
+    const projectsWithMilestonesOnDate = projects.map(project => {
+      // only milestones on this day
+      project.milestones = project.milestones.filter(milestone => milestone.date === date.format('DD/MM/YYYY'));
+      return project;
+    });
+
+    // only projects that have milestones on this day
+    return projectsWithMilestonesOnDate.filter(project => project.milestones.length);
+  }
+
+  departmentsWithProjectsWithMilestonesForDate(departments, date) {
+    const departmentsCloned = cloneDeep(departments);
+
+    let departmentsByDate = departmentsCloned.map(department => {
+      department.projects = this.projectsWithMilestonesForDate(department.projects, date);
+
+      // add up total milestones for department
+      department.totalMilestones = department.projects.reduce((total, project) => {
+        total += project.milestones.length;
+        return total;
+      }, 0);
+
+      return department;
+    });
+
+    // only departments that have milestones on this day
+    return departmentsByDate.filter(department => department.projects.length);
+  }
+
+  groupDataByDate(departments, from, to) {
     const dates = [];
 
-    for (let m = moment(today); m.isBefore(thirtyDaysFromNow); m.add(1, 'days')) {
-      let totalMilestones = 0;
-      const departmentsCloned = cloneDeep(departments);
-      const _departments = departmentsCloned.map(department => {
-        department.totalMilestones = 0;
+    for (let date = moment(from); date.isBefore(to); date.add(1, 'days')) {
+      const departmentsWithProjectsWithMilestonesForDate = this.departmentsWithProjectsWithMilestonesForDate(departments, date);
 
-        department.projects = department.projects.map(project => {
-          project.milestones = project.milestones
-            .filter(milestone => milestone.date === m.format('DD/MM/YYYY'));
-          totalMilestones += project.milestones.length;
-          department.totalMilestones += project.milestones.length;
-          return project;
-        });
+      // add up total milestones for department
+      const totalMilestones = departmentsWithProjectsWithMilestonesForDate.reduce((total, department) => {
+        total += department.totalMilestones;
+        return total;
+      }, 0);
 
-        department.projects = department.projects.filter(project => project.milestones.length);
-
-        return department;
-      })
-        .filter(department => department.projects.length);
-
-      if(_departments.length) {
+      if(departmentsWithProjectsWithMilestonesForDate.length) {
         dates.push({
-          date: m.format('DD/MM/YYYY'),
-          departments: _departments,
+          date: date.format('DD/MM/YYYY'),
+          departments: departmentsWithProjectsWithMilestonesForDate,
           totalMilestones
         });
       }
