@@ -5,7 +5,7 @@ const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
 const { removeNulls } = require('helpers/utils');
 
-const showMilstonesDaysFromNow = 30;
+const showMilstonesDaysFromNow = 100;
 
 class UpcomingMilestones extends Page {
   get url() {
@@ -16,13 +16,7 @@ class UpcomingMilestones extends Page {
     const today = moment();
     const thirtyDaysFromNow = moment().add(showMilstonesDaysFromNow, 'days');
 
-    const departments = await this.req.user.getDepartmentsWithProjects({
-      date: {
-        from: today.format('DD/MM/YYYY'),
-        to: thirtyDaysFromNow.format('DD/MM/YYYY')
-      },
-      impact: [0, 1]
-    });
+    const departments = await this.req.user.getDepartmentsWithProjects(this.data.filters);
 
     return this.groupDataByDate(departments, today, thirtyDaysFromNow);
   }
