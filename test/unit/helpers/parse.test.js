@@ -7,8 +7,8 @@ describe('helpers/parse', () => {
       expect(parse.parseString(' some string ', {})).to.eql('some string');
     });
 
-    it('returns undefined if value starts with n/a', () => {
-      expect(parse.parseString('N/A - some reason', { isRequried: true })).to.eql(undefined);
+    it('returns undefined if no value', () => {
+      expect(parse.parseString('')).to.eql(undefined);
     });
   });
 
