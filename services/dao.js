@@ -132,7 +132,7 @@ class DAO {
 
     let query = `
       SELECT
-        project.uid, project.department_name, project.title, project.impact,
+        project.uid, project.department_name AS departmentName, project.title, project.impact,
         project.sro, project.description, project.created_at, project.updated_at,
 
         \`department\`.name AS \`department.name\`,
@@ -225,7 +225,7 @@ class DAO {
 
     let query = `
       SELECT
-        project.uid, project.department_name, project.title, project.impact,
+        project.uid, project.department_name as DepartmentName, project.title, project.impact,
         project.sro, project.description, project.created_at, project.updated_at,
 
         \`department\`.name AS \`department.name\`,
@@ -314,6 +314,7 @@ class DAO {
       "model": Project,
       "mapToModel": true
     };
+
 
     Project._validateIncludedElements(options);
     const result = await this.sequelize.query(query,options);
