@@ -5,7 +5,7 @@ const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
 const { removeNulls } = require('helpers/utils');
 
-const showMilstonesDaysFromNow = 100;
+const showMilstonesDaysFromNow = 30;
 
 class UpcomingMilestones extends Page {
   get url() {
