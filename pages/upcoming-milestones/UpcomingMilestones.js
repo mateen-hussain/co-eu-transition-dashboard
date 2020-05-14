@@ -5,20 +5,26 @@ const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
 const { removeNulls } = require('helpers/utils');
 
-const showMilstonesDaysFromNow = 30;
-
 class UpcomingMilestones extends Page {
   get url() {
     return config.paths.upcomingMilestones;
   }
 
-  async getDepartmentsWithUpcomingMilestones() {
-    const today = moment();
-    const thirtyDaysFromNow = moment().add(showMilstonesDaysFromNow, 'days');
+  get schema() {
+    return {
+      filters: {
+        date: {
+          from: moment().format('DD/MM/YYYY'),
+          to: moment().add('6', 'weeks').format('DD/MM/YYYY')
+        }
+      }
+    };
+  }
 
+  async getDepartmentsWithUpcomingMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects(this.data.filters);
 
-    return this.groupDataByDate(departments, today, thirtyDaysFromNow);
+    return this.groupDataByDate(departments);
   }
 
   projectsWithMilestonesForDate(projects, date) {
@@ -51,10 +57,25 @@ class UpcomingMilestones extends Page {
     return departmentsByDate.filter(department => department.projects.length);
   }
 
-  groupDataByDate(departments, from, to) {
-    const dates = [];
+  milestoneDates(departments) {
+    const dates = departments.reduce((dates, department) => {
+      department.projects.forEach(project => {
+        project.milestones.forEach(milestone => {
+          if(milestone.date && !dates.includes(milestone.date)){
+            dates.push(moment(milestone.date, 'DD/MM/YYYY'));
+          }
+        });
+      });
+      return dates;
+    }, []);
 
-    for (let date = moment(from); date.isBefore(to); date.add(1, 'days')) {
+    return dates.sort((a, b) => a.valueOf() - b.valueOf());
+  }
+
+  groupDataByDate(departments) {
+    const milestoneDates = this.milestoneDates(departments);
+
+    return milestoneDates.map(date => {
       const departmentsWithProjectsWithMilestonesForDate = this.departmentsWithProjectsWithMilestonesForDate(departments, date);
 
       // add up total milestones for department
@@ -63,16 +84,12 @@ class UpcomingMilestones extends Page {
         return total;
       }, 0);
 
-      if(departmentsWithProjectsWithMilestonesForDate.length) {
-        dates.push({
-          date: date.format('DD/MM/YYYY'),
-          departments: departmentsWithProjectsWithMilestonesForDate,
-          totalMilestones
-        });
-      }
-    }
-
-    return dates;
+      return {
+        date: date.format('DD/MM/YYYY'),
+        departments: departmentsWithProjectsWithMilestonesForDate,
+        totalMilestones
+      };
+    });
   }
 
   get filtersFields() {

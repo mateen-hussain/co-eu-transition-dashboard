@@ -1,0 +1,24 @@
+{{ govukInput({
+  label: {
+    text: "From"
+  },
+  classes: "govuk-input--width-10",
+  hint: {
+    html: "For example, 01/01/2020"
+  },
+    id: "fromDate",
+    name: "filters[date][from]",
+    value: data.filters.date.from
+}) }}
+{{ govukInput({
+  label: {
+    text: "To"
+  },
+  classes: "govuk-input--width-10",
+  hint: {
+    text: "For example, 01/01/2021"
+  },
+    id: "toDate",
+    name: "filters[date][to]",
+    value: data.filters.date.to
+}) }}
