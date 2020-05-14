@@ -3,6 +3,7 @@ const config = require('config');
 const moment = require('moment');
 const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
+const { removeNulls } = require('helpers/utils');
 
 const showMilstonesDaysFromNow = 30;
 
@@ -160,6 +161,27 @@ class UpcomingMilestones extends Page {
 
   formatDate(date) {
     return moment(date, 'DD/MM/YYYY').format("Do MMMM YYYY");
+  }
+
+  async postRequest(req, res) {
+    if(req.body.filterId) {
+      let filters = this.data.filters;
+      const filterId = req.body.filterId;
+      const optionValue = req.body.optionValue;
+
+      if (!optionValue) {
+        delete filters[filterId];
+      } else {
+        for (var i = filters[filterId].length - 1; i >= 0; i--) {
+          if (filters[filterId][i] == optionValue) filters[filterId].splice(i, 1);
+        }
+      }
+
+      this.saveData(removeNulls({ filters }));
+      res.redirect(this.url);
+    } else {
+      super.postRequest(req, res);
+    }
   }
 }
 
