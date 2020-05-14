@@ -5,7 +5,7 @@ const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
 const { removeNulls } = require('helpers/utils');
 
-const showMilstonesDaysFromNow = 100;
+const showMilstonesDaysFromNow = 30;
 
 class UpcomingMilestones extends Page {
   get url() {
@@ -73,47 +73,6 @@ class UpcomingMilestones extends Page {
     }
 
     return dates;
-  }
-
-  getProjectsFromDepartments(departments) {
-    return departments.reduce((projects, department) => {
-      projects.push(...department.projects);
-      return projects;
-    }, []);
-  }
-
-  chartData(departments) {
-    const projects = this.getProjectsFromDepartments(departments);
-
-    let items = projects.reduce((items, project) => {
-      project.milestones.forEach(milestone => {
-        items.push({
-          departmentName: project.departmentName,
-          title: project.title,
-          milestoneDescription: milestone.description,
-          impact: project.impact,
-          hmgConfidence: project.fields.get('hmgConfidence') ? project.fields.get('hmgConfidence').value : 'N/A',
-          date: milestone.date
-        });
-      });
-
-      return items;
-    }, []);
-
-    items = items
-      .sort((a, b) => (moment(a.date, 'DD/MM/YYYY').isAfter(moment(b.date, 'DD/MM/YYYY'))) ? 1 : -1);
-
-    return {
-      min: moment().format('x'),
-      max: moment().add(showMilstonesDaysFromNow, 'days').format('x'),
-      data: items.map((item, index) => {
-        return {
-          x: moment(item.date, 'DD/MM/YYYY').format('x'),
-          y: items.length - index - 1
-        };
-      }),
-      meta: items
-    };
   }
 
   get filtersFields() {

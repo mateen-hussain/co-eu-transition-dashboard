@@ -1,7 +1,6 @@
 import govukFrontend from 'govuk-frontend/govuk/all';
 
 import missedMilestonesChart from './missed-milestones';
-import upcomingMilestoneChart from './upcoming-milestones';
 import removeAccordionCross from './remove-accordion-cross';
 import disableButton from './disable-button';
 import groupDisplay from './group-display';
@@ -10,7 +9,6 @@ import seeMore from './see-more';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
-  upcomingMilestoneChart,
   removeAccordionCross,
   disableButton,
   groupDisplay,
