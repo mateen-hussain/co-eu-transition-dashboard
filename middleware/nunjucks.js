@@ -13,10 +13,16 @@ const nunjucksDefaults = {
   loader: nunjucks.FileSystemLoader,
   filters: {
     date: (date, format) => {
-      return moment(date, 'DD/MM/YYYY').format(format);
+      const momentDate = moment(date, 'DD/MM/YYYY');
+      if(momentDate.isValid()) {
+        return momentDate.format(format);
+      }
     },
     beforeToDay: (date) => {
-      return moment(date, 'DD/MM/YYYY').isBefore(moment());
+      const momentDate = moment(date, 'DD/MM/YYYY');
+      if(momentDate.isValid()) {
+        return momentDate.isBefore(moment());
+      }
     }
   }
 };
