@@ -59,7 +59,7 @@
             {% for milestone in project.milestones %}
               <div class="milestones">
                 <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
-                <span class="govuk-caption-m">Milestone delivery confidence: 0</span>
+                {# <span class="govuk-caption-m">Milestone delivery confidence: 0</span> #}
                 <p class="govuk-body">{{ milestone.description }}</p>
               </div>
             {% endfor %}

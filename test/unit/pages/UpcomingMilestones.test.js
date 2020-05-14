@@ -5,19 +5,6 @@ const jwt = require('services/jwt');
 let page = {};
 let getDepartmentsWithProjects = {};
 
-const departments = [{
-  dataValues: {
-    name: 'department',
-    projects: ['project 1'],
-    departmentUser: ['departmentUser']
-  },
-  projects: [{
-    project: {
-      milestones: ['milestone 1'],
-    },
-  }],
-}]
-
 describe('pages/upcoming-milestones/UpcomingMilestones', () => {
   beforeEach(() => {
     const UpcomingMilestones = require('pages/upcoming-milestones/UpcomingMilestones');
@@ -43,22 +30,15 @@ describe('pages/upcoming-milestones/UpcomingMilestones', () => {
     });
   });
 
-  describe('#projectFields', () => {
-    it('should return an array of project id and title', () => {
-      expect(page.projectFields).to.eql([{ title:'Project UID', id: 'uid' }, { title:'Project Name', id: 'title' }, { title:'Impact', id: 'impact' }, { title:'HMG Confidence', id: 'hmgConfidence' }, { title:'Citizen Readiness', id: 'citizenReadiness' }, { title:'Business Readiness', id: 'businessReadiness' }, { title:'EU Member State Delivery Confidence', id: 'euStateConfidence' }]);
+  describe('#formatDate', () => {
+    it('should format the date', () => {
+      expect(page.formatDate('01/01/2020')).to.eql('1st January 2020');
     });
   });
 
-  describe('#milestoneFields', () => {
-    it('should return an array of milestone id and title', () => {
-      expect(page.milestoneFields).to.eql([{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comment' }]);
-    });
-  });
-
-  describe('#getProjectsFromDepartments', () => {
-    it('should get projects from departments', () => {
-      expect(page.getProjectsFromDepartments(departments)).to.eql([{ project: { milestones: [ 'milestone 1'] } } ]);
+  describe('#filtersFields', () => {
+    it('should not return the filters list', () => {
+      expect(page.filtersFields).to.eql(['departmentName', 'deliveryTheme', 'impact', 'hmgConfidence']);
     });
   });
 });
-

@@ -103,8 +103,17 @@ class AllData extends Page {
   }
 
   async postRequest(req, res) {
+    let filters = this.data.filters;
+
+    if(req.body.clear) {
+      for (var key in filters) {
+        delete filters[key];
+      }
+      this.saveData(removeNulls({ filters }));
+      return res.redirect(this.url);
+    }
+
     if(req.body.filterId) {
-      let filters = this.data.filters;
       const filterId = req.body.filterId;
       const optionValue = req.body.optionValue;
 

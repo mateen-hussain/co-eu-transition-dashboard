@@ -52,4 +52,11 @@
     <h3 class="govuk-heading-s panelTitle">Filters</h3>
     {% include "all-data/partials/filters/all-filters.njk" %}
     {% include "all-data/partials/filters/filter-btn.njk" %}
+    {{ govukButton({
+      text: "Clear all filters",
+      name: "clear",
+      value: "clear",
+      classes: "govuk-button--secondary",
+      preventDoubleClick: true
+    }) }}
   </form>

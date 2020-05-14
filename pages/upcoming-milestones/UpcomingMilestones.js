@@ -5,7 +5,7 @@ const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
 const { removeNulls } = require('helpers/utils');
 
-const showMilstonesDaysFromNow = 30;
+const showMilstonesDaysFromNow = 100;
 
 class UpcomingMilestones extends Page {
   get url() {
@@ -181,6 +181,16 @@ class UpcomingMilestones extends Page {
   }
 
   async postRequest(req, res) {
+    let filters = this.data.filters;
+
+    if(req.body.clear) {
+      for (var key in filters) {
+        delete filters[key];
+      }
+      this.saveData(removeNulls({ filters }));
+      return res.redirect(this.url);
+    }
+
     if(req.body.filterId) {
       let filters = this.data.filters;
       const filterId = req.body.filterId;
