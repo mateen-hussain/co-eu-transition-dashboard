@@ -182,7 +182,7 @@ class DAO {
         ${this.generateMatch("user","id",userId)}
     `;
 
-    await projectFilters.forEach( filter => {
+    projectFilters.forEach( filter => {
       query += `
         AND ${this.generateMatch("project",filter.name,filter.value)}
       `;
