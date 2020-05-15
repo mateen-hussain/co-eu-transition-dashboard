@@ -22,6 +22,8 @@ class UpcomingMilestones extends Page {
   }
 
   async getDepartmentsWithUpcomingMilestones() {
+    const filters = this.data.filters || {};
+    filters.complete = ['No'];
     const departments = await this.req.user.getDepartmentsWithProjects(this.data.filters);
 
     return this.groupDataByDate(departments);
@@ -30,7 +32,7 @@ class UpcomingMilestones extends Page {
   projectsWithMilestonesForDate(projects, date) {
     const projectsWithMilestonesOnDate = projects.map(project => {
       // only milestones on this day
-      project.milestones = project.milestones.filter(milestone => milestone.date === date.format('DD/MM/YYYY'));
+      project.milestones = project.milestones.filter(milestone => milestone.date === date);
       return project;
     });
 
@@ -62,7 +64,7 @@ class UpcomingMilestones extends Page {
       department.projects.forEach(project => {
         project.milestones.forEach(milestone => {
           if(milestone.date && !dates.includes(milestone.date)){
-            dates.push(moment(milestone.date, 'DD/MM/YYYY'));
+            dates.push(milestone.date);
           }
         });
       });
@@ -85,7 +87,7 @@ class UpcomingMilestones extends Page {
       }, 0);
 
       return {
-        date: date.format('DD/MM/YYYY'),
+        date: moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY'),
         departments: departmentsWithProjectsWithMilestonesForDate,
         totalMilestones
       };
