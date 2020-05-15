@@ -163,12 +163,12 @@ class DAO {
         LEFT OUTER JOIN project_field AS \`projectFieldEntries->projectField\` ON (\`projectFieldEntries->projectField\`.id = \`projectFieldEntries\`.project_field_id)
     `;
 
-    for await (const filter of projectFieldFilters) {
+    for (const filter of projectFieldFilters) {
       const fieldId = await dao.getProjectFieldId(filter);
       query += this.generateProjectProjectFieldFilter(fieldId,filter.value);
     }
 
-    for await (const filter of milestoneFieldFilters) {
+    for (const filter of milestoneFieldFilters) {
       const fieldId = await dao.getMilestoneFieldId(filter);
       query += this.generateProjectMilestoneFieldFilter(fieldId,filter.value);
     }
@@ -263,12 +263,12 @@ class DAO {
         LEFT OUTER JOIN milestone_field AS \`milestones->milestoneFieldEntries->milestoneField\` ON (\`milestones->milestoneFieldEntries->milestoneField\`.id = \`milestones->milestoneFieldEntries\`.milestone_field_id)
     `;
 
-    for await (const filter of projectFieldFilters) {
+    for (const filter of projectFieldFilters) {
       const fieldId = await dao.getProjectFieldId(filter);
       query += this.generateMilestoneProjectFieldFilter(fieldId,filter.value);
     }
 
-    for await (const filter of milestoneFieldFilters) {
+    for (const filter of milestoneFieldFilters) {
       const fieldId = await dao.getMilestoneFieldId(filter);
       query += this.generateMilestoneMilestoneFieldFilter(fieldId,filter.value);
     }
