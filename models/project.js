@@ -178,7 +178,6 @@ Project.init({
     type: STRING(10),
     displayName: 'Department',
     allowNull: false,
-    showCount: true,
     searchable: true,
     field: "department_name"
   },
