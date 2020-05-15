@@ -3,78 +3,68 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
-{% import 'accordion-header-macro.njk' as headers %}
-{% import 'critical-milestones-macro.njk' as milestones %}
-
-{% set departmentsWithUpcomingMilestone = getDepartmentsWithUpcomingMilestones() | await  %}
-{% set data = chartData(departmentsWithUpcomingMilestone) %}
-{% set upcomingMilestonesTable = [] %}
-{% set criticalMilestonesKey = [{ text:'Department' }, { text:'Upcoming Milestones' }] %}
-{% set extraField = 'Upcoming Milestones' %}
+{% set filters = filters() | await %}
+{% set dates = getDepartmentsWithUpcomingMilestones() | await  %}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
 {% block content %}
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
+<div class="govuk-grid-row" id="show">
 
-  {{ govukWarningText({
-    text: "All data displayed here is just for projects with a 0 to 1 impact rating.",
-    iconFallbackText: "All data displayed here is just for projects with a 0 to 1 impact rating."
-  }) }}
+  <div class="govuk-grid-column-one-quarter" id="filterPanel">
+  {% include "upcoming-milestones/partials/filters/filters.njk" %}
+  </div>
 
-  <h1 class="govuk-heading-xl">Upcoming milestones for next 30 days</h1>
+  <div class="govuk-grid-column-full" id="dataTable">
 
-  {% if config.features.upcomingMilestonesChart %}
-    <canvas id="upcoming-milestones" aria-label="This chart shows the total number of upcoming milestones in the next 30 days for projects with a 0 to 1 impact rating." role="img">
-      {% include "upcoming-milestones/partials/accessible-table.njk" %}
-    </canvas>
-    <br><br>
-  {% endif %}
+  <h1 class="govuk-heading-xl">Upcoming milestones</h1>
 
-  {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
-    heading: {
-      html: headers.accordionHeader(criticalMilestonesKey)
-    }
-  }), upcomingMilestonesTable) %}
+  <div id="showFilter">
+    <p class="govuk-body"><a href="#show" class="govuk-link">Show filters</a></p>
+  </div>
 
-  {% for department in departmentsWithUpcomingMilestone %}
-  {% set departmentRow %}
-    {{ govukTable({
-      rows: [
-        [
-          {
-            text: department.name
-          },
-          {
-            text: department.totalUpcomingMilestones
-          }
-        ]
-      ]
-    }) }}
-  {% endset %}
+  <div id="hideFilter">
+      <p class="govuk-body"><a href="#hide" class="govuk-link">Hide filters</a></p>
+  </div>
 
-  {% set upcomingMilestonesTable = (upcomingMilestonesTable.push ({
-      summary: {
-        html: departmentRow
-      },
-      content: {
-        html: milestones.criticalMilestones(department.projects, projectFields, milestoneFields, extraField, config)
-      }
-    }), upcomingMilestonesTable) %}
+  {% include "all-data/partials/filters/filter-summary.njk" %}
 
-  {% endfor %}
+  <div id="timeline">
+    {% for date in dates %}
 
-  <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
-  <br><br><br><br>
+      <h3 class="govuk-heading-m milestone-date">{{ date.date }}
+      <span class="milestone-count department">{{ date.totalMilestones }}</span>
+      {% for i in range(1, date.totalMilestones) -%}
+        <span class="milestone-count milestone"></span>
+      {%- endfor %}
+      </h3>
 
-  {{ govukAccordion({
-    id: "accordion-table",
-    classes: "upcoming-milestones-accordion",
-    items: upcomingMilestonesTable
-  }) }}
+      <p class="govuk-body"><a href="#" class="govuk-link see-more" onclick="return false;">See more</a></p>
+      <div class="upcoming-milestones">
+        <hr class="govuk-section-break govuk-section-break--visible">
+        {% for department in date.departments %}
+          <h4 class="govuk-heading-s">{{ department.name }} <span class="milestone-count">{{ department.totalMilestones }}</span> </h4>
+          {% for project in department.projects %}
+            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a> {{ project.fields.get('deliveryTheme').value }}</p>
+            {% for milestone in project.milestones %}
+              <div class="milestones">
+                <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
+                <span class="govuk-caption-m">Milestone delivery confidence: {{ milestone.fields.get('deliveryConfidence').value }}</span>
+                <p class="govuk-body">{{ milestone.description }}</p>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+      
+    {% endfor %}
+  </div>
 
   </div>
 </div>
@@ -83,7 +73,6 @@
 
 {% block afterScript %}
   <script>
-    var data = {{ data | dump | safe }};
-    TRANSITIONDELIVERYDASHBOARD.upcomingMilestoneChart('upcoming-milestones', data);
+    TRANSITIONDELIVERYDASHBOARD.seeMore();
   </script>
 {% endblock %}

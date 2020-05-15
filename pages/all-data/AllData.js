@@ -103,6 +103,11 @@ class AllData extends Page {
   }
 
   async postRequest(req, res) {
+    if(req.body.clear) {
+      this.clearData();
+      return res.redirect(this.url);
+    }
+
     if(req.body.filterId) {
       let filters = this.data.filters;
       const filterId = req.body.filterId;
@@ -117,10 +122,10 @@ class AllData extends Page {
       }
 
       this.saveData(removeNulls({ filters }));
-      res.redirect(this.url);
-    } else {
-      super.postRequest(req, res);
+      return res.redirect(this.url);
     }
+
+    super.postRequest(req, res);
   }
 }
 

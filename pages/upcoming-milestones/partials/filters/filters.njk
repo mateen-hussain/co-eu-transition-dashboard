@@ -1,0 +1,65 @@
+    {% set items = [] %}
+    {% set filterTitles = [] %}
+
+    {% set dates  %}
+    {% include "all-data/partials/filters/dates.njk" %}
+    {% endset %}
+
+    {% set items = (items.push ({
+        heading: {
+          text: "Milestone Due Dates"
+        },
+        content: {
+          html: dates
+        }
+      }), items)
+    %}
+
+  {% for tableFieldId in filtersFields %}
+
+    {% set filter = filters.get(tableFieldId) %}
+
+    {% set filterCheckboxes  %}
+      {% if (filter.options | length != 1) %}
+        {% set filterTitles = (filterTitles.push (filter.name), filterTitles) %}
+        {% for option in filter.options %}
+          {% if option.value !== null %}
+            {% include "all-data/partials/filters/checkboxes.njk" %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endset -%}
+
+    {% if filter.name in filterTitles %}
+       {% set items = (items.push ({
+          heading: {
+            text: filter.name
+          },
+          content: {
+            html: filterCheckboxes
+          }
+        }), items)
+      %}
+    {% endif %}
+
+    {% if (filter.name == 'Department') and (filter.name not in filterTitles) %}
+      {% set departmentView = 'true' %}
+    {% endif %}
+
+  {% endfor %}
+
+  <form action="{{ url }}" method="post">
+    <h3 class="govuk-heading-s panelTitle">Filters</h3>
+    {% include "all-data/partials/filters/all-filters.njk" %}
+    {% include "all-data/partials/filters/filter-btn.njk" %}
+  </form>
+
+  <form action="{{ url }}" method="post">
+    {{ govukButton({
+      text: "Clear all filters",
+      name: "clear",
+      value: "clear",
+      classes: "govuk-button--secondary",
+      preventDoubleClick: true
+    }) }}
+  </form>
