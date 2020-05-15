@@ -146,13 +146,8 @@ class UpcomingMilestones extends Page {
   }
 
   async postRequest(req, res) {
-    let filters = this.data.filters;
-
     if(req.body.clear) {
-      for (var key in filters) {
-        delete filters[key];
-      }
-      this.saveData(removeNulls({ filters }));
+      this.clearData();
       return res.redirect(this.url);
     }
 
@@ -170,10 +165,10 @@ class UpcomingMilestones extends Page {
       }
 
       this.saveData(removeNulls({ filters }));
-      res.redirect(this.url);
-    } else {
-      super.postRequest(req, res);
+      return res.redirect(this.url);
     }
+
+    super.postRequest(req, res);
   }
 }
 
