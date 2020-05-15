@@ -17,18 +17,12 @@
 <div class="govuk-grid-column-full">
 
 {% if errors | length %}
-
+<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
 <h1 class="govuk-heading-xl">Upload failed
 <span class="govuk-caption-xl">No data has been uploaded</span>
 </h1>
-
-<div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
   <h2 class="govuk-error-summary__title" id="error-summary-title">
-  {% if flash %}
-   {{ flash }}
-   {% else %}
-  Please fix the errors detailed below and then re-upload the file
-  {% endif %}
+   {{ flash if flash else 'Please fix the errors detailed below and then re-upload the file' }}
   </h2>
   <div class="govuk-error-summary__body">
     <ul class="govuk-list govuk-error-summary__list">
@@ -180,6 +174,35 @@
   </div>
 </div>
 
+<form action="{{ url }}" method="post">
+<input type="hidden" name="importId" value="{{ importId }}" />
+
+{{ govukButton({
+  text: "Add data to dashboard",
+  name: "import",
+  value: "import",
+  type: "submit",
+  preventDoubleClick: true
+}) }}
+<br>
+{{ govukButton({
+  text: "Cancel upload",
+  value: "cancel",
+  name: "cancel",
+  type: "submit",
+  classes: "govuk-button--secondary",
+  preventDoubleClick: true
+}) }}
+
+</form>
+
+{{ govukDetails({
+  summaryText: "The data uploaded is not what I was expecting",
+  html: "<p class='govuk-body'>If the number of projects and milestones uploaded don't correspond to the number in the
+  file you uploaded, please log the issue here.</p>
+  <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
+}) }}
+
 <table class="govuk-table">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
@@ -214,43 +237,12 @@
   </tbody>
 </table>
 
-{{ govukDetails({
-  summaryText: "The data uploaded is not what I was expecting",
-  html: "<p class='govuk-body'>If the number of projects and milestones uploaded don't correspond to the number in the
-  file you uploaded, please log the issue here.</p>
-  <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
-}) }}
-
-<form action="{{ url }}" method="post">
-
-<input type="hidden" name="importId" value="{{ importId }}" />
-
-{{ govukButton({
-  text: "Add data to dashboard",
-  name: "import",
-  value: "import",
-  type: "submit",
-  preventDoubleClick: true
-}) }}
-<br>
-{{ govukButton({
-  text: "Cancel upload",
-  value: "cancel",
-  name: "cancel",
-  type: "submit",
-  classes: "govuk-button--secondary",
-  preventDoubleClick: true
-}) }}
-
-</form>
-
 {% endif %}
 
 </div>
 </div>
 
 {% endblock %}
-
 
 
 
