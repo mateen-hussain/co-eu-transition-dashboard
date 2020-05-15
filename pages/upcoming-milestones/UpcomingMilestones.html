@@ -51,7 +51,7 @@
         {% for department in date.departments %}
           <h4 class="govuk-heading-s">{{ department.name }} <span class="milestone-count">{{ department.totalMilestones }}</span> </h4>
           {% for project in department.projects %}
-            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a> {{ project.fields.get('deliveryTheme').value }}</p>
+            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a> <span class="govuk-caption-m theme-caption">{{ project.fields.get('deliveryTheme').value }}</span></p>
             {% for milestone in project.milestones %}
               <div class="milestones">
                 <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
