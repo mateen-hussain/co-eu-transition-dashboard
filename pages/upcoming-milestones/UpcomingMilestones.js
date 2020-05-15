@@ -71,7 +71,7 @@ class UpcomingMilestones extends Page {
       return dates;
     }, []);
 
-    return dates.sort((a, b) => a.valueOf() - b.valueOf());
+    return dates.sort((a, b) => moment(a, 'DD/MM/YYYY').valueOf() - moment(b, 'DD/MM/YYYY').valueOf());
   }
 
   groupDataByDate(departments) {
