@@ -27,16 +27,16 @@ class AllData extends Page {
     return result[0].updated_at;
   }
 
-  applyFormatting(attribute, value) {
+  applyFormatting(attribute, value = "") {
     const getConfidenceDescription = (type) => {
-      switch(value) {
-      case 3:
+      switch(String(value)) {
+      case "3":
         return `High ${type}`;
-      case 2:
+      case "2":
         return `Medium ${type}`;
-      case 1:
+      case "1":
         return `Low ${type}`;
-      case 0:
+      case "0":
         return `Very low ${type}`;
       default:
         return `No ${type} level given`;
@@ -44,14 +44,14 @@ class AllData extends Page {
     };
 
     const getImpactDescription = (type) => {
-      switch(value) {
-      case 0:
+      switch(String(value)) {
+      case "0":
         return `Very high ${type}`;
-      case 1:
+      case "1":
         return `High ${type}`;
-      case 2:
+      case "2":
         return `Medium ${type}`;
-      case 3:
+      case "3":
         return `Low ${type}`;
       default:
         return `No ${type} level given`;
