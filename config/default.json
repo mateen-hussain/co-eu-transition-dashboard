@@ -43,7 +43,6 @@
     "missedMilestones": "/missed-milestones",
     "upcomingMilestones": "/upcoming-milestones",
     "dataEntry": {
-      "addData": "/add-data",
       "projectMilestoneTemplate": "/project-milestone-template",
       "bulkUpload": "/bulk-upload",
       "bulkUploadProjectMilestone": "/bulk-upload/project-milestone",
