@@ -102,31 +102,31 @@ class UpcomingMilestones extends Page {
     return await getFilters(this.data.filters, this.req.user);
   }
 
-  applyFormatting(attribute, value) {
+  applyFormatting(attribute, value = "") {
     const getConfidenceDescription = (type) => {
-      switch(value) {
-      case 3:
+      switch(String(value)) {
+      case "3":
         return `High ${type}`;
-      case 2:
+      case "2":
         return `Medium ${type}`;
-      case 1:
+      case "1":
         return `Low ${type}`;
-      case 0:
+      case "0":
         return `Very low ${type}`;
       default:
         return `No ${type} level given`;
       }
     };
 
-    const getImpactDescription = (type) => {
-      switch(value) {
-      case 0:
+    const getImpactDescription = (type = "") => {
+      switch(String(value)) {
+      case "0":
         return `Very high ${type}`;
-      case 1:
+      case "1":
         return `High ${type}`;
-      case 2:
+      case "2":
         return `Medium ${type}`;
-      case 3:
+      case "3":
         return `Low ${type}`;
       default:
         return `No ${type} level given`;
