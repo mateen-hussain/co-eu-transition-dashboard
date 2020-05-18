@@ -55,10 +55,19 @@
 
       <br><br><br>
 
+      {% set uid = projectInfo.value %}
       {% for projectInfo in projectInformationTable %}
         {% set projectKey = (projectKey.push({ text:projectInfo.name }), projectKey) %}
-        {% set projectInformationRows = (projectInformationRows.push({html:
-          "<span class=" + (cellBlock + projectInfo.value) | escape + ">" + projectInfo.value | default('N/A') | escape + "</span>" }), projectInformationRows) %}
+
+        {% set html %}
+          {% if projectInfo.name === 'Project Name' %}
+            <a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class='govuk-link project-link'>{{ projectInfo.value | escape }}</a>
+          {% else %}
+            <span class="{{ (cellBlock + projectInfo.value) | escape }}">{{ projectInfo.value | default('N/A') | escape }}</span>
+          {% endif %}
+        {% endset %}
+
+        {% set projectInformationRows = (projectInformationRows.push({html: html}), projectInformationRows) %}
       {% endfor %}
 
       {% set projectTable %}

@@ -95,7 +95,7 @@ class UpcomingMilestones extends Page {
   }
 
   get filtersFields() {
-    return ['departmentName', 'deliveryTheme', 'impact', 'hmgConfidence'];
+    return ['deliveryConfidence', 'category', 'departmentName', 'deliveryTheme', 'impact', 'hmgConfidence'];
   }
 
   async filters() {
