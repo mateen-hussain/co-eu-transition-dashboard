@@ -92,18 +92,18 @@ const getProjectCoreFields = async (search, user) => {
 const getProjectFields = async (search, user) => {
   const response = await ProjectField.findAll({
     attributes: [
-      [literal(`projectField.id`), 'id'],
-      [literal(`projectField.name`), 'name'],
-      [literal(`projectField.display_name`), 'displayName'],
-      [literal(`projectField.type`), 'type'],
-      [literal(`projectFieldEntries.value`), 'value']
+      [literal('projectField.id'), 'id'],
+      [literal('projectField.name'), 'name'],
+      [literal('projectField.display_name'), 'displayName'],
+      [literal('projectField.type'), 'type'],
+      [literal('projectFieldEntries.value'), 'value']
     ],
     group: [
-      `projectField.id`,
-      `projectField.name`,
-      `projectField.display_name`,
-      `projectField.type`,
-      `projectFieldEntries.value`
+      'projectField.id',
+      'projectField.name',
+      'projectField.display_name',
+      'projectField.type',
+      'projectFieldEntries.value'
     ],
     raw: true,
     includeIgnoreAttributes: false,
@@ -171,18 +171,18 @@ const getProjectFields = async (search, user) => {
 const getMilestoneFields = async (search, user) => {
   const response = await MilestoneField.findAll({
     attributes: [
-      [literal(`milestoneField.id`), 'id'],
-      [literal(`milestoneField.name`), 'name'],
-      [literal(`milestoneField.display_name`), 'displayName'],
-      [literal(`milestoneField.type`), 'type'],
-      [literal(`milestoneFieldEntries.value`), 'value']
+      [literal('milestoneField.id'), 'id'],
+      [literal('milestoneField.name'), 'name'],
+      [literal('milestoneField.display_name'), 'displayName'],
+      [literal('milestoneField.type'), 'type'],
+      [literal('milestoneFieldEntries.value'), 'value']
     ],
     group: [
-      `milestoneField.id`,
-      `milestoneField.name`,
-      `milestoneField.display_name`,
-      `milestoneField.type`,
-      `milestoneFieldEntries.value`
+      'milestoneField.id',
+      'milestoneField.name',
+      'milestoneField.display_name',
+      'milestoneField.type',
+      'milestoneFieldEntries.value'
     ],
     raw: true,
     includeIgnoreAttributes: false,
