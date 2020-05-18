@@ -137,6 +137,7 @@ class UpcomingMilestones extends Page {
     case 'impact':
       return `${value} - ${getImpactDescription('impact')}`;
     case 'hmgConfidence':
+    case 'deliveryConfidence':
       return `${value} - ${getConfidenceDescription('confidence')}`;
     }
 
