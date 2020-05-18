@@ -20,7 +20,15 @@ class User extends Model {
     const dao = new DAO({
       sequelize: sequelize
     });
-    return await dao.getAllData(this.id,search);
+
+    const projects = await dao.getAllData(this.id, search);
+
+    projects.forEach(project => {
+      project.milestones = project.milestones
+        .sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+    });
+
+    return projects;
   }
 
   async getDepartmentsWithProjects (search) {
