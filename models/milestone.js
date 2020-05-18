@@ -61,7 +61,7 @@ class Milestone extends Model {
           description: { fill: "A4C2F2" }
         }
       },
-      description: 'When is the date your are currently aiming to deliver this milestone?',
+      description: 'When is the date you are currently aiming to deliver this milestone?',
       isRequired: true
     }];
 
