@@ -4,6 +4,7 @@ const expectedSheets = {
   'TAB A - Baseline data': 'projects',
   'TAB B - Milestones data': 'milestones'
 };
+const get = require('lodash/get');
 
 const validateBool = value => {
   const isABoolean = [...truthy, ...falsey].includes(String(value).toLowerCase());
@@ -28,7 +29,7 @@ const validateDate = value => {
   }
 };
 
-const isValueInGroup = (value, options) => {
+const isValueInGroup = (value, options = []) => {
   const valueInGroup = options.includes(value);
 
   if(!valueInGroup) {
@@ -75,7 +76,7 @@ const validateValue = (value, definition, allValues) => {
   case 'date':
     return validateDate(value);
   case 'group':
-    return isValueInGroup(value, definition.config.options);
+    return isValueInGroup(value, get(definition, 'config.options'));
   }
 };
 

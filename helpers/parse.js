@@ -1,4 +1,5 @@
 const { removeNulls } = require('./utils');
+const get = require('lodash/get');
 
 const parseString = (value = '') => {
   value = String(value).trim();
@@ -10,10 +11,10 @@ const parseString = (value = '') => {
   return value;
 };
 
-const parseGroupItem = (value, definition) => {
+const parseGroupItem = (value, options = []) => {
   value = parseString(value);
 
-  const matchedOption = definition.config.options.find(option => String(option).toLowerCase() === String(value).toLowerCase());
+  const matchedOption = options.find(option => String(option).toLowerCase() === String(value).toLowerCase());
 
   if (matchedOption) {
     return matchedOption;
@@ -22,7 +23,7 @@ const parseGroupItem = (value, definition) => {
   return value;
 }
 
-const parseValue = (value, definition) => {
+const parseValue = (value, definition = {}) => {
   switch(definition.type) {
   case 'string':
   case 'boolean':
@@ -31,7 +32,7 @@ const parseValue = (value, definition) => {
   case 'date':
     return parseString(value);
   case 'group':
-    return parseGroupItem(value, definition);
+    return parseGroupItem(value, get(definition, 'config.options'));
   }
 };
 
