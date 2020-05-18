@@ -38,7 +38,7 @@ describe('pages/upcoming-milestones/UpcomingMilestones', () => {
 
   describe('#filtersFields', () => {
     it('should not return the filters list', () => {
-      expect(page.filtersFields).to.eql(['departmentName', 'deliveryTheme', 'impact', 'hmgConfidence']);
+      expect(page.filtersFields).to.eql(['deliveryConfidence', 'category', 'departmentName', 'deliveryTheme', 'impact', 'hmgConfidence']);
     });
   });
 });
