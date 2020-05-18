@@ -30,7 +30,7 @@ class ProjectDetails extends Page {
   }
 
   get milestoneTableFields() {
-    return ['uid', 'description', 'date', 'comments'];
+    return ['uid', 'description', 'date', 'complete', 'comments'];
   }
 }
 

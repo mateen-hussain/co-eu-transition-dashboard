@@ -78,5 +78,6 @@ MilestoneFieldEntry.init({
 }, { sequelize, modelName: 'milestoneFieldEntry', tableName: 'milestone_field_entry', createdAt: 'created_at', updatedAt: 'updated_at' });
 
 MilestoneFieldEntry.belongsTo(MilestoneField, { foreignKey: 'fieldId' });
+MilestoneField.hasMany(MilestoneFieldEntry, { foreignKey: 'fieldId' });
 
 module.exports = MilestoneFieldEntry;

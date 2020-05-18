@@ -181,5 +181,7 @@ Milestone.init({
 
 Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid' });
 Milestone.hasMany(MilestoneFieldEntry, { foreignKey: 'milestoneUid', as: 'MilestoneFieldEntryFilter' });
+MilestoneFieldEntry.belongsTo(Milestone, { foreignKey: 'milestoneUid' });
+
 
 module.exports = Milestone;

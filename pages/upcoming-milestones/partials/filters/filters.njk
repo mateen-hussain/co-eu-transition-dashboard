@@ -31,9 +31,13 @@
     {% endset -%}
 
     {% if filter.name in filterTitles %}
+      {% set filterName = filter.name %}
+      {% if (filter.id === 'deliveryConfidence') or (filter.id === 'category') %}
+        {% set filterName = 'Milestone ' + filter.name %}
+      {% endif %}
        {% set items = (items.push ({
           heading: {
-            text: filter.name
+            text: filterName
           },
           content: {
             html: filterCheckboxes
