@@ -198,45 +198,47 @@ describe('models/milestone', () => {
 
   describe('#getNextIDIncrement', () => {
     it('gets next uid', async () => {
-      Milestone.findOne.returns({ uid: 'MIL-01-05' });
+      const options = {
+        model: Milestone,
+        mapToModel: true
+      };
+      sequelize.query.returns([{ uid: 'MIL-01-05' }]);
 
       const newId = await Milestone.getNextIDIncrement('MIL-01');
 
-      sinon.assert.calledWith(Milestone.findOne, {
-        where: { projectUid: 'MIL-01' },
-        order: [['uid', 'DESC']]
-      });
+      sinon.assert.calledWith(sequelize.query, "SELECT uid FROM milestone WHERE project_uid='MIL-01' ORDER BY uid DESC LIMIT 1 FOR UPDATE", options);
 
       expect(newId).to.eql('MIL-01-06');
     });
 
     it('creates first milestone id if none returned', async () => {
-      Milestone.findOne.returns();
+      sequelize.query.returns();
+      const options = {
+        model: Milestone,
+        mapToModel: true
+      };
 
       const newId = await Milestone.getNextIDIncrement('MIL-01');
 
-      sinon.assert.calledWith(Milestone.findOne, {
-        where: { projectUid: 'MIL-01' },
-        order: [['uid', 'DESC']]
-      });
+      sinon.assert.calledWith(sequelize.query, "SELECT uid FROM milestone WHERE project_uid='MIL-01' ORDER BY uid DESC LIMIT 1 FOR UPDATE", options);
 
       expect(newId).to.eql('MIL-01-01');
     });
 
     it('uses transaction and lock if passed in', async () => {
-      Milestone.findOne.returns();
       const options = {
+        model: Milestone,
+        mapToModel: true,
         transaction: {
           LOCK: 'some lock'
-        }
+        },
+        lock: 'some lock'
       };
+      sequelize.query.returns();
 
       const newId = await Milestone.getNextIDIncrement('MIL-01', options);
 
-      sinon.assert.calledWith(Milestone.findOne, {
-        where: { projectUid: 'MIL-01' },
-        order: [['uid', 'DESC']]
-      }, { transaction: options.transaction, lock: options.transaction.LOCK });
+      sinon.assert.calledWith(sequelize.query, "SELECT uid FROM milestone WHERE project_uid='MIL-01' ORDER BY uid DESC LIMIT 1 FOR UPDATE", options);
 
       expect(newId).to.eql('MIL-01-01');
     });

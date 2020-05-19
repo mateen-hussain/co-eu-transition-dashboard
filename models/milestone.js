@@ -127,21 +127,23 @@ class Milestone extends Model {
   }
 
   static async getNextIDIncrement(projectUid, { transaction } = {}) {
-    const options = { transaction };
+    const options = {
+      model: Milestone,
+      mapToModel: true
+    };
+
     if (transaction) {
+      options.transaction = transaction;
       options.lock = transaction.LOCK
     }
 
-    const milestone = await Milestone.findOne({
-      where: { projectUid },
-      order: [['uid', 'DESC']]
-    }, options);
+    const milestones = await sequelize.query(`SELECT uid FROM milestone WHERE project_uid='${projectUid}' ORDER BY uid DESC LIMIT 1 FOR UPDATE`, options);
 
-    if(!milestone) {
+    if(!milestones || !milestones.length) {
       return `${projectUid}-01`;
     }
 
-    const current = parseInt(milestone.uid.split('-')[2]);
+    const current = parseInt(milestones[0].uid.split('-')[2]);
     return sprintf("%s-%02d", projectUid, current+1);
   }
 }
