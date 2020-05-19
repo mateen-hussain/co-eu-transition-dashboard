@@ -39,7 +39,7 @@ class User extends Model {
     let departments = {};
 
     projects.forEach( project => {
-      if (project.milestones.length > 0) {
+      if (project.milestones && project.milestones.length > 0) {
         if (Array.isArray(departments[project.departmentName])) {
           departments[project.departmentName].push(project);
         } else {
