@@ -24,7 +24,7 @@ class UpcomingMilestones extends Page {
   async getDepartmentsWithUpcomingMilestones() {
     const filters = this.data.filters || {};
     filters.complete = ['No'];
-    const departments = await this.req.user.getDepartmentsWithProjects(this.data.filters);
+    const departments = await this.req.user.getDepartmentsWithProjects(filters);
 
     return this.groupDataByDate(departments);
   }
