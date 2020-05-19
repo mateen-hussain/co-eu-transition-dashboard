@@ -83,16 +83,32 @@ class EditMilestone extends Page {
     }
   }
 
-  async validateMilestone(milestone) {
+  async parseData(milestone) {
     const milestoneFields = await Milestone.fieldDefintions();
+    const parsedData = {};
 
     milestoneFields.forEach(field => {
-      if(field.type === 'date' && milestone[field.name] && moment(milestone[field.name], 'DD/MM/YYYY').isValid()) {
-        milestone[field.name] = moment(milestone[field.name], 'DD/MM/YYYY').format();
+      if(!milestone[field.name]) {
+        return;
       }
-    })
 
-    const errors = validation.validateItems([milestone], milestoneFields);
+      if(field.type === 'date') {
+        if(moment(milestone[field.name], 'DD/MM/YYYY').isValid()) {
+          parsedData[field.name] = moment(milestone[field.name], 'DD/MM/YYYY').format('YYYY-MM-DD');
+        } else {
+          parsedData[field.name] = 'invalid';
+        }
+      } else {
+        parsedData[field.name] = milestone[field.name];
+      }
+    });
+
+    return parsedData;
+  }
+
+  async validateMilestone(parsedData) {
+    const milestoneFields = await Milestone.fieldDefintions();
+    const errors = validation.validateItems([parsedData], milestoneFields);
 
     return errors.reduce((message, error) => {
       message += `${error.itemDefinition.importColumnName}: ${error.error}<br>`;
@@ -105,13 +121,14 @@ class EditMilestone extends Page {
       const data = Object.assign({}, removeNulls(req.body));
       this.saveData(data);
 
-      const errors = await this.validateMilestone(data);
+      const parsedData = await this.parseData(data);
+      const errors = await this.validateMilestone(parsedData);
       if (errors && errors.length) {
         req.flash(errors);
         return res.redirect(this.req.originalUrl);
       }
 
-      return await this.saveFieldToDatabase(data);
+      return await this.saveFieldToDatabase(parsedData);
     }
 
     return res.redirect(this.req.originalUrl);
