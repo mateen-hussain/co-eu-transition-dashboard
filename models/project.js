@@ -148,21 +148,23 @@ class Project extends Model {
   }
 
   static async getNextIDIncrement(departmentName, { transaction } = {}) {
-    const options = { transaction };
+    const options = {
+      model: Project,
+      mapToModel: true
+    };
+
     if (transaction) {
+      options.transaction = transaction;
       options.lock = transaction.LOCK
     }
 
-    const project = await Project.findOne({
-      where: { departmentName },
-      order: [['uid', 'DESC']]
-    }, options);
+    const projects = await sequelize.query(`SELECT uid FROM project WHERE department_name='${departmentName}' ORDER BY uid DESC LIMIT 1 FOR UPDATE`, options);
 
-    if(!project) {
+    if(!projects || !projects.length) {
       return `${departmentName}-01`;
     }
 
-    const current = parseInt(project.uid.split('-')[1]);
+    const current = parseInt(projects[0].uid.split('-')[1]);
     return sprintf("%s-%02d", departmentName, current+1);
   }
 }

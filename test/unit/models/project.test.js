@@ -4,6 +4,7 @@ const Milestone = require('models/milestone');
 const modelUtils = require('helpers/models');
 const ProjectFieldEntry = require('models/projectFieldEntry');
 const ProjectField = require('models/projectField');
+const sequelize = require('services/sequelize');
 
 describe('models/project', () => {
   beforeEach(() => {
@@ -205,45 +206,48 @@ describe('models/project', () => {
 
   describe('#getNextIDIncrement', () => {
     it('gets next uid', async () => {
-      Project.findOne.returns({ uid: 'MIL-01' });
+      const options = {
+        model: Project,
+        mapToModel: true
+      };
+
+      sequelize.query.returns([{ uid: 'MIL-01' }]);
 
       const newId = await Project.getNextIDIncrement('MIL');
 
-      sinon.assert.calledWith(Project.findOne, {
-        where: { departmentName: 'MIL' },
-        order: [['uid', 'DESC']]
-      });
+      sinon.assert.calledWith(sequelize.query, "SELECT uid FROM project WHERE department_name='MIL' ORDER BY uid DESC LIMIT 1 FOR UPDATE", options);
 
       expect(newId).to.eql('MIL-02');
     });
 
     it('creates first project id if none returned', async () => {
-      Project.findOne.returns();
+      const options = {
+        model: Project,
+        mapToModel: true
+      };
+      sequelize.query.returns();
 
       const newId = await Project.getNextIDIncrement('PRO');
 
-      sinon.assert.calledWith(Project.findOne, {
-        where: { departmentName: 'PRO' },
-        order: [['uid', 'DESC']]
-      });
+      sinon.assert.calledWith(sequelize.query, "SELECT uid FROM project WHERE department_name='PRO' ORDER BY uid DESC LIMIT 1 FOR UPDATE", options);
 
       expect(newId).to.eql('PRO-01');
     });
 
     it('uses transaction and lock if passed in', async () => {
-      Project.findOne.returns();
       const options = {
+        model: Project,
+        mapToModel: true,
         transaction: {
           LOCK: 'some lock'
-        }
+        },
+        lock: 'some lock'
       };
+      sequelize.query.returns();
 
       const newId = await Project.getNextIDIncrement('PRO', options);
 
-      sinon.assert.calledWith(Project.findOne, {
-        where: { departmentName: 'PRO' },
-        order: [['uid', 'DESC']]
-      }, { transaction: options.transaction, lock: options.transaction.LOCK });
+      sinon.assert.calledWith(sequelize.query, "SELECT uid FROM project WHERE department_name='PRO' ORDER BY uid DESC LIMIT 1 FOR UPDATE", options);
 
       expect(newId).to.eql('PRO-01');
     });
