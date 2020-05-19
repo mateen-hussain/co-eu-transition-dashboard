@@ -59,39 +59,81 @@ class UpcomingMilestones extends Page {
     return departmentsByDate.filter(department => department.projects.length);
   }
 
-  milestoneDates(departments) {
-    const dates = departments.reduce((dates, department) => {
-      department.projects.forEach(project => {
-        project.milestones.forEach(milestone => {
-          if(milestone.date && !dates.includes(milestone.date)){
-            dates.push(milestone.date);
+  groupDataByDate(departments) {
+    let dates = {};
+
+    departments.forEach( department => {
+      department.projects.forEach( project => {
+        project.milestones.forEach( milestone => {
+          const dateString = moment(milestone.date,'DD/MM/YYYY').format('DD/MM/YYYY');
+          if (dates[dateString]) {
+            if (dates[dateString][department.name]) {
+              if (dates[dateString][department.name]["projects"][project.uid]) {
+                dates[dateString][department.name]["projects"][project.uid].milestones.push(milestone);
+              } else {
+                dates[dateString][department.name]["projects"][project.uid] = {
+                  project: project,
+                  milestones: [milestone]
+                };
+              }
+            } else {
+              dates[dateString][department.name] = {
+                department: department,
+                projects: {
+                  [project.uid]: {
+                    project: project,
+                    milestones: [milestone]
+                  }
+                }
+              };
+            }
+          } else {
+            dates[dateString] = {};
+            dates[dateString][department.name] = {
+              department: department,
+              projects: {
+                [project.uid]: {
+                  project: project,
+                  milestones: [milestone]
+                }
+              }
+            };
           }
         });
       });
-      return dates;
-    }, []);
-
-    return dates.sort((a, b) => moment(a, 'DD/MM/YYYY').valueOf() - moment(b, 'DD/MM/YYYY').valueOf());
-  }
-
-  groupDataByDate(departments) {
-    const milestoneDates = this.milestoneDates(departments);
-
-    return milestoneDates.map(date => {
-      const departmentsWithProjectsWithMilestonesForDate = this.departmentsWithProjectsWithMilestonesForDate(departments, date);
-
-      // add up total milestones for department
-      const totalMilestones = departmentsWithProjectsWithMilestonesForDate.reduce((total, department) => {
-        total += department.totalMilestones;
-        return total;
-      }, 0);
-
-      return {
-        date: moment(date, 'DD/MM/YYYY').format('DD/MM/YYYY'),
-        departments: departmentsWithProjectsWithMilestonesForDate,
-        totalMilestones
-      };
     });
+
+    let result = [];
+
+    Object.keys(dates).forEach( date => {
+      let departments = [];
+      let count = 0;
+      Object.keys(dates[date]).forEach( departmentName => {
+        let department = cloneDeep(dates[date][departmentName].department);
+        department.projects = [];
+        department.dataValues.projects = [];
+        Object.keys(dates[date][departmentName].projects).forEach( projectUid => {
+          let project = cloneDeep(dates[date][departmentName].projects[projectUid].project);
+          project.milestones = dates[date][departmentName].projects[projectUid].milestones;
+          project.dataValues.milestones = dates[date][departmentName].projects[projectUid].milestones;
+
+          count += project.dataValues.milestones.length;
+
+          department.projects.push(project);
+          department.dataValues.projects.push(project);
+        });
+        departments.push(department);
+      });
+      result.push({
+        date: date,
+        departments: departments,
+        totalMilestones: count
+      });
+    });
+
+    result.sort((a, b) => moment(a, 'DD/MM/YYYY').valueOf() - moment(b, 'DD/MM/YYYY').valueOf());
+
+    return result;
   }
 
   get filtersFields() {
