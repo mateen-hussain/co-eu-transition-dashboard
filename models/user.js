@@ -25,67 +25,40 @@ class User extends Model {
   }
 
   async getDepartmentsWithProjects (search) {
-    const groupedSearch = await modelUtils.groupSearchItems(search);
+    const dao = new DAO({
+      sequelize: sequelize
+    });
+    const projects = await dao.getAllData(this.id,search);
+    let departments = {};
 
-    const milestoneSearchCriteria = [...Object.keys(groupedSearch.milestone), ...Object.keys(groupedSearch.milestoneField)];
-    const projectsMustHaveMilestones = milestoneSearchCriteria.length ? true : false;
-
-    const milestoneInclude = [{
-      model: MilestoneFieldEntry,
-      include: MilestoneField
-    }];
-
-    if (milestoneSearchCriteria.length) {
-      milestoneInclude.push({
-        model: MilestoneFieldEntry,
-        required: true,
-        as: 'MilestoneFieldEntryFilter',
-        attributes: [],
-        where: groupedSearch.milestoneField
-      })
-    }
-
-    const include = [
-      {
-        model: Milestone,
-        include: milestoneInclude,
-        required: projectsMustHaveMilestones,
-        where: groupedSearch.milestone
-      },
-      {
-        model: ProjectFieldEntry,
-        include: ProjectField
+    projects.forEach( project => {
+      if (Array.isArray(departments[project.departmentName])) {
+        departments[project.departmentName].push(project);
+      } else {
+        departments[project.departmentName] = [project];
       }
-    ];
-
-    if (Object.keys(groupedSearch.projectField).length) {
-      include.push({
-        required: true,
-        as: 'ProjectFieldEntryFilter',
-        attributes: [],
-        model: ProjectFieldEntry,
-        where: groupedSearch.projectField
-      })
-    }
-
-    const departmentsWithProjects = await this.getDepartments({
-      include: [{
-        model: Project,
-        where: groupedSearch.project,
-        required: true,
-        include
-      }]
     });
 
+    const departmentObjects = await this.getDepartments(); 
+    let result = [];
+    departmentObjects .forEach( (department) => {
+      if (departments[department.name]) {
+        department.projects = departments[department.name];
+        department.dataValues.projects = departments[department.name];
+        result.push(department);
+      }
+    });
+
+
     // sort milestones inside projects
-    departmentsWithProjects.forEach(departments => {
+    result.forEach(departments => {
       departments.projects.forEach(projects => {
         projects.milestones = projects.milestones
           .sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
       });
     });
 
-    return departmentsWithProjects;
+    return result;
   }
 
   async getProject (projectUid) {
