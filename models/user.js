@@ -8,7 +8,6 @@ const MilestoneFieldEntry = require('./milestoneFieldEntry');
 const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
-const modelUtils = require('helpers/models');
 const moment = require('moment');
 const DAO = require('services/dao');
 
