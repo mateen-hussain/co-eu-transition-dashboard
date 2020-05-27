@@ -57,7 +57,7 @@ departments.then( (departmentsArray) => {
   });
   authentication.hashPassphrase(passphrase).then( (hashedPassphrase) => {
     User.create({
-      role: "user",
+      role: "viewer",
       email: email,
       hashedPassphrase: hashedPassphrase
     }).then( (user) => {
