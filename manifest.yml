@@ -2,7 +2,7 @@ applications:
   - name: ((name))
     instances: ((instances))
     command: NODE_PATH=. node server.js
-    memory: 4G
+    memory: ((memory))
     buildpacks:
     - https://github.com/cloudfoundry/nodejs-buildpack
     services:

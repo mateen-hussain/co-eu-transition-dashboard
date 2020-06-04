@@ -1,2 +1,3 @@
 instances: 1
 name: transition-dashboard-staging
+memory: 1G
