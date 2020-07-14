@@ -28,7 +28,7 @@ describe('pages/start/Start', () => {
     });
 
     it('redirects to password reset', async() => {
-      req.user.passwordReset = true;
+      req.user.mustChangePassword = true;
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
     });

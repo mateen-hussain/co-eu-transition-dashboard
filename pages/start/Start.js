@@ -8,7 +8,7 @@ class Start extends Page {
   }
 
   async handler(req, res) {
-    if(req.user.passwordReset) {
+    if(req.user.mustChangePassword) {
       return res.redirect(config.paths.authentication.passwordReset);
     }
 

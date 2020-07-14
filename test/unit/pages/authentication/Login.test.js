@@ -47,11 +47,11 @@ describe('pages/authentication/login/Login', () => {
       sinon.assert.calledWith(page.res.redirect, config.paths.authentication.twoFactorAuthentication);
     });
 
-    it('redirects if user passwordReset is true', () => {
+    it('redirects if user mustChangePassword is true', () => {
       config.features.twoFactorAuth = false;
       page.res.redirect = sinon.stub();
 
-      const user = { passwordReset: true };
+      const user = { mustChangePassword: true };
       page.next(user);
 
       sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordReset);

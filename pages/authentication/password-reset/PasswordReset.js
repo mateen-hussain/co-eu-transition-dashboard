@@ -78,7 +78,7 @@ class PasswordReset extends Page {
     const hashedPassphrase = await authentication.hashPassphrase(password);
     await this.req.user.update({
       hashedPassphrase,
-      passwordReset: false
+      mustChangePassword: false
     });
 
     return this.res.redirect(config.paths.authentication.passwordResetComplete);

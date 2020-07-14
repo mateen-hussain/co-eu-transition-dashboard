@@ -32,7 +32,7 @@ describe('models/user', () => {
         type: INTEGER,
         field: "login_attempts"
       },
-      passwordReset: {
+      mustChangePassword: {
         type: BOOLEAN,
         field: "must_change_password"
       }
