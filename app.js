@@ -32,3 +32,7 @@ pages.attach(app);
 app.get('/', (req, res) => res.redirect(startPage()));
 
 logger.attachErrorLogger(app);
+
+app.use(function (req, res) {
+  res.status(404).redirect(config.paths.pageNotFound);
+});
