@@ -30,9 +30,7 @@ logger.attachRouteLogger(app);
 cache.preventCache(app);
 pages.attach(app);
 app.get('/', (req, res) => res.redirect(startPage()));
+app.use((req, res) => res.status(404).redirect(config.paths.pageNotFound));
 
 logger.attachErrorLogger(app);
 
-app.use(function (req, res) {
-  res.status(404).redirect(config.paths.pageNotFound);
-});
