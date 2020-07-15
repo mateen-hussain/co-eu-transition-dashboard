@@ -12,8 +12,7 @@
       "name": "[Staging] Transition Taskforce Dashboard"
     },
     "tableau": {
-      "url": "",
-      "username": ""
+      "url": ""
     }
   },
   "features": {

@@ -11,8 +11,7 @@
     },
     "googleAnalytics": {},
     "tableau": {
-      "url": "someurl",
-      "username": "someusername"
+      "url": "someurl"
     }
   },
   "bcrypt": {

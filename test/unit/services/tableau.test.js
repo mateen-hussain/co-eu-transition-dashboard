@@ -14,12 +14,13 @@ describe('services/sequelize', () => {
 
     const workbookName = 'some-workbook';
     const viewName = 'some-view';
-    const url = await tableau.getTableauUrl(workbookName, viewName);
+    const user = { email: 'email@email.com' };
+    const url = await tableau.getTableauUrl(user, workbookName, viewName);
 
     sinon.assert.calledWith(nodeFetch, `${config.services.tableau.url}/trusted`, {
       method: 'POST',
       body: {
-        username: config.services.tableau.username
+        username: user.email
       }
     });
 
@@ -27,12 +28,14 @@ describe('services/sequelize', () => {
   });
 
   it('throws error if no secret returned', async () => {
+    const user = { email: 'email@email.com' };
+
     const error = new Error('some error');
     nodeFetch.rejects(error);
 
     let message = '';
     try{
-      await tableau.getTableauUrl();
+      await tableau.getTableauUrl(user);
     } catch (thrownError) {
       message = thrownError.message;
     }
