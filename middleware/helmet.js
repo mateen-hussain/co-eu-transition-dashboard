@@ -1,7 +1,15 @@
 const helmet = require('helmet');
+const config = require('config');
 
 const attach = app => {
   app.use(helmet());
+
+  const frameSrc = [];
+  if(config.services.tableau.url) {
+    frameSrc.push(config.services.tableau.url);
+  }else {
+    frameSrc.push('\'none\'');
+  }
 
   // Helmet content security policy (CSP) to allow only assets from same domain.
   app.use(helmet.contentSecurityPolicy({
@@ -10,7 +18,7 @@ const attach = app => {
       scriptSrc: ['\'self\'', '\'unsafe-eval\'', '\'unsafe-inline\'', 'www.google-analytics.com', 'www.googletagmanager.com'],
       connectSrc: ['\'self\''],
       mediaSrc: ['\'self\''],
-      frameSrc: ['\'none\''],
+      frameSrc,
       imgSrc: ['\'self\'', '\'self\' data:', 'www.google-analytics.com']
     }
   }));

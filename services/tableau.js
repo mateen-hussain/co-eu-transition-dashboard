@@ -12,12 +12,13 @@ const getTableauUrl = async (user, workbook, view) => {
       username: user.email
     }
   });
+  const token = await response.text();
 
-  if(response == "-1") {
+  if(token == "-1") {
     throw new Error('error accessing tableau');
   }
 
-  return `http://${config.services.tableau.url}/trusted/${response}/views/${workbook}/${view}`;
+  return `http://${config.services.tableau.url}/trusted/${token}/views/${workbook}/${view}`;
 };
 
 module.exports = { getTableauUrl };
