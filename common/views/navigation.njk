@@ -26,6 +26,11 @@
         </a>
     </li>
     {% endif %}
+    <li class="govuk-header__navigation-item {% if (url == config.paths.viewReporting) %} govuk-header__navigation-item--active {% endif %}">
+        <a class="govuk-header__link nav" href="{{ config.paths.viewReporting }}">
+        View reporting
+        </a>
+    </li>
     </ul>
 </nav>
 
