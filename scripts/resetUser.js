@@ -23,6 +23,7 @@ if (!email) {
 let passphrase = randomString.generate({
   readable: true
 });
+
 authentication.hashPassphrase(passphrase).then( (hashedPassphrase) => {
   User.findOne({
     where: {

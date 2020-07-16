@@ -13,7 +13,8 @@
     },
     "googleAnalytics": {
       "id": "UA-161904342-1"
-    }
+    },
+    "tableau": {}
   },
   "features": {
     "missedMilestones": true

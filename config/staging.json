@@ -10,7 +10,8 @@
     },
     "tfa": {
       "name": "[Staging] Transition Taskforce Dashboard"
-    }
+    },
+    "tableau": {}
   },
   "features": {
     "missedMilestones": true

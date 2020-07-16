@@ -1,0 +1,25 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endblock %}
+
+{% block pageTitle %}Reporting Overview{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    <iframe src="{{ getIframeUrl() }}" class="tableu"></iframe>
+  </div>
+</div>
+
+{% endblock %}
+

@@ -48,7 +48,7 @@ class User extends Model {
       }
     });
 
-    const departmentObjects = await this.getDepartments(); 
+    const departmentObjects = await this.getDepartments();
     let result = [];
     departmentObjects .forEach( (department) => {
       if (departments[department.name]) {
@@ -168,7 +168,7 @@ User.init({
     type: INTEGER,
     field: "login_attempts"
   },
-  passwordReset: {
+  mustChangePassword: {
     type: BOOLEAN,
     field: "must_change_password"
   }

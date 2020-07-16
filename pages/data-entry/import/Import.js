@@ -35,8 +35,10 @@ class Import extends Page {
       for(const project of projects) {
         await Project.import(project, projectFields, { transaction });
       }
-      for(const milestone of milestones) {
-        await Milestone.import(milestone, milestoneFields, { transaction });
+      if (milestones) {
+        for(const milestone of milestones) {
+          await Milestone.import(milestone, milestoneFields, { transaction });
+        }
       }
       await transaction.commit();
 
