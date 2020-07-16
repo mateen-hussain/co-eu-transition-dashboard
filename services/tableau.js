@@ -13,6 +13,10 @@ const getTableauUrl = async (user, workbook, view) => {
     }
   });
 
+  if(response == "-1") {
+    throw new Error('error accessing tableau');
+  }
+
   return `http://${config.services.tableau.url}/trusted/${response}/views/${workbook}/${view}`;
 };
 

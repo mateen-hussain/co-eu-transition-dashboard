@@ -19,7 +19,7 @@ describe('services/sequelize', () => {
     config.services.tableau.url = oldUrl;
   });
 
-  it('throws if no url set in config', async () => {
+  it('throws error if no url set in config', async () => {
     let message = '';
     try{
       await tableau.getTableauUrl();
@@ -27,6 +27,22 @@ describe('services/sequelize', () => {
       message = thrownError.message;
     }
     expect(message).to.eql('No tableau url set');
+  });
+
+  it('throws error if response from tableau is -1', async () => {
+    config.services.tableau.url = 'some url';
+    const user = { email: 'email@email.com' };
+
+    const error = new Error('error accessing tableau');
+    nodeFetch.resolves("-1");
+
+    let message = '';
+    try{
+      await tableau.getTableauUrl(user);
+    } catch (thrownError) {
+      message = thrownError.message;
+    }
+    expect(message).to.eql(error.message);
   });
 
   it('should create a trusted url to iframe in tableau view', async () => {
