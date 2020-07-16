@@ -2,9 +2,9 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const tableau = require('services/tableau');
 
-class ViewReporting extends Page {
+class ReportingOverview extends Page {
   get url() {
-    return paths.viewReporting;
+    return paths.reportingOverview;
   }
 
   async getIframeUrl() {
@@ -12,4 +12,4 @@ class ViewReporting extends Page {
   }
 }
 
-module.exports = ViewReporting;
+module.exports = ReportingOverview;

@@ -53,7 +53,7 @@
       "submissionSuccess": "/submission-success"
     },
     "editMilestone": "/edit-milestone",
-    "viewReporting": "/view-reporting"
+    "reportingOverview": "/reporting-overview"
   },
   "features": {
     "twoFactorAuth": true,
