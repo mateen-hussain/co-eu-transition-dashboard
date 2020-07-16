@@ -29,6 +29,10 @@ logger.attachRouteLogger(app);
 
 cache.preventCache(app);
 pages.attach(app);
+app.post('/trusted', (req, res) => {
+  console.log('body in', req.body)
+  res.send('test');
+})
 app.get('/', (req, res) => res.redirect(startPage()));
 
 logger.attachErrorLogger(app);

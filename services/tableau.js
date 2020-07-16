@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const request = require('request-promise-native');
 const config = require('config');
 
 const getTableauUrl = async (user, workbook, view) => {
@@ -6,13 +6,11 @@ const getTableauUrl = async (user, workbook, view) => {
     throw new Error('No tableau url set');
   }
 
-  const response = await fetch(`${config.services.tableau.url}/trusted`, {
+  const token = await request({
     method: 'POST',
-    body: {
-      username: user.email
-    }
+    uri: `${config.services.tableau.url}/trusted`,
+    form: { username: user.email }
   });
-  const token = await response.text();
 
   if(token == "-1") {
     throw new Error('error accessing tableau');
