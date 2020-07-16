@@ -65,7 +65,7 @@ const sendEmails = async (projectsByDepartment) => {
         {
           personalisation: {
             email_address: user.email,
-            list: list.join(', '),
+            list: list.join('; '),
             link: config.serviceUrl
           },
           reference: `${user.id}`

@@ -121,7 +121,7 @@ describe('notifications/upcomingMilestones', () => {
         {
           personalisation: {
             email_address: users[0].email,
-            list: list.join(', '),
+            list: list.join('; '),
             link: config.serviceUrl
           },
           reference: `${users[0].id}`
