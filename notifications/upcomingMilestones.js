@@ -10,7 +10,6 @@ const logger = require('services/logger');
 const dao = new DAO({
   sequelize: sequelize
 });
-const notifyClient = new NotifyClient(config.notify.apiKey);
 
 const getProjectsDueInNextTwoDays = async () => {
   const search = {
@@ -47,6 +46,8 @@ const getUsers = async (departmentName) => {
 };
 
 const sendEmails = async (projectsByDepartment) => {
+  const notifyClient = new NotifyClient(config.notify.apiKey);
+
   for(const departmentName in projectsByDepartment) {
     const users = await getUsers(departmentName);
 
