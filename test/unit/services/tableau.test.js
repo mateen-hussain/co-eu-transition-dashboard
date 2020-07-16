@@ -1,9 +1,9 @@
 const { sinon, expect } = require('test/unit/util/chai');
 const config = require('config');
 const proxyquire = require('proxyquire');
-const nodeFetch = sinon.stub();
+const requestPromise = sinon.stub();
 const tableau = proxyquire('services/tableau', {
-  'node-fetch': nodeFetch
+  'request-promise-native': requestPromise
 });
 
 const someSecret = 'some-secret';
@@ -34,9 +34,7 @@ describe('services/sequelize', () => {
     const user = { email: 'email@email.com' };
 
     const error = new Error('error accessing tableau');
-    nodeFetch.resolves({
-      text: sinon.stub().resolves("-1")
-    });
+    requestPromise.resolves("-1");
 
     let message = '';
     try{
@@ -49,20 +47,17 @@ describe('services/sequelize', () => {
 
   it('should create a trusted url to iframe in tableau view', async () => {
     config.services.tableau.url = 'some url';
-    nodeFetch.resolves({
-      text: sinon.stub().resolves(someSecret)
-    });
+    requestPromise.resolves(someSecret);
 
     const workbookName = 'some-workbook';
     const viewName = 'some-view';
     const user = { email: 'email@email.com' };
     const url = await tableau.getTableauUrl(user, workbookName, viewName);
 
-    sinon.assert.calledWith(nodeFetch, `${config.services.tableau.url}/trusted`, {
+    sinon.assert.calledWith(requestPromise, {
       method: 'POST',
-      body: {
-        username: user.email
-      }
+      uri: `${config.services.tableau.url}/trusted`,
+      form: { username: user.email }
     });
 
     expect(url).to.eql(`http://${config.services.tableau.url}/trusted/${someSecret}/views/${workbookName}/${viewName}`);
@@ -73,7 +68,7 @@ describe('services/sequelize', () => {
     const user = { email: 'email@email.com' };
 
     const error = new Error('some error');
-    nodeFetch.rejects(error);
+    requestPromise.rejects(error);
 
     let message = '';
     try{
