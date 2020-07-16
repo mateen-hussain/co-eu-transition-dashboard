@@ -1,6 +1,7 @@
 {
   "env": "development",
   "port": "3000",
+  "serviceUrl": "http://localhost:3000",
   "cookie": {
     "expires": 3600000
   },
@@ -60,6 +61,7 @@
     "missedMilestones": false
   },
   "notify": {
-    "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289"
+    "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289",
+    "missedMilestonesKey": "81ac6df8-2e4a-4d33-9ba9-7d6d9bca46fb"
   }
 }

@@ -158,7 +158,7 @@ class DAO {
       FROM
         user INNER JOIN department_user ON (user.id = department_user.user_id)
         INNER JOIN project ON (department_user.department_name = project.department_name)
-        INNER JOIN department ON (project.department_name = department.name) 
+        INNER JOIN department ON (project.department_name = department.name)
         LEFT OUTER JOIN project_field_entry AS \`projectFieldEntries\` ON (project.uid = \`projectFieldEntries\`.project_uid)
         LEFT OUTER JOIN project_field AS \`projectFieldEntries->projectField\` ON (\`projectFieldEntries->projectField\`.id = \`projectFieldEntries\`.project_field_id)
     `;
@@ -177,15 +177,21 @@ class DAO {
       query += this.generateProjectMilestoneFilter(filter.name,filter.value);
     });
 
-    query += `
-      WHERE
-        ${this.generateMatch("user","id",userId)}
-    `;
+    let whereSet = false;
+
+    if(userId) {
+      query += `
+        WHERE
+          ${this.generateMatch("user","id",userId)}
+      `;
+      whereSet = true;
+    }
 
     projectFilters.forEach( filter => {
       query += `
-        AND ${this.generateMatch("project",filter.name,filter.value)}
+        ${whereSet ? 'AND' : 'WHERE'} ${this.generateMatch("project",filter.name,filter.value)}
       `;
+      whereSet = true;
     });
 
     return [query,{}];
@@ -273,21 +279,28 @@ class DAO {
       query += this.generateMilestoneMilestoneFieldFilter(fieldId,filter.value);
     }
 
-    query += `
-      WHERE
-        ${this.generateMatch("user","id",userId)}
-    `;
+    let whereSet = false;
+
+    if(userId) {
+      query += `
+        WHERE
+          ${this.generateMatch("user","id",userId)}
+      `;
+      whereSet = true;
+    }
 
     projectFilters.forEach( filter => {
       query += `
-        AND ${this.generateMatch("project",filter.name,filter.value)}
+        ${whereSet ? 'AND' : 'WHERE'} ${this.generateMatch("project",filter.name,filter.value)}
       `;
+      whereSet = true;
     });
 
     milestoneFilters.forEach( filter => {
       query += `
-        AND ${this.generateMatch("milestones",filter.name,filter.value)}
+        ${whereSet ? 'AND' : 'WHERE'} ${this.generateMatch("milestones",filter.name,filter.value)}
       `;
+      whereSet = true;
     });
 
     return [query,{}];
@@ -359,7 +372,7 @@ class DAO {
       return acc;
     }, {});
 
-    
+
     projects.forEach( (project,index) => {
       const milestones =  milestoneMap[project.uid];
       projects[index].dataValues.milestones = milestones;
@@ -422,7 +435,7 @@ class DAO {
       return acc;
     }, {});
 
-    
+
     projects.forEach( (project,index) => {
       const milestones =  milestoneMap[project.uid];
       projects[index].dataValues.milestones = milestones;

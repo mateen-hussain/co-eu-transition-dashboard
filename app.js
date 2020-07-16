@@ -11,6 +11,7 @@ const cache = require('middleware/cache');
 const path = require('path');
 const PageNotFound = require('pages/page-not-found/PageNotFound');
 const pageNotFound = new PageNotFound(path.resolve('pages/page-not-found'));
+require('./notifications');
 
 const app = module.exports = express();
 
