@@ -60,7 +60,7 @@ describe('services/sequelize', () => {
       form: { username: user.email }
     });
 
-    expect(url).to.eql(`http://${config.services.tableau.url}/trusted/${someSecret}/views/${workbookName}/${viewName}`);
+    expect(url).to.eql(`${config.services.tableau.url}/trusted/${someSecret}/views/${workbookName}/${viewName}`);
   });
 
   it('throws error if no secret returned', async () => {
