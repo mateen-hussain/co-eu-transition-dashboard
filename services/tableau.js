@@ -16,7 +16,7 @@ const getTableauUrl = async (user, workbook, view) => {
     throw new Error('error accessing tableau');
   }
 
-  return `http://${config.services.tableau.url}/trusted/${token}/views/${workbook}/${view}`;
+  return `${config.services.tableau.url}/trusted/${token}/views/${workbook}/${view}`;
 };
 
 module.exports = { getTableauUrl };
