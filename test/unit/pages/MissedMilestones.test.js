@@ -4,6 +4,7 @@ const MissedMilestones = require('pages/missed-milestones/MissedMilestones');
 const Milestone = require('models/milestone');
 const Project = require('models/project');
 const config = require('config');
+const moment = require('moment');
 
 const department = [{
   dataValues: {
@@ -80,11 +81,19 @@ describe('pages/missed-milestones/MissedMilestones', () => {
 
     let departmentsWithMissedMilestones = {};
 
-    before(async () => {
+    beforeEach(async () => {
       sinon.stub(page, 'totalMilestones').returns(5);
 
       req.user.getDepartmentsWithProjects.returns(departments);
       departmentsWithMissedMilestones = await page.getDepartmentsWithMissedMilestones();
+    });
+
+    it('calls #req.user.getDepartmentsWithProjects with correct parameters', () => {
+      sinon.assert.calledWith(req.user.getDepartmentsWithProjects, {
+        date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') },
+        complete: ['No'],
+        impact: [0, 1]
+      });
     });
 
     it('adds total milestones to each department', () => {
