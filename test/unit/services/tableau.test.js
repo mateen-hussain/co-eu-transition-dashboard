@@ -34,7 +34,9 @@ describe('services/sequelize', () => {
     const user = { email: 'email@email.com' };
 
     const error = new Error('error accessing tableau');
-    nodeFetch.resolves("-1");
+    nodeFetch.resolves({
+      text: sinon.stub().resolves("-1")
+    });
 
     let message = '';
     try{
@@ -47,7 +49,9 @@ describe('services/sequelize', () => {
 
   it('should create a trusted url to iframe in tableau view', async () => {
     config.services.tableau.url = 'some url';
-    nodeFetch.resolves(someSecret);
+    nodeFetch.resolves({
+      text: sinon.stub().resolves(someSecret)
+    });
 
     const workbookName = 'some-workbook';
     const viewName = 'some-view';
