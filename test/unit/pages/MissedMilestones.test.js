@@ -139,7 +139,7 @@ describe('pages/missed-milestones/MissedMilestones', () => {
 
   describe('#milestoneFields', () => {
     it('should return an array of milestone id and title', () => {
-      expect(page.milestoneFields).to.eql([{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comment' }]);
+      expect(page.milestoneFields).to.eql([{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comments' }]);
     });
   });
 
