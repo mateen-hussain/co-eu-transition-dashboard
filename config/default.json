@@ -53,8 +53,7 @@
       "submissionSuccess": "/submission-success"
     },
     "editMilestone": "/edit-milestone",
-    "reportingOverview": "/reporting-overview",
-    "pageNotFound": "/page-not-found"
+    "reportingOverview": "/reporting-overview"
   },
   "features": {
     "twoFactorAuth": true,
