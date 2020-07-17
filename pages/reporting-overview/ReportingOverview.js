@@ -8,7 +8,7 @@ class ReportingOverview extends Page {
   }
 
   async getIframeUrl() {
-    return await tableau.getTableauUrl(this.req.user, 'workbook', 'view');
+    return await tableau.getTableauUrl(this.req.user, 'MilestonesWorkbook1', 'Gantt');
   }
 }
 
