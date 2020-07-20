@@ -2,6 +2,8 @@ const Page = require('core/pages/page');
 const { Router } = require('express');
 
 class PageNotFound extends Page {
+  // do not attach pageNotFound to the global router or all pages will redirect to it
+  // this page is manually added in app.js
   static get isEnabled() {
     return false;
   }
