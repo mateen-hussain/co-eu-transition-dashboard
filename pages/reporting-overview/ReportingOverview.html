@@ -14,12 +14,19 @@
 {% block pageTitle %}Reporting Overview{% endblock %}
 
 {% block content %}
-
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    <iframe src="{{ getIframeUrl() | await }}" class="tableu"></iframe>
-  </div>
-</div>
-
+  {% if tableauIframeError %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-xl">Reporting overview</h1>
+        <p class="govuk-body">There has been an error accessing this page, please contact The Transition Taskforce Dashboard Team.</p>
+      </div>
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <iframe src="{{ tableauIframeUrl }}" class="tableu"></iframe>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}
 

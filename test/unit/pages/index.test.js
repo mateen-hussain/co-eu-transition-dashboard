@@ -11,10 +11,15 @@ describe('Pages', () => {
       missedMilestones: true
     });
 
-    const allPageNames = []
+    const allPageNames = [];
+    const allPageNamesToNotAdd = [];
     glob.sync('./pages/**/*.js', { "ignore":['./pages/index.js'] }).forEach(file => {
       const Page = require(path.resolve(file));
-      allPageNames.push(new Page().constructor.name);
+      if (Page.isEnabled) {
+        allPageNames.push(new Page().constructor.name);
+      } else {
+        allPageNamesToNotAdd.push(new Page().constructor.name);
+      }
     });
 
     const pagesAttached = [];
@@ -23,6 +28,7 @@ describe('Pages', () => {
     pages.attach({ use });
 
     allPageNames.forEach(name => expect(pagesAttached).to.include(name));
+    allPageNamesToNotAdd.forEach(name => expect(pagesAttached).to.not.include(name));
 
     sandbox.restore();
   });

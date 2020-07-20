@@ -26,11 +26,13 @@
         </a>
     </li>
     {% endif %}
+    {% if req.user.hasViewAllPermissions %}
     <li class="govuk-header__navigation-item {% if (url == config.paths.reportingOverview) %} govuk-header__navigation-item--active {% endif %}">
         <a class="govuk-header__link nav" href="{{ config.paths.reportingOverview }}">
         Reporting overview
         </a>
     </li>
+    {% endif %}
     </ul>
 </nav>
 
