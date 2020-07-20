@@ -4,6 +4,7 @@ const Department = require("models/department");
 const proxyquire = require('proxyquire');
 const config = require('config');
 const moment = require('moment');
+const sequelize = require('services/sequelize');
 
 let sendEmailStub = sinon.stub();
 let getAllDataStub = sinon.stub();
@@ -93,7 +94,7 @@ describe('notifications/upcomingMilestones', () => {
     const projectsByDepartment = {
       'department1': [{
         title: 'project title',
-        milestones: [{ description: 'milestone description' }]
+        milestones: [{ uid: '123' }]
       }]
     };
 
@@ -111,7 +112,7 @@ describe('notifications/upcomingMilestones', () => {
 
     it('sends emails to users', async () => {
       const list = [
-        `${projectsByDepartment['department1'][0].title} - ${projectsByDepartment['department1'][0].milestones[0].description}`
+        `${projectsByDepartment['department1'][0].title}: ${projectsByDepartment['department1'][0].milestones[0].uid}`
       ];
 
       await upcomingMilestones.sendEmails(projectsByDepartment);
@@ -139,6 +140,34 @@ describe('notifications/upcomingMilestones', () => {
           reference: `${users[1].id}`
         }
       );
+    });
+  });
+
+  describe('#setLock', () => {
+    it('should set lock with a uuid', async () => {
+      const guid = await upcomingMilestones.setLock();
+      sinon.assert.calledWith(sequelize.query, `UPDATE dashboard_locks SET guid="${guid}" WHERE name='upcoming milestones notifications'`)
+    })
+  });
+
+  describe('#getLock', () => {
+    it('should return false if guid does not match', async () => {
+      const guid = 'some guid';
+      sequelize.query.resolves([[], []]);
+
+      const response = await upcomingMilestones.getLock(guid);
+
+      expect(response).to.not.be.ok;
+    });
+
+    it('should return true if guid does match', async () => {
+      const guid = 'some guid';
+      sequelize.query.resolves([[{}], [{}]]);
+
+      const response = await upcomingMilestones.getLock(guid);
+
+      expect(response).to.be.ok;
+      sinon.assert.calledWith(sequelize.query, `SELECT * FROM dashboard_locks WHERE guid="${guid}" AND name='upcoming milestones notifications'`)
     });
   });
 });
