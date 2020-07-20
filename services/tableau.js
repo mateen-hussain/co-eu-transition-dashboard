@@ -13,7 +13,7 @@ const getTableauUrl = async (user, workbook, view) => {
   });
 
   if(token == "-1") {
-    throw new Error('error accessing tableau');
+    throw new Error('error accessing tableau with response -1');
   }
 
   return `${config.services.tableau.url}/trusted/${token}/views/${workbook}/${view}`;
