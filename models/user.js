@@ -140,6 +140,10 @@ class User extends Model {
       milestone: projects[0].milestones[0]
     };
   }
+
+  get hasViewAllPermissions() {
+    return this.departments.length > 1;
+  }
 }
 
 User.init({
