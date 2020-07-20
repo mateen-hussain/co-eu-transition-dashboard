@@ -2,6 +2,10 @@ const Page = require('core/pages/page');
 const { Router } = require('express');
 
 class PageNotFound extends Page {
+  static get isEnabled() {
+    return false;
+  }
+
   // page-not-found page does not require user authentication
   get middleware() {
     return [];
