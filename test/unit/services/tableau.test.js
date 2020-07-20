@@ -33,7 +33,7 @@ describe('services/sequelize', () => {
     config.services.tableau.url = 'some url';
     const user = { email: 'email@email.com' };
 
-    const error = new Error('error accessing tableau');
+    const error = new Error('error accessing tableau with response -1');
     requestPromise.resolves("-1");
 
     let message = '';
