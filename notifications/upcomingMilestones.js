@@ -6,6 +6,7 @@ const NotifyClient = require('notifications-node-client').NotifyClient;
 const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
 const logger = require('services/logger');
+const { v4: uuidv4 } = require('uuid');
 
 const dao = new DAO({
   sequelize: sequelize
@@ -53,36 +54,59 @@ const sendEmails = async (projectsByDepartment) => {
 
     const list = projectsByDepartment[departmentName].reduce((list, project) => {
       project.milestones.forEach(milestone => {
-        list.push(`${project.title} - ${milestone.description}`);
+        list.push(`${project.title}: ${milestone.uid}`);
       });
       return list;
     }, []);
 
     for(const user of users) {
-      logger.info(`Send upcoming milestone email to ${user.email}`);
-      notifyClient.sendEmail(
-        config.notify.missedMilestonesKey,
-        user.email,
-        {
-          personalisation: {
-            email_address: user.email,
-            list: list.join('; '),
-            link: config.serviceUrl
-          },
-          reference: `${user.id}`
-        }
-      );
+      try {
+        await notifyClient.sendEmail(
+          config.notify.missedMilestonesKey,
+          user.email,
+          {
+            personalisation: {
+              email_address: user.email,
+              list: list.join('; '),
+              link: config.serviceUrl
+            },
+            reference: `${user.id}`
+          }
+        );
+        logger.info(`Send upcoming milestone email to ${user.email}`);
+      } catch (error) {
+        logger.error(`Error sending upcoming milestones email to ${user.email}". ${error}`);
+      }
     }
   }
 };
 
+const setLock = async () => {
+  const guid = uuidv4();
+  const query = `UPDATE dashboard_locks SET guid="${guid}" WHERE name='upcoming milestones notifications'`;
+  await sequelize.query(query);
+  return guid;
+};
+
+const getLock = async (guid) => {
+  const query = `SELECT * FROM dashboard_locks WHERE guid="${guid}" AND name='upcoming milestones notifications'`;
+  const response = await sequelize.query(query);
+  return response[0].length > 0;
+};
+
 const notifyUpcomingMilestones = async () => {
-  const projects = await getProjectsDueInNextTwoDays();
-  const projectsByDepartment = groupProjectsByDepartment(projects);
-  await sendEmails(projectsByDepartment);
+  const guid = await setLock();
+
+  if(await getLock(guid)) {
+    const projects = await getProjectsDueInNextTwoDays();
+    const projectsByDepartment = groupProjectsByDepartment(projects);
+    await sendEmails(projectsByDepartment);
+  }
 };
 
 module.exports = {
+  setLock,
+  getLock,
   notifyUpcomingMilestones,
   sendEmails,
   getUsers,
