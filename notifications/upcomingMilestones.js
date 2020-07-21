@@ -48,13 +48,14 @@ const getUsers = async (departmentName) => {
 
 const sendEmails = async (projectsByDepartment) => {
   const notifyClient = new NotifyClient(config.notify.apiKey);
+  const summary = { infos: [], errors: [] };
 
   for(const departmentName in projectsByDepartment) {
     const users = await getUsers(departmentName);
 
     const list = projectsByDepartment[departmentName].reduce((list, project) => {
       project.milestones.forEach(milestone => {
-        list.push(`${project.title}: ${milestone.uid}`);
+        list.push(`${project.title} - ${milestone.uid}`);
       });
       return list;
     }, []);
@@ -73,43 +74,93 @@ const sendEmails = async (projectsByDepartment) => {
             reference: `${user.id}`
           }
         );
-        logger.info(`Send upcoming milestone email to ${user.email}`);
+        summary.infos.push(`Send upcoming milestone email to ${user.email} for milestones: ${list.join('; ')}`);
+        logger.info(`Send upcoming milestone email to ${user.email} for milestones: ${list.join('; ')}`);
       } catch (error) {
+        summary.infos.push(`Error sending upcoming milestones email to ${user.email}". ${error}`);
         logger.error(`Error sending upcoming milestones email to ${user.email}". ${error}`);
       }
     }
   }
+
+  return summary;
 };
 
 const setLock = async () => {
   const guid = uuidv4();
-  const query = `UPDATE dashboard_locks SET guid="${guid}" WHERE name='upcoming milestones notifications'`;
-  await sequelize.query(query);
+  const query = `UPDATE dashboard_locks SET guid=? WHERE name=? AND guid IS NULL`;
+  const options = {
+    replacements: [ guid, config.locks.upcomingMilestonesNotifications ]
+  };
+  await sequelize.query(query, options);
   return guid;
 };
 
 const getLock = async (guid) => {
-  const query = `SELECT * FROM dashboard_locks WHERE guid="${guid}" AND name='upcoming milestones notifications'`;
-  const response = await sequelize.query(query);
+  const query = `SELECT * FROM dashboard_locks WHERE guid=? AND name=?`;
+  const options = {
+    replacements: [ guid, config.locks.upcomingMilestonesNotifications ]
+  };
+  const response = await sequelize.query(query, options);
   return response[0].length > 0;
 };
 
-const notifyUpcomingMilestones = async () => {
-  const guid = await setLock();
+const clearLock = async () => {
+  const query = `UPDATE dashboard_locks SET guid=NULL WHERE name=?`;
+  const options = {
+    replacements: [ config.locks.upcomingMilestonesNotifications ]
+  };
+  await sequelize.query(query, options);
+};
 
-  if(await getLock(guid)) {
-    const projects = await getProjectsDueInNextTwoDays();
-    const projectsByDepartment = groupProjectsByDepartment(projects);
-    await sendEmails(projectsByDepartment);
+const sendSummaryNotification = async (summary = { infos: [], errors: [] }) => {
+  const notifyClient = new NotifyClient(config.notify.apiKey);
+
+  try {
+    await notifyClient.sendEmail(
+      config.notify.summaryNotificationKey,
+      config.notify.summaryNotificationEmail,
+      {
+        personalisation: {
+          email_address: config.notify.summaryNotificationEmail,
+          infos: summary.infos.join(', '),
+          errors: summary.errors.join(', ')
+        }
+      }
+    );
+  } catch (error) {
+    logger.error(`Error sending summary notification email. ${error}`);
+  }
+};
+
+const notifyUpcomingMilestones = async () => {
+  try {
+    const guid = await setLock();
+
+    if(await getLock(guid)) {
+      const projects = await getProjectsDueInNextTwoDays();
+      const projectsByDepartment = groupProjectsByDepartment(projects);
+      const summary = await sendEmails(projectsByDepartment);
+      await sendSummaryNotification(summary);
+    }
+  }
+  catch(error) {
+    logger.error(`Error notify Upcoming Milestones: ${error}`);
+    await sendSummaryNotification({ infos: [], errors: [error] });
+  }
+  finally {
+    await clearLock();
   }
 };
 
 module.exports = {
   setLock,
   getLock,
+  clearLock,
   notifyUpcomingMilestones,
   sendEmails,
   getUsers,
   getProjectsDueInNextTwoDays,
-  groupProjectsByDepartment
+  groupProjectsByDepartment,
+  sendSummaryNotification
 };

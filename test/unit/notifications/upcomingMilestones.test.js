@@ -112,7 +112,7 @@ describe('notifications/upcomingMilestones', () => {
 
     it('sends emails to users', async () => {
       const list = [
-        `${projectsByDepartment['department1'][0].title}: ${projectsByDepartment['department1'][0].milestones[0].uid}`
+        `${projectsByDepartment['department1'][0].title} - ${projectsByDepartment['department1'][0].milestones[0].uid}`
       ];
 
       await upcomingMilestones.sendEmails(projectsByDepartment);
@@ -146,7 +146,10 @@ describe('notifications/upcomingMilestones', () => {
   describe('#setLock', () => {
     it('should set lock with a uuid', async () => {
       const guid = await upcomingMilestones.setLock();
-      sinon.assert.calledWith(sequelize.query, `UPDATE dashboard_locks SET guid="${guid}" WHERE name='upcoming milestones notifications'`)
+      const options = {
+        replacements: [ guid, config.locks.upcomingMilestonesNotifications ]
+      };
+      sinon.assert.calledWith(sequelize.query, `UPDATE dashboard_locks SET guid=? WHERE name=? AND guid IS NULL`, options)
     })
   });
 
@@ -167,7 +170,47 @@ describe('notifications/upcomingMilestones', () => {
       const response = await upcomingMilestones.getLock(guid);
 
       expect(response).to.be.ok;
-      sinon.assert.calledWith(sequelize.query, `SELECT * FROM dashboard_locks WHERE guid="${guid}" AND name='upcoming milestones notifications'`)
+
+      const options = {
+        replacements: [ guid, config.locks.upcomingMilestonesNotifications ]
+      };
+      sinon.assert.calledWith(sequelize.query, 'SELECT * FROM dashboard_locks WHERE guid=? AND name=?', options)
+    });
+  });
+
+  describe('#clearLock', () => {
+    it('should clear the lock', async () => {
+      await upcomingMilestones.clearLock();
+      const options = {
+        replacements: [ config.locks.upcomingMilestonesNotifications ]
+      };
+      sinon.assert.calledWith(sequelize.query, `UPDATE dashboard_locks SET guid=NULL WHERE name=?`, options)
+    });
+  });
+
+  describe('#sendSummaryNotification', () => {
+    it('should send email summerising notifications', async () => {
+      const summary = {
+        infos: ['some info', 'some info2'],
+        errors: ['errors 1', 'errors 2']
+      };
+
+      await upcomingMilestones.sendSummaryNotification(summary);
+
+      sinon.assert.calledWith(sendEmailStub,
+        config.notify.summaryNotificationKey,
+        config.notify.summaryNotificationEmail,
+        {
+          personalisation: {
+            email_address: config.notify.summaryNotificationEmail,
+            infos: summary.infos.join(', '),
+            errors: summary.errors.join(', ')
+          }
+        }
+      );
     });
   });
 });
+
+
+
