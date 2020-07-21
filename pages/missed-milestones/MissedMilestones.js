@@ -15,7 +15,7 @@ class MissedMilestones extends Page {
 
   async getDepartmentsWithMissedMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects({
-      date: { to: moment().format('DD/MM/YYYY') },
+      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') },
       complete: ['No'],
       impact: [0, 1]
     });
@@ -64,7 +64,7 @@ class MissedMilestones extends Page {
   }
 
   get milestoneFields() {
-    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comment' }];
+    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comments' }];
   }
 }
 

@@ -6,6 +6,9 @@
   "services": {
     "mysql": {
       "uri": "DATABASE_URL"
+    },
+    "tableau": {
+      "url": "TABLEAU_URL"
     }
   },
   "port": "PORT",

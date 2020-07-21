@@ -32,20 +32,32 @@ describe('models/user', () => {
         type: INTEGER,
         field: "login_attempts"
       },
-      passwordReset: {
+      mustChangePassword: {
         type: BOOLEAN,
         field: "must_change_password"
       }
     });
+  });
 
-    it('called User.belongsToMany with the correct parameters', () => {
-      expect(User.belongsToMany).to.have.been.calledWith(Department, { through: DepartmentUser, foreignKey: 'userId' });
+  it('called User.belongsToMany with the correct parameters', () => {
+    expect(User.belongsToMany).to.have.been.calledWith(Department, { through: DepartmentUser, foreignKey: 'userId' });
+  });
+
+  it('called Department.belongsToMany with the correct parameters', () => {
+    expect(Department.belongsToMany).to.have.been.calledWith(User, { through: DepartmentUser, foreignKey: 'departmentName' });
+  });
+
+  describe('#hasViewAllPermissions', () => {
+    it('returns true if user can view more than one department', () => {
+      const user = new User();
+      user.departments = [{}, {}];
+      expect(user.hasViewAllPermissions).to.be.ok;
     });
 
-    it('called Department.belongsToMany with the correct parameters', () => {
-      expect(Department.belongsToMany).to.have.been.calledWith(User, { through: DepartmentUser, foreignKey: 'departmentName' });
-    });
-
-    it.skip('#getProjects');
+    it('returns false if user can only view one department', () => {
+      const user = new User();
+      user.departments = [{}];
+      expect(user.hasViewAllPermissions).to.not.be.ok;
+    })
   });
 });

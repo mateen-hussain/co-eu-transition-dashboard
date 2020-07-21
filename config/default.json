@@ -9,7 +9,8 @@
     "tfa": {
       "name": "Transition Taskforce Dashboard"
     },
-    "googleAnalytics": {}
+    "googleAnalytics": {},
+    "tableau": {}
   },
   "bcrypt": {
     "saltRounds": 10
@@ -51,7 +52,8 @@
       "import": "/import",
       "submissionSuccess": "/submission-success"
     },
-    "editMilestone": "/edit-milestone"
+    "editMilestone": "/edit-milestone",
+    "reportingOverview": "/reporting-overview"
   },
   "features": {
     "twoFactorAuth": true,

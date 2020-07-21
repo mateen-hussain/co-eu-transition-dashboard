@@ -48,7 +48,7 @@ class User extends Model {
       }
     });
 
-    const departmentObjects = await this.getDepartments(); 
+    const departmentObjects = await this.getDepartments();
     let result = [];
     departmentObjects .forEach( (department) => {
       if (departments[department.name]) {
@@ -140,6 +140,10 @@ class User extends Model {
       milestone: projects[0].milestones[0]
     };
   }
+
+  get hasViewAllPermissions() {
+    return this.departments.length > 1;
+  }
 }
 
 User.init({
@@ -168,7 +172,7 @@ User.init({
     type: INTEGER,
     field: "login_attempts"
   },
-  passwordReset: {
+  mustChangePassword: {
     type: BOOLEAN,
     field: "must_change_password"
   }

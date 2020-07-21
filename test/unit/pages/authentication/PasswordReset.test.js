@@ -120,7 +120,7 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
 
       sinon.assert.calledWith(page.req.user.update, {
         hashedPassphrase: 'password hash',
-        passwordReset: false
+        mustChangePassword: false
       });
       sinon.assert.calledWith(page.res.redirect, config.paths.authentication.passwordResetComplete);
     });
