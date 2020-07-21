@@ -17,5 +17,8 @@
   },
   "notify": {
     "apiKey": "NOTIFY_API_KEY"
+  },
+  "notify": {
+    "summaryNotificationEmail": "SUMMARY_NOTIFICATION_EMAIL"
   }
 }

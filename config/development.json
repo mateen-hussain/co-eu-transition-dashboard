@@ -1,5 +1,6 @@
 {
   "env": "development",
+  "serviceUrl": "http://localhost:3000",
   "cookie": {
     "secret": "some secrent...",
     "domain": "localhost",
