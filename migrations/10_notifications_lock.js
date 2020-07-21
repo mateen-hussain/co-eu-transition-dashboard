@@ -1,6 +1,7 @@
 const { services } = require('config');
 const logger = require('services/logger');
-const Sequelize = require('sequelize')
+const Sequelize = require('sequelize');
+const config = require('config');
 
 const up = async (query) => {
   await query.createTable('dashboard_locks', {
@@ -9,7 +10,7 @@ const up = async (query) => {
   }, { charset: services.mysql.charset });
 
   query.bulkInsert('dashboard_locks', [{
-    name: 'upcoming milestones notifications'
+    name: config.locks.upcomingMilestonesNotifications
   }]);
 };
 
