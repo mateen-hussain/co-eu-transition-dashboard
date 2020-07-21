@@ -62,8 +62,7 @@
   "notify": {
     "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289",
     "missedMilestonesKey": "81ac6df8-2e4a-4d33-9ba9-7d6d9bca46fb",
-    "summaryNotificationKey": "26be1793-7401-4541-b119-78ce1d6a729b",
-    "summaryNotificationEmail": ""
+    "summaryNotificationKey": "26be1793-7401-4541-b119-78ce1d6a729b"
   },
   "locks": {
     "upcomingMilestonesNotifications": "upcoming milestones notifications"
