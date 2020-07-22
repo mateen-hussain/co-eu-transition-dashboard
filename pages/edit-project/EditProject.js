@@ -9,7 +9,6 @@ const moment = require('moment');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
 const FieldEntryGroup = require('models/fieldEntryGroup');
-const jwt = require('services/jwt');
 
 class EditProject extends Page {
   get url() {
