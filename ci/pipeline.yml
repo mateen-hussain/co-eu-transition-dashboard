@@ -13,22 +13,28 @@ meta:
       tag: 864e80c4793e4fca17a2374e8075af119dd03162
 
 resources:
-  - name: co-eu-transition-dashboard-src
+  - name: co-eu-transition-dashboard-staging
     type: git
     icon: git
     source:
-      branch: master
+      branch: staging
+      uri: https://github.com/alphagov/co-eu-transition-dashboard.git
+
+  - name: co-eu-transition-dashboard-production
+    type: git
+    icon: git
+    source:
+      branch: production
       uri: https://github.com/alphagov/co-eu-transition-dashboard.git
 
 jobs:
   - name: deploy-staging
     serial: true
     plan:
-      - get: co-eu-transition-dashboard-src
+      - get: co-eu-transition-dashboard-staging
         trigger: true
 
   - name: deploy-production
     serial: true
     plan:
-      - get: co-eu-transition-dashboard-src
-        passed: [deploy-staging]
+      - get: co-eu-transition-dashboard-production
