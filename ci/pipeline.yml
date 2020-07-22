@@ -1,0 +1,34 @@
+---
+meta:
+  nodejs-img:
+    type: registry-image
+    source:
+      repository: node
+      tag: 10-alpine
+
+  cf-cli-img:
+    type: registry-image
+    source:
+      repository: governmentpaas/cf-cli
+      tag: 864e80c4793e4fca17a2374e8075af119dd03162
+
+resources:
+  - name: co-eu-transition-dashboard-src
+    type: git
+    icon: git
+    source:
+      branch: master
+      uri: https://github.com/alphagov/co-eu-transition-dashboard.git
+
+jobs:
+  - name: deploy-staging
+    serial: true
+    plan:
+      - get: co-eu-transition-dashboard-src
+        trigger: true
+
+  - name: deploy-production
+    serial: true
+    plan:
+      - get: co-eu-transition-dashboard-src
+        passed: [deploy-staging]
