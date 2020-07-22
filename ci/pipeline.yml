@@ -30,7 +30,7 @@ jobs:
         trigger: true
 
       - task: deploy
-        config:
+        config: &deploy-config
           platform: linux
 
           image_resource: *cf-cli-img
@@ -52,7 +52,7 @@ jobs:
 
                 cf push --vars-file "${CF_SPACE}.yml" --strategy=rolling
 
-          params:
+          params: &deploy-config-params
             CF_API_ENDPOINT: https://api.london.cloud.service.gov.uk
             CF_USERNAME: ((cf-username))
             CF_PASSWORD: ((cf-password))
@@ -62,4 +62,13 @@ jobs:
   - name: deploy-production
     serial: true
     plan:
-      - get: co-eu-transition-dashboard-production
+      - get: repo
+        resource: co-eu-transition-dashboard-production
+        trigger: true
+
+      - task: deploy
+        config:
+          <<: *deploy-config
+          params:
+            <<: *deploy-config-params
+            CF_SPACE: production
