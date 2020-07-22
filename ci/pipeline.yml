@@ -59,6 +59,33 @@ jobs:
             CF_ORG: cabinet-office-transition-team
             CF_SPACE: staging
 
+      - task: smoke-test
+        config: &smoke-test-config
+          platform: linux
+
+          image_resource: *cf-cli-img
+
+          run:
+            dir: repo
+            path: sh
+            args:
+              - -c
+              - |
+                set -eu
+
+                code="$(curl -s "$APP_URL" -o /dev/null -w "%{http_code}")"
+
+                if [ "$code" = "200" ]; then
+                  echo 'Login page returned HTTP 200'
+                  exit 0
+                else
+                  echo "Login page returned HTTP ${code}"
+                  exit 1
+                fi
+
+          params:
+            APP_URL: https://transition-dashboard-staging.london.cloudapps.digital/login
+
   - name: deploy-production
     serial: true
     plan:
@@ -72,3 +99,9 @@ jobs:
           params:
             <<: *deploy-config-params
             CF_SPACE: production
+
+      - task: smoke-test
+        config:
+          <<: *smoke-test-config
+          params:
+            APP_URL: https://transition-dashboard.london.cloudapps.digital/login
