@@ -1,12 +1,6 @@
 ---
 meta:
-  nodejs-img:
-    type: registry-image
-    source:
-      repository: node
-      tag: 10-alpine
-
-  cf-cli-img:
+  cf-cli-img: &cf-cli-img
     type: registry-image
     source:
       repository: governmentpaas/cf-cli
@@ -31,8 +25,39 @@ jobs:
   - name: deploy-staging
     serial: true
     plan:
-      - get: co-eu-transition-dashboard-staging
+      - get: repo
+        resource: co-eu-transition-dashboard-staging
         trigger: true
+
+      - task: deploy
+        config:
+          platform: linux
+
+          image_resource: *cf-cli-img
+
+          inputs:
+            - name: repo
+
+          run:
+            dir: repo
+            path: sh
+            args:
+              - -c
+              - |
+                set -eu
+
+                cf api "${CF_API_ENDPOINT}"
+                cf auth "${CF_USERNAME}" "${CF_PASSWORD}"
+                cf target -o "${CF_ORG}" -s "${CF_SPACE}"
+
+                cf push --vars-file "${CF_SPACE}.yml" --strategy=rolling
+
+          params:
+            CF_API_ENDPOINT: https://api.london.cloud.service.gov.uk
+            CF_USERNAME: ((cf-username))
+            CF_PASSWORD: ((cf-password))
+            CF_ORG: cabinet-office-transition-team
+            CF_SPACE: staging
 
   - name: deploy-production
     serial: true
