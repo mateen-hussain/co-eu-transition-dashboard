@@ -61,7 +61,8 @@
       "submissionSuccess": "/entity-submission-success"
     },
     "editMilestone": "/edit-milestone",
-    "reportingOverview": "/reporting-overview"
+    "reportingOverview": "/reporting-overview",
+    "editProject": "/edit-project"
   },
   "features": {
     "twoFactorAuth": true,
