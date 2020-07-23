@@ -27,7 +27,8 @@ password: password
 
 Releases to the various environments all happen automatically via [Concourse](https://cd.gds-reliability.engineering/teams/cabinet-office-transition/pipelines/co-eu-transition-dashboard).  There are branches for each environment (staging/production) and merges to these branches will automatically trigger a deployment.  The deployments use a rolling strategy to ensure no downtime to the service.
 
-Before merging to these branches you should ensure that the build is passing on [Travis](https://travis-ci.org/github/alphagov/co-eu-transition-dashboard/) [![Build Status](https://travis-ci.org/alphagov/co-eu-transition-dashboard.svg?branch=master)](https://travis-ci.org/alphagov/co-eu-transition-dashboard).
+Before merging to these branches you should ensure that the build is passing on [Travis](https://travis-ci.org/github/alphagov/co-eu-transition-dashboard/).
+[![Build Status](https://travis-ci.org/alphagov/co-eu-transition-dashboard.svg?branch=master)](https://travis-ci.org/alphagov/co-eu-transition-dashboard)
 
 ### Staging
 1. Make sure your repository is up to date `git fetch --all`
