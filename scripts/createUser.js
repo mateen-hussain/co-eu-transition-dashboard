@@ -1,4 +1,5 @@
 const config = require('config');
+const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
 const readlineSync = require("readline-sync");
 const User = require("models/user");
@@ -81,6 +82,7 @@ departments.then( (departmentsArray) => {
         } else {
           console.log(`User ${email} created with departments ${departmentsString} and password ${passphrase}`);
         }
+        sequelize.close();
       });
     }).catch( (err) => {
       console.log(`Could not create user [${err}]`);
