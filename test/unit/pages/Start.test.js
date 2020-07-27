@@ -21,26 +21,13 @@ describe('pages/start/Start', () => {
   });
 
   describe('#handler', () => {
-    const originalMissedMilestoneFeature = config.features.missedMilestones;
-
-    afterEach(() => {
-      config.features.missedMilestones = originalMissedMilestoneFeature;
-    });
-
     it('redirects to password reset', async() => {
       req.user.mustChangePassword = true;
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
     });
 
-    it('redirects to missedMilestones is feature is active', async() => {
-      config.features.missedMilestones = true;
-      await page.handler(req, res);
-      sinon.assert.calledWith(res.redirect, config.paths.missedMilestones);
-    });
-
-    it('redirects to all data page if missedMilestones is feature is not active', async() => {
-      config.features.missedMilestones = false;
+    it('redirects to all data landing page by default', async() => {
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.allData);
     });
