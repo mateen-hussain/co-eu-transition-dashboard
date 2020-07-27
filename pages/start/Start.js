@@ -12,10 +12,6 @@ class Start extends Page {
       return res.redirect(config.paths.authentication.passwordReset);
     }
 
-    if (config.features.missedMilestones){
-      return res.redirect(config.paths.missedMilestones);
-    }
-
     return res.redirect(config.paths.allData);
   }
 }

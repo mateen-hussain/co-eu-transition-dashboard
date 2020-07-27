@@ -1,16 +1,23 @@
 <nav class="navigation">
     <ul id="navigation" class="govuk-header__navigation " aria-label="Top Level Navigation">
+    <li class="govuk-header__navigation-item {% if url == config.paths.allData %} govuk-header__navigation-item--active {% endif %}">
+        <a class="govuk-header__link nav" href="{{ config.paths.allData }}">
+        All data
+        </a>
+    </li>
+    {% if req.user.hasViewAllPermissions %}
+    <li class="govuk-header__navigation-item {% if (url == config.paths.reportingOverview) %} govuk-header__navigation-item--active {% endif %}">
+        <a class="govuk-header__link nav" href="{{ config.paths.reportingOverview }}">
+        Reporting overview
+        </a>
+    </li>
+    {% endif %}
     <li class="govuk-header__navigation-item {% if (url == config.paths.missedMilestones) or (url == config.paths.upcomingMilestones) %} govuk-header__navigation-item--active {% endif %}">
         {% if config.features.missedMilestones %}
         <a class="govuk-header__link nav" href="{{ config.paths.missedMilestones }}">Milestones</a>
         {% else %}
         <a class="govuk-header__link nav" href="{{ config.paths.upcomingMilestones }}">Milestones</a>
         {% endif %}
-    </li>
-    <li class="govuk-header__navigation-item {% if url == config.paths.allData %} govuk-header__navigation-item--active {% endif %}">
-        <a class="govuk-header__link nav" href="{{ config.paths.allData }}">
-        All data
-        </a>
     </li>
     {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
     <li class="govuk-header__navigation-item {% if (url == config.paths.dataEntry.bulkUploadProjectMilestone) or (url == config.paths.dataEntry.submissionSuccess) or (url == config.paths.editMilestone) %} govuk-header__navigation-item--active {% endif %}">
@@ -23,13 +30,6 @@
     <li class="govuk-header__navigation-item {% if (url == config.paths.admin.projectFieldList) or (url == config.paths.admin.projectField) %} govuk-header__navigation-item--active {% endif %}">
         <a class="govuk-header__link nav" href="{{ config.paths.admin.projectFieldList }}">
         Manage data input
-        </a>
-    </li>
-    {% endif %}
-    {% if req.user.hasViewAllPermissions %}
-    <li class="govuk-header__navigation-item {% if (url == config.paths.reportingOverview) %} govuk-header__navigation-item--active {% endif %}">
-        <a class="govuk-header__link nav" href="{{ config.paths.reportingOverview }}">
-        Reporting overview
         </a>
     </li>
     {% endif %}
