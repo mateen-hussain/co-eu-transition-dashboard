@@ -16,7 +16,6 @@ class EntityBulkUpload extends Page {
   static get isEnabled() {
     return config.features.entityData;
   }
-
   get url() {
     return paths.dataEntryEntity.bulkUpload;
   }
