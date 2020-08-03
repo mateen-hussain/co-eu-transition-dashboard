@@ -1,0 +1,180 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+  {% include "feedback.njk" %}
+{% endblock %}
+
+{% block pageTitle %}Import data{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+<div class="govuk-grid-column-full">
+
+{% if errors | length %}
+  <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+    <h1 class="govuk-heading-xl">Upload failed
+      <span class="govuk-caption-xl">No data has been uploaded</span>
+    </h1>
+    <h2 class="govuk-error-summary__title" id="error-summary-title">
+     {{ flash if flash else 'Please fix the errors detailed below and then re-upload the file' }}
+    </h2>
+    <div class="govuk-error-summary__body">
+      <ul class="govuk-list govuk-error-summary__list">
+      {% if errors.entityErrors or errors.entityColumnErrors %}
+        <li>
+          <a href="#project-error">{{ errors.entityErrors | length + errors.entityColumnErrors | length }} data errors found</a>
+        </li>
+       {% endif %}
+      </ul>
+    </div>
+  </div>
+
+{% if errors.sheetErrors %}
+  <h3 class="govuk-heading-m" id="excel-sheet-error">Excel sheet errors</h3>
+    <ul class="govuk-list">
+    {% for error in errors.sheetErrors %}
+      <li>{{ error.error }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if errors.entityErrors or errors.entityColumnErrors %}
+  <h3 class="govuk-heading-m" id="project-error">Import errors</h3>
+
+  {{ govukDetails({
+    summaryText: "Where do I fix project errors?",
+    html: "<p class='govuk-body'>To fix the data errors you will need to open the spreadsheet you have tried to upload and fix the issues.</p>"
+  }) }}
+
+  {% if errors.entityColumnErrors %}
+    <h4 class="govuk-heading-s">Column errors:</h4>
+    <ul class="govuk-list">
+      {% for error in errors.entityColumnErrors %}
+        <li>{{ error.error }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if errors.entityErrors %}
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Public ID</th>
+        <th scope="col" class="govuk-table__header">Column Name</th>
+        <th scope="col" class="govuk-table__header">Value</th>
+        <th scope="col" class="govuk-table__header">Error</th>
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+      {% for error in errors.entityErrors %}
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell">{{ error.item.publicId }}</td>
+        <td class="govuk-table__cell">{{ error.itemDefinition.displayName }}</td>
+        <td class="govuk-table__cell">{{ error.item[error.itemDefinition.name] }}</td>
+        <td class="govuk-table__cell">{{ error.error }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+{% endif %}
+
+  <form action='{{ url }}' method='POST'>
+    <input type="hidden" name="importId" value="{{ importId }}" />
+    {{ govukButton({
+    text: "Upload new file",
+    name: "cancel",
+    value: "cancel",
+    type: "submit",
+    preventDoubleClick: true
+    }) }}
+  </form>
+
+{% else %}
+
+<h1 class="govuk-heading-xl">Please check your data</h1>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <p class="govuk-body">Please check that the data in your file corresponds the items
+    successfully uploaded to the dashboard.</p>
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-third validate-data">
+    <h2 class="govuk-heading-l validate-number">{{ entities | length }}</h2>
+    <p class="govuk-body-s">Items uploaded</p>
+  </div>
+</div>
+
+<form action="{{ url }}" method="post">
+<input type="hidden" name="importId" value="{{ importId }}" />
+
+{{ govukButton({
+  text: "Add data to dashboard",
+  name: "import",
+  value: "import",
+  type: "submit",
+  preventDoubleClick: true
+}) }}
+<br>
+{{ govukButton({
+  text: "Cancel upload",
+  value: "cancel",
+  name: "cancel",
+  type: "submit",
+  classes: "govuk-button--secondary",
+  preventDoubleClick: true
+}) }}
+
+</form>
+
+{{ govukDetails({
+  summaryText: "The data uploaded is not what I was expecting",
+  html: "<p class='govuk-body'>If the number of items uploaded don't correspond to the number in the
+  file you uploaded, please log the issue here.</p>
+  <a class='govuk-link' href='mailto:ttf-portfoliodashboard@cabinetoffice.gov.uk'>ttf-portfoliodashboard@cabinetoffice.gov.uk</a>"
+}) }}
+
+<table class="govuk-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      {% for item in categoryFields %}
+        <th scope="col" class="govuk-table__header">{{ item.displayName }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    {% for entity in entities %}
+      <tr class="govuk-table__row">
+        {% for item in categoryFields %}
+          {% if (item.name == 'id') and (not entity[item.name]) %}
+            <td class="govuk-table__cell">Auto generated</td>
+          {% else %}
+            <td class="govuk-table__cell">{{ entity[item.name] }}</td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endif %}
+
+</div>
+</div>
+
+{% endblock %}
+
+
+
+

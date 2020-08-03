@@ -1,0 +1,31 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{% include "feedback.njk" %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endblock %}
+
+{% block pageTitle %}Bulk upload{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+
+  {% include "data-entry-entity/bulk-upload/partials/" + mode + ".njk" %}
+
+</div>
+
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.disableButton();
+  </script>
+{% endblock %}

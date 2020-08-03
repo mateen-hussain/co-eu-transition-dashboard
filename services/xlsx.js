@@ -102,10 +102,35 @@ const parse = buffer => {
     });
 };
 
+const parseEntities = buffer => {
+  const excelDocument = xlsx.read(buffer, { cellDates: true });
+
+  return Object.keys(excelDocument.Sheets)
+    // .filter(sheetName => Object.keys(expectedSheets).includes(sheetName))
+    .map(name => {
+      const sheet = excelDocument.Sheets[name];
+      // const range = getRange(sheet);
+
+      let data = xlsx.utils.sheet_to_json(sheet, {
+        raw: true,
+        defval: '',
+        // range,
+        blankrows: false
+      });
+
+      return {
+        name,
+        data: cleanData(data)
+      };
+    });
+};
+
+
 module.exports = {
   parse,
   getRange,
   removeSubHeaderRows,
   getFirstHeaderCell,
-  getLastCellWithData
+  getLastCellWithData,
+  parseEntities
 };

@@ -49,8 +49,10 @@ class Import extends Page {
   }
 
   validateItems(items, parsedItems, fields) {
-    const requiredColumns = fields.map(field => field['importColumnName']);
-    const columnErrors = validation.validateColumns(Object.keys(items[0]), requiredColumns);
+    const requiredColumns = fields.filter(field => field.isRequired).map(field => field['importColumnName']);
+    const allowedColumns = fields.map(field => field['importColumnName']);
+
+    const columnErrors = validation.validateColumns(Object.keys(items[0]), requiredColumns, allowedColumns);
 
     const itemErrors = validation.validateItems(parsedItems, fields);
 
@@ -139,7 +141,8 @@ class Import extends Page {
     const activeImport = await BulkImport.findOne({
       where: {
         userId: this.req.user.id,
-        id: importId
+        id: importId,
+        category: 'data-entry-old'
       },
       raw: true
     });
@@ -168,7 +171,8 @@ class Import extends Page {
     await BulkImport.destroy({
       where: {
         userId: this.req.user.id,
-        id: importId
+        id: importId,
+        category: 'data-entry-old'
       }
     });
   }
@@ -194,7 +198,8 @@ class Import extends Page {
   async getRequest(req, res) {
     const activeImport = await BulkImport.findOne({
       where: {
-        userId: req.user.id
+        userId: req.user.id,
+        category: 'data-entry-old'
       },
       raw: true
     });

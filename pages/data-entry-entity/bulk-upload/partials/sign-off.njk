@@ -1,0 +1,38 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+<div class="govuk-grid-column-two-thirds">
+
+<h1 class="govuk-heading-xl">Has this file been signed off?</h1>
+
+<p class="govuk-body">Your file must be signed off by the Senior Reporting Officer before it can be uploaded.<p>
+
+<p class="govuk-body">Your file must match the template of the category you are importing. If your file does not match this template, the upload function will not work. <p>
+
+<br><br>
+
+{{ govukRadios({
+  idPrefix: "sign-off",
+  name: "sign-off",
+  items: [
+    {
+      value: "yes",
+      text: "Yes",
+      checked: true
+    },
+    {
+      value: "no",
+      text: "No"
+    }
+  ]
+}) }}
+
+{{ govukButton({
+  classes: "continueBtn",
+  text: "Continue",
+  href: config.paths.dataEntryEntity.bulkUploadFile
+}) }}
+
+</div>
+

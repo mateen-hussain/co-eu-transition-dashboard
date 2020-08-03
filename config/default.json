@@ -52,6 +52,14 @@
       "import": "/import",
       "submissionSuccess": "/submission-success"
     },
+    "dataEntryEntity": {
+      "bulkUpload": "/bulk-upload-entity",
+      "bulkUploadEntity": "/bulk-upload-entity/entity",
+      "bulkUploadSignOff": "/bulk-upload-entity/sign-off",
+      "bulkUploadFile": "/bulk-upload-entity/upload-file",
+      "import": "/import-entity",
+      "submissionSuccess": "/entity-submission-success"
+    },
     "editMilestone": "/edit-milestone",
     "reportingOverview": "/reporting-overview"
   },

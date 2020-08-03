@@ -1,7 +1,35 @@
 const { Model, INTEGER, TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
+const EntityFieldEntryAudit = require('./entityFieldEntryAudit');
 
-class EntityFieldEntry extends Model {}
+class EntityFieldEntry extends Model {
+  static async import(entityFieldEntry, options) {
+    if (entityFieldEntry.value === undefined) {
+      return;
+    }
+
+    await this.createAuditTrail(entityFieldEntry, options);
+
+    await this.upsert(entityFieldEntry, options);
+  }
+
+  static async createAuditTrail(entityFieldEntry, options) {
+    const existingField = await EntityFieldEntry.findOne({
+      where: {
+        entityId: entityFieldEntry.entityId,
+        categoryFieldId: entityFieldEntry.categoryFieldId
+      }
+    });
+
+    if (existingField && String(existingField.value) === String(entityFieldEntry.value)) {
+      return;
+    }
+
+    if (existingField) {
+      await EntityFieldEntryAudit.create(existingField.toJSON(), options);
+    }
+  }
+}
 
 EntityFieldEntry.init({
   entityId: {

@@ -39,7 +39,7 @@ const parseValue = (value, definition = {}) => {
 const parseItems = (items, itemDefinitions) => {
   const parseItem = item => {
     const parsed = itemDefinitions.reduce((parsedItem, itemDefinition) => {
-      const value = item[itemDefinition.importColumnName];
+      const value = item[itemDefinition.importColumnName || itemDefinition.displayName];
       parsedItem[itemDefinition.name] = parseValue(value, itemDefinition);
       return parsedItem;
     }, {});

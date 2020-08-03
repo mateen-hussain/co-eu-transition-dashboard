@@ -4,7 +4,62 @@ const CategoryParent = require('./categoryParent');
 const CategoryField = require('./categoryField');
 const Entity = require('./entity');
 
-class Category extends Model {}
+class Category extends Model {
+  static async fieldDefintions(categoryName) {
+    const category = await Category.findOne({
+      where: { name: categoryName },
+      include: {
+        model: Category,
+        as: 'parents'
+      }
+    });
+
+    if(!category) {
+      throw new Error('Unkown category');
+    }
+
+    const fields = [{
+      name: 'publicId',
+      type: 'string',
+      isUnique: true,
+      displayName: 'Public ID',
+      isActive: true
+    }];
+
+    if(category.parents.length) {
+      const parentEntities = await Entity.findAll({
+        attributes: ['publicId'],
+        include: {
+          attributes: [],
+          model: Category,
+          required: true,
+          where: { id: category.parents.map(parent => parent.id ) }
+        }
+      });
+
+      fields.push({
+        name: 'parentPublicId',
+        type: 'group',
+        displayName: 'Parent Public ID',
+        isActive: true,
+        config: { options: parentEntities.map(parentEntity => parentEntity.publicId) }
+      })
+    }
+
+    const categoryFields = await CategoryField.findAll({
+      include: {
+        attributes: [],
+        model: Category,
+        where: { name: categoryName },
+        required: true
+      },
+      where: { isActive: true },
+      raw: true
+    });
+
+    return [...fields, ...categoryFields];
+  }
+}
 
 Category.init({
   id: {
