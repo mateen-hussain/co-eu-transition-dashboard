@@ -15,7 +15,7 @@ let req = {};
 describe('pages/edit-project/EditProject', () => {
   beforeEach(() => {
     res = { redirect: sinon.stub(), render: sinon.stub() };
-    req = { user: { getProjects: sinon.stub(), getProjectMilestone: sinon.stub() }, flash: sinon.stub(), originalUrl: 'originalUrl' };
+    req = { user: { getProject: sinon.stub(), getProjects: sinon.stub() }, flash: sinon.stub(), originalUrl: 'originalUrl' };
 
     page = new EditProject('some path', res, req);
 
