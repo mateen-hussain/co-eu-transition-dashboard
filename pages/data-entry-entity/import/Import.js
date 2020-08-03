@@ -15,6 +15,10 @@ const Category = require('models/category');
 const { Op } = require('sequelize');
 
 class Import extends Page {
+  static get isEnabled() {
+    return config.features.entityData;
+  }
+
   get url() {
     return paths.dataEntryEntity.import;
   }

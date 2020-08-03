@@ -10,8 +10,13 @@ const uuid = require('uuid');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const logger = require('services/logger');
 const { Op } = require('sequelize');
+const config = require('config');
 
 class BulkUpload extends Page {
+  static get isEnabled() {
+    return config.features.entityData;
+  }
+
   get url() {
     return paths.dataEntryEntity.bulkUpload;
   }

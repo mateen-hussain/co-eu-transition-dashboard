@@ -1,8 +1,13 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const Entity = require('models/entity');
+const config = require('config');
 
 class Output extends Page {
+  static get isEnabled() {
+    return config.features.entityData;
+  }
+
   get url() {
     return paths.dataEntryEntity.output;
   }
