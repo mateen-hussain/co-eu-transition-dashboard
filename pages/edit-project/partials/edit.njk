@@ -9,7 +9,10 @@
 
 <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl">Edit project details</h1>
+  <h1 class="govuk-heading-xl">
+    <span class="govuk-caption-xl">{{ data.uid }}</span>
+    Edit project details
+  </h1>
 
   {% if flash %}
     {{ govukErrorSummary({
