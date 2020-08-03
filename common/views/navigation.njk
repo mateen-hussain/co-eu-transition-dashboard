@@ -1,52 +1,68 @@
+{% set managementInformationUrls = [
+    config.paths.reportingOverview,
+    config.paths.allData,
+    config.paths.missedMilestones,
+    config.paths.upcomingMilestones
+    ] 
+%}
+
+{% set addDataUrls = [
+    config.paths.dataEntry.bulkUpload,
+    config.paths.dataEntry.bulkUploadProjectMilestone,
+    config.paths.dataEntry.submissionSuccess,
+    config.paths.editMilestone
+    ] 
+%}
+
+{% set adminUrls = [
+    config.paths.admin.projectFieldList,
+    config.paths.admin.projectField
+    ] 
+%}
+
 <nav class="navigation">
-    <ul id="navigation" class="govuk-header__navigation " aria-label="Top Level Navigation">
-    <li class="govuk-header__navigation-item {% if url == config.paths.allData %} govuk-header__navigation-item--active {% endif %}">
-        <a class="govuk-header__link nav" href="{{ config.paths.allData }}">
-        All data
-        </a>
-    </li>
-    {% if req.user.hasViewAllPermissions %}
-    <li class="govuk-header__navigation-item {% if (url == config.paths.reportingOverview) %} govuk-header__navigation-item--active {% endif %}">
-        <a class="govuk-header__link nav" href="{{ config.paths.reportingOverview }}">
-        Reporting overview
-        </a>
-    </li>
-    {% endif %}
-    <li class="govuk-header__navigation-item {% if (url == config.paths.missedMilestones) or (url == config.paths.upcomingMilestones) %} govuk-header__navigation-item--active {% endif %}">
-        {% if config.features.missedMilestones %}
-        <a class="govuk-header__link nav" href="{{ config.paths.missedMilestones }}">Milestones</a>
-        {% else %}
-        <a class="govuk-header__link nav" href="{{ config.paths.upcomingMilestones }}">Milestones</a>
-        {% endif %}
+    <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in managementInformationUrls }}">
+        <a class="govuk-header__link nav" href="{{ config.paths.allData }}">Management information</a>
     </li>
     {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
-    <li class="govuk-header__navigation-item {% if (url == config.paths.dataEntry.bulkUploadProjectMilestone) or (url == config.paths.dataEntry.submissionSuccess) or (url == config.paths.editMilestone) %} govuk-header__navigation-item--active {% endif %}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addDataUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
         </a>
     </li>
     {% endif %}
     {% if req.user.role == 'administrator' %}
-    <li class="govuk-header__navigation-item {% if (url == config.paths.admin.projectFieldList) or (url == config.paths.admin.projectField) %} govuk-header__navigation-item--active {% endif %}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in adminUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.admin.projectFieldList }}">
-        Manage data input
+        Admin
         </a>
     </li>
     {% endif %}
     </ul>
 </nav>
 
-{% if (url == config.paths.missedMilestones) or (url == config.paths.upcomingMilestones) %}
+{% if url in managementInformationUrls %}
 <nav class="child-navigation">
-    <ul id="childNavigation" class="govuk-header__navigation " aria-label="Second Level Navigation">
-    {% if config.features.missedMilestones %}
-        <li class="govuk-header__navigation-item child-item {% if url == config.paths.missedMilestones %} govuk-header__navigation-item--active {% endif %}">
-        <a class="govuk-header__link child-nav" href="{{ config.paths.missedMilestones }}">
-            Missed milestones
+    <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
+    {% if req.user.hasViewAllPermissions %}
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.reportingOverview }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.reportingOverview }}">
+        Reporting overview
         </a>
-        </li>
+    </li>
     {% endif %}
-    <li class="govuk-header__navigation-item child-item {% if url == config.paths.upcomingMilestones %} govuk-header__navigation-item--active {% endif %}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.allData }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.allData }}">
+        All data
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.missedMilestones }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.missedMilestones }}">
+        Missed milestones
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.upcomingMilestones }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.upcomingMilestones }}">
         Upcoming milestones
         </a>
@@ -55,12 +71,24 @@
 </nav>
 {% endif %}
 
-{% if (url == config.paths.admin.projectFieldList) or (url == config.paths.admin.projectField) %}
+{% if url in addDataUrls %}
 <nav class="child-navigation">
-    <ul id="childNavigation" class="govuk-header__navigation " aria-label="Second Level Navigation">
+    <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
+    <li class="govuk-header__navigation-item child-item govuk-header__navigation-item--active">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
+        Management information
+        </a>
+    </li>
+    </ul>
+</nav>
+{% endif %}
+
+{% if url in adminUrls %}
+<nav class="child-navigation">
+    <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
     <li class="govuk-header__navigation-item child-item govuk-header__navigation-item--active">
         <a class="govuk-header__link child-nav" href="{{ config.paths.admin.projectFieldList }}">
-        Project data
+        MI Data structure
         </a>
     </li>
     </ul>
