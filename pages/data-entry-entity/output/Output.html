@@ -1,0 +1,25 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+{% include "feedback.njk" %}
+{% endblock %}
+
+{% block pageTitle %}Output{% endblock %}
+
+{% block content %}
+
+  {% for entity in output() | await %}
+    {{ entity.publicId }}<br>
+    =============<br>
+    {% for entityChild in entity.children %}
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-> {{ entityChild.publicId }}<br>
+      {% for entityChildChild in entityChild.children %}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--> {{ entityChildChild.publicId }}<br>
+      {% endfor %}
+    {% endfor %}
+    <br><br><br>
+  {% endfor %}
+
+{% endblock %}
+
