@@ -9,6 +9,7 @@ const moment = require('moment');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
 const FieldEntryGroup = require('models/fieldEntryGroup');
+const { transformDeliveryConfidenceValue } = require('helpers/display');
 
 class EditProject extends Page {
   get url() {
@@ -142,19 +143,8 @@ class EditProject extends Page {
   }
 
   transformDeliveryConfidenceValue(value) {
-    switch(value) {
-    case 3:
-      return `${value} - High confidence`;
-    case 2:
-      return `${value} - Medium confidence`;
-    case 1:
-      return `${value} - Low confidence`;
-    case 0:
-      return `${value} - Very low confidence`;
-    default:
-      return `No level given`;
-    }
-  }
+    return transformDeliveryConfidenceValue(value);
+  };
 
   async getProject() {
     return await this.req.user.getProject(this.req.params.uid);

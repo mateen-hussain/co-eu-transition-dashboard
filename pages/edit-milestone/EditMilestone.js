@@ -8,6 +8,7 @@ const validation = require('helpers/validation');
 const moment = require('moment');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
+const { transformDeliveryConfidenceValue } = require('helpers/display');
 
 class EditMilestone extends Page {
   get url() {
@@ -160,19 +161,8 @@ class EditMilestone extends Page {
   }
 
   transformDeliveryConfidenceValue(value) {
-    switch(value) {
-    case 3:
-      return `${value} - High confidence`;
-    case 2:
-      return `${value} - Medium confidence`;
-    case 1:
-      return `${value} - Low confidence`;
-    case 0:
-      return `${value} - Very low confidence`;
-    default:
-      return `No level given`;
-    }
-  }
+    return transformDeliveryConfidenceValue(value);
+  };
 
   async getProjectMilestone() {
     return await this.req.user.getProjectMilestone(this.req.params.uid);
