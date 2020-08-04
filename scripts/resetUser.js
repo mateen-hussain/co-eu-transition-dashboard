@@ -7,6 +7,7 @@ const DepartmentUser = require("models/departmentUser");
 const NotifyClient = require('notifications-node-client').NotifyClient;
 const randomString = require('randomstring');
 const getopts = require('getopts');
+const sequelize = require('services/sequelize');
 
 const options = getopts(process.argv.slice(2), {
   default: {
@@ -53,6 +54,7 @@ authentication.hashPassphrase(passphrase).then( (hashedPassphrase) => {
       } else {
         console.log(`User ${email} reset with password ${passphrase}`);
       }
+      sequelize.close();
     });
   }).catch( (err) => {
     console.log(`Could not create user [${err}]`);
