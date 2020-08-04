@@ -4,6 +4,7 @@ const EntityParent = require('./entityParent');
 const EntityFieldEntry = require('./entityFieldEntry');
 const EntityFieldEntryAudit = require('./entityFieldEntryAudit');
 const pick = require('lodash/pick');
+const sprintf = require('sprintf-js').sprintf;
 
 class Entity extends Model {
   static async import(entity, category, entityFields, options) {
@@ -25,6 +26,8 @@ class Entity extends Model {
       if(entityModel) {
         entity.id = entityModel.id;
       }
+    } else {
+      entity.publicId = entityToUpsert.publicId = await this.nextPublicId(category, options);
     }
 
     // if no id then its a new entity
@@ -39,7 +42,7 @@ class Entity extends Model {
         where: {
           publicId: entity.parentPublicId
         }
-      });
+      }, options);
 
       // currently no way to support multiple parents through excel import to remove previous parent
       if (parent) {
@@ -79,6 +82,27 @@ class Entity extends Model {
     for (const entityFieldEntry of entityFieldEntries) {
       await EntityFieldEntry.import(entityFieldEntry, options);
     }
+  }
+
+  static async nextPublicId(category, { transaction } = {}) {
+    const options = {
+      model: Entity,
+      mapToModel: true
+    };
+
+    if (transaction) {
+      options.transaction = transaction;
+      options.lock = transaction.LOCK
+    }
+
+    const entities = await sequelize.query(`SELECT public_id FROM entity WHERE category_id=${category.id} ORDER BY public_id DESC LIMIT 1 FOR UPDATE`, options);
+
+    if(!entities || !entities.length) {
+      return `${category.publicIdFormat}01`;
+    }
+
+    const current = parseInt(entities[0].publicId.split('-')[1]);
+    return sprintf("%s%02d", category.publicIdFormat, current+1);
   }
 }
 

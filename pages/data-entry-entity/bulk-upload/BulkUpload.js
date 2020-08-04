@@ -12,7 +12,7 @@ const logger = require('services/logger');
 const { Op } = require('sequelize');
 const config = require('config');
 
-class BulkUpload extends Page {
+class EntityBulkUpload extends Page {
   static get isEnabled() {
     return config.features.entityData;
   }
@@ -23,7 +23,7 @@ class BulkUpload extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['administrator']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -35,7 +35,7 @@ class BulkUpload extends Page {
     return categories.map(category => {
       return {
         value: category.name,
-        text: category.name.charAt(0).toUpperCase() + category.name.slice(1)
+        text: category.name
       };
     });
   }
@@ -110,5 +110,5 @@ class BulkUpload extends Page {
 }
 
 
-module.exports = BulkUpload;
+module.exports = EntityBulkUpload;
 

@@ -3,7 +3,7 @@ const { paths } = require('config');
 const authentication = require('services/authentication');
 const config = require('config');
 
-class SubmissionSuccess extends Page {
+class EntitySubmissionSuccess extends Page {
   static get isEnabled() {
     return config.features.entityData;
   }
@@ -14,9 +14,9 @@ class SubmissionSuccess extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator'])
+      ...authentication.protect(['administrator'])
     ];
   }
 }
 
-module.exports = SubmissionSuccess;
+module.exports = EntitySubmissionSuccess;

@@ -66,7 +66,11 @@ Category.init({
     type: INTEGER,
     primaryKey: true
   },
-  name: STRING(45)
+  name: STRING(45),
+  publicIdFormat: {
+    type: STRING(50),
+    field: "public_id_format"
+  }
 }, { sequelize, modelName: 'category', tableName: 'category', timestamps: false });
 
 Category.hasMany(CategoryField, { foreignKey: 'categoryId' });

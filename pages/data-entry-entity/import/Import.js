@@ -14,7 +14,7 @@ const Entity = require('models/entity');
 const Category = require('models/category');
 const { Op } = require('sequelize');
 
-class Import extends Page {
+class EntityImport extends Page {
   static get isEnabled() {
     return config.features.entityData;
   }
@@ -25,7 +25,7 @@ class Import extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['administrator']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -184,4 +184,4 @@ class Import extends Page {
   }
 }
 
-module.exports = Import;
+module.exports = EntityImport;

@@ -103,7 +103,7 @@ const validateItems = (items, itemDefinitions) => {
   return items.reduce(validateItem, []);
 };
 
-const validateColumns = (columnsRecieved, requiredColumns, allowedColumns) => {
+const validateColumns = (columnsRecieved = [], requiredColumns = [], allowedColumns = []) => {
   const errors = [];
 
   requiredColumns.forEach(requiredColumn => {

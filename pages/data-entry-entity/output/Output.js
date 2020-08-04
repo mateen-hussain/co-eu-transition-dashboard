@@ -2,8 +2,9 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const Entity = require('models/entity');
 const config = require('config');
+const authentication = require('services/authentication');
 
-class Output extends Page {
+class EntityOutput extends Page {
   static get isEnabled() {
     return config.features.entityData;
   }
@@ -12,9 +13,10 @@ class Output extends Page {
     return paths.dataEntryEntity.output;
   }
 
-  // privacy-notice page does not require user authentication
   get middleware() {
-    return [];
+    return [
+      ...authentication.protect(['administrator'])
+    ];
   }
 
   async output() {
@@ -25,11 +27,15 @@ class Output extends Page {
         as: 'children',
         include: {
           model: Entity,
-          as: 'children'
+          as: 'children',
+          include: {
+            model: Entity,
+            as: 'children'
+          }
         }
       }
     })
   }
 }
 
-module.exports = Output;
+module.exports = EntityOutput;

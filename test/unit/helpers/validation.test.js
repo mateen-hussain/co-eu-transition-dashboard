@@ -116,17 +116,23 @@ describe('helpers/validation', () => {
     const requiredColumns = ['col1', 'col2', 'col3'];
     it('should not return any errors if columns are valid', () => {
       const columnsRecieved = ['col1', 'col2', 'col3'];
-      expect(validation.validateColumns(columnsRecieved, requiredColumns)).to.eql([]);
+      expect(validation.validateColumns(columnsRecieved, requiredColumns, requiredColumns)).to.eql([]);
     });
 
     it('should return errors if a coloumn is missing', () => {
       const columnsRecieved = ['col1', 'col2'];
-      expect(validation.validateColumns(columnsRecieved, requiredColumns)).to.eql([{ error: '"col3" column is missing from the spreadsheet.' }]);
+      expect(validation.validateColumns(columnsRecieved, requiredColumns, requiredColumns)).to.eql([{ error: '"col3" column is missing from the spreadsheet.' }]);
     });
 
     it('should return errors if an extra coloumn is present', () => {
       const columnsRecieved = ['col1', 'col2', 'col3', 'col4'];
-      expect(validation.validateColumns(columnsRecieved, requiredColumns)).to.eql([{ error: '"col4" column is not recognised as a valid column, please either remove or rename.' }]);
+      expect(validation.validateColumns(columnsRecieved, requiredColumns, requiredColumns)).to.eql([{ error: '"col4" column is not recognised as a valid column, please either remove or rename.' }]);
+    });
+
+    it('should not return errors if col4 is allowed', () => {
+      const columnsRecieved = ['col1', 'col2', 'col3', 'col4'];
+      const allowedColumns = ['col1', 'col2', 'col3', 'col4'];
+      expect(validation.validateColumns(columnsRecieved, requiredColumns, allowedColumns)).to.eql([]);
     });
   });
 

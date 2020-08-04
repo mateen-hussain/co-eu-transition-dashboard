@@ -2,7 +2,7 @@ const { services } = require('config');
 const logger = require('services/logger');
 const Sequelize = require('sequelize');
 
-const categories = ['themes', 'statements', 'measures', 'communications', 'projects', 'milestones'];
+const categories = ['Theme', 'Statement', 'Measure', 'Communication', 'Project', 'Milestone'];
 
 const up = async (query) => {
   await query.createTable('category', {
@@ -14,11 +14,17 @@ const up = async (query) => {
     name: {
       type: Sequelize.DataTypes.STRING(50),
       allowNull: false
+    },
+    public_id_format: {
+      type: Sequelize.DataTypes.STRING(50)
     }
   }, { charset: services.mysql.charset });
 
   query.bulkInsert('category', categories.map(category => {
-    return { name: category };
+    return {
+      name: category,
+      public_id_format: `${category.toLowerCase()}-`
+    };
   }));
 
   await query.createTable('category_field', {
@@ -131,7 +137,7 @@ const up = async (query) => {
     parent_category_id: 2
   },{
     category_id: 6,
-    parent_category_id: 2
+    parent_category_id: 5
   }]);
 
   await query.createTable('entity', {
@@ -325,4 +331,3 @@ module.exports = {
   },
   down
 };
-

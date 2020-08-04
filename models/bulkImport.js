@@ -1,4 +1,4 @@
-const { Model, INTEGER, DATE, JSON, STRING } = require('sequelize');
+const { Model, INTEGER, JSON, STRING } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class BulkImport extends Model {}

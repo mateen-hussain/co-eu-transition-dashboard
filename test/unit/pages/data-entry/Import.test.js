@@ -116,7 +116,7 @@ describe('pages/data-entry/import/Import', () => {
     it('validates each item parsed', () => {
       const items = [{ id: 1 }, { id: 2 }];
       const parsedItems = [{ foo: 'bar' }];
-      const fields = [{ importColumnName: 'some name' }];
+      const fields = [{ importColumnName: 'some name', isRequired: true }];
 
       validation.validateColumns.returns('validation.validateColumns');
       validation.validateItems.returns('validation.validateItems');
@@ -125,7 +125,7 @@ describe('pages/data-entry/import/Import', () => {
 
       expect(response).to.eql(['validation.validateColumns', 'validation.validateItems']);
 
-      sinon.assert.calledWith(validation.validateColumns, Object.keys(items[0]), [fields[0].importColumnName]);
+      sinon.assert.calledWith(validation.validateColumns, Object.keys(items[0]), [fields[0].importColumnName], [fields[0].importColumnName]);
       sinon.assert.calledWith(validation.validateItems, parsedItems, fields);
     });
   });
@@ -283,7 +283,8 @@ describe('pages/data-entry/import/Import', () => {
       sinon.assert.calledWith(BulkImport.destroy, {
         where: {
           userId: page.req.user.id,
-          id: 1
+          id: 1,
+          category: "data-entry-old"
         }
       });
     });

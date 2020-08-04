@@ -157,7 +157,7 @@
     {% for entity in entities %}
       <tr class="govuk-table__row">
         {% for item in categoryFields %}
-          {% if (item.name == 'id') and (not entity[item.name]) %}
+          {% if (item.name == 'publicId') and (not entity[item.name]) %}
             <td class="govuk-table__cell">Auto generated</td>
           {% else %}
             <td class="govuk-table__cell">{{ entity[item.name] }}</td>
