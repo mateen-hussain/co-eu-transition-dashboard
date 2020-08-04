@@ -144,7 +144,7 @@ class EditProject extends Page {
 
   transformDeliveryConfidenceValue(value) {
     return transformDeliveryConfidenceValue(value);
-  };
+  }
 
   async getProject() {
     return await this.req.user.getProject(this.req.params.uid);

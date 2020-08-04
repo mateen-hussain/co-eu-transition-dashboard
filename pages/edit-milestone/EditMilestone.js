@@ -162,7 +162,7 @@ class EditMilestone extends Page {
 
   transformDeliveryConfidenceValue(value) {
     return transformDeliveryConfidenceValue(value);
-  };
+  }
 
   async getProjectMilestone() {
     return await this.req.user.getProjectMilestone(this.req.params.uid);
