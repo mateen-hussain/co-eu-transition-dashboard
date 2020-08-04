@@ -3,21 +3,31 @@
     config.paths.allData,
     config.paths.missedMilestones,
     config.paths.upcomingMilestones
-    ] 
+    ]
 %}
 
-{% set addDataUrls = [
+{% set addProjectMilestonesUrls = [
     config.paths.dataEntry.bulkUpload,
     config.paths.dataEntry.bulkUploadProjectMilestone,
     config.paths.dataEntry.submissionSuccess,
     config.paths.editMilestone
-    ] 
+    ]
+%}
+
+{% set addEntitiesUrls = [
+    config.paths.dataEntryEntity.bulkUpload,
+    config.paths.dataEntryEntity.bulkUploadEntity,
+    config.paths.dataEntryEntity.bulkUploadSignOff,
+    config.paths.dataEntryEntity.bulkUploadFile,
+    config.paths.dataEntryEntity.import,
+    config.paths.dataEntryEntity.submissionSuccess
+    ]
 %}
 
 {% set adminUrls = [
     config.paths.admin.projectFieldList,
     config.paths.admin.projectField
-    ] 
+    ]
 %}
 
 <nav class="navigation">
@@ -26,7 +36,7 @@
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">Management information</a>
     </li>
     {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
-    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addDataUrls }}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
         </a>
@@ -71,14 +81,26 @@
 </nav>
 {% endif %}
 
-{% if url in addDataUrls %}
+{% if url in addProjectMilestonesUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output %}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
-    <li class="govuk-header__navigation-item child-item govuk-header__navigation-item--active">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Management information
         </a>
     </li>
+    {% if config.features.entityData %}
+        <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
+            <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
+                Entity Data Import
+            </a>
+        </li>
+        <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.dataEntryEntity.output }}">
+            <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.output }}">
+                Entity Data Preview
+            </a>
+        </li>
+    {% endif %}
     </ul>
 </nav>
 {% endif %}
