@@ -1,5 +1,5 @@
 const { expect, sinon } = require('test/unit/util/chai');
-const { paths } = require('config');
+const config = require('config');
 const authentication = require('services/authentication');
 const proxyquire = require('proxyquire');
 const flash = require('middleware/flash');
@@ -33,8 +33,35 @@ describe('pages/data-entry-entity/entity-bulk-upload/EntityBulkUpload', () => {
     authentication.protect.restore();
   });
 
+  describe('#isEnabled', () => {
+    let sandbox = {};
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('should be enabled if entityData feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        entityData: true
+      });
+
+      expect(EntityBulkUpload.isEnabled).to.be.ok;
+    });
+
+    it('should be enabled if missedMilestones feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        entityData: false
+      });
+
+      expect(EntityBulkUpload.isEnabled).to.not.be.ok;
+    })
+  });
+
   it('returns correct url', () => {
-    expect(page.url).to.eql(paths.dataEntryEntity.bulkUpload);
+    expect(page.url).to.eql(config.paths.dataEntryEntity.bulkUpload);
   });
 
   it('only admins are alowed to access this page', () => {
@@ -72,7 +99,7 @@ describe('pages/data-entry-entity/entity-bulk-upload/EntityBulkUpload', () => {
 
     it('redirects back to upload page if no file provided', async () => {
       await page.postRequest(req, res);
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.bulkUpload);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.bulkUpload);
     });
 
     it('calls import data function if file provided', async () => {

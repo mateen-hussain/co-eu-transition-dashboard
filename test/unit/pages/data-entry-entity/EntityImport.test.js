@@ -1,5 +1,5 @@
 const { expect, sinon } = require('test/unit/util/chai');
-const { paths } = require('config');
+const config = require('config');
 const authentication = require('services/authentication');
 const proxyquire = require('proxyquire');
 const flash = require('middleware/flash');
@@ -49,9 +49,36 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
     parse.parseItems.restore();
   });
 
+  describe('#isEnabled', () => {
+    let sandbox = {};
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('should be enabled if entityData feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        entityData: true
+      });
+
+      expect(EntityImport.isEnabled).to.be.ok;
+    });
+
+    it('should be enabled if missedMilestones feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        entityData: false
+      });
+
+      expect(EntityImport.isEnabled).to.not.be.ok;
+    })
+  });
+
   describe('#url', () => {
     it('returns correct url', () => {
-      expect(page.url).to.eql(paths.dataEntryEntity.import);
+      expect(page.url).to.eql(config.paths.dataEntryEntity.import);
     });
   });
 
@@ -178,7 +205,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
 
       await page.finaliseImport();
 
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.bulkUploadFile);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.bulkUploadFile);
     });
 
     it('redirects if any errors found when validating import', async () => {
@@ -189,7 +216,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
 
       await page.finaliseImport();
 
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.import);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.import);
     });
 
     it('redirects with flash if import failed', async () => {
@@ -204,7 +231,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
       await page.finaliseImport();
 
       sinon.assert.calledWith(page.req.flash, 'Failed to import data');
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.import);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.import);
     });
 
     it('redirects to submission success on good import', async () => {
@@ -217,7 +244,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
 
       await page.finaliseImport();
 
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.submissionSuccess);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.submissionSuccess);
     });
   });
 
@@ -243,7 +270,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
       await page.cancelImport();
 
       sinon.assert.called(page.removeTemporaryBulkImport);
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.bulkUploadFile);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.bulkUploadFile);
     });
   });
 
@@ -269,7 +296,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
 
       await page.getRequest(req, res);
 
-      sinon.assert.calledWith(page.res.redirect, paths.dataEntryEntity.bulkUploadFile);
+      sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.bulkUploadFile);
     });
 
     it('validates upload and renders page', async () => {

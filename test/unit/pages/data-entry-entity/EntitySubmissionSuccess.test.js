@@ -1,13 +1,14 @@
 const { expect, sinon } = require('test/unit/util/chai');
-const { paths } = require('config');
+const config = require('config');
 const jwt = require('services/jwt');
 const authentication = require('services/authentication');
 
 let page = {};
+let EntitySubmissionSuccess;
 
 describe('pages/data-entry-entity/entity-submission-success/EntitySubmissionSuccess', () => {
   beforeEach(() => {
-    const EntitySubmissionSuccess = require('pages/data-entry-entity/entity-submission-success/EntitySubmissionSuccess');
+    EntitySubmissionSuccess = require('pages/data-entry-entity/entity-submission-success/EntitySubmissionSuccess');
 
     const res = { cookies: sinon.stub() };
 
@@ -25,6 +26,33 @@ describe('pages/data-entry-entity/entity-submission-success/EntitySubmissionSucc
     authentication.protect.restore();
   });
 
+  describe('#isEnabled', () => {
+    let sandbox = {};
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('should be enabled if entityData feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        entityData: true
+      });
+
+      expect(EntitySubmissionSuccess.isEnabled).to.be.ok;
+    });
+
+    it('should be enabled if missedMilestones feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        entityData: false
+      });
+
+      expect(EntitySubmissionSuccess.isEnabled).to.not.be.ok;
+    })
+  });
+
   it('only admins are alowed to access this page', () => {
     expect(page.middleware).to.eql([
       ...authentication.protect(['administrator'])
@@ -35,7 +63,7 @@ describe('pages/data-entry-entity/entity-submission-success/EntitySubmissionSucc
 
   describe('#url', () => {
     it('returns correct url', () => {
-      expect(page.url).to.eql(paths.dataEntryEntity.submissionSuccess);
+      expect(page.url).to.eql(config.paths.dataEntryEntity.submissionSuccess);
     });
   });
 });
