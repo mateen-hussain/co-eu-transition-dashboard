@@ -255,6 +255,32 @@ describe('pages/edit-project/EditProject', () => {
     });
   });
 
+  describe('#setData', () => {
+    beforeEach(() => {
+      page.req.params = { uid: 1 };
+      sinon.stub(page, 'clearData');
+      sinon.stub(page, 'saveData');
+
+      req.user.getProject.returns({
+        fields: {
+          get: sinon.stub().returns({ value: 'value' })
+        }
+      });
+
+      Project.fieldDefintions = sinon.stub().returns([{
+        name: 'projectUid',
+        config: {}
+      }]);
+    });
+
+    it('sets data', async () => {
+      await page.setData();
+
+      sinon.assert.calledOnce(page.clearData);
+      sinon.assert.calledWith(page.saveData, { projectUid: "value" });
+    });
+  });
+
   describe('#transformDeliveryConfidenceValue', () => {
     it(`Transforms Delivery Confidence Value of 0 to "0 - Very low confidence"`, async () => {
       expect(page.transformDeliveryConfidenceValue(0)).to.eql("0 - Very low confidence");
