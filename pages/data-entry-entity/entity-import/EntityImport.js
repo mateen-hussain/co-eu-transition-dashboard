@@ -44,7 +44,6 @@ class EntityImport extends Page {
       }
       await transaction.commit();
     } catch (error) {
-      console.log(error)
       await transaction.rollback();
       throw error;
     }

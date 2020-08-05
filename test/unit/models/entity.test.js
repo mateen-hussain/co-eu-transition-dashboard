@@ -59,7 +59,7 @@ describe('models/entity', () => {
       const entity = { publicId: 'some-public-id' };
       const options = { someoption: 1 };
       const entityFields = [];
-      const category = { id: 'some-category-id'}
+      const category = { id: 'some-category-id' };
 
       Entity.findOne.returns({ id: 'some-id' });
 
@@ -73,7 +73,7 @@ describe('models/entity', () => {
       const entity = { };
       const options = { someoption: 1 };
       const entityFields = [];
-      const category = { id: 'some-category-id'}
+      const category = { id: 'some-category-id' };
 
       Entity.create.returns({ id: 'some-id' });
 
@@ -87,7 +87,7 @@ describe('models/entity', () => {
       const entity = { parentPublicId: 'some-parent-id' };
       const options = { someoption: 1 };
       const entityFields = [];
-      const category = { id: 'some-category-id'}
+      const category = { id: 'some-category-id' };
 
       Entity.create.returns({ id: 'some-id' });
       Entity.findOne.returns({ id: 'some-parent-id' });
@@ -104,7 +104,7 @@ describe('models/entity', () => {
       const entity = { parentPublicId: 'some-parent-id' };
       const options = { someoption: 1 };
       const entityFields = [];
-      const category = { id: 'some-category-id'}
+      const category = { id: 'some-category-id' };
 
       Entity.create.returns({ id: 'some-id' });
       Entity.findOne.returns();
