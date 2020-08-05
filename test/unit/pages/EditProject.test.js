@@ -91,7 +91,7 @@ describe('pages/edit-project/EditProject', () => {
   });
 
   describe('#middleware', () => {
-    it('only admins and upladers are aloud to access this page', () => {
+    it('only admins and uploaders are alowed to access this page', () => {
       expect(page.middleware).to.eql([
         ...authentication.protect(['uploader', 'administrator']),
         flash
