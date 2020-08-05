@@ -43,7 +43,7 @@ class Category extends Model {
         displayName: 'Parent Public ID',
         isActive: true,
         config: { options: parentEntities.map(parentEntity => parentEntity.publicId) }
-      })
+      });
     }
 
     const categoryFields = await CategoryField.findAll({

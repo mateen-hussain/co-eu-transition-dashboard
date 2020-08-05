@@ -44,6 +44,7 @@ class EntityImport extends Page {
       }
       await transaction.commit();
     } catch (error) {
+      console.log(error)
       await transaction.rollback();
       throw error;
     }
@@ -65,7 +66,7 @@ class EntityImport extends Page {
 
     const parsedEntities = parse.parseItems(entities, categoryFields);
 
-    if (!parsedEntities.length) {
+    if (!parsedEntities || !parsedEntities.length) {
       const entityColumnErrors = [{ error: 'No entities found' }];
       return { entityColumnErrors };
     }
@@ -166,7 +167,7 @@ class EntityImport extends Page {
       raw: true
     });
 
-    if (!activeImport) {
+    if (!activeImport || !activeImport.data || !activeImport.data.length) {
       return res.redirect(config.paths.dataEntryEntity.bulkUploadFile);
     }
 

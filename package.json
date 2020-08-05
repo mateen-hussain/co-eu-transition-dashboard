@@ -9,6 +9,7 @@
     "install": "bash build.sh",
     "test:lint": "eslint .",
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
+    "test:coverage": "NODE_PATH=. FEATURE_2FA=true nyc mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
     "release": "release-it --no-npm.publish --ci",
     "deploy-staging": "bash deploy.sh staging staging.yml",
     "deploy-research": "bash deploy.sh research research.yml",
@@ -113,7 +114,8 @@
       "test/**/*",
       "services/logger.js",
       "middleware/logger.js",
-      "migrations/**/*"
+      "migrations/**/*",
+      "pages/data-entry-entity/entity-output/**/*"
     ]
   },
   "engines": {
