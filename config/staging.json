@@ -15,8 +15,5 @@
   },
   "features": {
     "missedMilestones": true
-  },
-  "notify": {
-    "cron": "0 10 * * * *"
   }
 }
