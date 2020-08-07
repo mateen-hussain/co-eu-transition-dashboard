@@ -134,10 +134,12 @@ const sendSummaryNotification = async (summary = { infos: [], errors: [] }) => {
 };
 
 const notifyUpcomingMilestones = async () => {
+  logger.info('Selecting node to send milestone notifications');
   try {
     const guid = await setLock();
 
     if(await getLock(guid)) {
+      logger.info('node selected, Send upcoming milstones notifications');
       const projects = await getProjectsDueInNextTwoDays();
       const projectsByDepartment = groupProjectsByDepartment(projects);
       const summary = await sendEmails(projectsByDepartment);
@@ -149,6 +151,7 @@ const notifyUpcomingMilestones = async () => {
     await sendSummaryNotification({ infos: [], errors: [error] });
   }
   finally {
+    logger.info('finished Send upcoming milstones notifications');
     await clearLock();
   }
 };
