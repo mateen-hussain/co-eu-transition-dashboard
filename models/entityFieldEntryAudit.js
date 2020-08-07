@@ -21,5 +21,6 @@ EntityFieldEntryAudit.init({
     defaultValue: NOW
   }
 }, { sequelize, modelName: 'entityFieldEntryAudit', tableName: 'entity_field_entry_audit', createdAt: 'created_at', updatedAt: 'updated_at' });
+EntityFieldEntryAudit.removeAttribute('id');
 
 module.exports = EntityFieldEntryAudit;

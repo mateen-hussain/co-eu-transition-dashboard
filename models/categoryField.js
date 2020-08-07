@@ -18,7 +18,7 @@ CategoryField.init({
     field: "display_name",
     type: STRING(300),
   },
-  type: ENUM("string", "boolean", "integer", "float", "group"),
+  type: ENUM("string", "boolean", "integer", "float", "group", "date"),
   config: JSON,
   isActive: {
     type: BOOLEAN,

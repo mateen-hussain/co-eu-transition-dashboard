@@ -13,7 +13,8 @@ const up = async (query) => {
     },
     name: {
       type: Sequelize.DataTypes.STRING(50),
-      allowNull: false
+      allowNull: false,
+      unique: true
     },
     public_id_format: {
       type: Sequelize.DataTypes.STRING(50)
@@ -51,7 +52,7 @@ const up = async (query) => {
       allowNull: false
     },
     type: {
-      type: Sequelize.DataTypes.ENUM("string", "boolean", "integer", "float", "group"),
+      type: Sequelize.DataTypes.ENUM("string", "boolean", "integer", "float", "group", "date"),
       allowNull: false
     },
     config: {
@@ -161,7 +162,7 @@ const up = async (query) => {
     },
     created_at: {
       type: Sequelize.DataTypes.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     }
   }, { charset: services.mysql.charset });
 
@@ -214,10 +215,11 @@ const up = async (query) => {
     },
     created_at: {
       type: Sequelize.DataTypes.DATE,
-      defaultValue: Sequelize.NOW
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     },
     updated_at: {
-      type: Sequelize.DataTypes.DATE
+      type: Sequelize.DataTypes.DATE,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
     }
   }, { charset: services.mysql.charset });
 
@@ -244,10 +246,12 @@ const up = async (query) => {
       type: Sequelize.DataTypes.TEXT
     },
     created_at: {
-      type: Sequelize.DataTypes.DATE
+      type: Sequelize.DataTypes.DATE,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     },
     updated_at: {
-      type: Sequelize.DataTypes.DATE
+      type: Sequelize.DataTypes.DATE,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
     },
     archived_at: {
       type: Sequelize.DataTypes.DATE,

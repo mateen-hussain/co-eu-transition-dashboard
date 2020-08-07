@@ -93,7 +93,7 @@
 </nav>
 {% endif %}
 
-{% if url in adminUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output  %}
+{% if url in adminUrls or url in addEntitiesUrls  %}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.admin.projectFieldList }}">
@@ -105,11 +105,6 @@
         <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
             <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
                 Entity Data Import
-            </a>
-        </li>
-        <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.dataEntryEntity.output }}">
-            <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.output }}">
-                Entity Data Preview
             </a>
         </li>
     {% endif %}

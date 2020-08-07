@@ -53,7 +53,6 @@
       "submissionSuccess": "/submission-success"
     },
     "dataEntryEntity": {
-      "output": "/bulk-upload-entity-output",
       "bulkUpload": "/bulk-upload-entity",
       "bulkUploadEntity": "/bulk-upload-entity/entity",
       "bulkUploadSignOff": "/bulk-upload-entity/sign-off",

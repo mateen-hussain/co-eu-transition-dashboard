@@ -20,7 +20,7 @@ describe('models/categoryField', () => {
         field: "display_name",
         type: STRING(300),
       },
-      type: ENUM("string", "boolean", "integer", "float", "group"),
+      type: ENUM("string", "boolean", "integer", "float", "group", "date"),
       isActive: {
         type: BOOLEAN,
         field: "is_active",
