@@ -36,14 +36,14 @@
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">Management information</a>
     </li>
     {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
-    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output }}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
         </a>
     </li>
     {% endif %}
     {% if req.user.role == 'administrator' %}
-    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in adminUrls }}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in adminUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output }}">
         <a class="govuk-header__link nav" href="{{ config.paths.admin.projectFieldList }}">
         Admin
         </a>
@@ -81,12 +81,24 @@
 </nav>
 {% endif %}
 
-{% if url in addProjectMilestonesUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output %}
+{% if url in addProjectMilestonesUrls%}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Management information
+        </a>
+    </li>
+    </ul>
+</nav>
+{% endif %}
+
+{% if url in adminUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output  %}
+<nav class="child-navigation">
+    <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.admin.projectFieldList }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.admin.projectFieldList }}">
+        MI Data structure
         </a>
     </li>
     {% if config.features.entityData %}
@@ -101,18 +113,6 @@
             </a>
         </li>
     {% endif %}
-    </ul>
-</nav>
-{% endif %}
-
-{% if url in adminUrls %}
-<nav class="child-navigation">
-    <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
-    <li class="govuk-header__navigation-item child-item govuk-header__navigation-item--active">
-        <a class="govuk-header__link child-nav" href="{{ config.paths.admin.projectFieldList }}">
-        MI Data structure
-        </a>
-    </li>
     </ul>
 </nav>
 {% endif %}
