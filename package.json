@@ -36,7 +36,7 @@
     "css-loader": "^3.5.3",
     "excel4node": "^1.7.2",
     "express": "^4.17.1",
-    "express-fileupload": "^1.1.6",
+    "express-fileupload": "^1.1.9",
     "express-nunjucks": "^2.2.5",
     "express-winston": "^4.0.3",
     "getopts": "^2.2.5",
