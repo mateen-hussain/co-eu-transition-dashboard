@@ -70,7 +70,8 @@
     "editProject": "/edit-project",
     "tableauExport": "/tableau-export",
     "readinessOverview": "/readiness-overview",
-    "transitionReadinessThemeDetail": "/transition-readiness-detail"
+    "transitionReadinessThemeDetail": "/transition-readiness-detail",
+    "csvExport": "/temp-csv-export"
   },
   "features": {
     "twoFactorAuth": true,
