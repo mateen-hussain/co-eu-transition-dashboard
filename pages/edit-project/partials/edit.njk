@@ -9,7 +9,10 @@
 
 <div class="govuk-grid-column-two-thirds">
 
-  <h1 class="govuk-heading-xl">Edit milestone details</h1>
+  <h1 class="govuk-heading-xl">
+    <span class="govuk-caption-xl">{{ data.uid }}</span>
+    Edit project details
+  </h1>
 
   {% if flash %}
     {{ govukErrorSummary({
@@ -23,9 +26,19 @@
 
 <form action='{{ editModeUrl }}' method='POST'>
 
-  {% for field in milestonefields %}
+  {% for projectGroup in projectEntryGroups %}
+    <br>
+    <h2 class="govuk-heading-m">{{ projectGroup.name }}</h2>
 
-    {% include "global-partials/fields.njk" %}
+    {% for field in projectfields %}
+
+      {% if field.group === projectGroup.name %}
+
+        {% include "global-partials/fields.njk" %}
+        
+      {% endif %}
+
+    {% endfor %}
 
   {% endfor %}
 
