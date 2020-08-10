@@ -37,9 +37,9 @@ class CSVExport extends Page {
 
     for(var i = 0; i < 10; i ++) {
       data.push({
-        index: i,
-        date: moment().format('x'),
-        number: Math.floor(Math.random() * 10)
+        name: `Item ${i+1}`,
+        metric1: Math.floor(Math.random() * 10),
+        metric2: Math.floor(Math.random() * 10)
       });
     }
 
