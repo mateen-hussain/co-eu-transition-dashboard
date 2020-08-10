@@ -1,14 +1,6 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
-const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
-const Project = require('models/project');
-const Milestone = require('models/milestone');
-const xl = require('excel4node');
-const moment = require('moment');
-const FieldEntryGroup = require('models/fieldEntryGroup');
-const get = require('lodash/get');
-const logger = require('services/logger');
 const { Parser } = require('json2csv');
 
 class CSVExport extends Page {
