@@ -23,6 +23,7 @@ class Category extends Model {
       type: 'string',
       isUnique: true,
       displayName: 'Public ID',
+      description: 'A unqiue ID to each item',
       isActive: true
     }];
 
@@ -41,6 +42,7 @@ class Category extends Model {
         name: 'parentPublicId',
         type: 'group',
         displayName: 'Parent Public ID',
+        description: 'The parent Public ID this item is directly relaited to',
         isActive: true,
         config: { options: parentEntities.map(parentEntity => parentEntity.publicId) }
       });

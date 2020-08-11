@@ -58,7 +58,8 @@
       "bulkUploadSignOff": "/bulk-upload-entity/sign-off",
       "bulkUploadFile": "/bulk-upload-entity/upload-file",
       "import": "/import-entity",
-      "submissionSuccess": "/entity-submission-success"
+      "submissionSuccess": "/entity-submission-success",
+      "categoryTemplate": "/category-template"
     },
     "editMilestone": "/edit-milestone",
     "reportingOverview": "/reporting-overview",

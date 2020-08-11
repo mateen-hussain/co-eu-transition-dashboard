@@ -62,6 +62,7 @@ describe('models/category', () => {
           name: 'publicId',
           type: 'string',
           isUnique: true,
+          description: 'A unqiue ID to each item',
           displayName: 'Public ID',
           isActive: true
         },{
@@ -127,11 +128,13 @@ describe('models/category', () => {
           name: 'publicId',
           type: 'string',
           isUnique: true,
+          description: 'A unqiue ID to each item',
           displayName: 'Public ID',
           isActive: true
         }, {
           name: 'parentPublicId',
           type: 'group',
+          description: 'The parent Public ID this item is directly relaited to',
           displayName: 'Parent Public ID',
           isActive: true,
           config: { options: ['public id 1', 'public id 2'] }

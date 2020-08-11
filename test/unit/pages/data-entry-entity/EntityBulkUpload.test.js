@@ -18,7 +18,7 @@ let res = {};
 
 describe('pages/data-entry-entity/entity-bulk-upload/EntityBulkUpload', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub() };
+    res = { cookies: sinon.stub(), sendStatus: sinon.stub() };
     req = { cookies: [] };
 
     page = new EntityBulkUpload('some path', req, res);
@@ -93,6 +93,7 @@ describe('pages/data-entry-entity/entity-bulk-upload/EntityBulkUpload', () => {
 
   describe('#postRequest', () => {
     beforeEach(() => {
+      page.req.path = '/upload-file';
       page.req.flash = sinon.stub();
       page.res.redirect = sinon.stub();
     });

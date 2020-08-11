@@ -8,7 +8,8 @@ const subHeaderRowIdentifers = [
   '[Set by CO]',
   '[Free text]',
   '[Drop down]',
-  'The UID of the project these milestones cover'
+  'The UID of the project these milestones cover',
+  'A unqiue ID to each item'
 ];
 
 const getFirstHeaderCell = sheet => {
@@ -106,15 +107,13 @@ const parseEntities = buffer => {
   const excelDocument = xlsx.read(buffer, { cellDates: true });
 
   return Object.keys(excelDocument.Sheets)
-    // .filter(sheetName => Object.keys(expectedSheets).includes(sheetName))
+    .filter((name, index) => index === 0)
     .map(name => {
       const sheet = excelDocument.Sheets[name];
-      // const range = getRange(sheet);
 
       let data = xlsx.utils.sheet_to_json(sheet, {
         raw: true,
         defval: '',
-        // range,
         blankrows: false
       });
 

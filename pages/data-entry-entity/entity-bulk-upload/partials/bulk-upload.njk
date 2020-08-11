@@ -1,5 +1,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% set items = categories() | await %}
 
 <div class="govuk-grid-column-two-thirds">
 
@@ -17,7 +18,11 @@ file here to quickly submit it to the dashboard. <p>
 
 <p class="govuk-body">Make sure your document template is up to date.<p>
 
-<br><br><br>
+{% for category in categories() | await %}
+  <a class="govuk-link" href="{{ config.paths.dataEntryEntity.categoryTemplate }}?category={{ category.value }}" target="_blank">Download the latest template for {{ category.text }}s.</a><br>
+{% endfor %}
+
+<br>
 
 {{ govukButton({
   text: "Upload",

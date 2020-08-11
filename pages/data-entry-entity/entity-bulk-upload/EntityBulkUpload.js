@@ -50,7 +50,7 @@ class EntityBulkUpload extends Page {
     case paths.dataEntryEntity.bulkUploadFile:
       return 'upload-file';
     default:
-      return 'upload-file';
+      return 'bulk-upload';
     }
   }
 
@@ -110,4 +110,3 @@ class EntityBulkUpload extends Page {
 
 
 module.exports = EntityBulkUpload;
-

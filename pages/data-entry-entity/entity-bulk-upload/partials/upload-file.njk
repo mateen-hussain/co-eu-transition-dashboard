@@ -24,7 +24,11 @@
 
   <p class="govuk-body">Upload the entity data for the category you are importing.<p>
 
-  <form action="{{ url }}" method="post" encType="multipart/form-data">
+  {% for category in items %}
+    <a class="govuk-link" href="{{ config.paths.dataEntryEntity.categoryTemplate }}?category={{ category.value }}" target="_blank">Download the latest template for {{ category.text }}s.</a><br>
+  {% endfor %}
+
+  <form action="{{ config.paths.dataEntryEntity.bulkUploadFile }}" method="post" encType="multipart/form-data">
     {{ govukSelect({
       id: "category",
       name: "category",
