@@ -25,7 +25,7 @@ const up = async (query) => {
       name: 'uploader'
     },{
       id: 3,  
-      name: 'viewAll'
+      name: 'viewer'
     },{
       id: 4,  
       name: 'management'
