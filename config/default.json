@@ -71,7 +71,7 @@
     "tableauExport": "/tableau-export",
     "readinessOverview": "/readiness-overview",
     "transitionReadinessThemeDetail": "/transition-readiness-detail",
-    "csvExport": "/temp-csv-export"
+    "csvExport": "/temp-export"
   },
   "features": {
     "twoFactorAuth": true,

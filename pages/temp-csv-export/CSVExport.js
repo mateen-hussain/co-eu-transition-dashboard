@@ -1,46 +1,36 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
-const { Parser } = require('json2csv');
 
 class CSVExport extends Page {
   get url() {
     return paths.csvExport;
   }
 
-  userFriendlyType(type) {
-    switch(type){
-    case 'integer':
-    case 'float':
-      return 'Number';
-    case 'date':
-      return 'Date';
-    case 'group':
-    case 'boolean':
-      return 'Drop down';
-    case 'string':
-    default:
-      return 'Free text';
-    }
+  get middleware() {
+    return [];
+  }
+
+  get mode() {
+    return this.req.path === '/' ? 'html' : 'data';
   }
 
   async getRequest(req, res) {
-    let data = [];
+    if(this.mode === 'data') {
+      const data = [];
 
-    for(var i = 0; i < 10; i ++) {
-      data.push({
-        name: `Item ${i+1}`,
-        metric1: Math.floor(Math.random() * 10),
-        metric2: Math.floor(Math.random() * 10)
-      });
+      for(var i = 0; i < 10; i ++) {
+        data.push({
+          name: `Item ${i+1}`,
+          metric1: Math.floor(Math.random() * 10),
+          metric2: Math.floor(Math.random() * 10)
+        });
+      }
+
+      return res.json(data);
     }
 
-    const json2csvParser = new Parser();
-    const csv = json2csvParser.parse(data);
-
-    res.set('Cache-Control', 'public, max-age=0');
-    res.attachment('test.csv');
-    res.status(200).send(csv);
+    super.getRequest(req, res);
   }
 
   async postRequest(req, res) {
