@@ -11,7 +11,7 @@ const up = async (query) => {
     },
     name: {
       type: Sequelize.DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
       unique: true
     }
   }, { charset: services.mysql.charset });
