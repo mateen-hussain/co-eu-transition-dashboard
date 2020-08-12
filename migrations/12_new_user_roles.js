@@ -37,7 +37,7 @@ const up = async (query) => {
 
   await query.createTable('user_role', {
     user_id: {
-      type: Sequelize.DataTypes.INTEGER,
+      type: Sequelize.DataTypes.INTEGER.UNSIGNED,
       allowNull: false
     },
     role_id: {
