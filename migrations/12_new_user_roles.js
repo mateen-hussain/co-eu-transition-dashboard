@@ -2,19 +2,27 @@ const { services } = require('config');
 const logger = require('services/logger');
 const Sequelize = require('sequelize');
 
+const roles = ['uploader', 'admin', 'viewAll', 'management', 'guest'];
+
 const up = async (query) => {
   await query.createTable('role', {
     id: {
       type: Sequelize.DataTypes.INTEGER,
       primaryKey: true,
-      allowNull: false
+      autoIncrement: true
     },
     name: {
       type: Sequelize.DataTypes.STRING(45),
-      allowNull: true,
+      allowNull: false,
       unique: true
     }
   }, { charset: services.mysql.charset });
+
+  query.bulkInsert('role', roles.map(role => {
+    return {
+      name: role
+    };
+  }));
 
   await query.createTable('user_role', {
     user_id: {
