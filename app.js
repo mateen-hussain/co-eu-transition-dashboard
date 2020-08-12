@@ -29,6 +29,8 @@ if (config.env === 'development') {
   app.use('/assets', express.static('dist'));
 }
 
+app.use('/common', express.static('common'));
+
 logger.attachRouteLogger(app);
 
 cache.preventCache(app);
