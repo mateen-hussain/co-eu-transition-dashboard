@@ -16,8 +16,5 @@
   "features": {
     "missedMilestones": true,
     "entityData": true
-  },
-  "notify": {
-    "cron": "0 10 * * * *"
   }
 }
