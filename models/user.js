@@ -10,7 +10,6 @@ const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const moment = require('moment');
 const DAO = require('services/dao');
-const UserRole = require('./userRole');
 
 class User extends Model {
   get isDepartmentalViewer () {
@@ -181,8 +180,5 @@ User.init({
 
 User.belongsToMany(Department, { through: DepartmentUser, foreignKey: 'userId' });
 Department.belongsToMany(User, { through: DepartmentUser, foreignKey: 'departmentName' });
-
-User.hasMany(UserRole, { foreignKey: 'user_id' });
-UserRole.belongsTo(User, { foreignKey: 'user_id' });
 
 module.exports = User;
