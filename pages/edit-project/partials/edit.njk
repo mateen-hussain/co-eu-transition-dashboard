@@ -30,7 +30,7 @@
     <br>
     <h2 class="govuk-heading-m">{{ projectGroup.name }}</h2>
 
-    {% for field in projectfields %}
+    {% for field in projectfields | sort(attribute='order') %}
 
       {% if field.group === projectGroup.name %}
 
