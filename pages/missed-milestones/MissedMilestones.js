@@ -16,7 +16,7 @@ class MissedMilestones extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['viewer', 'management'])
+      ...authentication.protect(['uploader', 'admin', 'viewer', 'management'])
     ];
   }
 
