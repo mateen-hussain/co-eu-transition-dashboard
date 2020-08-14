@@ -30,10 +30,10 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
   describe('#middleware', () => {
     it('only admins are alowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader', 'administrator'])
+        ...authentication.protect(['uploader', 'admin'])
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader', 'admin']);
     });
   });
 

@@ -39,12 +39,12 @@ describe('pages/data-entry/bulk-upload/BulkUpload', () => {
 
   it('only admins are alowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['uploader', 'admin']),
       fileUploadMock,
       flash
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+    sinon.assert.calledWith(authentication.protect, ['uploader', 'admin']);
   });
 
   describe('#mode', () => {

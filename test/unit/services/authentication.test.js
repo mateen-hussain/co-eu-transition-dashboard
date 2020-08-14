@@ -264,7 +264,7 @@ describe('services/authentication', () => {
       });
 
       it('redirects to login if user role does not match', () => {
-        const middleware = authentication.protect(['uploader', 'administrator']);
+        const middleware = authentication.protect(['uploader', 'admin']);
         const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
@@ -288,7 +288,7 @@ describe('services/authentication', () => {
         jwt.restoreData.returns({ tfa: true });
 
         const middleware = authentication.protect(['viewer']);
-        const req = { user: { role: 'viewer' } };
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -301,7 +301,7 @@ describe('services/authentication', () => {
         jwt.restoreData.returns({ tfa: false });
 
         const middleware = authentication.protect(['viewer']);
-        const req = { user: { role: 'viewer' } };
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -316,7 +316,7 @@ describe('services/authentication', () => {
       sinon.stub(jwt, 'saveData');
 
       const middleware = authentication.protect(['viewer']);
-      const req = { user: { role: 'viewer' } };
+      const req = { user: { roles: [{ name: 'viewer' }] } };
       const res = { redirect: sinon.stub() };
       const next = sinon.stub();
 

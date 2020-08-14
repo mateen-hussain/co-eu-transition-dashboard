@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire');
 const moment = require('moment');
 const ProjectField = require('models/projectField');
 const FieldEntryGroup = require('models/fieldEntryGroup');
+const authentication = require('services/authentication');
 
 let page = {};
 let getProject = {};
@@ -26,16 +27,27 @@ describe('pages/project-details/ProjectDetails', () => {
     page = new ProjectDetails('some path', req, res);
 
     sinon.stub(jwt, 'restoreData');
+
+    sinon.stub(authentication, 'protect').returns([]);
   });
 
   afterEach(() => {
     jwt.restoreData.restore();
+    authentication.protect.restore();
   });
 
   describe('#url', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(paths.projectDetails);
     });
+  });
+
+  it('only certain users are alowed to access this page', () => {
+    expect(page.middleware).to.eql([
+      ...authentication.protect(['uploader', 'admin', 'viewer', 'management'])
+    ]);
+
+    sinon.assert.calledWith(authentication.protect, ['uploader', 'admin', 'viewer', 'management']);
   });
 
   describe('#currentDate', () => {

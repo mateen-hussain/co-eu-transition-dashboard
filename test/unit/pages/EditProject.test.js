@@ -97,7 +97,7 @@ describe('pages/edit-project/EditProject', () => {
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader', 'admin']);
     });
   });
 

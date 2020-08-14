@@ -20,7 +20,7 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
   describe('#middleware', () => {
     it('loads correct middleware', () => {
       expect(page.middleware.toString()).to.eql([
-        ...authentication.protect(['uploader', 'administrator', 'viewer']),
+        ...authentication.protect(['uploader', 'admin', 'viewer', 'guest', 'management']),
         flash
       ].toString());
     });

@@ -55,10 +55,10 @@ describe('pages/data-entry-entity/entity-submission-success/EntitySubmissionSucc
 
   it('only admins are alowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['administrator'])
+      ...authentication.protect(['admin'])
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['administrator']);
+    sinon.assert.calledWith(authentication.protect, ['admin']);
   });
 
   describe('#url', () => {
