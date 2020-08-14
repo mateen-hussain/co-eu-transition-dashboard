@@ -4,6 +4,7 @@ const moment = require('moment');
 const { getFilters } = require('helpers/filters');
 const cloneDeep = require('lodash/cloneDeep');
 const { removeNulls } = require('helpers/utils');
+const authentication = require('services/authentication');
 
 class UpcomingMilestones extends Page {
   get url() {
@@ -19,6 +20,12 @@ class UpcomingMilestones extends Page {
         }
       }
     };
+  }
+
+  get middleware() {
+    return [
+      ...authentication.protect(['uploader', 'admin', 'viewer', 'management'])
+    ];
   }
 
   async getDepartmentsWithUpcomingMilestones() {

@@ -4,10 +4,17 @@ const Project = require('models/project');
 const Milestone = require('models/milestone');
 const MilestoneField = require('models/milestoneField');
 const MilestoneFieldEntryAudit = require('models/milestoneFieldEntryAudit');
+const authentication = require('services/authentication');
 
 class MilestoneDetails extends Page {
   get url() {
     return paths.milestoneDetails;
+  }
+
+  get middleware() {
+    return [
+      ...authentication.protect(['uploader', 'admin', 'viewer', 'management'])
+    ];
   }
 
   async getProjectMilestone() {

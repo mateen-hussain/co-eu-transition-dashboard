@@ -20,7 +20,7 @@ class Import extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['uploader', 'admin']),
       fileUpload({ safeFileNames: true }),
       flash
     ];

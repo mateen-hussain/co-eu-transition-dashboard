@@ -23,6 +23,11 @@ const nunjucksDefaults = {
       if(momentDate.isValid()) {
         return momentDate.isBefore(moment());
       }
+    },
+    includes: (roles, rolesToMatch) => {
+      return roles.filter(role =>
+        rolesToMatch.includes(role.name)
+      ).length > 0 ? true : false;
     }
   }
 };

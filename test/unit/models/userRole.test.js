@@ -5,24 +5,16 @@ const UserRole = require('models/userRole');
 describe('models/userRole', () => {
   it('called UserRole.init with the correct parameters', () => {
     expect(UserRole.init).to.have.been.calledWith({
-      user_id: {
+      userId: {
         type: INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        field: 'user_id'
       },
-      role_id: {
-        type: INTEGER
+      roleId: {
+        type: INTEGER,
+        primaryKey: true,
+        field: 'role_id'
       }
     });
-  });
-
-  it('throws an error if no user found', async () => {
-    UserRole.findAll.returns();
-    let message = '';
-    try{
-      await UserRole.getUserRole();
-    } catch (thrownError) {
-      message = thrownError.message;
-    }
-    expect(message).to.eql('Unknown user');
   });
 });

@@ -33,7 +33,7 @@ class ProjectFieldList extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['administrator']),
+      ...authentication.protect(['admin']),
       flash
     ];
   }

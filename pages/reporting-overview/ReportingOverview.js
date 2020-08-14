@@ -2,6 +2,7 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const tableau = require('services/tableau');
 const logger = require('services/logger');
+const authentication = require('services/authentication');
 
 const getTableauUrl = async (req, res, next) => {
   try {
@@ -21,7 +22,8 @@ class ReportingOverview extends Page {
   get middleware() {
     return [
       ...super.middleware,
-      getTableauUrl
+      getTableauUrl,
+      ...authentication.protect(['admin', 'viewer', 'uploader'])
     ];
   }
 }

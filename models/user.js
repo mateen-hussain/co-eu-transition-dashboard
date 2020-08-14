@@ -8,6 +8,8 @@ const MilestoneFieldEntry = require('./milestoneFieldEntry');
 const MilestoneField = require('./milestoneField');
 const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
+const Role = require('./role');
+const UserRole = require('./userRole');
 const moment = require('moment');
 const DAO = require('services/dao');
 
@@ -180,5 +182,7 @@ User.init({
 
 User.belongsToMany(Department, { through: DepartmentUser, foreignKey: 'userId' });
 Department.belongsToMany(User, { through: DepartmentUser, foreignKey: 'departmentName' });
+
+User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId' });
 
 module.exports = User;

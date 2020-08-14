@@ -1,40 +1,17 @@
 const { Model, INTEGER } = require('sequelize');
 const sequelize = require('services/sequelize');
-const Role = require('./role');
 
-class UserRole extends Model {
-  static async getUserRole(userId) {
-    const user = await UserRole.findAll({
-      where: { user_id: userId },
-      raw : true
-    });
-
-    if(!user) {
-      throw new Error('Unknown user');
-    }
-
-    if(user.length) {
-      const roles = await Role.findAll({
-        where: { id: user.map(user => user.role_id) },
-        raw : true
-      });
-      
-      const result = {
-        userId,
-        role: roles.map(role => role.name)
-      }
-      return result;
-    }
-  }
-}
-
+class UserRole extends Model {}
 UserRole.init({
-  user_id: {
+  userId: {
     type: INTEGER,
-    primaryKey: true
+    primaryKey: true,
+    field: 'user_id'
   },
-  role_id: {
-    type: INTEGER
+  roleId: {
+    type: INTEGER,
+    primaryKey: true,
+    field: 'role_id'
   }
 }, { sequelize, modelName: 'userRole', tableName: 'user_role', timestamps: false });
 
