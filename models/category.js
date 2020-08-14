@@ -42,7 +42,7 @@ class Category extends Model {
         name: 'parentPublicId',
         type: 'group',
         displayName: 'Parent Public ID',
-        description: 'The parent Public ID this item is directly relaited to',
+        description: 'The parent Public ID this item is directly related to',
         isActive: true,
         config: { options: parentEntities.map(parentEntity => parentEntity.publicId) }
       });

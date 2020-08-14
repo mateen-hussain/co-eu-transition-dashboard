@@ -134,7 +134,7 @@ describe('models/category', () => {
         }, {
           name: 'parentPublicId',
           type: 'group',
-          description: 'The parent Public ID this item is directly relaited to',
+          description: 'The parent Public ID this item is directly related to',
           displayName: 'Parent Public ID',
           isActive: true,
           config: { options: ['public id 1', 'public id 2'] }
