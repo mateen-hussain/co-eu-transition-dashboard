@@ -67,17 +67,6 @@ const up = async (query) => {
     onDelete: 'no action',
     onUpdate: 'no action'
   });
-
-  await query.bulkInsert('user_role', [
-    {
-      user_id: 1, 
-      role_id: 1
-    },
-    {
-      user_id: 1, 
-      role_id: 2
-    }
-  ]);
 };
 
 const down = async (query) => {
