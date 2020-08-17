@@ -1,0 +1,117 @@
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-xl">{{ "Review your " + category.name + " field details" if editMode else "Review your new " + category.name + " field details" }}</h1>
+  </div>
+</div>
+
+{% if flash %}
+{{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [{
+        text: flash
+    }]
+}) }}
+{% endif %}
+
+<dl class="govuk-summary-list">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Field name
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ data.displayName | default('') | string }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ editUrl }}">
+        Change<span class="govuk-visually-hidden"> field name</span>
+      </a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Field description
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ data.description | default('') | string }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ editUrl }}">
+        Change<span class="govuk-visually-hidden"> field description</span>
+      </a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Field type
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ dataType }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ editUrl }}">
+        Change<span class="govuk-visually-hidden"> field type</span>
+      </a>
+    </dd>
+  </div>
+  {% if data.config and data.type == 'group' %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Drop down options
+    </dt>
+    <dd class="govuk-summary-list__value">
+      <ul class="govuk-list">
+      {% for groupItem in data.config.options %}
+        <li>{{ groupItem }}</li>
+      {% endfor %}
+      </ul>
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ editUrl }}">
+        Change<span class="govuk-visually-hidden"> drop down options</span>
+      </a>
+    </dd>
+  </div>
+  {% endif %}
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Is this field active?
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ "Yes" if (data.isActive == "true") else "No" }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ editUrl }}">
+        Change<span class="govuk-visually-hidden"> is this field active?</span>
+      </a>
+    </dd>
+  </div>
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">
+      Is this field mandatory?
+    </dt>
+    <dd class="govuk-summary-list__value">
+      {{ "Yes" if (data.isRequired == 1) else "No" }}
+    </dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="{{ editUrl }}">
+        Change<span class="govuk-visually-hidden"> is this field mandatory?</span>
+      </a>
+    </dd>
+  </div>
+</dl>
+
+<form action='{{ req.originalUrl }}' method='POST'>
+
+{{ govukButton({
+  text: "Submit changes to dashboard" if editMode else "Add field to dashboard",
+  type: "submit",
+  preventDoubleClick: true
+}) }}
+
+</form>
+
+  </div>
+</div>

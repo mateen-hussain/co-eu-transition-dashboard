@@ -56,7 +56,8 @@ class Category extends Model {
         required: true
       },
       where: { isActive: true },
-      raw: true
+      raw: true,
+      order: [['order', 'ASC']]
     });
 
     return [...fields, ...categoryFields];

@@ -23,7 +23,10 @@
     "start": "/entry",
     "admin": {
       "projectFieldList": "/admin/project-field-list",
-      "projectField": "/admin/project-field"
+      "projectField": "/admin/project-field",
+      "categoryFieldList": "/admin/category-field-list",
+      "categoryField": "/admin/category-field",
+      "categoryList": "/admin/categories"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",

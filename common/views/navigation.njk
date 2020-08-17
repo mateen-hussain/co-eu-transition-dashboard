@@ -26,7 +26,10 @@
 
 {% set adminUrls = [
     config.paths.admin.projectFieldList,
-    config.paths.admin.projectField
+    config.paths.admin.projectField,
+    config.paths.admin.categoryFieldList,
+    config.paths.admin.categoryField,
+    config.paths.admin.categoryList
     ]
 %}
 
@@ -102,6 +105,11 @@
         </a>
     </li>
     {% if config.features.entityData %}
+        <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in config.paths.admin.categoryList }}">
+            <a class="govuk-header__link child-nav" href="{{ config.paths.admin.categoryList }}">
+                Manage categories
+            </a>
+        </li>
         <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
             <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
                 Entity Data Import

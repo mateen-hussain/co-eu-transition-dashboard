@@ -89,6 +89,7 @@ describe('models/category', () => {
           required: true
         },
         where: { isActive: true },
+        order: [["order", "ASC"]],
         raw: true
       });
     });

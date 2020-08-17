@@ -1,0 +1,154 @@
+{% extends "template.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% set fields = getFields() | await %}
+{% set fieldType = '' %}
+
+{% block pageTitle %}{{ category.name }} Fields{% endblock %}
+
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#",
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">{{ category.name }} fields</h1>
+
+  {% if editMode and flash %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [
+      {
+        text: flash
+      }
+    ]
+  }) }}
+  {% endif %}
+
+  {% if not editMode %}
+  <p class="govuk-body-l">Changes made to the data input fields will
+  be reflected in the downloadable template for the {{ category.name }} import and export. </p>
+  {% endif %}
+
+  <p class="govuk-body">
+    <a href="{{ config.paths.admin.categoryField }}/{{category.id}}" class="govuk-link">Add a new field</a><br>
+    <a href="{{ config.paths.admin.categoryFieldList }}/{{category.id}}/edit" class="{{ 'reorder-link' if editMode else 'govuk-link' }}">Re-order fields</a><br>
+  </p>
+  <hr class="govuk-section-break govuk-section-break--m">
+
+  </div>
+</div>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+
+  {% if editMode %}
+  <form action="{{ config.paths.admin.categoryFieldList }}/{{ category.id }}/edit" method="post">
+  {% endif %}
+
+  {% set totalCount = -1 %}
+  {% set count = 0 %}
+  <table class="govuk-table {{ 'order-fields' if editMode else 'category-fields' }}">
+    <thead class="govuk-table__head">
+      <tr class="govuk-table__row">
+      {% if editMode %}
+      <th scope="col" class="govuk-table__header order-cell"></th>
+      <th scope="col" class="govuk-table__header order-cell"></th>
+      {% endif %}
+      <th scope="col" class="govuk-table__header">Field Name</th>
+      <th scope="col" class="govuk-table__header">Field Type</th>
+      <th scope="col" class="govuk-table__header">Status</th>
+      {% if not editMode %}
+      <th scope="col" class="govuk-table__header">Edit</th>
+      {% endif %}
+      </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    {% for field in fields | sort(attribute='order') %}
+      {% if field.group == fieldGroup.name %}
+      {% set count = count + 1 %}
+      {% set totalCount = totalCount + 1 %}
+      <tr class="govuk-table__row">
+        {% if editMode %}
+          <td class="govuk-table__cell order-cell">
+            <input type="hidden" name="fields[][{{totalCount}}][order]" value="{{ count }}" />
+            <input type="hidden" name="fields[][{{totalCount}}][id]" value="{{ field.id }}" />
+            {% if field.id %}
+              <img class="move-up" src='/assets/images/up.png'/>
+            {% endif %}
+          </td>
+          <td class="govuk-table__cell order-cell">
+            {% if field.id %}
+              <img class="move-down" src='/assets/images/down.png'/>
+            {% endif %}
+          </td>
+        {% endif %}
+        <td class="govuk-table__cell">{{ field.displayName | default('') | string }}</td>
+        {% if field.type == 'group' %}
+          {% set fieldType = 'Drop down' %}
+        {% elif field.type == 'string' %}
+          {% set fieldType = 'Free text' %}
+        {% elif field.type == 'integer' %}
+          {% set fieldType = 'Number' %}
+        {% elif field.type == 'date' %}
+          {% set fieldType = 'Date input' %}
+        {% elif field.type == 'boolean' %}
+          {% set fieldType = 'Yes / No' %}
+        {% endif %}
+        <td class="govuk-table__cell">{{ fieldType }}</td>
+        <td class="govuk-table__cell">{{ "Active" if (field.isActive == true) else "Not active" }}</td>
+        {% if not editMode %}
+         {% if field.id %}
+          <td class="govuk-table__cell"><a href="{{ config.paths.admin.categoryField + '/' + category.id + '/' + field.id }}" class="govuk-link">Edit</a></td>
+          {% else %}
+          <td class="govuk-table__cell">Cannot edit this field</td>
+          {% endif %}
+        {% endif %}
+      </tr>
+      {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% if editMode %}
+  {{ govukButton({
+    text: "Apply changes",
+    type: "submit",
+    name: "submit",
+    preventDoubleClick: true
+  }) }}
+  &nbsp;
+  {{ govukButton({
+    text: "Cancel",
+    href: config.paths.admin.categoryFieldList + '/' + category.id,
+    preventDoubleClick: true,
+    classes: "govuk-button--secondary"
+  }) }}
+
+  </form>
+{% endif %}
+
+ </div>
+</div>
+
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.fieldOrder();
+  </script>
+{% endblock %}
