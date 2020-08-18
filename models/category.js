@@ -63,7 +63,7 @@ class Category extends Model {
       },
       where,
       raw: true,
-      priority: [['order', 'ASC']]
+      priority: [['priority', 'ASC']]
     });
 
     return [...fields, ...categoryFields];

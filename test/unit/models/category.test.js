@@ -89,7 +89,7 @@ describe('models/category', () => {
           required: true
         },
         where: { isActive: true },
-        priority: [["order", "ASC"]],
+        priority: [["priority", "ASC"]],
         raw: true
       });
     });
