@@ -5,7 +5,7 @@ const CategoryField = require('./categoryField');
 const Entity = require('./entity');
 
 class Category extends Model {
-  static async fieldDefintions(categoryName) {
+  static async fieldDefinitions(categoryName, activeFieldsOnly = true) {
     const category = await Category.findOne({
       where: { name: categoryName },
       include: {
@@ -48,6 +48,12 @@ class Category extends Model {
       });
     }
 
+    const where = {};
+
+    if(activeFieldsOnly) {
+      where['isActive'] = true;
+    }
+
     const categoryFields = await CategoryField.findAll({
       include: {
         attributes: [],
@@ -55,9 +61,9 @@ class Category extends Model {
         where: { name: categoryName },
         required: true
       },
-      where: { isActive: true },
+      where,
       raw: true,
-      order: [['order', 'ASC']]
+      priority: [['order', 'ASC']]
     });
 
     return [...fields, ...categoryFields];

@@ -32,7 +32,7 @@ CategoryField.init({
     field: "description",
     type: TEXT
   },
-  order: {
+  priority: {
     type: INTEGER
   }
 }, { sequelize, modelName: 'categoryField', tableName: 'category_field', timestamps: false });

@@ -22,7 +22,7 @@ class CategoryFieldList extends Page {
   }
 
   async getFields() {
-    return await Category.fieldDefintions(this.category.name);
+    return await Category.fieldDefinitions(this.category.name, false);
   }
 
   get editMode() {
@@ -44,10 +44,10 @@ class CategoryFieldList extends Page {
         if(!field.id || !field.id.length) {
           // means its not part of the project fields but a column of the project table
           continue;
-        } else if(!field.order) {
-          throw new Error('Field missing order or id');
+        } else if(!field.priority) {
+          throw new Error('Field missing priority or id');
         }
-        const values = { order: field.order };
+        const values = { priority: field.priority };
         await CategoryField.update(values, {
           where: { id: field.id },
           transaction
@@ -56,7 +56,7 @@ class CategoryFieldList extends Page {
 
       await transaction.commit();
     } catch (error) {
-      this.req.flash(`Error saing field order: ${error}`);
+      this.req.flash(`Error saving field priority: ${error}`);
       logger.error(error);
       await transaction.rollback();
     }

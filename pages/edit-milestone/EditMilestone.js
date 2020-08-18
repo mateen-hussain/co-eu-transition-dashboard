@@ -70,7 +70,7 @@ class EditMilestone extends Page {
 
   async saveFieldToDatabase(milestone) {
     const transaction = await sequelize.transaction();
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     try {
       await Milestone.import(milestone, milestoneFields, { transaction });
@@ -85,7 +85,7 @@ class EditMilestone extends Page {
   }
 
   async parseData(milestone) {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
     const parsedData = {};
 
     milestoneFields.forEach(field => {
@@ -108,7 +108,7 @@ class EditMilestone extends Page {
   }
 
   async validateMilestone(parsedData) {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
     const errors = validation.validateItems([parsedData], milestoneFields);
 
     return errors.reduce((message, error) => {
@@ -148,7 +148,7 @@ class EditMilestone extends Page {
     const projectMilestone = await this.req.user.getProjectMilestone(this.req.params.uid);
     const milestone = projectMilestone.milestone;
 
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const data = milestoneFields.reduce((data, field) => {
       if(milestone.fields.get(field.name)) {
@@ -169,7 +169,7 @@ class EditMilestone extends Page {
   }
 
   async getMilestoneFields() {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const projects = await this.req.user.getProjects();
     const projectUids = projects.map(project => project.uid);

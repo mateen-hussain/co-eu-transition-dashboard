@@ -17,7 +17,7 @@ class Milestone extends Model {
     return modelUtils.createFilterOptions(attributeKey, options);
   }
 
-  static async fieldDefintions() {
+  static async fieldDefinitions() {
     const config = {
       exportOptions: {
         header: {

@@ -35,7 +35,7 @@ class EntityImport extends Page {
     const category = await Category.findOne({
       where: { name: categoryName }
     });
-    const categoryFields = await Category.fieldDefintions(categoryName);
+    const categoryFields = await Category.fieldDefinitions(categoryName);
 
     const transaction = await sequelize.transaction();
     try {
@@ -61,7 +61,7 @@ class EntityImport extends Page {
   }
 
   async validateEntities(category, entities) {
-    const categoryFields = await Category.fieldDefintions(category);
+    const categoryFields = await Category.fieldDefinitions(category);
 
     const parsedEntities = parse.parseItems(entities, categoryFields);
 
@@ -171,7 +171,7 @@ class EntityImport extends Page {
     }
 
     const { errors, entities, importId } = await this.validateImport(activeImport);
-    const categoryFields = await Category.fieldDefintions(activeImport.category);
+    const categoryFields = await Category.fieldDefinitions(activeImport.category);
 
     return res.render(this.template,
       Object.assign(this.locals, {

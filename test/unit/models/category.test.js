@@ -37,7 +37,7 @@ describe('models/category', () => {
     expect(CategoryField.belongsTo).to.have.been.calledWith(Category, { foreignKey: 'categoryId' });
   });
 
-  describe('#fieldDefintions', () => {
+  describe('#fieldDefinitions', () => {
     beforeEach(() => {
       Category.findOne.returns({
         id: 1,
@@ -55,7 +55,7 @@ describe('models/category', () => {
     it('gets fields assosaited with category', async () => {
       const categoryName = 'theme';
 
-      const definitions = await Category.fieldDefintions(categoryName);
+      const definitions = await Category.fieldDefinitions(categoryName);
 
       expect(definitions).to.eql([
         {
@@ -89,7 +89,7 @@ describe('models/category', () => {
           required: true
         },
         where: { isActive: true },
-        order: [["order", "ASC"]],
+        priority: [["order", "ASC"]],
         raw: true
       });
     });
@@ -99,7 +99,7 @@ describe('models/category', () => {
 
       let message = '';
       try{
-        await Category.fieldDefintions();
+        await Category.fieldDefinitions();
       } catch (thrownError) {
         message = thrownError.message;
       }
@@ -122,7 +122,7 @@ describe('models/category', () => {
         publicId: 'public id 2'
       }]);
 
-      const definitions = await Category.fieldDefintions(categoryName);
+      const definitions = await Category.fieldDefinitions(categoryName);
 
       expect(definitions).to.eql([
         {

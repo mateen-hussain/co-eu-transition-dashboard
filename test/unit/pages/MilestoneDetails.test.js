@@ -21,12 +21,12 @@ describe('pages/milestone-details/MilestoneDetails', () => {
 
   describe('#getMilestoneFields', () => {
     it('returns milestone field defintions', async () => {
-      Milestone.fieldDefintions = sinon.stub().returns('some defintions');
+      Milestone.fieldDefinitions = sinon.stub().returns('some defintions');
 
       const response = await page.getMilestoneFields();
 
       expect(response).to.eql('some defintions');
-      sinon.assert.called(Milestone.fieldDefintions);
+      sinon.assert.called(Milestone.fieldDefinitions);
     });
   });
 
@@ -62,7 +62,7 @@ describe('pages/milestone-details/MilestoneDetails', () => {
         random: 'random'
       };
 
-      Project.fieldDefintions = sinon.stub().returns([
+      Project.fieldDefinitions = sinon.stub().returns([
         { name: 'title', displayName: 'title' },
         { name: 'sro', displayName: 'sro' },
         { name: 'impact', displayName: 'impact' },

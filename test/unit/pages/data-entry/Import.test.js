@@ -71,8 +71,8 @@ describe('pages/data-entry/import/Import', () => {
     beforeEach(() => {
       sinon.stub(Project, 'import');
       sinon.stub(Milestone, 'import');
-      Project.fieldDefintions = sinon.stub().returns(projectFields);
-      Milestone.fieldDefintions = sinon.stub().returns(milestoneFields);
+      Project.fieldDefinitions = sinon.stub().returns(projectFields);
+      Milestone.fieldDefinitions = sinon.stub().returns(milestoneFields);
     });
 
     afterEach(() => {

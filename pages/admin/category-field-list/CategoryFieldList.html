@@ -78,14 +78,14 @@
       </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for field in fields | sort(attribute='order') %}
+    {% for field in fields | sort(attribute='priority') %}
       {% if field.group == fieldGroup.name %}
       {% set count = count + 1 %}
       {% set totalCount = totalCount + 1 %}
       <tr class="govuk-table__row">
         {% if editMode %}
           <td class="govuk-table__cell order-cell">
-            <input type="hidden" name="fields[][{{totalCount}}][order]" value="{{ count }}" />
+            <input type="hidden" name="fields[][{{totalCount}}][priority]" value="{{ count }}" />
             <input type="hidden" name="fields[][{{totalCount}}][id]" value="{{ field.id }}" />
             {% if field.id %}
               <img class="move-up" src='/assets/images/up.png'/>

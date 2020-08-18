@@ -33,7 +33,7 @@ describe('models/categoryField', () => {
         field: "description",
         type: TEXT
       },
-      order: {
+      priority: {
         type: INTEGER
       }
     }));

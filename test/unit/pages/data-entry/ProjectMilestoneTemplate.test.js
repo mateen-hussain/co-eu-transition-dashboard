@@ -462,7 +462,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
 
       FieldEntryGroup.findAll.returns(groups);
 
-      Project.fieldDefintions.returns([{ group: 'somename' }]);
+      Project.fieldDefinitions.returns([{ group: 'somename' }]);
 
       projectSheet = {
         row: sinon.stub(),
@@ -523,7 +523,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
         getProjects: sinon.stub().returns(projects)
       };
 
-      Milestone.fieldDefintions.returns([{ config: { exportOptions: {} } }]);
+      Milestone.fieldDefinitions.returns([{ config: { exportOptions: {} } }]);
 
       milestoneSheet = {
         row: sinon.stub(),

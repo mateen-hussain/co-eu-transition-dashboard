@@ -15,7 +15,7 @@ class MilestoneDetails extends Page {
   }
 
   async getMilestoneFields() {
-    return await Milestone.fieldDefintions();
+    return await Milestone.fieldDefinitions();
   }
 
   async getAuditRecords(milestoneUid, fieldName) {
@@ -33,7 +33,7 @@ class MilestoneDetails extends Page {
   async projectInformation(project) {
     const fieldsToShow = ['title', 'sro', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
 
-    let fields = await Project.fieldDefintions();
+    let fields = await Project.fieldDefinitions();
     fields = fields.filter(field => fieldsToShow.includes(field.name));
 
     return fieldsToShow.map(name => {

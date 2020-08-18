@@ -93,7 +93,7 @@
       Is this field mandatory?
     </dt>
     <dd class="govuk-summary-list__value">
-      {{ "Yes" if (data.isRequired == 1) else "No" }}
+      {{ "Yes" if (data.isActive == "true") else "No" }}
     </dd>
     <dd class="govuk-summary-list__actions">
       <a class="govuk-link" href="{{ editUrl }}">

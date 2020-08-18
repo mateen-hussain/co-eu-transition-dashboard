@@ -71,7 +71,7 @@ class EditProject extends Page {
 
   async saveFieldToDatabase(project) {
     const transaction = await sequelize.transaction();
-    const projectFields = await Project.fieldDefintions();
+    const projectFields = await Project.fieldDefinitions();
 
     try {
       await Project.import(project, projectFields, { transaction });
@@ -151,7 +151,7 @@ class EditProject extends Page {
   }
 
   async getProjectFields() {
-    return await Project.fieldDefintions(this.req.user);
+    return await Project.fieldDefinitions(this.req.user);
   }
 
   async getProjectEntryGroups() {

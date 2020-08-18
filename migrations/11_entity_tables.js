@@ -71,7 +71,7 @@ const up = async (query) => {
       type: Sequelize.DataTypes.TEXT,
       allowNull: true
     },
-    order: {
+    priority: {
       type: Sequelize.DataTypes.INTEGER,
       allowNull: true
     },
@@ -86,7 +86,7 @@ const up = async (query) => {
       is_active: true,
       is_required: true,
       description: `Name of ${category}`,
-      order: 1,
+      priority: 1,
     });
 
     items.push({
@@ -97,7 +97,7 @@ const up = async (query) => {
       is_active: true,
       is_required: false,
       description: `Description of ${category}`,
-      order: 2
+      priority: 2
     });
 
     return items;

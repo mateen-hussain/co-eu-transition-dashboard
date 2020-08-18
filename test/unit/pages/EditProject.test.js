@@ -136,7 +136,7 @@ describe('pages/edit-project/EditProject', () => {
       sequelize.transaction.returns(transaction);
 
       Project.import = sinon.stub();
-      Project.fieldDefintions = sinon.stub().returns('fields');
+      Project.fieldDefinitions = sinon.stub().returns('fields');
 
       const project = { uid: 'uid' };
 
@@ -156,7 +156,7 @@ describe('pages/edit-project/EditProject', () => {
       sequelize.transaction.returns(transaction);
 
       Project.import = sinon.stub().throws(new Error('error'));
-      Project.fieldDefintions = sinon.stub().returns('fields');
+      Project.fieldDefinitions = sinon.stub().returns('fields');
 
       const project = { uid: 'uid' };
 
@@ -173,7 +173,7 @@ describe('pages/edit-project/EditProject', () => {
         { type: 'date', name: 'date', importColumnName: 'date' },
         { type: 'string', name: 'name', importColumnName: 'name' },
       ];
-      Project.fieldDefintions = sinon.stub().returns(fields);
+      Project.fieldDefinitions = sinon.stub().returns(fields);
       sinon.stub(validation, 'validateItems');
     });
 
@@ -267,7 +267,7 @@ describe('pages/edit-project/EditProject', () => {
         }
       });
 
-      Project.fieldDefintions = sinon.stub().returns([{
+      Project.fieldDefinitions = sinon.stub().returns([{
         name: 'projectUid',
         config: {}
       }]);
@@ -305,7 +305,7 @@ describe('pages/edit-project/EditProject', () => {
 
   describe('#getProjectFields', () => {
     it('returns project field defintions', async () => {
-      Project.fieldDefintions = sinon.stub().returns([{
+      Project.fieldDefinitions = sinon.stub().returns([{
         name: 'projectUid',
         config: {}
       }]);
@@ -317,7 +317,7 @@ describe('pages/edit-project/EditProject', () => {
         name: 'projectUid',
         config: {}
       }]);
-      sinon.assert.called(Project.fieldDefintions);
+      sinon.assert.called(Project.fieldDefinitions);
     });
   });
 

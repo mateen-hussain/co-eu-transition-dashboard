@@ -88,7 +88,7 @@ class EditCategoryField extends Page {
     if (field.id === 'temp') {
       delete field.id;
 
-      const fields = await Category.fieldDefintions(this.res.locals.category.name);
+      const fields = await Category.fieldDefinitions(this.res.locals.category.name);
 
       field.order = fields[fields.length-1].order + 1;
     }

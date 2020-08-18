@@ -27,8 +27,8 @@ class Import extends Page {
   }
 
   async import(projects, milestones) {
-    const projectFields = await Project.fieldDefintions();
-    const milestoneFields = await Milestone.fieldDefintions();
+    const projectFields = await Project.fieldDefinitions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const transaction = await sequelize.transaction();
     try {
@@ -60,7 +60,7 @@ class Import extends Page {
   }
 
   async validateProjects(projects) {
-    const projectFields = await Project.fieldDefintions(this.req.user);
+    const projectFields = await Project.fieldDefinitions(this.req.user);
 
     const parsedProjects = parse.parseItems(projects, projectFields);
     if (!parsedProjects.length) {
@@ -77,7 +77,7 @@ class Import extends Page {
   }
 
   async validateMilestones(milestones, parsedProjects = []) {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const parsedMilestones = parse.parseItems(milestones, milestoneFields);
     if (!parsedMilestones.length) {

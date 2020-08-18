@@ -60,7 +60,7 @@ describe('pages/admin/category-field-list/CategoryFieldList', () => {
 
   describe('#getFields', () => {
     it('gets fields for given category', async () => {
-      Category.fieldDefintions = sinon.stub().returns('test');
+      Category.fieldDefinitions = sinon.stub().returns('test');
       const fields = await page.getFields();
       expect(fields).to.eql('test');
     });

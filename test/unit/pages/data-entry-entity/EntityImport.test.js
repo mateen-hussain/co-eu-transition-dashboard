@@ -96,7 +96,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
 
   describe('#import', async () => {
     const categoryName = 'category';
-    const categoryFields = await Category.fieldDefintions(categoryName);
+    const categoryFields = await Category.fieldDefinitions(categoryName);
 
     beforeEach(() => {
       sinon.stub(Entity, 'import');

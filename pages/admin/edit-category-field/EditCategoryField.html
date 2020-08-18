@@ -163,14 +163,14 @@ Changes made to this field will be reflected in Bulk upload and Excel download f
   },
   items: [
     {
-      value: "true",
+      value: true,
       text: "Yes",
-      checked: true if (data.isActive == true) else true
+      checked: data.isActive == true or data.isActive == "true"
     },
     {
-      value: "false",
+      value: false,
       text: "No",
-      checked: true if (data.isActive == false)
+      checked: data.isActive == false or data.isActive == "false"
     }
   ]
 }) }}
@@ -187,14 +187,14 @@ Changes made to this field will be reflected in Bulk upload and Excel download f
   },
   items: [
     {
-      value: "1",
+      value: true,
       text: "Yes",
-      checked: true if (data.isRequired == true) else true
+      checked: data.isRequired == true or data.isRequired == "true"
     },
     {
-      value: "0",
+      value: false,
       text: "No",
-      checked: true if (data.isRequired == false)
+      checked: data.isRequired == false or data.isRequired == "false"
     }
   ]
 }) }}
