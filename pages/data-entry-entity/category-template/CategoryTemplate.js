@@ -234,7 +234,7 @@ class CategoryTemplate extends Page {
   }
 
   async createCategorySheet(category, workbook, entitySheet, validationSheet) {
-    const categoryFields = await Category.fieldDefintions(category.name);
+    const categoryFields = await Category.fieldDefinitions(category.name);
 
     const entities = await Entity.findAll({
       where: {

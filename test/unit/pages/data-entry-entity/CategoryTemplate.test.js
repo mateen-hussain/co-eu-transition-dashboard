@@ -414,7 +414,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
     };
 
     beforeEach(() => {
-      sinon.stub(Category, 'fieldDefintions').returns([{
+      Category.fieldDefinitions.returns([{
         name: 'publicId'
       }]);
       Entity.findAll.returns([{
@@ -436,10 +436,6 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
       sinon.stub(page, 'createTypeCell');
       sinon.stub(page, 'addGroupValidation');
       sinon.stub(page, 'addItem');
-    });
-
-    afterEach(() => {
-      Category.fieldDefintions.restore();
     });
 
     it('creates entity sheet', async () => {
@@ -464,7 +460,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
       const field = {
         name: 'publicId'
       };
-      Category.fieldDefintions.returns([field]);
+      Category.fieldDefinitions.returns([field]);
       Entity.findAll.returns([{
         publicId: 'some-id',
         entityFieldEntries: {
@@ -481,7 +477,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
       const field = {
         name: 'parentPublicId'
       };
-      Category.fieldDefintions.returns([field]);
+      Category.fieldDefinitions.returns([field]);
       Entity.findAll.returns([{
         parent: [{
           publicId: 'some-parent-id'
