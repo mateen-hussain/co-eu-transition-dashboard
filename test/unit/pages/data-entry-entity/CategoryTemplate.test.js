@@ -479,7 +479,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
       };
       Category.fieldDefinitions.returns([field]);
       Entity.findAll.returns([{
-        parent: [{
+        parents: [{
           publicId: 'some-parent-id'
         }],
         entityFieldEntries: {

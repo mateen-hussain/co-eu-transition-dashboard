@@ -1,6 +1,7 @@
 const { Model, INTEGER, TEXT } = require('sequelize');
 const sequelize = require('services/sequelize');
 const EntityFieldEntryAudit = require('./entityFieldEntryAudit');
+const modelUtils = require('helpers/models');
 
 class EntityFieldEntry extends Model {
   static async import(entityFieldEntry, options) {
@@ -43,7 +44,16 @@ EntityFieldEntry.init({
     field: "category_field_id"
   },
   value: {
-    type: TEXT
+    type: TEXT,
+    get() {
+      if (!this.getDataValue('value')) return;
+      const value = this.getDataValue('value').toString('utf8');
+      if (this.get('categoryField')) {
+        return modelUtils.parseFieldEntryValue(value, this.get('categoryField').get('type'));
+      } else {
+        return value;
+      }
+    }
   }
 }, { sequelize, modelName: 'entityFieldEntry', tableName: 'entity_field_entry', createdAt: 'created_at', updatedAt: 'updated_at' });
 

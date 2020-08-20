@@ -125,7 +125,7 @@ Entity.init({
 }, { sequelize, modelName: 'entity', tableName: 'entity', createdAt: 'created_at', updatedAt: false });
 
 Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'parentEntityId', as: 'children', otherKey: 'entityId' });
-Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'entityId', as: 'parent', otherKey: 'parentEntityId' });
+Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'entityId', as: 'parents', otherKey: 'parentEntityId' });
 
 Entity.hasMany(EntityFieldEntry, { foreignKey: 'entityId' });
 EntityFieldEntry.belongsTo(Entity, { foreignKey: 'entityId' });

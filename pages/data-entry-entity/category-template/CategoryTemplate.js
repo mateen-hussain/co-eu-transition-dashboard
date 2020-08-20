@@ -244,7 +244,7 @@ class CategoryTemplate extends Page {
         model: EntityFieldEntry
       },{
         model: Entity,
-        as: 'parent'
+        as: 'parents'
       }]
     });
 
@@ -270,10 +270,12 @@ class CategoryTemplate extends Page {
         if(field.name === 'publicId') {
           value = entity.publicId;
         } else if(field.name === 'parentPublicId') {
-          value = entity.parent[0].publicId;
+          value = entity.parents[0].publicId;
         } else {
           const entityfieldEntry = entity.entityFieldEntries.find(entityfieldEntry => entityfieldEntry.categoryFieldId === field.id);
-          value = entityfieldEntry.value;
+          if(entityfieldEntry) {
+            value = entityfieldEntry.value;
+          }
         }
 
         this.addItem(workbook, entitySheet, columnIndex, rowIndex, field, value);
