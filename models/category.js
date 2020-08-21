@@ -44,6 +44,7 @@ class Category extends Model {
         displayName: 'Parent Public ID',
         description: 'The parent Public ID this item is directly related to',
         isActive: true,
+        isRequired: true,
         config: { options: parentEntities.map(parentEntity => parentEntity.publicId) }
       });
     }
