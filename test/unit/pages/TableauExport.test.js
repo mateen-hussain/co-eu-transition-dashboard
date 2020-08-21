@@ -2,16 +2,24 @@ const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const Entity = require('models/entity');
 const Category = require('models/category');
+const proxyquire = require('proxyquire');
 
 let page = {};
 let res = {};
 let req = {};
 
+let getAllDataStub = sinon.stub();
+const daoStub = function() {
+  return {
+    getAllData: getAllDataStub
+  };
+};
+
 describe('pages/tableau-export/TableauExport', () => {
   beforeEach(() => {
-    const TableauExport = require('pages/tableau-export/TableauExport');
-
-    req = { params: { type: 'metrics' } };
+    const TableauExport = proxyquire('pages/tableau-export/TableauExport', {
+      'services/dao': daoStub
+    });
 
     page = new TableauExport('some path', req, res);
   });
@@ -28,9 +36,17 @@ describe('pages/tableau-export/TableauExport', () => {
     });
   });
 
-  describe('#exportingMetrics', () => {
+  describe('#exportingMeasures', () => {
     it('returns correct url', () => {
-      expect(page.exportingMetrics).to.be.ok;
+      page.req = { params: { type: 'measures' } };
+      expect(page.exportingMeasures).to.be.ok;
+    });
+  });
+
+  describe('#exportingProjects', () => {
+    it('returns correct url', () => {
+      page.req = { params: { type: 'projects' } };
+      expect(page.exportingProjects).to.be.ok;
     });
   });
 
@@ -60,13 +76,12 @@ describe('pages/tableau-export/TableauExport', () => {
     });
   });
 
-  describe('#getMetrics', () => {
-    it('gets all metrics and creats an object', async () => {
-      Category.findOne.resolves({
-        id: 1
-      });
+  describe('#getEntitiesFlatStructure', () => {
+    it('gets entites with a flat structure', async () => {
+      sinon.stub(page, 'addParents').resolves();
 
       Entity.findAll.resolves([{
+        publicId: '1',
         entityFieldEntries: [{
           categoryField: {
             displayName: 'name'
@@ -75,6 +90,7 @@ describe('pages/tableau-export/TableauExport', () => {
         }],
         parents: []
       },{
+        publicId: '1',
         entityFieldEntries: [{
           categoryField: {
             displayName: 'name'
@@ -84,32 +100,86 @@ describe('pages/tableau-export/TableauExport', () => {
         parents: []
       }]);
 
-      const entites = await page.getMetrics();
+      const entityObjects = await page.getEntitiesFlatStructure({ id: 1 });
 
-      expect(entites).to.eql([ { name: 'some name' }, { name: 'some name' } ])
+      expect(entityObjects).to.eql([
+        { name: 'some name', 'Public ID': '1' },
+        { name: 'some name', 'Public ID': '1' }
+      ]);
     });
   });
 
-  describe('#exportMetrics', () => {
-    it('returns data as csv', async () => {
-      const data = { test: 'test1' };
-      sinon.stub(page, 'getMetrics').resolves(data);
+  describe('#exportMeasures', () => {
+    it('gets all metrics and creats an object', async () => {
+      const resp = { data: 'data' };
+      sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
+      sinon.stub(page, 'responseAsCSV');
 
-      res = {
-        set: sinon.stub(),
-        attachment: sinon.stub(),
-        status: sinon.stub(),
-        send: sinon.stub()
-      };
+      Category.findOne.resolves({
+        id: 1
+      });
 
-      await page.exportMetrics(req, res);
+      await page.exportMeasures(req, res);
 
-      sinon.assert.calledWith(res.set, 'Cache-Control', 'public, max-age=0')
-      sinon.assert.calledWith(res.attachment, 'metrics.csv');
-      sinon.assert.calledWith(res.status, 200);
-      sinon.assert.calledWith(res.send, `"test"
-"test1"`);
+      sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
+      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+    });
+  });
 
+  describe('#mergeProjectsWithEntities', () => {
+    it('get projects and merge with project entities', async () => {
+      const entities = [{
+        'Public ID': 1
+      },{
+        'Public ID': 2
+      }];
+
+      const projects = [{
+        uid: 1,
+        name: 'project 1',
+        projectFieldEntries: [{
+          projectField: {
+            displayName: 'UID'
+          },
+          value: 'UID 1'
+        }]
+      },{
+        uid: 2,
+        name: 'project 2',
+        projectFieldEntries: [{
+          projectField: {
+            displayName: 'UID'
+          },
+          value: 'UID 2'
+        }]
+      }];
+      getAllDataStub.resolves(projects);
+
+      const mergedEntities = await page.mergeProjectsWithEntities(entities);
+      expect(mergedEntities).to.eql([
+        { 'Public ID': 1, 'Project UID': 'UID 1' },
+        { 'Public ID': 2, 'Project UID': 'UID 2' }
+      ]);
+    });
+  });
+
+  describe('#exportProjects', () => {
+    it('gets all metrics and creats an object', async () => {
+      const entities = [{ data: 'data' }];
+      const entitiesWithProjects = [{ data: 'data', data1: 'data 1' }];
+      sinon.stub(page, 'getEntitiesFlatStructure').resolves(entities);
+      sinon.stub(page, 'mergeProjectsWithEntities').resolves(entitiesWithProjects);
+      sinon.stub(page, 'responseAsCSV');
+
+      Category.findOne.resolves({
+        id: 1
+      });
+
+      await page.exportProjects(req, res);
+
+      sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
+      sinon.assert.calledWith(page.mergeProjectsWithEntities, entities);
+      sinon.assert.calledWith(page.responseAsCSV, entitiesWithProjects, res);
     });
   });
 });

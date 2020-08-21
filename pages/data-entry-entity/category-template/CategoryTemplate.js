@@ -269,7 +269,7 @@ class CategoryTemplate extends Page {
 
         if(field.name === 'publicId') {
           value = entity.publicId;
-        } else if(field.name === 'parentPublicId') {
+        } else if(field.name === 'parentPublicId' && entity.parents.length) {
           value = entity.parents[0].publicId;
         } else {
           const entityfieldEntry = entity.entityFieldEntries.find(entityfieldEntry => entityfieldEntry.categoryFieldId === field.id);
