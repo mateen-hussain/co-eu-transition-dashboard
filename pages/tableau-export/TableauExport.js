@@ -10,6 +10,7 @@ const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
 const Project = require('models/project');
 const moment = require('moment');
+const sprintf = require('sprintf-js').sprintf;
 
 class TableauExport extends Page {
   get url() {
@@ -28,7 +29,7 @@ class TableauExport extends Page {
     return this.req.params && this.req.params.type === 'projects';
   }
 
-  async addParents(entity, entityObject) {
+  async addParents(entity, entityObject, replaceArraysWithNumberedKeyValues = true) {
     for(const parent of entity.parents) {
       const parentEntity = await Entity.findOne({
         where: {
@@ -45,15 +46,31 @@ class TableauExport extends Page {
         }]
       });
 
+      entityObject[parentEntity.category.name] = entityObject[parentEntity.category.name] || [];
+
       const name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
         return entityFieldEntry.categoryField.name === 'name';
       });
 
-      entityObject[parentEntity.category.name] = name.value;
+      if(!entityObject[parentEntity.category.name].includes(name.value)){
+        entityObject[parentEntity.category.name].push(name.value);
+      }
 
       if(parentEntity.parents.length) {
-        await this.addParents(parentEntity, entityObject);
+        await this.addParents(parentEntity, entityObject, false);
       }
+    }
+
+    if(replaceArraysWithNumberedKeyValues){
+      Object.keys(entityObject).forEach(key => {
+        const value = entityObject[key];
+        if(Array.isArray(value)) {
+          value.reverse().forEach((valueItem, index) => {
+            entityObject[`${key} - ${index + 1}`] = valueItem;
+          });
+          delete entityObject[key];
+        }
+      });
     }
   }
 
@@ -83,6 +100,8 @@ class TableauExport extends Page {
 
       if(entity.parents.length) {
         await this.addParents(entity, entityObject);
+
+
       }
 
       entityObjects.push(entityObject);
