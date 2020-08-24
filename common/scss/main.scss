@@ -73,3 +73,8 @@ a.govuk-header__link.child-nav {
 .child-item.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
    color: #000000;
 }
+
+li.govuk-header__navigation-item.child-item, li.govuk-header__navigation-item {
+    margin-right: 24px;
+}
+
