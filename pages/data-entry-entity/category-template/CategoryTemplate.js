@@ -244,7 +244,8 @@ class CategoryTemplate extends Page {
         model: EntityFieldEntry
       },{
         model: Entity,
-        as: 'parents'
+        as: 'parents',
+        include: Category
       }]
     });
 
@@ -267,10 +268,16 @@ class CategoryTemplate extends Page {
         rowIndex += 4;
         let value;
 
+        const parentFieldNames = entity.parents.map(parent => `parent${parent.category.name}PublicId`);
+
         if(field.name === 'publicId') {
           value = entity.publicId;
-        } else if(field.name === 'parentPublicId' && entity.parents.length) {
-          value = entity.parents[0].publicId;
+        } else if(parentFieldNames.includes(field.name)) {
+          const parent = entity.parents.find(parent => {
+            return `parent${parent.category.name}PublicId` === field.name
+          });
+
+          value = parent.publicId;
         } else {
           const entityfieldEntry = entity.entityFieldEntries.find(entityfieldEntry => entityfieldEntry.categoryFieldId === field.id);
           if(entityfieldEntry) {

@@ -405,7 +405,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
     });
   });
 
-  describe('milestone sheet creation', () => {
+  describe('main sheet creation', () => {
     let workbook = {};
     let entitySheet = {};
     const category = {
@@ -418,7 +418,8 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
         name: 'publicId'
       }]);
       Entity.findAll.returns([{
-        publicId: 'some id'
+        publicId: 'some id',
+        parents: []
       }]);
 
       entitySheet = {
@@ -465,7 +466,8 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
         publicId: 'some-id',
         entityFieldEntries: {
           publicId: 'not-this',
-        }
+        },
+        parents: []
       }]);
 
       await page.createCategorySheet(category, workbook, entitySheet);
@@ -475,15 +477,19 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
 
     it('sets parent Public Id from entity parent not from entity field', async () => {
       const field = {
-        name: 'parentPublicId'
+        name: 'parentCategoryPublicId'
       };
       Category.fieldDefinitions.returns([field]);
       Entity.findAll.returns([{
         parents: [{
-          publicId: 'some-parent-id'
+          publicId: 'some-parent-id',
+          name: 'some parent',
+          category: {
+            name: 'Category'
+          }
         }],
         entityFieldEntries: {
-          publicId: 'not-this',
+          publicId: 'not-this'
         }
       }]);
 

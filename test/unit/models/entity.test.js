@@ -86,7 +86,7 @@ describe('models/entity', () => {
     it('if parent publid id, destory old parent and create new', async () => {
       const entity = { parentPublicId: 'some-parent-id' };
       const options = { someoption: 1 };
-      const entityFields = [];
+      const entityFields = [{ name: 'parentPublicId', isParentField: true }];
       const category = { id: 'some-category-id' };
 
       Entity.create.returns({ id: 'some-id' });
@@ -103,7 +103,7 @@ describe('models/entity', () => {
     it('throw error if no parent found', async () => {
       const entity = { parentPublicId: 'some-parent-id' };
       const options = { someoption: 1 };
-      const entityFields = [];
+      const entityFields = [{ name: 'parentPublicId', isParentField: true }];
       const category = { id: 'some-category-id' };
 
       Entity.create.returns({ id: 'some-id' });

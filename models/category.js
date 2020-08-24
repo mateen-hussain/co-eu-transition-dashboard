@@ -28,25 +28,28 @@ class Category extends Model {
     }];
 
     if(category.parents.length) {
-      const parentEntities = await Entity.findAll({
-        attributes: ['publicId'],
-        include: {
-          attributes: [],
-          model: Category,
-          required: true,
-          where: { id: category.parents.map(parent => parent.id ) }
-        }
-      });
+      for ( const parent of category.parents) {
+        const parentEntities = await Entity.findAll({
+          attributes: ['publicId'],
+          include: {
+            attributes: [],
+            model: Category,
+            required: true,
+            where: { id: parent.id }
+          }
+        });
 
-      fields.push({
-        name: 'parentPublicId',
-        type: 'group',
-        displayName: 'Parent Public ID',
-        description: 'The parent Public ID this item is directly related to',
-        isActive: true,
-        isRequired: true,
-        config: { options: parentEntities.map(parentEntity => parentEntity.publicId) }
-      });
+        fields.push({
+          name: `parent${parent.name}PublicId`,
+          type: 'group',
+          displayName: `Parent ${parent.name} Public ID`,
+          description: `The parent ${parent.name} Public ID this item is directly related to`,
+          isActive: true,
+          isRequired: parent.categoryParent.isRequired,
+          config: { options: parentEntities.map(parentEntity => parentEntity.publicId) },
+          isParentField: true
+        });
+      }
     }
 
     const where = {};

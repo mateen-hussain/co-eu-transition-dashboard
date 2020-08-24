@@ -36,29 +36,32 @@ class Entity extends Model {
       entity.id = entityModel.id;
     }
 
-    // if a parent public id is set create that relationship
-    if(entity.parentPublicId) {
-      const parent = await this.findOne({
-        where: {
-          publicId: entity.parentPublicId
-        }
-      }, options);
+    const parentPublicFields = entityFields.filter(field => field.isParentField);
 
-      // currently no way to support multiple parents through excel import to remove previous parent
-      if (parent) {
-        await EntityParent.destroy({
+    await EntityParent.destroy({
+      where: {
+        entityId: entity.id
+      }
+    }, options);
+
+    for(const parentPublicField of parentPublicFields) {
+      if(entity[parentPublicField.name]) {
+        const parent = await this.findOne({
           where: {
-            entityId: entity.id
+            publicId: entity[parentPublicField.name]
           }
         }, options);
 
-        await EntityParent.create({
-          entityId: entity.id,
-          parentEntityId: parent.id
-        }, options);
-      } else {
-        // this should not happen as its validated in a previous step.
-        throw new Error(`Parent ${entity.parentPublicId} was not found in the database`);
+        // currently no way to support multiple parents through excel import to remove previous parent
+        if (parent) {
+          await EntityParent.create({
+            entityId: entity.id,
+            parentEntityId: parent.id
+          }, options);
+        } else {
+          // this should not happen as its validated in a previous step.
+          throw new Error(`Parent ${entity[parentPublicField.name]} was not found in the database`);
+        }
       }
     }
 
@@ -68,7 +71,11 @@ class Entity extends Model {
   static async importFieldEntries(entity, entityFields, options) {
     const attributes = Object.keys(entity);
 
-    const entityFieldEntryAttributes = attributes.filter(attribute => !this.rawAttributes[attribute] && attribute != 'parentPublicId');
+    const entityFieldEntryAttributes = attributes.filter(attribute => {
+      const isRawField = this.rawAttributes[attribute];
+      const entityField = entityFields.find(entityField => entityField.name === attribute);
+      return !isRawField && !entityField.isParentField;
+    });
 
     const entityFieldEntries = entityFieldEntryAttributes.map(entityFieldEntryAttribute => {
       const entityField = entityFields.find(entityField => entityField.name === entityFieldEntryAttribute)

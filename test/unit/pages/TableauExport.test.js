@@ -72,7 +72,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
       await page.addParents(entity, entityObject);
 
-      expect(entityObject).to.eql({ ['Category name']: 'Some name' });
+      expect(entityObject).to.eql({ ['Category name - 1']: 'Some name' });
     });
   });
 

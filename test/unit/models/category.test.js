@@ -112,7 +112,11 @@ describe('models/category', () => {
       Category.findOne.returns({
         id: 2,
         parents: [{
-          id: 1
+          id: 1,
+          name: 'Category',
+          categoryParent: {
+            isRequired: true
+          }
         }]
       });
 
@@ -133,13 +137,14 @@ describe('models/category', () => {
           displayName: 'Public ID',
           isActive: true
         }, {
-          name: 'parentPublicId',
+          name: 'parentCategoryPublicId',
           type: 'group',
-          description: 'The parent Public ID this item is directly related to',
-          displayName: 'Parent Public ID',
+          description: 'The parent Category Public ID this item is directly related to',
+          displayName: 'Parent Category Public ID',
           isRequired: true,
           isActive: true,
-          config: { options: ['public id 1', 'public id 2'] }
+          config: { options: ['public id 1', 'public id 2'] },
+          isParentField: true
         }, {
           name: 'field1',
           type: 'string',
@@ -154,7 +159,7 @@ describe('models/category', () => {
           attributes: [],
           model: Category,
           required: true,
-          where: { id: [1] }
+          where: { id: 1 }
         }
       });
     });
