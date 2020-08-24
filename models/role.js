@@ -1,4 +1,4 @@
-const { Model, INTEGER, ENUM } = require('sequelize');
+const { Model, INTEGER, STRING } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class Role extends Model {}
@@ -8,7 +8,7 @@ Role.init({
     primaryKey: true
   },
   name: {
-    type: ENUM('uploader', 'viewer', 'admin', 'management', 'guest')
+    type: STRING(45)
   }
 }, { sequelize, modelName: 'role', tableName: 'role', timestamps: false });
 

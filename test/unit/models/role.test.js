@@ -1,5 +1,5 @@
 const { expect } = require('test/unit/util/chai');
-const { INTEGER, ENUM } = require('sequelize');
+const { INTEGER, STRING } = require('sequelize');
 const Role = require('models/role');
 
 describe('models/role', () => {
@@ -10,7 +10,7 @@ describe('models/role', () => {
         primaryKey: true
       },
       name: {
-        type: ENUM('uploader', 'viewer', 'admin', 'management', 'guest')
+        type: STRING(45)
       }
     });
   });

@@ -8,6 +8,7 @@ const up = async (query) => {
       type: Sequelize.DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
+      autoIncrement: true
     },
     name: {
       type: Sequelize.DataTypes.STRING(45),
@@ -18,19 +19,14 @@ const up = async (query) => {
 
   await query.bulkInsert('role', [
     {
-      id: 1, 
       name: 'admin'
     },{
-      id: 2,
       name: 'uploader'
-    },{
-      id: 3,  
+    },{ 
       name: 'viewer'
-    },{
-      id: 4,  
+    },{ 
       name: 'management'
     },{
-      id: 5,  
       name: 'guest'
     }
   ]);
@@ -70,26 +66,14 @@ const up = async (query) => {
 };
 
 const down = async (query) => {
-  try{
-    await query.removeConstraint('user_role', 'fk_user_role_user1');
-  } catch (error) {
-    logger.error(`Error rolling back ${error}`);
-  }
-
-  try{
-    await query.removeConstraint('user_role', 'fk_user_role_role1');
-  } catch (error) {
-    logger.error(`Error rolling back ${error}`);
-  }
-      
-  try {
-    await query.dropTable('role');
-  } catch (error) {
-    logger.error(`Error rolling back ${error}`);
-  }
-
   try {
     await query.dropTable('user_role');
+  } catch (error) {
+    logger.error(`Error rolling back ${error}`);
+  }
+
+  try {
+    await query.dropTable('role');
   } catch (error) {
     logger.error(`Error rolling back ${error}`);
   }
