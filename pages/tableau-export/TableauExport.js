@@ -10,7 +10,6 @@ const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
 const Project = require('models/project');
 const moment = require('moment');
-const sprintf = require('sprintf-js').sprintf;
 
 class TableauExport extends Page {
   get url() {
