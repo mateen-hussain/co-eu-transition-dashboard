@@ -98,12 +98,13 @@ const protect = (roles = []) => {
       return res.redirect(config.paths.authentication.login);
     }
 
-    if (!req.user.roles.filter(role => 
-      roles.includes(role.name)).length > 0) {
-      return res.redirect(config.paths.authentication.login)
+    if ((req.user.roles.filter(role => 
+      roles.includes(role.name)).length > 0) || 
+      (req.user.roles.some(role => role.name === 'guest'))) {
+      return next();
     }
 
-    return next();
+    return res.redirect(config.paths.authentication.login)
   };
 
   const updateCookieExpiration = (req, res, next) => {
