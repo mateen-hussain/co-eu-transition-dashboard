@@ -28,7 +28,7 @@ class TableauExport extends Page {
     return this.req.params && this.req.params.type === 'projects';
   }
 
-  async addParents(entity, entityObject, replaceArraysWithNumberedKeyValues = true) {
+  async addParents(entity, entityFieldMap, replaceArraysWithNumberedKeyValues = true) {
     for(const parent of entity.parents) {
       const parentEntity = await Entity.findOne({
         where: {
@@ -45,29 +45,29 @@ class TableauExport extends Page {
         }]
       });
 
-      entityObject[parentEntity.category.name] = entityObject[parentEntity.category.name] || [];
+      entityFieldMap[parentEntity.category.name] = entityFieldMap[parentEntity.category.name] || [];
 
       const name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
         return entityFieldEntry.categoryField.name === 'name';
       });
 
-      if(!entityObject[parentEntity.category.name].includes(name.value)){
-        entityObject[parentEntity.category.name].push(name.value);
+      if(!entityFieldMap[parentEntity.category.name].includes(name.value)){
+        entityFieldMap[parentEntity.category.name].push(name.value);
       }
 
       if(parentEntity.parents.length) {
-        await this.addParents(parentEntity, entityObject, false);
+        await this.addParents(parentEntity, entityFieldMap, false);
       }
     }
 
     if(replaceArraysWithNumberedKeyValues){
-      Object.keys(entityObject).forEach(key => {
-        const value = entityObject[key];
+      Object.keys(entityFieldMap).forEach(key => {
+        const value = entityFieldMap[key];
         if(Array.isArray(value)) {
           value.reverse().forEach((valueItem, index) => {
-            entityObject[`${key} - ${index + 1}`] = valueItem;
+            entityFieldMap[`${key} - ${index + 1}`] = valueItem;
           });
-          delete entityObject[key];
+          delete entityFieldMap[key];
         }
       });
     }
@@ -87,26 +87,26 @@ class TableauExport extends Page {
       }]
     });
 
-    const entityObjects = [];
+    const entityFieldMaps = [];
 
     for(const entity of entities) {
-      const entityObject = entity.entityFieldEntries.reduce((object, entityFieldEntry) => {
+      const entityFieldMap = entity.entityFieldEntries.reduce((object, entityFieldEntry) => {
         object[entityFieldEntry.categoryField.displayName] = entityFieldEntry.value;
         return object;
       }, {});
 
-      entityObject['Public ID'] = entity.publicId;
+      entityFieldMap['Public ID'] = entity.publicId;
 
       if(entity.parents.length) {
-        await this.addParents(entity, entityObject);
+        await this.addParents(entity, entityFieldMap);
 
 
       }
 
-      entityObjects.push(entityObject);
+      entityFieldMaps.push(entityFieldMap);
     }
 
-    return entityObjects;
+    return entityFieldMaps;
   }
 
   async exportMeasures(req, res) {

@@ -5,6 +5,10 @@ const CategoryField = require('./categoryField');
 const Entity = require('./entity');
 
 class Category extends Model {
+  static parentPublicIdString(category) {
+    return `parent${category.name}PublicId`;
+  }
+
   static async fieldDefinitions(categoryName, activeFieldsOnly = true) {
     const category = await Category.findOne({
       where: { name: categoryName },
@@ -40,7 +44,7 @@ class Category extends Model {
         });
 
         fields.push({
-          name: `parent${parent.name}PublicId`,
+          name: this.parentPublicIdString(parent),
           type: 'group',
           displayName: `Parent ${parent.name} Public ID`,
           description: `The parent ${parent.name} Public ID this item is directly related to`,

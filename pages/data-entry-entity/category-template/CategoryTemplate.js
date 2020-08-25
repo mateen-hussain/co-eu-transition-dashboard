@@ -268,13 +268,13 @@ class CategoryTemplate extends Page {
         rowIndex += 4;
         let value;
 
-        const parentFieldNames = entity.parents.map(parent => `parent${parent.category.name}PublicId`);
+        const parentFieldNames = entity.parents.map(parent => Category.parentPublicIdString(parent.category));
 
         if(field.name === 'publicId') {
           value = entity.publicId;
         } else if(parentFieldNames.includes(field.name)) {
           const parent = entity.parents.find(parent => {
-            return `parent${parent.category.name}PublicId` === field.name
+            return Category.parentPublicIdString(parent.category) === field.name
           });
 
           value = parent.publicId;
