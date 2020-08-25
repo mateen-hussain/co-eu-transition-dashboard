@@ -273,6 +273,17 @@ describe('services/authentication', () => {
 
         sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
       });
+
+      it('allows empty roles', () => {
+        const middleware = authentication.protect([]);
+        const req = { user: { roles: [{ name: 'viewer' }] } };
+        const res = { redirect: sinon.stub() };
+        const next = sinon.stub();
+
+        middleware[2](req, res, next);
+
+        sinon.assert.called(next);
+      });
     });
 
     describe('check 2fa', () => {

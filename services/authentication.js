@@ -98,7 +98,7 @@ const protect = (roles = []) => {
       return res.redirect(config.paths.authentication.login);
     }
 
-    if ((req.user.roles.filter(role => 
+    if ((req.user && roles.length == 0) || (req.user.roles.filter(role => 
       roles.includes(role.name)).length > 0)) {
       return next();
     }

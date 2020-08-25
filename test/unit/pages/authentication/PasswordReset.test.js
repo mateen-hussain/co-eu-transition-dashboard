@@ -26,10 +26,10 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
   describe('#middleware', () => {
     it('loads correct middleware', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader', 'viewer', 'admin', 'management', 'management_overview']),
+        ...authentication.protect([]),
         flash
       ]);
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'viewer', 'admin', 'management', 'management_overview']);
+      sinon.assert.calledWith(authentication.protect, []);
     });
   });
 

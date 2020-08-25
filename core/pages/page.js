@@ -49,7 +49,7 @@ class Page {
   }
 
   get middleware() {
-    return [...protect(['uploader', 'viewer', 'admin', 'management', 'management_overview'])];
+    return [...protect([])];
   }
 
   get template() {
