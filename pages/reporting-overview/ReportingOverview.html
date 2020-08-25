@@ -2,16 +2,13 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block beforeContent %}
-  {{ govukBackLink({
-    text: "Back",
-    href: "#",
-    attributes: {
-      onclick: "history.go(-1);"
-    }
-  }) }}
+{% include "navigation.njk" %}
+{% include "feedback.njk" %}
+
   {% if tableauIframeError %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
+      <br><br>
         <h1 class="govuk-heading-xl">Reporting overview</h1>
         <p class="govuk-body">There has been an error accessing this page, please contact The Transition Taskforce Dashboard Team.</p>
       </div>
