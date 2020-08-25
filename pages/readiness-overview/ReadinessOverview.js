@@ -5,7 +5,7 @@ const logger = require('services/logger');
 
 const getTableauUrl = async (req, res, next) => {
   try {
-    res.locals.tableauIframeUrl = await tableau.getTableauUrl(req.user, 'MilestonesWorkbook1', 'Gantt');
+    res.locals.tableauIframeUrl = await tableau.getTableauUrl(req.user, 'Readiness', 'Landing');
   } catch (error) {
     res.locals.tableauIframeError = error;
     logger.error(`Error from tableau: ${error}`);
