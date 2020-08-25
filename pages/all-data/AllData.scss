@@ -15,7 +15,7 @@ a.govuk-link.project-link {
     pointer-events: all;
 }
 
-button#accordion-table-heading-1 ~ .govuk-accordion__icon {
+button#accordion-table-heading-1 > .govuk-accordion__icon {
     display: none;
 }
 

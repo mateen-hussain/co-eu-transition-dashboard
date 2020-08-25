@@ -36,7 +36,7 @@
 <nav class="navigation">
     <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in managementInformationUrls }}">
-        <a class="govuk-header__link nav" href="{{ config.paths.allData }}">Management information</a>
+        <a class="govuk-header__link nav" href="{{ config.paths.allData }}">HMG delivery management information</a>
     </li>
     {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">

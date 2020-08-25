@@ -9,10 +9,21 @@
 @import 'pages/project-details/ProjectDetails.scss';
 @import 'pages/reporting-overview/ReportingOverview.scss';
 
+.govuk-width-container {
+    margin-right: 10px;
+    margin-left: 10px;
+    max-width: 100%;
+}
+
+.govuk-header__container {
+    border-bottom: 10px solid #f3f2f1;
+}
+
 .navigation {
     background-color: #f3f2f1;
     padding-top: 10px;
-    padding-left: 10px;
+    padding-left: 5px;
+    margin-top: -10px;
 }
 
 a.govuk-header__link.nav {
@@ -47,11 +58,12 @@ li.govuk-header__navigation-item.logout-item {
 }
 
 .child-navigation {
-    padding-left: 10px;
+    padding-left: 5px;
 }
 
 ul#childNavigation {
     border-bottom: 1px solid #b1b4b6;
+    display: inline-block;
 }
 
 a.govuk-header__link.child-nav {
@@ -62,3 +74,8 @@ a.govuk-header__link.child-nav {
 .child-item.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
    color: #000000;
 }
+
+li.govuk-header__navigation-item.child-item, li.govuk-header__navigation-item {
+    margin-right: 24px;
+}
+
