@@ -20,7 +20,8 @@
     config.paths.dataEntryEntity.bulkUploadSignOff,
     config.paths.dataEntryEntity.bulkUploadFile,
     config.paths.dataEntryEntity.import,
-    config.paths.dataEntryEntity.submissionSuccess
+    config.paths.dataEntryEntity.submissionSuccess,
+    config.paths.dataEntryEntity.output
     ]
 %}
 
@@ -49,7 +50,7 @@
     </li>
     {% endif %}
     {% if req.user.roles | includes(['uploader']) %}
-    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls or url == config.paths.dataEntryEntity.output }}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
         </a>
