@@ -69,12 +69,12 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
   });
 
-  it('only certain users are alowed to access this page', () => {
+  it('only management are allowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['uploader', 'admin', 'viewer', 'management'])
+      ...authentication.protect(['management'])
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['uploader', 'admin', 'viewer', 'management']);
+    sinon.assert.calledWith(authentication.protect, ['management']);
   });
 
   describe('#getDepartmentsWithMissedMilestones', () => {

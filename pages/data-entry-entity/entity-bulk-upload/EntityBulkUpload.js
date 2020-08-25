@@ -22,7 +22,7 @@ class EntityBulkUpload extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin']),
+      ...authentication.protect(['uploader']),
       fileUpload({ safeFileNames: true }),
       flash
     ];

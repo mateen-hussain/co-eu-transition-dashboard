@@ -27,7 +27,7 @@ const up = async (query) => {
     },{ 
       name: 'management'
     },{
-      name: 'guest'
+      name: 'management_overview'
     }
   ]);
 

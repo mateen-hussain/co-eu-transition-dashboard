@@ -17,7 +17,7 @@ class AllData extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['admin', 'uploaders', 'viewer', 'management'])
+      ...authentication.protect(['management'])
     ];
   }
 

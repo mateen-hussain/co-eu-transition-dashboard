@@ -17,7 +17,7 @@ class CategoryTemplate extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['administrator'])
+      ...authentication.protect(['uploader'])
     ];
   }
 

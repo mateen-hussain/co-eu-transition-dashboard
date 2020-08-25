@@ -48,7 +48,7 @@
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">HMG delivery management information</a>
     </li>
     {% endif %}
-    {% if req.user.roles | includes(['admin', 'uploader']) %}
+    {% if req.user.roles | includes(['uploader']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
@@ -68,7 +68,7 @@
 {% if url in managementInformationUrls %}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
-    {% if req.user.roles | includes(['viewer']) %} 
+    {% if req.user.roles | includes(['management_overview']) %} 
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.reportingOverview }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.reportingOverview }}">
         Reporting overview

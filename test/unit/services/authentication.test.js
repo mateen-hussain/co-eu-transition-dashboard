@@ -252,16 +252,6 @@ describe('services/authentication', () => {
         sinon.assert.called(next);
       });
 
-      it('allows guest roles', () => {
-        const middleware = authentication.protect(['uploader', 'admin', 'viewer']);
-        const req = { user: { roles: [{ name: 'guest' }] } };
-        const next = sinon.stub();
-
-        middleware[2](req, {}, next);
-
-        sinon.assert.called(next);
-      });
-
       it('redirects to login if no user assigned to req', () => {
         const middleware = authentication.protect(['viewer']);
         const req = { };

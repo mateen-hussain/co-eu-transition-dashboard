@@ -12,7 +12,7 @@ class PasswordReset extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'viewer', 'admin', 'management', 'guest']),
+      ...authentication.protect(['uploader', 'viewer', 'admin', 'management', 'management_overview']),
       flash
     ];
   }

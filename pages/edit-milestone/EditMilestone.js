@@ -53,7 +53,7 @@ class EditMilestone extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'admin']),
+      ...authentication.protect(['uploader']),
       flash
     ];
   }

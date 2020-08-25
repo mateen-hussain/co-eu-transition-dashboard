@@ -23,7 +23,7 @@ class ReportingOverview extends Page {
     return [
       ...super.middleware,
       getTableauUrl,
-      ...authentication.protect(['admin', 'viewer', 'uploader'])
+      ...authentication.protect(['management_overview'])
     ];
   }
 }

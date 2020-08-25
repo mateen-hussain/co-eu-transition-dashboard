@@ -54,7 +54,7 @@ class EditProject extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'admin']),
+      ...authentication.protect(['uploader']),
       flash
     ];
   }

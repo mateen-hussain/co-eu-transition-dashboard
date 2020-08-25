@@ -99,8 +99,7 @@ const protect = (roles = []) => {
     }
 
     if ((req.user.roles.filter(role => 
-      roles.includes(role.name)).length > 0) || 
-      (req.user.roles.some(role => role.name === 'guest'))) {
+      roles.includes(role.name)).length > 0)) {
       return next();
     }
 

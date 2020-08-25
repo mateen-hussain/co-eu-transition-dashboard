@@ -83,14 +83,14 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
   });
 
   describe('#middleware', () => {
-    it('only admins are alowed to access this page', () => {
+    it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['admin']),
+        ...authentication.protect(['uploader']),
         fileUploadMock,
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['admin']);
+      sinon.assert.calledWith(authentication.protect, ['uploader']);
     });
   });
 
