@@ -33,7 +33,7 @@ describe('pages/start/Start', () => {
       sinon.assert.calledWith(res.redirect, config.paths.readinessOverview);
     });
 
-    it('redirects to all data landing page by default', async() => {
+    it('redirects to all data landing page if it has management role', async() => {
       req.user.roles = [{ name: 'management' }];
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.allData);
