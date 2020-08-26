@@ -33,8 +33,16 @@
     ]
 %}
 
+{% set transitionReadinessUrls = [
+    config.paths.readinessOverview
+    ]
+%}
+
 <nav class="navigation">
     <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in transitionReadinessUrls }}">
+        <a class="govuk-header__link nav" href="{{ config.paths.readinessOverview }}">Transition readiness</a>
+    </li>
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in managementInformationUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">HMG delivery management information</a>
     </li>
@@ -116,6 +124,18 @@
             </a>
         </li>
     {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% if url in transitionReadinessUrls%}
+<nav class="child-navigation">
+    <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in transitionReadinessUrls }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.readinessOverview }}">
+        Overview
+        </a>
+    </li>
     </ul>
 </nav>
 {% endif %}

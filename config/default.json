@@ -67,7 +67,8 @@
     "editMilestone": "/edit-milestone",
     "reportingOverview": "/reporting-overview",
     "editProject": "/edit-project",
-    "tableauExport": "/tableau-export"
+    "tableauExport": "/tableau-export",
+    "readinessOverview": "/readiness-overview"
   },
   "features": {
     "twoFactorAuth": true,
