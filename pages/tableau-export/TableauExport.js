@@ -8,8 +8,9 @@ const EntityFieldEntry = require('models/entityFieldEntry');
 const { Parser } = require('json2csv');
 const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
-const Project = require('models/project');
+const Milestone = require('models/milestone');
 const moment = require('moment');
+const cloneDeep = require('lodash/cloneDeep');
 
 class TableauExport extends Page {
   get url() {
@@ -25,7 +26,7 @@ class TableauExport extends Page {
   }
 
   get exportingProjects() {
-    return this.req.params && this.req.params.type === 'projects';
+    return this.req.params && this.req.params.type === 'projects-milestones';
   }
 
   async addParents(entity, entityFieldMap, replaceArraysWithNumberedKeyValues = true) {
@@ -99,8 +100,6 @@ class TableauExport extends Page {
 
       if(entity.parents.length) {
         await this.addParents(entity, entityFieldMap);
-
-
       }
 
       entityFieldMaps.push(entityFieldMap);
@@ -125,33 +124,45 @@ class TableauExport extends Page {
     const dao = new DAO({
       sequelize: sequelize
     });
-    const projectFieldDefinitions = await Project.fieldDefinitions();
+    const milestoneFieldDefinitions = await Milestone.fieldDefinitions();
 
     const projectIds = entities.map(d => d['Public ID']);
     const projects = await dao.getAllData(this.id, {
       uid: projectIds
     });
 
+    const milestoneDatas = [];
+
     for(const entity of entities) {
       const project = projects.find(project => entity['Public ID'] === project.uid);
 
       if(project) {
-        projectFieldDefinitions.forEach(field => {
-          if(project[field.name]) {
-            entity[`Project ${field.displayName}`] = project[field.name];
-          }
-        });
 
-        project.projectFieldEntries.forEach(field => {
-          entity[`Project ${field.projectField.displayName}`] = field.value;
-        });
+        for(const milestone of project.milestones) {
+          const milestoneData = cloneDeep(entity);
+
+          milestoneData['Project - Name'] = project.title;
+          milestoneData['Project - UID'] = project.uid;
+
+          milestoneFieldDefinitions.forEach(field => {
+            if(milestone[field.name]) {
+              milestoneData[`Milestone - ${field.displayName || field.name}`] = milestone[field.name];
+            }
+          });
+
+          milestone.milestoneFieldEntries.forEach(field => {
+            milestoneData[`Milestone - ${field.milestoneField.displayName}`] = field.value;
+          });
+
+          milestoneDatas.push(milestoneData);
+        }
       }
     }
 
-    return entities;
+    return milestoneDatas;
   }
 
-  async exportProjects(req, res) {
+  async exportProjectsMilestones(req, res) {
     const projectsCategory = await Category.findOne({
       where: {
         name: 'Project'
@@ -178,7 +189,7 @@ class TableauExport extends Page {
     if(this.exportingMeasures) {
       return await this.exportMeasures(req, res);
     } else if(this.exportingProjects) {
-      return await this.exportProjects(req, res);
+      return await this.exportProjectsMilestones(req, res);
     }
 
     return res.sendStatus(METHOD_NOT_ALLOWED);

@@ -3,6 +3,7 @@ const { paths } = require('config');
 const Entity = require('models/entity');
 const Category = require('models/category');
 const proxyquire = require('proxyquire');
+const Milestone = require('models/milestone');
 
 let page = {};
 let res = {};
@@ -45,7 +46,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
   describe('#exportingProjects', () => {
     it('returns correct url', () => {
-      page.req = { params: { type: 'projects' } };
+      page.req = { params: { type: 'projects-milestones' } };
       expect(page.exportingProjects).to.be.ok;
     });
   });
@@ -127,6 +128,13 @@ describe('pages/tableau-export/TableauExport', () => {
   });
 
   describe('#mergeProjectsWithEntities', () => {
+    beforeEach(() => {
+      Milestone.fieldDefinitions.returns([{
+        name: 'name',
+        displayName: 'Name'
+      }]);
+    });
+
     it('get projects and merge with project entities', async () => {
       const entities = [{
         'Public ID': 1
@@ -137,33 +145,53 @@ describe('pages/tableau-export/TableauExport', () => {
       const projects = [{
         uid: 1,
         name: 'project 1',
+        title: 'project 1',
         projectFieldEntries: [{
           projectField: {
             displayName: 'UID'
           },
           value: 'UID 1'
+        }],
+        milestones: [{
+          name: 'milestone 1',
+          milestoneFieldEntries: [{
+            milestoneField: {
+              displayName: 'date'
+            },
+            value: 'date 1'
+          }]
         }]
       },{
         uid: 2,
         name: 'project 2',
+        title: 'project 2',
         projectFieldEntries: [{
           projectField: {
             displayName: 'UID'
           },
           value: 'UID 2'
+        }],
+        milestones: [{
+          name: 'milestone 2',
+          milestoneFieldEntries: [{
+            milestoneField: {
+              displayName: 'date'
+            },
+            value: 'date 2'
+          }]
         }]
       }];
       getAllDataStub.resolves(projects);
 
       const mergedEntities = await page.mergeProjectsWithEntities(entities);
       expect(mergedEntities).to.eql([
-        { 'Public ID': 1, 'Project UID': 'UID 1' },
-        { 'Public ID': 2, 'Project UID': 'UID 2' }
+        { 'Public ID': 1, 'Project - UID': 1, 'Milestone - Name': 'milestone 1', 'Milestone - date': 'date 1', 'Project - Name': 'project 1' },
+        { 'Public ID': 2, 'Project - UID': 2, 'Milestone - Name': 'milestone 2', 'Milestone - date': 'date 2', 'Project - Name': 'project 2' }
       ]);
     });
   });
 
-  describe('#exportProjects', () => {
+  describe('#exportProjectsMilestones', () => {
     it('gets all metrics and creats an object', async () => {
       const entities = [{ data: 'data' }];
       const entitiesWithProjects = [{ data: 'data', data1: 'data 1' }];
@@ -175,7 +203,7 @@ describe('pages/tableau-export/TableauExport', () => {
         id: 1
       });
 
-      await page.exportProjects(req, res);
+      await page.exportProjectsMilestones(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
       sinon.assert.calledWith(page.mergeProjectsWithEntities, entities);
