@@ -3,7 +3,7 @@ const Entity = require('models/entity');
 const EntityParent = require('models/entityParent');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const EntityFieldEntryAudit = require('models/entityFieldEntryAudit');
-const { STRING, INTEGER } = require('sequelize');
+const { STRING, INTEGER, DATE } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 describe('models/entity', () => {
@@ -23,6 +23,10 @@ describe('models/entity', () => {
         type: INTEGER,
         allowNull: false,
         field: "category_id"
+      },
+      createdAt: {
+        field: "created_at",
+        type: DATE
       }
     });
   });

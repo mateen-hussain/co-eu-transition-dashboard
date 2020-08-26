@@ -1,4 +1,4 @@
-const { Model, STRING, INTEGER } = require('sequelize');
+const { Model, STRING, INTEGER, DATE } = require('sequelize');
 const sequelize = require('services/sequelize');
 const EntityParent = require('./entityParent');
 const EntityFieldEntry = require('./entityFieldEntry');
@@ -128,6 +128,10 @@ Entity.init({
     type: INTEGER,
     allowNull: false,
     field: "category_id"
+  },
+  createdAt: {
+    field: "created_at",
+    type: DATE
   }
 }, { sequelize, modelName: 'entity', tableName: 'entity', createdAt: 'created_at', updatedAt: false });
 

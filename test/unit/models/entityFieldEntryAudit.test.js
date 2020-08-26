@@ -20,6 +20,10 @@ describe('models/categoryParent', () => {
         type: DATE,
         field: 'archived_at',
         defaultValue: NOW
+      },
+      createdAt: {
+        field: "created_at",
+        type: DATE
       }
     });
   });

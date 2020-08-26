@@ -19,6 +19,10 @@ EntityFieldEntryAudit.init({
     type: DATE,
     field: 'archived_at',
     defaultValue: NOW
+  },
+  createdAt: {
+    field: "created_at",
+    type: DATE
   }
 }, { sequelize, modelName: 'entityFieldEntryAudit', tableName: 'entity_field_entry_audit', createdAt: 'created_at', updatedAt: 'updated_at' });
 EntityFieldEntryAudit.removeAttribute('id');

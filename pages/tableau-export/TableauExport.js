@@ -10,6 +10,9 @@ const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
 const Project = require('models/project');
 const moment = require('moment');
+const EntityFieldEntryAudit = require('models/entityFieldEntryAudit');
+const cloneDeep = require('lodash/cloneDeep');
+const groupBy = require('lodash/groupBy');
 
 class TableauExport extends Page {
   get url() {
@@ -84,6 +87,10 @@ class TableauExport extends Page {
       }, {
         model: Entity,
         as: 'parents'
+      }, {
+        model: EntityFieldEntryAudit,
+        include: CategoryField,
+        required: false
       }]
     });
 
@@ -96,14 +103,31 @@ class TableauExport extends Page {
       }, {});
 
       entityFieldMap['Public ID'] = entity.publicId;
+      entityFieldMap['Imported At'] = entity.createdAt;
 
       if(entity.parents.length) {
         await this.addParents(entity, entityFieldMap);
-
-
       }
 
       entityFieldMaps.push(entityFieldMap);
+
+      if(entity.entityFieldEntryAudits && entity.entityFieldEntryAudits.length && entity.entityFieldEntryAudits[0].entityId) {
+        const entityFieldEntryAuditsByDates = groupBy(entity.entityFieldEntryAudits, entityFieldEntryAudit => entityFieldEntryAudit.archivedAt);
+
+        for(const auditDate of Object.keys(entityFieldEntryAuditsByDates)) {
+          const entityFieldEntryAudits = entityFieldEntryAuditsByDates[auditDate];
+
+          const entityAuditFieldMap = cloneDeep(entityFieldMap);
+          entityFieldEntryAudits.forEach(entityFieldEntryAudit => {
+            entityAuditFieldMap[entityFieldEntryAudit.categoryField.displayName] = entityFieldEntryAudit.value;
+          });
+          entityFieldMap['Imported At'] = entityFieldEntryAuditsByDates[auditDate][0].archivedAt;
+
+          entityFieldMaps.push(entityAuditFieldMap);
+        }
+      }
+
+
     }
 
     return entityFieldMaps;

@@ -82,6 +82,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
       Entity.findAll.resolves([{
         publicId: '1',
+        createdAt: 'date 1',
         entityFieldEntries: [{
           categoryField: {
             displayName: 'name'
@@ -90,7 +91,8 @@ describe('pages/tableau-export/TableauExport', () => {
         }],
         parents: []
       },{
-        publicId: '1',
+        publicId: '2',
+        createdAt: 'date 2',
         entityFieldEntries: [{
           categoryField: {
             displayName: 'name'
@@ -103,8 +105,40 @@ describe('pages/tableau-export/TableauExport', () => {
       const entityObjects = await page.getEntitiesFlatStructure({ id: 1 });
 
       expect(entityObjects).to.eql([
-        { name: 'some name', 'Public ID': '1' },
-        { name: 'some name', 'Public ID': '1' }
+        { name: 'some name', 'Public ID': '1', 'Imported At': 'date 1' },
+        { name: 'some name', 'Public ID': '2', 'Imported At': 'date 2' }
+      ]);
+    });
+
+    it.only('adds historical data', async () => {
+      sinon.stub(page, 'addParents').resolves();
+
+      Entity.findAll.resolves([{
+        id: '1',
+        publicId: '1',
+        createdAt: 'date 1',
+        entityFieldEntries: [{
+          categoryField: {
+            displayName: 'some number'
+          },
+          value: 5
+        }],
+        parents: [],
+        entityFieldEntryAudits: [{
+          entityId: '1',
+          archivedAt: 'date 2',
+          value: 10,
+          categoryField: {
+            displayName: 'some number'
+          }
+        }]
+      }]);
+
+      const entityObjects = await page.getEntitiesFlatStructure({ id: 1 });
+
+      expect(entityObjects).to.eql([
+        { 'some number': 5, 'Public ID': '1', 'Imported At': 'date 1' },
+        { 'some number': 10, 'Public ID': '1', 'Imported At': 'date 2' }
       ]);
     });
   });
