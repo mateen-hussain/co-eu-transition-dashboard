@@ -5,18 +5,32 @@ const Project = require('models/project');
 const Milestone = require('models/milestone');
 const MilestoneField = require('models/milestoneField');
 const MilestoneFieldEntryAudit = require('models/milestoneFieldEntryAudit');
+const authentication = require('services/authentication');
 
 let page = {};
 
 describe('pages/milestone-details/MilestoneDetails', () => {
   beforeEach(() => {
     page = new MilestoneDetails('some path', {}, {});
+    sinon.stub(authentication, 'protect').returns([]);
+  });
+
+  afterEach(() => {
+    authentication.protect.restore();
   });
 
   describe('#url', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(paths.milestoneDetails);
     });
+  });
+
+  it('only management are allowed to access this page', () => {
+    expect(page.middleware).to.eql([
+      ...authentication.protect(['management'])
+    ]);
+
+    sinon.assert.calledWith(authentication.protect, ['management']);
   });
 
   describe('#getMilestoneFields', () => {

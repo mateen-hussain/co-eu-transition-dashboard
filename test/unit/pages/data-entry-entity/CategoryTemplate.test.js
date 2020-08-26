@@ -27,12 +27,12 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
   });
 
   describe('#middleware', () => {
-    it('only admins are alowed to access this page', () => {
+    it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['administrator'])
+        ...authentication.protect(['uploader'])
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader']);
     });
   });
 

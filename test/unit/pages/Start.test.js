@@ -9,7 +9,7 @@ let req = {};
 describe('pages/start/Start', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub(), redirect: sinon.stub() };
-    req = { cookies: [], user: { role: 'viewer' } };
+    req = { cookies: [], user: { roles: [] } };
 
     page = new Start('some path', req, res);
   });
@@ -27,7 +27,14 @@ describe('pages/start/Start', () => {
       sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
     });
 
+    it('redirects to readiness overview if it does not have management role', async() => {
+      req.user.roles = [{ name: 'viewer' }];
+      await page.handler(req, res);
+      sinon.assert.calledWith(res.redirect, config.paths.readinessOverview);
+    });
+
     it('redirects to all data landing page by default', async() => {
+      req.user.roles = [{ name: 'management' }];
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.allData);
     });

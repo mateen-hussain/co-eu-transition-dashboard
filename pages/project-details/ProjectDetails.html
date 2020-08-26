@@ -36,7 +36,7 @@
 
 {% set projectKey = [{ text:'Project UID' }, { text:'Impact' }, { text:'HMG Confidence' }, { text:'Citizen Readiness' }, { text:'Business Readiness' }, { text:'EU Member State Delivery Confidence' }, { text:'Themes' }] %}
 {% set milestoneKey = [{ text:'Milestone UID' }, { text:'Milestone Description' }, { text:'Due Date' }, { text:'Complete' }, { text:'Latest Comments' }] %}
-{% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
+{% if req.user.roles | includes(['uploader']) %}
   {% set milestoneKey = (milestoneKey.push( { text: '' }), milestoneKey) %}
 {% endif %}
 
@@ -76,7 +76,7 @@
 
     {% endfor %}
 
-    {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
+    {% if req.user.roles | includes(['uploader']) %}
     {% set milestoneValue = (milestoneValue.push({html: '<a href="' + config.paths.editMilestone + '/' + uid | urlencode + '" class="govuk-link edit-link">Edit</a>' }), milestoneValue) %}
     {% endif %}
     {% set milestoneFields = (milestoneFields.push(milestoneValue), milestoneFields) %}
@@ -93,7 +93,7 @@
     <span class="govuk-caption-xl dept-name">{{ project.department_name }}</span>
   </div>
   <div class="govuk-grid-column-one-quarter">
-    {% if req.user.role == 'uploader' or req.user.role == 'administrator' %}
+    {% if req.user.roles | includes(['uploader']) %}
       <a href="{{ config.paths.editProject }}/{{ project.uid | urlencode }}" class="govuk-link edit-link">Edit project data</a>
     {% endif %}
   </div>

@@ -4,6 +4,7 @@ const jwt = require('services/jwt');
 const proxyquire = require('proxyquire');
 const moment = require('moment');
 const sequelize = require('services/sequelize');
+const authentication = require('services/authentication');
 
 let page = {};
 let filtersStub = {};
@@ -28,11 +29,14 @@ describe('pages/all-data/AllData', () => {
 
     page = new AllData('some path', req, res);
 
+    sinon.stub(authentication, 'protect').returns([]);
+
     sinon.stub(jwt, 'restoreData');
   });
 
   afterEach(() => {
     jwt.restoreData.restore();
+    authentication.protect.restore();
   });
 
   describe('#url', () => {
@@ -45,6 +49,14 @@ describe('pages/all-data/AllData', () => {
     it('returns the correct data schema', () => {
       expect(page.schema).to.eql({ filters: {} });
     });
+  });
+
+  it('only management are allowed to access this page', () => {
+    expect(page.middleware).to.eql([
+      ...authentication.protect(['management'])
+    ]);
+
+    sinon.assert.calledWith(authentication.protect, ['management']);
   });
 
   describe('#getLastUpdatedAt', () => {

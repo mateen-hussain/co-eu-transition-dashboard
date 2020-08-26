@@ -31,7 +31,7 @@ class CategoryFieldList extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['administrator']),
+      ...authentication.protect(['admin']),
       flash,
       setCategoryToLocals
     ];

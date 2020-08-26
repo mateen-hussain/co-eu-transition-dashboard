@@ -91,13 +91,13 @@ describe('pages/edit-milestone/EditMilestone', () => {
   });
 
   describe('#middleware', () => {
-    it('only admins and upladers are aloud to access this page', () => {
+    it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader', 'administrator']),
+        ...authentication.protect(['uploader']),
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader']);
     });
   });
 

@@ -5,6 +5,7 @@ const config = require('config');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
 const Department = require('models/department');
+const Role = require('models/role');
 const sequelize = require('services/sequelize');
 const { Op } = require('sequelize');
 
@@ -183,7 +184,11 @@ describe('services/authentication', () => {
 
         sinon.assert.calledWith(User.findOne, {
           where: { id: jwtPayload.id, loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts } },
-          include: Department
+          include: [{
+            model: Department
+          },{
+            model: Role 
+          }]
         });
 
         sinon.assert.calledWith(authenticateUserCallback, null, { id: user.id, role: user.role });
@@ -198,7 +203,11 @@ describe('services/authentication', () => {
 
         sinon.assert.calledWith(User.findOne, {
           where: { id: jwtPayload.id, loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts } },
-          include: Department
+          include: [{
+            model: Department
+          },{
+            model: Role 
+          }]
         });
 
         sinon.assert.calledWith(authenticateUserCallback, error);
@@ -224,7 +233,7 @@ describe('services/authentication', () => {
     describe('handle roles', () => {
       it('allows defined role', () => {
         const middleware = authentication.protect(['viewer']);
-        const req = { user: { role: 'viewer' } };
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -234,8 +243,8 @@ describe('services/authentication', () => {
       });
 
       it('allows mulitple defined roles', () => {
-        const middleware = authentication.protect(['uploader', 'administrator', 'viewer']);
-        const req = { user: { role: 'viewer' } };
+        const middleware = authentication.protect(['uploader', 'admin', 'viewer']);
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const next = sinon.stub();
 
         middleware[2](req, {}, next);
@@ -255,14 +264,25 @@ describe('services/authentication', () => {
       });
 
       it('redirects to login if user role does not match', () => {
-        const middleware = authentication.protect(['uploader', 'administrator']);
-        const req = { user: { role: 'viewer' } };
+        const middleware = authentication.protect(['uploader', 'admin']);
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
         middleware[2](req, res, next);
 
         sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
+      });
+
+      it('allows empty roles', () => {
+        const middleware = authentication.protect([]);
+        const req = { user: { roles: [{ name: 'viewer' }] } };
+        const res = { redirect: sinon.stub() };
+        const next = sinon.stub();
+
+        middleware[2](req, res, next);
+
+        sinon.assert.called(next);
       });
     });
 
@@ -279,7 +299,7 @@ describe('services/authentication', () => {
         jwt.restoreData.returns({ tfa: true });
 
         const middleware = authentication.protect(['viewer']);
-        const req = { user: { role: 'viewer' } };
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -292,7 +312,7 @@ describe('services/authentication', () => {
         jwt.restoreData.returns({ tfa: false });
 
         const middleware = authentication.protect(['viewer']);
-        const req = { user: { role: 'viewer' } };
+        const req = { user: { roles: [{ name: 'viewer' }] } };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -307,7 +327,7 @@ describe('services/authentication', () => {
       sinon.stub(jwt, 'saveData');
 
       const middleware = authentication.protect(['viewer']);
-      const req = { user: { role: 'viewer' } };
+      const req = { user: { roles: [{ name: 'viewer' }] } };
       const res = { redirect: sinon.stub() };
       const next = sinon.stub();
 

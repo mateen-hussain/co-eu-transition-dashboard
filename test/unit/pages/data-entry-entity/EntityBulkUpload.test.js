@@ -64,14 +64,14 @@ describe('pages/data-entry-entity/entity-bulk-upload/EntityBulkUpload', () => {
     expect(page.url).to.eql(config.paths.dataEntryEntity.bulkUpload);
   });
 
-  it('only admins are alowed to access this page', () => {
+  it('only uploaders are allowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['administrator']),
+      ...authentication.protect(['uploader']),
       fileUploadMock,
       flash
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['administrator']);
+    sinon.assert.calledWith(authentication.protect, ['uploader']);
   });
 
   describe('#mode', () => {

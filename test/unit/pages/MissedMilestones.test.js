@@ -5,6 +5,7 @@ const Milestone = require('models/milestone');
 const Project = require('models/project');
 const config = require('config');
 const moment = require('moment');
+const authentication = require('services/authentication');
 
 const department = [{
   dataValues: {
@@ -27,6 +28,12 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     req = { cookies: [], user: { getDepartmentsWithProjects: sinon.stub() } };
 
     page = new MissedMilestones('some path', req, res);
+
+    sinon.stub(authentication, 'protect').returns([]);
+  });
+
+  afterEach(() => {
+    authentication.protect.restore();
   });
 
   describe('#isEnabled', () => {
@@ -60,6 +67,14 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(paths.missedMilestones);
     });
+  });
+
+  it('only management are allowed to access this page', () => {
+    expect(page.middleware).to.eql([
+      ...authentication.protect(['management'])
+    ]);
+
+    sinon.assert.calledWith(authentication.protect, ['management']);
   });
 
   describe('#getDepartmentsWithMissedMilestones', () => {
