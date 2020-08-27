@@ -1,5 +1,7 @@
   {% if (field.name == 'uid') %}
     <input type="hidden" name="uid" value="{{ data.uid }}" />
+  {% elseif (field.name == 'departmentName') %}
+    <input type="hidden" name="departmentName" id="departmentName" value="{{ data.departmentName }}" />
   {% elseif (field.type == 'string') %}
 
   {{ govukTextarea({
