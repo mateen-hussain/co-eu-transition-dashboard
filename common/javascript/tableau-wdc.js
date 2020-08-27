@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 const getTableauDataType = type => {
   switch (type) {
   case 'string':
@@ -18,7 +20,7 @@ const getTableauDataType = type => {
 // Tableau only allows the following regex items to be used as an ID
 const formatKey = key => key.replace(/[^a-zA-Z0-9_]/g, '');
 
-(async () => {
+(function() {
   // Create the connector object
   var myConnector = tableau.makeConnector();
 
@@ -29,7 +31,8 @@ const formatKey = key => key.replace(/[^a-zA-Z0-9_]/g, '');
       for (const [key, value] of Object.entries(data)) {
         cols.push({
           id: formatKey(key),
-          dataType: getTableauDataType(value.type)
+          dataType: getTableauDataType(value.type),
+          alias: key
         });
       }
   

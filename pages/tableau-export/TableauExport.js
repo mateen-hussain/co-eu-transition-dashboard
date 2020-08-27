@@ -180,17 +180,17 @@ class TableauExport extends Page {
         for(const milestone of project.milestones) {
           const milestoneData = cloneDeep(entity);
 
-          milestoneData['Project - Name'] = project.title;
-          milestoneData['Project - UID'] = project.uid;
+          milestoneData['Project - Name'] = { value: project.title, type: 'string' };
+          milestoneData['Project - UID'] = { value: project.uid, type: 'string' };
 
           milestoneFieldDefinitions.forEach(field => {
             if(milestone[field.name]) {
-              milestoneData[`Milestone - ${field.displayName || field.name}`] = milestone[field.name];
+              milestoneData[`Milestone - ${field.displayName || field.name}`] = { value:  milestone[field.name], type: 'string' };
             }
           });
 
           milestone.milestoneFieldEntries.forEach(field => {
-            milestoneData[`Milestone - ${field.milestoneField.displayName}`] = field.value;
+            milestoneData[`Milestone - ${field.milestoneField.displayName}`] =  { value: field.value, type: field.milestoneField.type }; 
           });
 
           milestoneDatas.push(milestoneData);
@@ -211,7 +211,6 @@ class TableauExport extends Page {
     const entities = await this.getEntitiesFlatStructure(projectsCategory);
     const entitiesWithProjects = await this.mergeProjectsWithEntities(entities);
 
-    // this.responseAsCSV(entitiesWithProjects, res);
     return res.json(entitiesWithProjects);
   }
 
