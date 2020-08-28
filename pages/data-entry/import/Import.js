@@ -73,6 +73,15 @@ class Import extends Page {
       projectErrors
     ] = this.validateItems(projects, parsedProjects, projectFields);
 
+    for(const project of parsedProjects) {
+      if(project.deliveryTheme === 'Borders' && !this.req.user.departments.map(d => d.name).includes('BPDG')) {
+        projectErrors.push({
+          item: project,
+          error: 'Only BPDG can manage Border information'
+        });
+      }
+    }
+
     return { projectErrors, projectColumnErrors, parsedProjects };
   }
 
