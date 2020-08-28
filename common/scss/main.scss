@@ -10,8 +10,8 @@
 @import 'pages/reporting-overview/ReportingOverview.scss';
 
 .govuk-width-container {
-    margin-right: 15px;
-    margin-left: 15px;
+    margin-right: 20px;
+    margin-left: 20px;
     max-width: 100%;
 }
 
@@ -22,10 +22,10 @@
 .navigation {
     background-color: #f3f2f1;
     padding-top: 10px;
-    padding-left: 20px;
+    padding-left: 24px;
     margin-top: -10px;
-    margin-left: -15px !important;
-    margin-right: -15px !important;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
 }
 
 a.govuk-header__link.nav {
@@ -79,7 +79,7 @@ a.govuk-header__link.child-nav {
 }
 
 li.govuk-header__navigation-item.child-item, li.govuk-header__navigation-item {
-    margin-right: 24px;
+    margin-right: 25px;
 }
 
 li.govuk-header__navigation-item.child-item:last-child, li.govuk-header__navigation-item:last-child {
