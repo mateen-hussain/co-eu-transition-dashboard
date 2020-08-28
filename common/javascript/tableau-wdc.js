@@ -37,8 +37,8 @@ const formatKey = key => key.replace(/[^a-zA-Z0-9_]/g, '');
       }
   
       var tableSchema = {
-        id: "feed",
-        alias: "feed 1",
+        id: `${formatKey(tableau.connectionName)}feed`,
+        alias: `${tableau.connectionName} feed`,
         columns: cols
       };
   
