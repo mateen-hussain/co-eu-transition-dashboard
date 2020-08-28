@@ -29,6 +29,10 @@ class TableauExport extends Page {
     return this.req.params && this.req.params.type === 'projects-milestones';
   }
 
+  get exportingCommunications() {
+    return this.req.params && this.req.params.type === 'communications';
+  }
+
   async addParents(entity, entityFieldMap, replaceArraysWithNumberedKeyValues = true) {
     for(const parent of entity.parents) {
       const parentEntity = await Entity.findOne({
@@ -120,6 +124,18 @@ class TableauExport extends Page {
     this.responseAsCSV(data, res);
   }
 
+  async exportCommunications(req, res) {
+    const measuresCategory = await Category.findOne({
+      where: {
+        name: 'Communication'
+      }
+    });
+
+    const data = await this.getEntitiesFlatStructure(measuresCategory);
+
+    this.responseAsCSV(data, res);
+  }
+
   async mergeProjectsWithEntities(entities) {
     const dao = new DAO({
       sequelize: sequelize
@@ -190,6 +206,8 @@ class TableauExport extends Page {
       return await this.exportMeasures(req, res);
     } else if(this.exportingProjects) {
       return await this.exportProjectsMilestones(req, res);
+    } else if(this.exportingCommunications) {
+      return await this.exportCommunications(req, res);
     }
 
     return res.sendStatus(METHOD_NOT_ALLOWED);

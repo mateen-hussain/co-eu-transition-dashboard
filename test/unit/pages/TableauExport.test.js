@@ -51,6 +51,13 @@ describe('pages/tableau-export/TableauExport', () => {
     });
   });
 
+  describe('#exportingCommunications', () => {
+    it('returns correct url', () => {
+      page.req = { params: { type: 'communications' } };
+      expect(page.exportingCommunications).to.be.ok;
+    });
+  });
+
   describe('#addParents', () => {
     it('add parents category name for each entity parent', async () => {
       const entityObject = {};
@@ -121,6 +128,23 @@ describe('pages/tableau-export/TableauExport', () => {
       });
 
       await page.exportMeasures(req, res);
+
+      sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
+      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+    });
+  });
+
+  describe('#exportCommunications', () => {
+    it('gets all comms and creats an object', async () => {
+      const resp = { data: 'data' };
+      sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
+      sinon.stub(page, 'responseAsCSV');
+
+      Category.findOne.resolves({
+        id: 1
+      });
+
+      await page.exportCommunications(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
       sinon.assert.calledWith(page.responseAsCSV, resp, res);
