@@ -16,6 +16,10 @@ describe('models/category', () => {
       publicIdFormat: {
         type: STRING(50),
         field: "public_id_format"
+      },
+      currentMaxId: {
+        type: INTEGER,
+        field: "current_max_id"
       }
     });
   });

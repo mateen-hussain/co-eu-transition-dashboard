@@ -87,6 +87,10 @@ Category.init({
   publicIdFormat: {
     type: STRING(50),
     field: "public_id_format"
+  },
+  currentMaxId: {
+    type: INTEGER,
+    field: "current_max_id"
   }
 }, { sequelize, modelName: 'category', tableName: 'category', timestamps: false });
 

@@ -92,24 +92,15 @@ class Entity extends Model {
   }
 
   static async nextPublicId(category, { transaction } = {}) {
-    const options = {
-      model: Entity,
-      mapToModel: true
-    };
-
+    const options = {};
     if (transaction) {
       options.transaction = transaction;
       options.lock = transaction.LOCK
     }
 
-    const entities = await sequelize.query(`SELECT public_id FROM entity WHERE category_id=${category.id} ORDER BY public_id DESC LIMIT 1 FOR UPDATE`, options);
-
-    if(!entities || !entities.length) {
-      return `${category.publicIdFormat}01`;
-    }
-
-    const current = parseInt(entities[0].publicId.split('-')[1]);
-    return sprintf("%s%02d", category.publicIdFormat, current+1);
+    await sequelize.query(`UPDATE category SET current_max_id = current_max_id + 1 WHERE id=${category.id}`, options);
+    const updatedCategory = await sequelize.query(`SELECT * FROM category WHERE id=${category.id} LIMIT 1 FOR UPDATE`, options);
+    return sprintf("%s%02d", category.publicIdFormat, updatedCategory[0][0].current_max_id);
   }
 }
 

@@ -131,6 +131,10 @@ describe('pages/data-entry/import/Import', () => {
   });
 
   describe('#validateProjects', () => {
+    beforeEach(() => {
+      Project.fieldDefinitions = sinon.stub();
+    });
+
     it('rejects if no project found', async () => {
       parse.parseItems.returns([])
       const response = await page.validateProjects();
@@ -143,6 +147,40 @@ describe('pages/data-entry/import/Import', () => {
       const parsedProjects = [{ id: 1 }];
 
       page.validateItems = () => [projectColumnErrors, projectErrors];
+      parse.parseItems.returns(parsedProjects);
+
+      const response = await page.validateProjects();
+
+      expect(response).to.eql({ projectErrors, projectColumnErrors, parsedProjects });
+    });
+
+    it('rejects if deliveryTheme is Borders and user does not have access to BPDG', async () => {
+      req.user.departments = [{ name: 'DFT' }];
+      const projectColumnErrors = [];
+      const projectErrors = [{
+        error: 'Only BPDG can manage Border information',
+        item: {
+          deliveryTheme: 'Borders',
+          id: 1
+        }
+      }];
+      const parsedProjects = [{ id: 1, deliveryTheme: 'Borders' }];
+
+      page.validateItems = () => [[], []];
+      parse.parseItems.returns(parsedProjects);
+
+      const response = await page.validateProjects();
+
+      expect(response).to.eql({ projectErrors, projectColumnErrors, parsedProjects });
+    });
+
+    it('allows if deliveryTheme is Borders and has access to BPDG', async () => {
+      req.user.departments = [{ name: 'BPDG' }];
+      const projectColumnErrors = [];
+      const projectErrors = [];
+      const parsedProjects = [{ id: 1, deliveryTheme: 'Borders' }];
+
+      page.validateItems = () => [[], []];
       parse.parseItems.returns(parsedProjects);
 
       const response = await page.validateProjects();

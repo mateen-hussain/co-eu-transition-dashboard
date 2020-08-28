@@ -150,48 +150,31 @@ describe('models/entity', () => {
     };
 
     it('gets next uid', async () => {
-      const options = {
-        model: Entity,
-        mapToModel: true
-      };
+      const options = {};
 
-      sequelize.query.returns([{ publicId: 'someformat-01' }]);
+      sequelize.query.returns([[{ current_max_id: 1 }]]);
 
       const newId = await Entity.nextPublicId(category, options);
 
-      sinon.assert.calledWith(sequelize.query, `SELECT public_id FROM entity WHERE category_id=${category.id} ORDER BY public_id DESC LIMIT 1 FOR UPDATE`, options);
-
-      expect(newId).to.eql('someformat-02');
-    });
-
-    it('creates first id if no entity returned', async () => {
-      const options = {
-        model: Entity,
-        mapToModel: true
-      };
-      sequelize.query.returns();
-
-      const newId = await Entity.nextPublicId(category, options);
-
-      sinon.assert.calledWith(sequelize.query, `SELECT public_id FROM entity WHERE category_id=${category.id} ORDER BY public_id DESC LIMIT 1 FOR UPDATE`, options);
+      sinon.assert.calledWith(sequelize.query, `UPDATE category SET current_max_id = current_max_id + 1 WHERE id=${category.id}`, options);
+      sinon.assert.calledWith(sequelize.query, `SELECT * FROM category WHERE id=${category.id} LIMIT 1 FOR UPDATE`, options);
 
       expect(newId).to.eql('someformat-01');
     });
 
     it('uses transaction and lock if passed in', async () => {
       const options = {
-        model: Entity,
-        mapToModel: true,
         transaction: {
           LOCK: 'some lock'
         },
         lock: 'some lock'
       };
-      sequelize.query.returns();
+      sequelize.query.returns([[{ current_max_id: 1 }]]);
 
       const newId = await Entity.nextPublicId(category, options);
 
-      sinon.assert.calledWith(sequelize.query, `SELECT public_id FROM entity WHERE category_id=${category.id} ORDER BY public_id DESC LIMIT 1 FOR UPDATE`, options);
+      sinon.assert.calledWith(sequelize.query, `UPDATE category SET current_max_id = current_max_id + 1 WHERE id=${category.id}`, options);
+      sinon.assert.calledWith(sequelize.query, `SELECT * FROM category WHERE id=${category.id} LIMIT 1 FOR UPDATE`, options);
 
       expect(newId).to.eql('someformat-01');
     });

@@ -73,6 +73,7 @@ class Import extends Page {
       projectErrors
     ] = this.validateItems(projects, parsedProjects, projectFields);
 
+    // specific error if theme is borders and user permissions does not include BPDG
     for(const project of parsedProjects) {
       if(project.deliveryTheme === 'Borders' && !this.req.user.departments.map(d => d.name).includes('BPDG')) {
         projectErrors.push({
