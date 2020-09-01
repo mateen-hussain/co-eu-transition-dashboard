@@ -90,7 +90,8 @@ Category.init({
   },
   currentMaxId: {
     type: INTEGER,
-    field: "current_max_id"
+    field: "current_max_id",
+    defaultValue: 0
   }
 }, { sequelize, modelName: 'category', tableName: 'category', timestamps: false });
 

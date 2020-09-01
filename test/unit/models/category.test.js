@@ -19,7 +19,8 @@ describe('models/category', () => {
       },
       currentMaxId: {
         type: INTEGER,
-        field: "current_max_id"
+        field: "current_max_id",
+        defaultValue: 0
       }
     });
   });
