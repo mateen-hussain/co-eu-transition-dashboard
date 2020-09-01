@@ -75,7 +75,8 @@ class Import extends Page {
 
     // specific error if theme is borders and user permissions does not include BPDG
     for(const project of parsedProjects) {
-      if(project.deliveryTheme === 'Borders' && !this.req.user.departments.map(d => d.name).includes('BPDG')) {
+      const userDepartments = this.req.user.departments.map(d => d.name);
+      if(project.deliveryTheme === 'Borders' && !userDepartments.includes('BPDG')) {
         projectErrors.push({
           item: project,
           error: 'Only BPDG can manage Border information'
