@@ -98,9 +98,23 @@ class Entity extends Model {
       options.lock = transaction.LOCK
     }
 
-    await sequelize.query(`UPDATE category SET current_max_id = current_max_id + 1 WHERE id=${category.id}`, options);
-    const updatedCategory = await sequelize.query(`SELECT * FROM category WHERE id=${category.id} LIMIT 1 FOR UPDATE`, options);
-    return sprintf("%s%02d", category.publicIdFormat, updatedCategory[0][0].current_max_id);
+    const categories = await sequelize.query('SELECT * FROM category WHERE id=? LIMIT 1 FOR UPDATE', Object.assign({
+      mapToModel: true,
+      model: sequelize.models.category,
+      replacements: [category.id]
+    }, options));
+
+    if (!categories.length) {
+      throw new Error(`Category not found for id ${category.id}`);
+    }
+
+    const newMaxId = categories[0].currentMaxId + 1;
+
+    await sequelize.query('UPDATE category SET current_max_id=? WHERE id=?', Object.assign({
+      replacements: [newMaxId, category.id]
+    }, options));
+
+    return sprintf("%s%02d", category.publicIdFormat, newMaxId);
   }
 }
 
