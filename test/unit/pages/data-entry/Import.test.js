@@ -24,7 +24,7 @@ let res = {};
 describe('pages/data-entry/import/Import', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub() };
-    req = { cookies: [], user: { id: 1 }, flash: sinon.stub() };
+    req = { cookies: [], user: { id: 1, departments: [] }, flash: sinon.stub() };
 
     page = new Import('some path', req, res);
     page.req = req;
