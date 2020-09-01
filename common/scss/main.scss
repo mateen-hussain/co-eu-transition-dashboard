@@ -17,6 +17,7 @@
 
 .govuk-header__container {
     border-bottom: none;
+    padding-bottom: 5px;
 }
 
 .navigation {
@@ -44,11 +45,11 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 .cabinet-office__logotype-image {
     width: 165px;
     height: 32px;
-    margin-top: 6px;
+    margin-top: 2px;
 }
 
 .govuk-header__link--service-name {
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
 .govuk-header {
@@ -57,7 +58,7 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 
 li.govuk-header__navigation-item.logout-item {
     float: right;
-    margin-top: -45px;
+    margin-top: -50px;
 }
 
 .child-navigation {

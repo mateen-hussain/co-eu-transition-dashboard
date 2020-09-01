@@ -3,6 +3,11 @@
     position: relative;
     margin-left: -50vw;
     left: 50%;
-    height: 100vh; 
+    height: 100vh;
+    border: 0;
+}
+
+.iframe-full {
+    overflow: hidden;
 }
 
