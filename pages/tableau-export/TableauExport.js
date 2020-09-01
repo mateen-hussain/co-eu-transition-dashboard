@@ -85,7 +85,10 @@ class TableauExport extends Page {
       },
       include: [{
         model: EntityFieldEntry,
-        include: CategoryField
+        include: {
+          model: CategoryField,
+          where: { isActive: true }
+        }
       }, {
         model: Entity,
         as: 'parents'
