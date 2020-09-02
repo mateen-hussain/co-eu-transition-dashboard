@@ -7,7 +7,6 @@
 {% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
 {% set data = chartData(departmentsWithMissedMilestones) %}
 {% set cellBlock = "cell-color-" %}
-{% set flag = '' %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
 
@@ -44,19 +43,16 @@
     {% for department in departmentsWithMissedMilestones %}
       <tbody class="govuk-table__body">
         {% for project in department.projects %}
-        {% for milestone in project.milestones %}
+        {% for milestone in project.milestones | sort(attribute = 'date') %}
           <tr class="govuk-table__row">
             {% for milestoneField in milestoneFields %}
               {% set field = milestone.fields.get(milestoneField.id) %}
-              {% if (field.id == 'date') and (field.value | beforeToDay) %}
-                {% set flag = 'red-date' %}
-              {% endif %}
-              {% if (field.id=='date') %}
-                <td class="govuk-table__cell"><span class="{{ flag }}">{{ field.value | date("D MMM YYYY") }}</span></td>
-              {% elseif (field.id=='uid') %}
+              {% if (field.id == 'uid') %}
                 <td class="govuk-table__cell">
-                  <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link project-link'>{{ field.value | escape }}</a>
+                  <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link'>{{ field.value | escape }}</a>
                 </td>
+              {% elseif (field.id == 'date') %}
+                <td class="govuk-table__cell">{{ field.value | date("D MMM YYYY") }}</td>
               {% else %}
                 <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
               {% endif %}
