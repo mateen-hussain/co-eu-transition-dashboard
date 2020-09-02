@@ -22,7 +22,9 @@ class MissedMilestones extends Page {
 
   async getDepartmentsWithMissedMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects({
-      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') }
+      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') },
+      complete: ['No'],
+      impact: [0, 1]
     });
 
     for(const department of departments) {
