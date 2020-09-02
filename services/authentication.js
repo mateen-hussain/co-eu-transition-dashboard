@@ -10,6 +10,7 @@ const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
 const sequelize = require('services/sequelize');
 const { Op } = require('sequelize');
+const get = require('lodash/get');
 
 const hashPassphrase = passphrase => {
   try {
@@ -80,20 +81,30 @@ const jwtStrategy = new passportJWTStrategy({
 passport.use(jwtStrategy);
 
 const protect = (roles = []) => {
-  const auth = passport.authenticate('jwt', {
-    session: false,
-    failureRedirect: config.paths.authentication.login
-  });
+  const auth = (req, res, next) => {
+    if (get(res, 'locals.ipWhitelisted', false)){
+      return next()
+    }
+    return passport.authenticate('jwt', {
+      session: false,
+      failureRedirect: config.paths.authentication.login,
+    })(req, res, next);
+  };
 
   const check2fa = (req, res, next) => {
+    const ipWhitelisted = get(res, 'locals.ipWhitelisted', false)
     const data = jwt.restoreData(req, res) || {};
-    if(!data.tfa && config.features.twoFactorAuth) {
+    if(!data.tfa && config.features.twoFactorAuth && !ipWhitelisted) {
       return res.redirect(config.paths.authentication.login);
     }
     return next();
   };
 
   const checkRole = (req, res, next) => {
+    if (get(res, 'locals.ipWhitelisted', false)) {
+      return next()
+    }
+
     if(!req.user) {
       return res.redirect(config.paths.authentication.login);
     }
@@ -107,7 +118,10 @@ const protect = (roles = []) => {
   };
 
   const updateCookieExpiration = (req, res, next) => {
-    jwt.saveData(req, res);
+    const ipWhitelisted = get(res, 'locals.ipWhitelisted', false)
+    if (!ipWhitelisted) {
+      jwt.saveData(req, res);
+    }
     next();
   };
 

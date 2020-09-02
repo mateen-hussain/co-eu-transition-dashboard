@@ -11,10 +11,19 @@ const DAO = require('services/dao');
 const Milestone = require('models/milestone');
 const moment = require('moment');
 const cloneDeep = require('lodash/cloneDeep');
+const authentication = require('services/authentication');
+const ipWhitelist = require('middleware/ipWhitelist');
 
 class TableauExport extends Page {
   get url() {
     return paths.tableauExport;
+  }
+
+  get middleware() {
+    return [
+      ipWhitelist,
+      ...authentication.protect(['management'])
+    ];
   }
 
   get pathToBind() {

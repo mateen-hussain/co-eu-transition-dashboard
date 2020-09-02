@@ -8,7 +8,8 @@
       "uri": "DATABASE_URL"
     },
     "tableau": {
-      "url": "TABLEAU_URL"
+      "url": "TABLEAU_URL",
+      "ipAddress": "TABLEAU_IP_ADDRESS"
     }
   },
   "port": "PORT",

@@ -30,7 +30,7 @@ describe('services/authentication', () => {
     passportJWTStrategyStub = sinon.stub().returns(0);
     passportStub = {
       use: sinon.stub(),
-      authenticate: sinon.stub()
+      authenticate: () => sinon.stub()
     };
 
     sinon.stub(bcrypt, 'compare');
@@ -218,13 +218,7 @@ describe('services/authentication', () => {
   describe('#protect', () => {
     it('is created correctly', () => {
       const middleware = authentication.protect();
-
-      sinon.assert.calledWith(passportStub.authenticate, 'jwt', {
-        session: false,
-        failureRedirect: config.paths.authentication.login
-      });
-
-      expect(middleware[0]).to.eql(passportStub.authenticate());
+      expect(middleware[0].name).to.eql('auth');
       expect(middleware[1].name).to.eql('check2fa');
       expect(middleware[2].name).to.eql('checkRole');
       expect(middleware[3].name).to.eql('updateCookieExpiration');
@@ -284,7 +278,40 @@ describe('services/authentication', () => {
 
         sinon.assert.called(next);
       });
+
+      it('calls next when ipWhitelisted is true', () => {
+        const middleware = authentication.protect([]);
+        const req = {};
+        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+        const next = sinon.stub();
+
+        middleware[2](req, res, next);
+
+        sinon.assert.called(next);
+      });
     });
+
+    describe('check auth', () => {
+      it('next is called when ipWhitelisted is true', () => {
+        const middleware = authentication.protect(['viewer']);
+        const req = {};
+        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+        const next = sinon.stub();
+        middleware[0](req, res, next);
+
+        sinon.assert.called(next);       
+      });
+
+      it('authenticate is called when ipWhitelisted is false', () => {
+        const middleware = authentication.protect(['viewer']);
+        const req = {};
+        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: false } };
+        const next = sinon.stub();
+        middleware[0](req, res, next);
+
+        sinon.assert.notCalled(next);
+      });
+    })
 
     describe('check 2fa', () => {
       beforeEach(() => {
@@ -300,7 +327,7 @@ describe('services/authentication', () => {
 
         const middleware = authentication.protect(['viewer']);
         const req = { user: { roles: [{ name: 'viewer' }] } };
-        const res = { redirect: sinon.stub() };
+        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
         const next = sinon.stub();
 
         middleware[1](req, res, next);
@@ -313,7 +340,7 @@ describe('services/authentication', () => {
 
         const middleware = authentication.protect(['viewer']);
         const req = { user: { roles: [{ name: 'viewer' }] } };
-        const res = { redirect: sinon.stub() };
+        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: false } };
         const next = sinon.stub();
 
         middleware[1](req, res, next);
@@ -321,6 +348,22 @@ describe('services/authentication', () => {
         sinon.assert.calledWith(res.redirect, config.paths.authentication.login);
         sinon.assert.notCalled(next);
       });
+    });
+
+    it('dont update cookie expiration when ipWhitelisted is true', () => {
+      sinon.stub(jwt, 'saveData');
+
+      const middleware = authentication.protect(['viewer']);
+      const req = { user: { roles: [{ name: 'viewer' }] } };
+      const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+      const next = sinon.stub();
+
+      middleware[3](req, res, next);
+
+      sinon.assert.notCalled(jwt.saveData);
+      sinon.assert.called(next);
+
+      jwt.saveData.restore();
     });
 
     it('update cookie expiration', () => {
