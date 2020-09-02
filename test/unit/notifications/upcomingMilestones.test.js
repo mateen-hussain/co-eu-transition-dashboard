@@ -85,6 +85,7 @@ describe('notifications/upcomingMilestones', () => {
           }
         },{
           model: Role,
+          required: true,
           where: {
             name: 'uploader'
           } 

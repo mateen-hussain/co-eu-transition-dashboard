@@ -42,6 +42,7 @@ const getUsers = async (departmentName) => {
       }
     },{
       model: Role,
+      required: true,
       where: {
         name: 'uploader'
       } 
