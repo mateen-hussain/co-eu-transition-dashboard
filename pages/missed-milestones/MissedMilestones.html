@@ -4,14 +4,10 @@
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
-{% import 'accordion-header-macro.njk' as headers %}
-{% import 'critical-milestones-macro.njk' as milestones %}
-
 {% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
 {% set data = chartData(departmentsWithMissedMilestones) %}
-{% set missedMilestonesTable = [] %}
-{% set criticalMilestonesKey = [{ text:'Department' }, { text:'Missed Milestones' }] %}
-{% set extraField = 'Missed Milestones' %}
+{% set cellBlock = "cell-color-" %}
+{% set flag = '' %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
 
@@ -29,50 +25,52 @@
       <p>Department {{ label }} has {{ meta.totalMilestonesMissed }} missed milestones from {{ meta.totalMilestones }} total milestones. {{ ((meta.totalMilestonesMissed / meta.totalMilestones) * 100) | round }}% missed from department portfolio.</p>
     {% endfor %}
   </canvas>
-<br><br>
-{% endif %}
-
-  {% set missedMilestonesTable = (missedMilestonesTable.push ({
-    heading: {
-      html: headers.accordionHeader(criticalMilestonesKey)
-    }
-  }), missedMilestonesTable) %}
-
-  {% for department in departmentsWithMissedMilestones %}
-    {% set departmentRow %}
-      {{ govukTable({
-        rows: [
-          [
-            {
-              text: department.name
-            },
-            {
-              text: department.totalMilestonesMissed
-            }
-          ]
-        ]
-      }) }}
-    {% endset %}
-
-    {% set missedMilestonesTable = (missedMilestonesTable.push ({
-      summary: {
-        html: departmentRow
-      },
-      content: {
-        html: milestones.criticalMilestones(department.projects, projectFields, milestoneFields, extraField, config)
-      }
-    }), missedMilestonesTable) %}
-  {% endfor %}
-
+  <br><br>
+  {% endif %}
 
   <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
-  <br><br><br><br>
+  <br><br><br>
 
-  {{ govukAccordion({
-    id: "accordion-table",
-    classes: "missed-milestones-accordion",
-    items: missedMilestonesTable
-  }) }}
+  <table class="govuk-table">
+    <thead class="govuk-table__head">
+      {% for milestoneField in milestoneFields %}
+        <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
+      {% endfor %}
+      {% for projectField in projectFields %}
+        <th scope="col" class="govuk-table__header">{{ projectField.title }}</th>
+      {% endfor %}
+    </thead>
+
+    {% for department in departmentsWithMissedMilestones %}
+      <tbody class="govuk-table__body">
+        {% for project in department.projects %}
+        {% for milestone in project.milestones %}
+          <tr class="govuk-table__row">
+            {% for milestoneField in milestoneFields %}
+              {% set field = milestone.fields.get(milestoneField.id) %}
+              {% if (field.id == 'date') and (field.value | beforeToDay) %}
+                {% set flag = 'red-date' %}
+              {% endif %}
+              {% if (field.id=='date') %}
+                <td class="govuk-table__cell"><span class="{{ flag }}">{{ field.value | date("D MMM YYYY") }}</span></td>
+              {% elseif (field.id=='uid') %}
+                <td class="govuk-table__cell">
+                  <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link project-link'>{{ field.value | escape }}</a>
+                </td>
+              {% else %}
+                <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
+              {% endif %}
+            {% endfor %}
+            {% for projectField in projectFields %}
+            {% set field = project.fields.get(projectField.id) %}
+              <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    {% endfor %}
+    </table>
 
   </div>
 </div>

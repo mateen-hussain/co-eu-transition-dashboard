@@ -22,9 +22,7 @@ class MissedMilestones extends Page {
 
   async getDepartmentsWithMissedMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects({
-      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') },
-      complete: ['No'],
-      impact: [0, 1]
+      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') }
     });
 
     for(const department of departments) {
@@ -67,11 +65,11 @@ class MissedMilestones extends Page {
   }
 
   get projectFields() {
-    return [{ title:'Project UID', id: 'uid' }, { title:'Project Name', id: 'title' }, { title:'Impact', id: 'impact' }, { title:'HMG Confidence', id: 'hmgConfidence' }, { title:'Citizen Readiness', id: 'citizenReadiness' }, { title:'Business Readiness', id: 'businessReadiness' }, { title:'EU Member State Delivery Confidence', id: 'euStateConfidence' }];
+    return [{ title:'Project Impact', id: 'impact' }];
   }
 
   get milestoneFields() {
-    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comments' }];
+    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }];
   }
 }
 
