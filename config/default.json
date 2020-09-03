@@ -68,12 +68,14 @@
     "reportingOverview": "/reporting-overview",
     "editProject": "/edit-project",
     "tableauExport": "/tableau-export",
-    "readinessOverview": "/readiness-overview"
+    "readinessOverview": "/readiness-overview",
+    "theme": "/theme/:themeName"
   },
   "features": {
     "twoFactorAuth": true,
     "missedMilestones": false,
-    "entityData": false
+    "entityData": false,
+    "theme": true
   },
   "notify": {
     "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289",
