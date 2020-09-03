@@ -98,7 +98,8 @@
   },
   "resolutions": {
     "yargs-parser": "18.1.2",
-    "serialize-javascript": "3.1.0"
+    "serialize-javascript": "3.1.0",
+    "bcrypt": ">=5.0.0"
   },
   "nyc": {
     "report-dir": "coverage",
