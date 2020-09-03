@@ -2,5 +2,35 @@
 
 {% block pageTitle %}Theme{% endblock %}
 
-{% block content %}{% endblock %}
+{% block content %}
+
+{% set topOutcomes = topLevelOutcomeStatements() | await %}
+
+<div class="govuk-grid-row">
+
+  <div class="govuk-grid-column-one-quarter top-statements">
+  {% for topOutcome in topOutcomes %}
+  <a href="{{ topOutcome.link }}" class="statement-links">
+    <div class="top-outcomes {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
+        <h4 class="govuk-heading-s">{{ topOutcome.name }}
+        {% if topOutcome.active %} <img src='/assets/images/arrow.png' class='active' alt='active' /> {% endif %}
+        </h4>
+        <p class="govuk-body">{{ topOutcome.description }}</p>
+    </div>
+   </a> 
+  {% endfor %}
+  </div>
+
+  <div class="govuk-grid-column-one-quarter">
+    <p>govuk-grid-column-one-quarter</p>
+  </div>
+
+  <div class="govuk-grid-column-one-half">
+    <p>govuk-grid-column-one-half</p>
+  </div>
+
+</div>
+
+
+{% endblock %}
 
