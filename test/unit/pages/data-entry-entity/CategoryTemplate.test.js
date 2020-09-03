@@ -7,6 +7,7 @@ const moment = require('moment');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const xl = require('excel4node');
+const entityUserPermissions = require('middleware/entityUserPermissions');
 
 let page = {};
 let res = {};
@@ -14,22 +15,26 @@ let req = {};
 
 describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub() };
-    req = { cookies: [], query: { category: 'category' } };
+    res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
+    req = { cookies: [], query: { category: 'category' }, user: { roles: [] } };
+    res.status.returns(res);
 
     page = new CategoryTemplate('some path', req, res);
 
     sinon.stub(authentication, 'protect').returns([]);
+    sinon.stub(entityUserPermissions, 'assignEntityIdsUserCanAccessToLocals');
   });
 
   afterEach(() => {
     authentication.protect.restore();
+    entityUserPermissions.assignEntityIdsUserCanAccessToLocals.restore();
   });
 
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader'])
+        ...authentication.protect(['uploader']),
+        entityUserPermissions.assignEntityIdsUserCanAccessToLocals
       ]);
 
       sinon.assert.calledWith(authentication.protect, ['uploader']);
@@ -60,12 +65,25 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
   });
 
   describe('#getRequest', () => {
-    it('runs the createExcelTemplate function on get request', async () => {
+    beforeEach(() => {
       sinon.stub(page, 'createExcelTemplate');
+    });
+
+    it('runs the createExcelTemplate function on get request', async () => {
+      page.res.locals.entitiesUserCanAccess = [1,2,3];
 
       await page.getRequest(req, res);
 
       sinon.assert.calledWith(page.createExcelTemplate, req, res);
+    });
+
+    it('responeds with metho not allowed if not admin and no entitiesUserCanAccess', async () => {
+      page.res.locals.entitiesUserCanAccess = [];
+
+      await page.getRequest(req, res);
+
+      sinon.assert.calledWith(res.status, METHOD_NOT_ALLOWED);
+      sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
     });
   });
 
@@ -437,6 +455,8 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
       sinon.stub(page, 'createTypeCell');
       sinon.stub(page, 'addGroupValidation');
       sinon.stub(page, 'addItem');
+
+      res.locals.entitiesUserCanAccess = [];
     });
 
     it('creates entity sheet', async () => {

@@ -5,6 +5,8 @@ const Department = require('models/department');
 const DepartmentUser = require('models/departmentUser');
 const Role = require('models/role');
 const UserRole = require('models/userRole');
+const Entity = require('models/entity');
+const EntityUser = require('models/entityUser');
 
 describe('models/user', () => {
   it('called User.init with the correct parameters', async () => {
@@ -51,6 +53,11 @@ describe('models/user', () => {
 
   it('called User.belongsToMany with the correct parameters', () => {
     expect(User.belongsToMany).to.have.been.calledWith(Role, { through: UserRole, foreignKey: 'userId' });
+    expect(User.belongsToMany).to.have.been.calledWith(Entity, { through: EntityUser, foreignKey: 'userId' });
+  });
+
+  it('called Entity.belongsToMany with the correct parameters', () => {
+    expect(Entity.belongsToMany).to.have.been.calledWith(User, { through: EntityUser, foreignKey: 'entityId' });
   });
 
   describe('#hasViewAllPermissions', () => {

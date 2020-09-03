@@ -10,6 +10,7 @@ const parse = require('helpers/parse');
 const BulkImport = require('models/bulkImport');
 const Category = require('models/category');
 const { Op } = require('sequelize');
+const entityUserPermissions = require('middleware/entityUserPermissions');
 
 const fileUploadMock = sinon.stub();
 fileUploadMock.returns(fileUploadMock);
@@ -24,8 +25,8 @@ let res = {};
 
 describe('pages/data-entry-entity/entity-import/EntityImport', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub() };
-    req = { cookies: [], user: { id: 1 }, flash: sinon.stub() };
+    res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub(), locals: {} };
+    req = { cookies: [], user: { id: 1, roles: [] }, flash: sinon.stub() };
 
     page = new EntityImport('some path', req, res);
     page.req = req;
@@ -37,6 +38,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
     sinon.stub(validation, 'validateItems');
     sinon.stub(validation, 'validateSheetNames');
     sinon.stub(parse, 'parseItems');
+    sinon.stub(entityUserPermissions, 'assignEntityIdsUserCanAccessToLocals');
 
     Category.findOne.returns({ parents: [] });
   });
@@ -47,6 +49,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
     validation.validateItems.restore();
     validation.validateSheetNames.restore();
     parse.parseItems.restore();
+    entityUserPermissions.assignEntityIdsUserCanAccessToLocals.restore();
   });
 
   describe('#isEnabled', () => {
@@ -87,7 +90,8 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
       expect(page.middleware).to.eql([
         ...authentication.protect(['uploader']),
         fileUploadMock,
-        flash
+        flash,
+        entityUserPermissions.assignEntityIdsUserCanAccessToLocals
       ]);
 
       sinon.assert.calledWith(authentication.protect, ['uploader']);
@@ -164,6 +168,8 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
       const entityColumnErrors = [{ foo: 'bar' }];
       const entityErrors = [{ baz: 'baz' }];
       const parsedEntities = [{ id: 1 }];
+
+      sinon.stub(page, 'validateUserCanAccessEntities').returns([]);
 
       page.validateItems = () => [entityColumnErrors, entityErrors];
       parse.parseItems.returns(parsedEntities);
@@ -313,6 +319,75 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
       await page.getRequest(req, res);
 
       sinon.assert.called(res.render);
+    });
+  });
+
+  describe('#validateUserCanAccessEntities', () => {
+    it('returns an error if publicId is not in list of allowed entity ids', () => {
+      page.res.locals.entitiesUserCanAccess = [{ publicId: 'item 01' }];
+
+      const entityAccessErrors = page.validateUserCanAccessEntities([{ publicId: 'item 02' }]);
+
+      expect(entityAccessErrors).to.eql([{
+        error: "You do not have permissions to edit this entity",
+        item: { publicId: "item 02" },
+        itemIndex: 1
+      }]);
+    });
+
+    it('allows if user can access public id ', () => {
+      page.res.locals.entitiesUserCanAccess = [{ publicId: 'item 01' }];
+
+      const categoryFields = [{
+        isParentField: true,
+        name: 'field'
+      }];
+
+      const parsedEntities = [{
+        field: 'item 01'
+      }]
+
+      const entityAccessErrors = page.validateUserCanAccessEntities(parsedEntities, categoryFields);
+
+      expect(entityAccessErrors).to.eql([]);
+    });
+
+    it('returns an error if parentId is not in list of allowed entity ids', () => {
+      page.res.locals.entitiesUserCanAccess = [{ publicId: 'item 01' }];
+
+      const categoryFields = [{
+        isParentField: true,
+        name: 'field'
+      }];
+
+      const parsedEntities = [{
+        field: 'item 02'
+      }]
+
+      const entityAccessErrors = page.validateUserCanAccessEntities(parsedEntities, categoryFields);
+
+      expect(entityAccessErrors).to.eql([{
+        error: "You do not have permissions to edit this entity",
+        item: { field: "item 02" },
+        itemIndex: 1
+      }]);
+    });
+
+    it('allows if user can access parent public id ', () => {
+      page.res.locals.entitiesUserCanAccess = [{ publicId: 'item 01' }];
+
+      const categoryFields = [{
+        isParentField: true,
+        name: 'field'
+      }];
+
+      const parsedEntities = [{
+        field: 'item 01'
+      }]
+
+      const entityAccessErrors = page.validateUserCanAccessEntities(parsedEntities, categoryFields);
+
+      expect(entityAccessErrors).to.eql([]);
     });
   });
 });
