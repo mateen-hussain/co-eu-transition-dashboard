@@ -37,14 +37,14 @@ describe('pages/data-entry/bulk-upload/BulkUpload', () => {
     expect(page.url).to.eql(paths.dataEntry.bulkUpload);
   });
 
-  it('only admins are alowed to access this page', () => {
+  it('only uploaders are allowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['uploader']),
       fileUploadMock,
       flash
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+    sinon.assert.calledWith(authentication.protect, ['uploader']);
   });
 
   describe('#mode', () => {

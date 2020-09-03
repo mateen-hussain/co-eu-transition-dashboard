@@ -1,4 +1,4 @@
-const { Model, INTEGER, DATE, JSON } = require('sequelize');
+const { Model, INTEGER, JSON, STRING } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class BulkImport extends Model {}
@@ -16,10 +16,9 @@ BulkImport.init({
   data: {
     type: JSON
   },
-  createdAt: {
-    type: DATE,
-    field: 'created_at'
+  category: {
+    type: STRING(64)
   }
-}, { sequelize, modelName: 'bulkImport', tableName: 'bulk_import', timestamps: false });
+}, { sequelize, modelName: 'bulkImport', tableName: 'bulk_import', createdAt: 'created_at', updatedAt: false });
 
 module.exports = BulkImport;

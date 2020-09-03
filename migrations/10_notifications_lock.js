@@ -16,7 +16,7 @@ const up = async (query) => {
 
 const down = async (query) => {
   try {
-    await query.removeTable('dashboard_locks');
+    await query.dropTable('dashboard_locks');
   } catch (error) {
     logger.error(`Error rolling back ${error}`);
   }

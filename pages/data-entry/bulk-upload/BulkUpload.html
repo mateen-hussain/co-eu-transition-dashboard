@@ -2,7 +2,9 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
 {% block beforeContent %}
+{% include "navigation.njk" %}
 {% include "feedback.njk" %}
+{% if mode !== 'bulk-upload' %}
 {{ govukBackLink({
   text: "Back",
   href: "#",
@@ -10,6 +12,7 @@
     onclick: "history.go(-1);"
   }
 }) }}
+{% endif %}
 {% endblock %}
 
 {% block pageTitle %}Bulk upload{% endblock %}

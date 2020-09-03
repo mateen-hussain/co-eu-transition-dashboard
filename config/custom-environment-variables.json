@@ -16,9 +16,7 @@
     "twoFactorAuth": "FEATURE_2FA"
   },
   "notify": {
-    "apiKey": "NOTIFY_API_KEY"
-  },
-  "notify": {
+    "apiKey": "NOTIFY_API_KEY",
     "summaryNotificationEmail": "SUMMARY_NOTIFICATION_EMAIL"
   }
 }

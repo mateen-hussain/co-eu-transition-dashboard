@@ -20,15 +20,15 @@ class Import extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['uploader']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
   }
 
   async import(projects, milestones) {
-    const projectFields = await Project.fieldDefintions();
-    const milestoneFields = await Milestone.fieldDefintions();
+    const projectFields = await Project.fieldDefinitions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const transaction = await sequelize.transaction();
     try {
@@ -49,8 +49,10 @@ class Import extends Page {
   }
 
   validateItems(items, parsedItems, fields) {
-    const requiredColumns = fields.map(field => field['importColumnName']);
-    const columnErrors = validation.validateColumns(Object.keys(items[0]), requiredColumns);
+    const requiredColumns = fields.filter(field => field.isRequired).map(field => field['importColumnName']);
+    const allowedColumns = fields.map(field => field['importColumnName']);
+
+    const columnErrors = validation.validateColumns(Object.keys(items[0]), requiredColumns, allowedColumns);
 
     const itemErrors = validation.validateItems(parsedItems, fields);
 
@@ -58,7 +60,7 @@ class Import extends Page {
   }
 
   async validateProjects(projects) {
-    const projectFields = await Project.fieldDefintions(this.req.user);
+    const projectFields = await Project.fieldDefinitions(this.req.user);
 
     const parsedProjects = parse.parseItems(projects, projectFields);
     if (!parsedProjects.length) {
@@ -71,11 +73,22 @@ class Import extends Page {
       projectErrors
     ] = this.validateItems(projects, parsedProjects, projectFields);
 
+    // specific error if theme is borders and user permissions does not include BPDG
+    for(const project of parsedProjects) {
+      const userDepartments = this.req.user.departments.map(d => d.name);
+      if(project.deliveryTheme === 'Borders' && !userDepartments.includes('BPDG')) {
+        projectErrors.push({
+          item: project,
+          error: 'Only BPDG can manage Border information'
+        });
+      }
+    }
+
     return { projectErrors, projectColumnErrors, parsedProjects };
   }
 
   async validateMilestones(milestones, parsedProjects = []) {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const parsedMilestones = parse.parseItems(milestones, milestoneFields);
     if (!parsedMilestones.length) {
@@ -139,7 +152,8 @@ class Import extends Page {
     const activeImport = await BulkImport.findOne({
       where: {
         userId: this.req.user.id,
-        id: importId
+        id: importId,
+        category: 'data-entry-old'
       },
       raw: true
     });
@@ -168,7 +182,8 @@ class Import extends Page {
     await BulkImport.destroy({
       where: {
         userId: this.req.user.id,
-        id: importId
+        id: importId,
+        category: 'data-entry-old'
       }
     });
   }
@@ -194,7 +209,8 @@ class Import extends Page {
   async getRequest(req, res) {
     const activeImport = await BulkImport.findOne({
       where: {
-        userId: req.user.id
+        userId: req.user.id,
+        category: 'data-entry-old'
       },
       raw: true
     });

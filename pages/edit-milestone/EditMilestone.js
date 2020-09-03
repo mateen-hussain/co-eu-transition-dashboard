@@ -8,6 +8,7 @@ const validation = require('helpers/validation');
 const moment = require('moment');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
+const { transformDeliveryConfidenceValue } = require('helpers/display');
 
 class EditMilestone extends Page {
   get url() {
@@ -52,7 +53,7 @@ class EditMilestone extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['uploader']),
       flash
     ];
   }
@@ -69,7 +70,7 @@ class EditMilestone extends Page {
 
   async saveFieldToDatabase(milestone) {
     const transaction = await sequelize.transaction();
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     try {
       await Milestone.import(milestone, milestoneFields, { transaction });
@@ -84,7 +85,7 @@ class EditMilestone extends Page {
   }
 
   async parseData(milestone) {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
     const parsedData = {};
 
     milestoneFields.forEach(field => {
@@ -107,7 +108,7 @@ class EditMilestone extends Page {
   }
 
   async validateMilestone(parsedData) {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
     const errors = validation.validateItems([parsedData], milestoneFields);
 
     return errors.reduce((message, error) => {
@@ -147,7 +148,7 @@ class EditMilestone extends Page {
     const projectMilestone = await this.req.user.getProjectMilestone(this.req.params.uid);
     const milestone = projectMilestone.milestone;
 
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const data = milestoneFields.reduce((data, field) => {
       if(milestone.fields.get(field.name)) {
@@ -160,18 +161,7 @@ class EditMilestone extends Page {
   }
 
   transformDeliveryConfidenceValue(value) {
-    switch(value) {
-    case 3:
-      return `${value} - High confidence`;
-    case 2:
-      return `${value} - Medium confidence`;
-    case 1:
-      return `${value} - Low confidence`;
-    case 0:
-      return `${value} - Very low confidence`;
-    default:
-      return `No level given`;
-    }
+    return transformDeliveryConfidenceValue(value);
   }
 
   async getProjectMilestone() {
@@ -179,7 +169,7 @@ class EditMilestone extends Page {
   }
 
   async getMilestoneFields() {
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     const projects = await this.req.user.getProjects();
     const projectUids = projects.map(project => project.uid);

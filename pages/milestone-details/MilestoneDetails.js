@@ -4,10 +4,17 @@ const Project = require('models/project');
 const Milestone = require('models/milestone');
 const MilestoneField = require('models/milestoneField');
 const MilestoneFieldEntryAudit = require('models/milestoneFieldEntryAudit');
+const authentication = require('services/authentication');
 
 class MilestoneDetails extends Page {
   get url() {
     return paths.milestoneDetails;
+  }
+
+  get middleware() {
+    return [
+      ...authentication.protect(['management'])
+    ];
   }
 
   async getProjectMilestone() {
@@ -15,7 +22,7 @@ class MilestoneDetails extends Page {
   }
 
   async getMilestoneFields() {
-    return await Milestone.fieldDefintions();
+    return await Milestone.fieldDefinitions();
   }
 
   async getAuditRecords(milestoneUid, fieldName) {
@@ -33,7 +40,7 @@ class MilestoneDetails extends Page {
   async projectInformation(project) {
     const fieldsToShow = ['title', 'sro', 'impact', 'hmgConfidence', 'citizenReadiness', 'businessReadiness', 'euStateConfidence'];
 
-    let fields = await Project.fieldDefintions();
+    let fields = await Project.fieldDefinitions();
     fields = fields.filter(field => fieldsToShow.includes(field.name));
 
     return fieldsToShow.map(name => {

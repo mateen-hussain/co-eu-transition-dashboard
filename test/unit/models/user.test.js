@@ -3,6 +3,8 @@ const { expect } = require('test/unit/util/chai');
 const { STRING, DATE, ENUM, INTEGER, BOOLEAN } = require('sequelize');
 const Department = require('models/department');
 const DepartmentUser = require('models/departmentUser');
+const Role = require('models/role');
+const UserRole = require('models/userRole');
 
 describe('models/user', () => {
   it('called User.init with the correct parameters', async () => {
@@ -45,6 +47,10 @@ describe('models/user', () => {
 
   it('called Department.belongsToMany with the correct parameters', () => {
     expect(Department.belongsToMany).to.have.been.calledWith(User, { through: DepartmentUser, foreignKey: 'departmentName' });
+  });
+
+  it('called User.belongsToMany with the correct parameters', () => {
+    expect(User.belongsToMany).to.have.been.calledWith(Role, { through: UserRole, foreignKey: 'userId' });
   });
 
   describe('#hasViewAllPermissions', () => {

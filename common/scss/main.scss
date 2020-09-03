@@ -9,10 +9,24 @@
 @import 'pages/project-details/ProjectDetails.scss';
 @import 'pages/reporting-overview/ReportingOverview.scss';
 
+.govuk-width-container {
+    margin-right: 20px;
+    margin-left: 20px;
+    max-width: 100%;
+}
+
+.govuk-header__container {
+    border-bottom: none;
+    padding-bottom: 5px;
+}
+
 .navigation {
     background-color: #f3f2f1;
     padding-top: 10px;
-    padding-left: 10px;
+    padding-left: 24px;
+    margin-top: -10px;
+    margin-left: -20px !important;
+    margin-right: -20px !important;
 }
 
 a.govuk-header__link.nav {
@@ -21,6 +35,7 @@ a.govuk-header__link.nav {
 
 li.govuk-header__navigation-item.govuk-header__navigation-item--active {
     border-bottom: 5px solid #1d70b8;
+    margin-bottom: -1px;
 }
 
 li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
@@ -28,12 +43,13 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 }
 
 .cabinet-office__logotype-image {
-    width: 250px;
-    height: 40px
+    width: 165px;
+    height: 32px;
+    margin-top: 2px;
 }
 
 .govuk-header__link--service-name {
-    margin-top: 5px;
+    margin-top: 4px;
 }
 
 .govuk-header {
@@ -42,15 +58,16 @@ li.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
 
 li.govuk-header__navigation-item.logout-item {
     float: right;
-    margin-top: -45px;
+    margin-top: -50px;
 }
 
 .child-navigation {
-    padding-left: 10px;
+    padding-left: 5px;
 }
 
 ul#childNavigation {
     border-bottom: 1px solid #b1b4b6;
+    display: inline-block;
 }
 
 a.govuk-header__link.child-nav {
@@ -60,4 +77,12 @@ a.govuk-header__link.child-nav {
 
 .child-item.govuk-header__navigation-item.govuk-header__navigation-item--active > a {
    color: #000000;
+}
+
+li.govuk-header__navigation-item.child-item, li.govuk-header__navigation-item {
+    margin-right: 25px;
+}
+
+li.govuk-header__navigation-item.child-item:last-child, li.govuk-header__navigation-item:last-child {
+    margin-right: 0px;
 }

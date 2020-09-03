@@ -4,6 +4,7 @@ const { getFilters } = require('helpers/filters');
 const moment = require('moment');
 const { removeNulls } = require('helpers/utils');
 const sequelize = require('services/sequelize');
+const authentication = require('services/authentication');
 
 class AllData extends Page {
   get url() {
@@ -12,6 +13,12 @@ class AllData extends Page {
 
   get schema() {
     return { filters: {} };
+  }
+
+  get middleware() {
+    return [
+      ...authentication.protect(['management'])
+    ];
   }
 
   async getLastUpdatedAt() {

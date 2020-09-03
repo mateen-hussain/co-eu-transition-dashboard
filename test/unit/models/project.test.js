@@ -45,8 +45,8 @@ describe('models/project', () => {
     sinon.assert.calledWith(modelUtils.createFilterOptions, key, options);
   });
 
-  it('#fieldDefintions', async () => {
-    const definitions = await Project.fieldDefintions();
+  it('#fieldDefinitions', async () => {
+    const definitions = await Project.fieldDefinitions();
 
     expect(definitions).to.eql([
       {

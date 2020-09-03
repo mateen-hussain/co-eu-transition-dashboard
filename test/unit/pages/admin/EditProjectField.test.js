@@ -43,11 +43,11 @@ describe('pages/admin/edit-project-field/EditProjectField', () => {
   describe('#middleware', () => {
     it('only admins are aloud to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['administrator']),
+        ...authentication.protect(['admin']),
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['administrator']);
+      sinon.assert.calledWith(authentication.protect, ['admin']);
     });
   });
 

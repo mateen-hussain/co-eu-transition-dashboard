@@ -4,6 +4,7 @@ const config = require('config');
 const bcrypt = require('bcrypt');
 const User = require('models/user');
 const Department = require('models/department');
+const Role = require('models/role');
 const { Strategy: passportLocalStrategy } = require('passport-local');
 const { Strategy: passportJWTStrategy } = require("passport-jwt");
 const speakeasy = require('speakeasy');
@@ -59,9 +60,13 @@ const authenticateUser = (jwtPayload = {}, cb) => {
   return User.findOne({
     where: {
       id: jwtPayload.id,
-      loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts }
+      loginAttempts: { [Op.lte]: config.users.maximumLoginAttempts },
     },
-    include: Department
+    include: [{
+      model: Department
+    },{
+      model: Role 
+    }]
   })
     .then(user => {
       cb(null, user);
@@ -93,11 +98,12 @@ const protect = (roles = []) => {
       return res.redirect(config.paths.authentication.login);
     }
 
-    if (!roles.includes(req.user.role)) {
-      return res.redirect(config.paths.authentication.login);
+    if ((req.user && roles.length == 0) || (req.user.roles.filter(role => 
+      roles.includes(role.name)).length > 0)) {
+      return next();
     }
 
-    return next();
+    return res.redirect(config.paths.authentication.login)
   };
 
   const updateCookieExpiration = (req, res, next) => {

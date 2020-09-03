@@ -17,7 +17,7 @@ class ProjectMilestoneTemplate extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator'])
+      ...authentication.protect(['uploader'])
     ];
   }
 
@@ -266,7 +266,7 @@ class ProjectMilestoneTemplate extends Page {
     });
 
     const projects = await this.req.user.getProjects();
-    const projectFields = await Project.fieldDefintions(this.req.user);
+    const projectFields = await Project.fieldDefinitions(this.req.user);
 
     let currentColumnIndex = 1;
     const rowIndex = 1;
@@ -317,7 +317,7 @@ class ProjectMilestoneTemplate extends Page {
     const milestones = projects.reduce((milestones, project) => {
       return [...milestones, ...project.milestones];
     }, []);
-    const milestoneFields = await Milestone.fieldDefintions();
+    const milestoneFields = await Milestone.fieldDefinitions();
 
     let currentColumnIndex = 1;
 
