@@ -17,6 +17,56 @@ class Theme extends Page {
       ...authentication.protect(['management_overview'])
     ];
   }
+
+  topLevelOutcomeStatements() {
+    return [{
+      name: 'Category one goods',
+      color: 'yellow',
+      description: 'Supply of category one goods will be undistrupted',
+      link: 'someurl'
+    }, {
+      name: 'Other goods categories',
+      color: 'red',
+      active: true,
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }, {
+      name: 'Passengers',
+      color: 'green',
+      description: 'Minimise distruption of the import and export of goods between GB and EU',
+      link: 'someurl'
+    }];
+  }
 }
 
 module.exports = Theme;

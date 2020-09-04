@@ -1,0 +1,39 @@
+.top-statements {
+    height: 100vh;
+    overflow-y: scroll;
+}
+
+.statement {
+    background-color: #f3f2f1;
+    padding: 10px 5px 5px 10px;
+    margin-bottom: 4px;
+}
+
+.active {
+    float: right;
+    margin-right: 10px;
+}
+
+.active-statement {
+    background-color: white;
+}
+
+.statement-link {
+    text-decoration: none;
+}
+
+.red {
+    border-left: 10px solid #d4351c;
+}
+
+.orange {
+    border-left: 10px solid #f47738;
+}
+
+.green {
+    border-left: 10px solid #00703c;
+}
+
+.yellow {
+    border-left: 10px solid #ffdd00;
+}

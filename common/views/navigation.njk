@@ -146,11 +146,13 @@
         Overview
         </a>
     </li>
+    {% if config.features.theme %}
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url | replace(':themeName', 'borders' | urlencode) == borders }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.theme | replace(':themeName', 'borders' | urlencode) }}">
         Borders 
         </a>
     </li>
+    {% endif %}
     </ul>
 </nav>
 {% endif %}
