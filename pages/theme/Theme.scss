@@ -1,9 +1,9 @@
 .top-statements {
-    height: 500px;
+    height: 100vh;
     overflow-y: scroll;
 }
 
-.top-outcomes {
+.statement {
     background-color: #f3f2f1;
     padding: 10px 5px 5px 10px;
     margin-bottom: 4px;
@@ -18,7 +18,7 @@
     background-color: white;
 }
 
-.statement-links {
+.statement-link {
     text-decoration: none;
 }
 

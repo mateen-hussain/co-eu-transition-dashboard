@@ -10,8 +10,8 @@
 
   <div class="govuk-grid-column-one-quarter top-statements">
   {% for topOutcome in topOutcomes %}
-  <a href="{{ topOutcome.link }}" class="statement-links">
-    <div class="top-outcomes {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
+  <a href="{{ topOutcome.link }}" class="statement-link">
+    <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
         <h4 class="govuk-heading-s">{{ topOutcome.name }}
         {% if topOutcome.active %} <img src='/assets/images/arrow.png' class='active' alt='active' /> {% endif %}
         </h4>
