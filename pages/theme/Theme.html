@@ -1,4 +1,5 @@
 {% extends "template.njk" %}
+{% from "custom-accordion.njk" import buildOutcomeTree %}
 
 {% block pageTitle %}Theme{% endblock %}
 
@@ -8,7 +9,7 @@
 
 <div class="govuk-grid-row">
 
-  <div class="govuk-grid-column-one-quarter top-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
   {% for topOutcome in topOutcomes %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
@@ -21,8 +22,10 @@
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter">
-    <p>govuk-grid-column-one-quarter</p>
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
+    <div class="custom-accordion" >
+    {{ buildOutcomeTree(subOutcomeData, 1) }}
+    </div>
   </div>
 
   <div class="govuk-grid-column-one-half">

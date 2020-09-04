@@ -22,18 +22,123 @@
     text-decoration: none;
 }
 
+.govuk-accordion:not(.accordion-level-1) .item-colour-red,
 .red {
     border-left: 10px solid #d4351c;
 }
 
+.govuk-accordion:not(.accordion-level-1) .item-colour-orange,
 .orange {
     border-left: 10px solid #f47738;
 }
 
+.govuk-accordion:not(.accordion-level-1) .item-colour-green ,
 .green {
     border-left: 10px solid #00703c;
 }
 
+.govuk-accordion:not(.accordion-level-1) .item-colour-yellow ,
 .yellow {
     border-left: 10px solid #ffdd00;
 }
+
+.item-colour-red .govuk-accordion__section-button::before {
+    background-color: #d4351c
+}
+
+.item-colour-orange .govuk-accordion__section-button::before {
+    background-color: #f47738
+}
+
+.item-colour-green .govuk-accordion__section-button::before {
+    background-color: #00703c
+}
+
+.item-colour-yellow .govuk-accordion__section-button::before {
+    background-color: #ffdd00
+}
+
+.no-horizontal-padding {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.js-enabled .govuk-accordion__section--expanded .govuk-accordion__section-content {
+    display: none;
+  }
+  
+.js-enabled .govuk-accordion__section--expanded > .govuk-accordion__section-content {
+    display: block;
+}
+  
+.custom-accordion {
+    .govuk-accordion {
+        margin-bottom: 0;
+        border-bottom: none;
+    }
+
+    .govuk-accordion__section-content {
+        padding-top: 0;
+        padding-bottom: 0
+    }
+
+    .govuk-accordion__section-header {
+        border-top: none;
+     }
+    
+
+    .govuk-accordion__section {
+        background-color: #f3f2f1;
+    }
+
+    .accordion-level-1 {
+        > .govuk-accordion__section--expanded {
+            background-color: #ffffff; 
+        }
+
+        .section-header-1 {
+            .govuk-accordion__section-button {
+                padding-left: 20px;
+    
+                &::before {
+                    content: "";
+                    width: 18px;
+                    height: 18px;
+                    display: inline-block;
+                    margin-right: 10px;
+                }
+            }
+        }
+
+        .item-colour-red .govuk-accordion__section-button::before {
+            background-color: #d4351c
+        }
+
+        .item-colour-orange .govuk-accordion__section-button::before {
+            background-color: #f47738
+        }
+
+        .item-colour-green .govuk-accordion__section-button::before {
+            background-color: #00703c
+        }
+
+        .item-colour-yellow .govuk-accordion__section-button::before {
+            background-color: #ffdd00
+        }
+
+        
+    }
+
+    .govuk-accordion__section--expanded .govuk-accordion__icon:after {
+        display: block;
+    }
+
+    .govuk-accordion__section--expanded button[aria-expanded="true"] .govuk-accordion__icon:after {
+        display: none;
+    }
+
+    
+}
+  
+  
+  

@@ -6,6 +6,7 @@ import disableButton from './disable-button';
 import groupDisplay from './group-display';
 import fieldOrder from './field-order';
 import seeMore from './see-more';
+import CustomAccordion from './custom-accordion';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
@@ -18,6 +19,12 @@ window.TRANSITIONDELIVERYDASHBOARD = {
 
 document.addEventListener('DOMContentLoaded', function() {
   govukFrontend.initAll();
+
+  var $accordions = document.querySelectorAll('[data-module="govuk-custom-accordion"]')
+
+  if ($accordions) {
+    $accordions.forEach($accordion => new CustomAccordion($accordion).init())
+  }
 });
 
 // The expanded state of individual instances of the accordion component persists across page loads using sessionStorage.
