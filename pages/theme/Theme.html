@@ -27,7 +27,13 @@
   </div>
 
   <div class="govuk-grid-column-one-half">
-    <p>govuk-grid-column-one-half</p>
+  {% if tableauIframeError %}
+    <p class="govuk-body govuk-!-font-weight-bold theme-message">There has been an error, please contact The Transition Taskforce Dashboard Team</p>
+  {% elseif topOutcomeSelected %}
+    <p class="govuk-body govuk-!-font-weight-bold theme-message">To view data, select a metric or measure</p>
+  {% else %}
+    <iframe src="{{ tableauIframeUrl }}" class="theme-tableu"></iframe>
+  {% endif %}
   </div>
 
 </div>

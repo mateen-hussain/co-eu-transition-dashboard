@@ -6,7 +6,7 @@
 .statement {
     background-color: #f3f2f1;
     padding: 10px 5px 5px 10px;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .active {
@@ -36,4 +36,19 @@
 
 .yellow {
     border-left: 10px solid #ffdd00;
+}
+
+.theme-tableu {
+    width: 100%;
+    height: 100vh;
+    overflow: scroll;
+    border: 0;
+}
+
+.theme-message {
+    border: 1px solid #b1b4b6;
+    padding: 50px 50px 50px 50px;
+    width: 30%;
+    text-align: center;
+    color: #b1b4b6;
 }
