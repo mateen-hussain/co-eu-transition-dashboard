@@ -27,6 +27,32 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+
+// Countdown Timer
+const second = 1000,
+  minute = second * 60,
+  hour = minute * 60,
+  day = hour * 24;
+
+let countDown = new Date('Jan 01, 2021 00:00:00').getTime(),
+
+  x = setInterval(function() {    
+    let now = new Date().getTime(),
+      distance = countDown - now;
+
+    document.getElementById('countdown').innerText = Math.floor(distance / (day)) + ' days'
+
+    if (distance < 0) {
+      clearInterval(x);
+      var currentDate = Date.now();
+      var difference = now - currentDate;
+      var millisecondsPerDay = 24 * 60 * 60 * 1000;
+      document.getElementById('countdown').innerText = Math.floor(difference / millisecondsPerDay) + 'days of freedom';
+    }
+
+  }, second)
+
+
 // The expanded state of individual instances of the accordion component persists across page loads using sessionStorage.
 // These will be removed from the session storage so the accordions will collapse rather than stay open.
 // We want to keep session storage on the readiness theme pages to prevent accordions closing on a page refresh 

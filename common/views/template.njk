@@ -57,6 +57,7 @@
       </a>
 
   {% if req.isAuthenticated() %}
+      <p class="govuk-body-s govuk-!-font-weight-bold timer">Time left:  <span id="countdown"></span></p>
       <button type="button" class="govuk-header__menu-button govuk-js-header-toggle" aria-controls="navigation" aria-label="Show or hide logout link">Menu</button>
       <nav>
         <ul id="navigation" class="govuk-header__navigation " aria-label="Logout Link">
