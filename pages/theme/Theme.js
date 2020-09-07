@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const authentication = require('services/authentication');
