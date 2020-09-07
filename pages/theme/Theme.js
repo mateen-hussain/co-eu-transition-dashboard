@@ -297,7 +297,7 @@ class Theme extends Page {
           {
             name: 'Import',
             active: true,
-            color: 'orange',
+            color: 'amber',
             children: [
               {
                 name: 'UK Business Licensing',
@@ -308,7 +308,7 @@ class Theme extends Page {
                   {
                     name: '% of EU traders that have an EORI number',
                     link: 'http://www.bbc.co.uk"',
-                    color: 'orange',
+                    color: 'amber',
                     active: true,
                   },
                   {
@@ -332,7 +332,7 @@ class Theme extends Page {
               {
                 name: 'Customs Readiness',
                 active: false,
-                color: 'orange',
+                color: 'amber',
               }
             ]
           },
@@ -345,7 +345,7 @@ class Theme extends Page {
               {
                 name: '% of EU traders that have an EORI number',
                 link: 'http://www.bbc.co.uk"',
-                color: 'orange',
+                color: 'amber',
                 active: true,
               },
               {
@@ -367,7 +367,7 @@ class Theme extends Page {
         name: 'Comms',
         link: 'http:www.link.com"',
         active: false,
-        color: 'orange',
+        color: 'amber',
         children: [], 
       },
       {
@@ -379,7 +379,7 @@ class Theme extends Page {
       }
     ]
   }
-  
+
   async subOutcomeMeasures() {
     let datas = [];
 
