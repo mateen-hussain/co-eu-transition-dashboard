@@ -321,54 +321,36 @@ class Theme extends Page {
   }
 
   async topLevelOutcomeStatements() {
-    return [{
-      name: 'Category one goods',
-      color: 'yellow',
-      description: 'Supply of category one goods will be undistrupted',
-      link: 'someurl'
-    }, {
-      name: 'Other goods categories',
-      color: 'red',
-      active: true,
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }, {
-      name: 'Passengers',
-      color: 'green',
-      description: 'Minimise distruption of the import and export of goods between GB and EU',
-      link: 'someurl'
-    }];
+    let datas = [];
 
+    if(!this.req.params.theme) {
+      return datas;
+    }
+
+    try {
+      const topLevelEntity = await this.createEntityHierarchy(this.req.params.theme);
+      datas = topLevelEntity.children;
+
+      // apply rag roll ups
+      datas.forEach(this.applyRagRollups.bind(this));
+
+      // remove all children for top level outcome statements
+      datas = datas.map(entity => {
+        delete entity.children;
+        return entity;
+      });
+
+      // apply active items
+      datas.forEach(this.applyActiveItems(this.req.params.statement));
+
+      datas.forEach(data => {
+        data.link = `${this.url}/${this.req.params.theme}/${data.publicId}`;
+      });
+    } catch (error) {
+      logger.error(error);
+    }
+
+    return datas;
   }
 }
 
