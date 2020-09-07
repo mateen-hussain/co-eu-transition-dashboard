@@ -29,7 +29,7 @@
   <div class="govuk-grid-column-one-half">
   {% if tableauIframeError %}
     <p class="govuk-body govuk-!-font-weight-bold theme-message">There has been an error, please contact The Transition Taskforce Dashboard Team</p>
-  {% elseif noIframeLink %}
+  {% elseif topOutcomeSelected %}
     <p class="govuk-body govuk-!-font-weight-bold theme-message">To view data, select a metric or measure</p>
   {% else %}
     <iframe src="{{ tableauIframeUrl }}" class="theme-tableu"></iframe>
