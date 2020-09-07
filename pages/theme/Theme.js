@@ -91,6 +91,7 @@ class Theme extends Page {
                     name: '% of EU traders that have an EORI number',
                     link: 'http://www.bbc.co.uk"',
                     color: 'orange',
+                    active: true,
                   },
                   {
                     name: '% of Food business (by import value) that have registered on IPAFFS',
@@ -104,6 +105,16 @@ class Theme extends Page {
                     color: 'green',
                   }
                 ]
+              },
+              {
+                name: 'Logistics Readiness',
+                active: false,
+                color: 'green',
+              },
+              {
+                name: 'Customs Readiness',
+                active: false,
+                color: 'orange',
               }
             ]
           },
@@ -111,6 +122,26 @@ class Theme extends Page {
             name: 'Export',
             active: false,
             color: 'green',
+            isLastExpandable: true,
+            children: [
+              {
+                name: '% of EU traders that have an EORI number',
+                link: 'http://www.bbc.co.uk"',
+                color: 'orange',
+                active: true,
+              },
+              {
+                name: '% of Food business (by import value) that have registered on IPAFFS',
+                link: 'http://www.bbc.co.uk"',
+                color: 'green',
+              }
+              ,
+              {
+                name: '% of Excise business (by import value) that have completed E68/E69/E70/E71 form',
+                link: 'http://www.bbc.co.uk"',
+                color: 'green',
+              }
+            ]
           }
         ], 
       },

@@ -15,7 +15,7 @@ import { nodeListForEach } from 'govuk-frontend/govuk/common'
 import 'govuk-frontend/govuk/vendor/polyfills/Function/prototype/bind'
 import 'govuk-frontend/govuk/vendor/polyfills/Element/prototype/classList'
 
-function CustomAccordion ($module) {
+function ReadinessAccordion ($module) {
   this.$module = $module
   this.moduleId = $module.getAttribute('id')
   this.$sections = $module.querySelectorAll(`.govuk-accordion__section-${this.moduleId }`)
@@ -34,7 +34,7 @@ function CustomAccordion ($module) {
 }
 
 // Initialize component
-CustomAccordion.prototype.init = function () {
+ReadinessAccordion.prototype.init = function () {
   // Check for module
   if (!this.$module) {
     return
@@ -44,7 +44,7 @@ CustomAccordion.prototype.init = function () {
 }
 
 // Initialise section headers
-CustomAccordion.prototype.initSectionHeaders = function () {
+ReadinessAccordion.prototype.initSectionHeaders = function () {
   // Loop through section headers
   nodeListForEach(this.$sections, function ($section, i) {
     // Set header attributes
@@ -60,7 +60,7 @@ CustomAccordion.prototype.initSectionHeaders = function () {
 }
 
 // Set individual header attributes
-CustomAccordion.prototype.initHeaderAttributes = function ($headerWrapper, index) {
+ReadinessAccordion.prototype.initHeaderAttributes = function ($headerWrapper, index) {
   var $module = this
   var $span = $headerWrapper.querySelector('.' + this.sectionButtonClass)
   var $heading = $headerWrapper.querySelector('.' + this.sectionHeadingClass)
@@ -78,13 +78,13 @@ CustomAccordion.prototype.initHeaderAttributes = function ($headerWrapper, index
     $button.setAttribute(attr.nodeName, attr.nodeValue)
   }
 
-  $button.addEventListener('focusin', function (e) {
+  $button.addEventListener('focusin', function () {
     if (!$headerWrapper.classList.contains($module.sectionHeaderFocusedClass)) {
       $headerWrapper.className += ' ' + $module.sectionHeaderFocusedClass
     }
   })
 
-  $button.addEventListener('blur', function (e) {
+  $button.addEventListener('blur', function () {
     $headerWrapper.classList.remove($module.sectionHeaderFocusedClass)
   })
 
@@ -107,13 +107,13 @@ CustomAccordion.prototype.initHeaderAttributes = function ($headerWrapper, index
 }
 
 // When section toggled, set and store state
-CustomAccordion.prototype.onSectionToggle = function ($section) {
+ReadinessAccordion.prototype.onSectionToggle = function ($section) {
   var expanded = this.isExpanded($section)
   this.setExpanded(!expanded, $section)
 }
 
 // Set section attributes when opened/closed
-CustomAccordion.prototype.setExpanded = function (expanded, $section) {
+ReadinessAccordion.prototype.setExpanded = function (expanded, $section) {
   var $button = $section.querySelector('.' + this.sectionButtonClass)
   $button.setAttribute('aria-expanded', expanded)
 
@@ -125,9 +125,9 @@ CustomAccordion.prototype.setExpanded = function (expanded, $section) {
 }
 
 // Get state of section
-CustomAccordion.prototype.isExpanded = function ($section) {
+ReadinessAccordion.prototype.isExpanded = function ($section) {
   return $section.classList.contains(this.sectionExpandedClass)
 }
 
 
-export default CustomAccordion
+export default ReadinessAccordion

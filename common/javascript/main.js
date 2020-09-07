@@ -6,7 +6,7 @@ import disableButton from './disable-button';
 import groupDisplay from './group-display';
 import fieldOrder from './field-order';
 import seeMore from './see-more';
-import CustomAccordion from './custom-accordion';
+import ReadinessAccordion from './readiness-accordion';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
@@ -20,10 +20,10 @@ window.TRANSITIONDELIVERYDASHBOARD = {
 document.addEventListener('DOMContentLoaded', function() {
   govukFrontend.initAll();
 
-  var $accordions = document.querySelectorAll('[data-module="govuk-custom-accordion"]')
+  var $readinessAccordions = document.querySelectorAll('[data-module="readiness-accordion"]')
 
-  if ($accordions) {
-    $accordions.forEach($accordion => new CustomAccordion($accordion).init())
+  if ($readinessAccordions) {
+    $readinessAccordions.forEach($accordion => new ReadinessAccordion($accordion).init())
   }
 });
 
