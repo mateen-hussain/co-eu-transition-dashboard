@@ -145,7 +145,7 @@
         </a>
     </li>
     {% if config.features.transitionReadinessTheme %}
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if '/B' in req.originalUrl }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/B' in req.originalUrl }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/B">
         Borders
         </a>
