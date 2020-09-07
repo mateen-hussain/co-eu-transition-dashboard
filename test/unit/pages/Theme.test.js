@@ -28,7 +28,7 @@ describe('pages/theme/Theme', () => {
 
     it('should be enabled if theme feature is active', () => {
       sandbox.stub(config, 'features').value({
-        theme: true
+        transitionReadinessTheme: true
       });
 
       expect(Theme.isEnabled).to.be.ok;
@@ -36,7 +36,7 @@ describe('pages/theme/Theme', () => {
 
     it('should be disabled if theme feature is not active', () => {
       sandbox.stub(config, 'features').value({
-        theme: false
+        transitionReadinessTheme: false
       });
 
       expect(Theme.isEnabled).to.not.be.ok;
@@ -45,7 +45,7 @@ describe('pages/theme/Theme', () => {
 
   describe('#url', () => {
     it('returns correct url', () => {
-      expect(page.url).to.eql(paths.theme);
+      expect(page.url).to.eql(paths.transitionReadinessThemeDetail);
     });
   });
 

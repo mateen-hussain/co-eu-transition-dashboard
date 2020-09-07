@@ -69,13 +69,13 @@
     "editProject": "/edit-project",
     "tableauExport": "/tableau-export",
     "readinessOverview": "/readiness-overview",
-    "theme": "/theme/:themeName"
+    "transitionReadinessThemeDetail": "/transition-readiness-detail"
   },
   "features": {
     "twoFactorAuth": true,
     "missedMilestones": false,
     "entityData": false,
-    "theme": true
+    "transitionReadinessTheme": true
   },
   "notify": {
     "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289",

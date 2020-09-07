@@ -1,11 +1,12 @@
 {% extends "template.njk" %}
 {% from "readiness-accordion.njk" import buildOutcomeMeasures %}
 
+{% set topOutcomes = topLevelOutcomeStatements() | await %}
+{% set subOutcomeMeasures = subOutcomeMeasures() | await %}
+
 {% block pageTitle %}Theme{% endblock %}
 
 {% block content %}
-
-{% set topOutcomes = topLevelOutcomeStatements() | await %}
 
 <div class="govuk-grid-row">
 
@@ -18,14 +19,14 @@
         </h2>
         <p class="govuk-body govuk-!-font-size-16">{{ topOutcome.description }}</p>
     </div>
-   </a> 
+   </a>
   {% endfor %}
   </div>
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
-    {% if subOutcomeData %}
+    {% if subOutcomeMeasures %}
       <div class="readiness-accordion-wrapper" >
-        {{ buildOutcomeMeasures(subOutcomeData, 1) }}
+        {{ buildOutcomeMeasures(subOutcomeMeasures, 1) }}
       </div>
     {% else %}
       <h2 class="govuk-heading-s measures-message">To view data, select an outcome statement</h4>
@@ -33,7 +34,13 @@
   </div>
 
   <div class="govuk-grid-column-one-half">
-    <p>govuk-grid-column-one-half</p>
+  {% if tableauIframeError %}
+    <p class="govuk-body govuk-!-font-weight-bold tableu-message">There has been an error accessing this data, please contact The Transition Taskforce Dashboard Team</p>
+  {% elseif topOutcomeSelected %}
+    <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
+  {% else %}
+    <iframe src="{{ tableauIframeUrl }}" class="theme-tableu"></iframe>
+  {% endif %}
   </div>
 
 </div>
