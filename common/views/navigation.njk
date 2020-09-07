@@ -36,20 +36,18 @@
 
 {% set transitionReadinessUrls = [
     config.paths.readinessOverview,
-    config.paths.theme 
+    config.paths.transitionReadinessThemeDetail
     ]
 %}
 
-{% set borders = config.paths.theme | replace(':themeName', 'borders' | urlencode) %}
-
 <nav class="navigation">
     <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
-    {% if req.user.roles | includes(['viewer']) %}    
+    {% if req.user.roles | includes(['viewer']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in transitionReadinessUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.readinessOverview }}">Transition readiness</a>
     </li>
     {% endif %}
-    {% if req.user.roles | includes(['management']) %}    
+    {% if req.user.roles | includes(['management']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in managementInformationUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">HMG delivery management information</a>
     </li>
@@ -74,7 +72,7 @@
 {% if url in managementInformationUrls %}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
-    {% if req.user.roles | includes(['management_overview']) %} 
+    {% if req.user.roles | includes(['management_overview']) %}
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.reportingOverview }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.reportingOverview }}">
         Reporting overview
@@ -146,10 +144,10 @@
         Overview
         </a>
     </li>
-    {% if config.features.theme %}
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url | replace(':themeName', 'borders' | urlencode) == borders }}">
-        <a class="govuk-header__link child-nav" href="{{ config.paths.theme | replace(':themeName', 'borders' | urlencode) }}">
-        Borders 
+    {% if config.features.transitionReadinessTheme %}
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if '/B' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/B">
+        Borders
         </a>
     </li>
     {% endif %}
