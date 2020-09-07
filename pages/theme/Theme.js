@@ -313,6 +313,9 @@ class Theme extends Page {
         data.children = topLevelEntityClone.children;
       });
 
+      // remove any categories without children
+      datas = datas.filter(data => data.children.length);
+
       // apply active items
       datas.forEach(this.applyActiveItems(this.req.params.selectedPublicId));
 
@@ -331,6 +334,12 @@ class Theme extends Page {
     try {
       datas = topLevelEntity.children;
 
+      // remove any categories without children
+      datas = datas.filter(data => data.children.length);
+
+      // remove any entities that have more than one parent
+      datas = datas.filter(data => data.parents.length <= 1);
+
       // apply rag roll ups
       datas.forEach(this.applyRagRollups.bind(this));
 
@@ -339,9 +348,6 @@ class Theme extends Page {
         delete entity.children;
         return entity;
       });
-
-      // remove any entities that have more than one parent
-      datas = datas.filter(data => data.parents.length <= 1);
 
       // apply active items
       datas.forEach(this.applyActiveItems(this.req.params.statement));
