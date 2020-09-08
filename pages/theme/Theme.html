@@ -1,8 +1,7 @@
 {% extends "template.njk" %}
 {% from "readiness-accordion.njk" import buildOutcomeMeasures %}
 
-{% set topOutcomes = topLevelOutcomeStatements() | await %}
-{% set subOutcomeMeasures = subOutcomeMeasures() | await %}
+{% set data = data() | await %}
 
 {% block pageTitle %}Theme{% endblock %}
 
@@ -11,7 +10,7 @@
 <div class="govuk-grid-row">
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
-  {% for topOutcome in topOutcomes %}
+  {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
         <h2 class="govuk-heading-s">{{ topOutcome.name }}
@@ -24,9 +23,9 @@
   </div>
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
-    {% if subOutcomeData | length > 0%}
+    {% if data.subOutcomeStatementsAndDatas | length > 0%}
       <div class="readiness-accordion-wrapper" >
-        {{ buildOutcomeMeasures(subOutcomeData, 1) }}
+        {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1) }}
       </div>
     {% else %}
       <h2 class="govuk-heading-s measures-message">To view data, select an outcome statement</h4>

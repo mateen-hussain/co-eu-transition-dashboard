@@ -35,59 +35,26 @@ class Theme extends Page {
 
   mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entityFieldMap, project) {
     entityFieldMap.name = project.title;
-    entityFieldMap.hMGConfidence = 3;
+    entityFieldMap.hmgConfidence = project.hmgConfidence;
+
+    project.projectFieldEntries.forEach(projectFieldEntry => {
+      entityFieldMap[projectFieldEntry.projectField.name] = projectFieldEntry.value
+    });
 
     entityFieldMap.children = project.milestones.map(milestone => {
       const milestoneFieldMap = {
         name: milestone.description,
         publicId: milestone.uid,
-        deliveryConfidence: 3,
+        deliveryConfidence: milestone.deliveryConfidence,
         categoryId: entityFieldMap.categoryId
       };
 
+      milestone.milestoneFieldEntries.forEach(milestoneFieldEntry => {
+        milestoneFieldMap[milestoneFieldEntry.milestoneField.name] = milestoneFieldEntry.value
+      });
+
       return milestoneFieldMap;
     });
-  }
-
-  async mergeProjectsWithEntities(entities) {
-    const dao = new DAO({
-      sequelize: sequelize
-    });
-    const milestoneFieldDefinitions = await Milestone.fieldDefinitions();
-
-    const projectIds = entities.map(d => d['Public ID']);
-    const projects = await dao.getAllData(this.id, {
-      uid: projectIds
-    });
-
-    const milestoneDatas = [];
-
-    for(const entity of entities) {
-      const project = projects.find(project => entity['Public ID'] === project.uid);
-
-      if(project) {
-        for(const milestone of project.milestones) {
-          const milestoneData = cloneDeep(entity);
-
-          milestoneData['Project - Name'] = project.title;
-          milestoneData['Project - UID'] = project.uid;
-
-          milestoneFieldDefinitions.forEach(field => {
-            if(milestone[field.name]) {
-              milestoneData[`Milestone - ${field.displayName || field.name}`] = milestone[field.name];
-            }
-          });
-
-          milestone.milestoneFieldEntries.forEach(field => {
-            milestoneData[`Milestone - ${field.milestoneField.displayName}`] = field.value;
-          });
-
-          milestoneDatas.push(milestoneData);
-        }
-      }
-    }
-
-    return milestoneDatas;
   }
 
   applyRagRollups(entity) {
@@ -95,23 +62,23 @@ class Theme extends Page {
 
     let color = '';
 
-    if(entity.hMGConfidence) {
-      if (entity.hMGConfidence === 1) {
+    if(entity.hmgConfidence) {
+      if (entity.hmgConfidence == 0) {
         color = "red";
-      } else if (entity.hMGConfidence === 2) {
+      } else if (entity.hmgConfidence == 1 || entity.hmgConfidence == 2) {
         color = "amber";
-      } else if (entity.hMGConfidence === 3) {
+      } else if (entity.hmgConfidence == 3) {
         color = "green";
       }
-      entity.color = color || '';
+      entity.color = color;
       entity.children.forEach(this.applyRagRollups.bind(this));
       return color;
     } else if(entity.deliveryConfidence) {
-      if (entity.deliveryConfidence === 1) {
+      if (entity.deliveryConfidence == 0) {
         color = "red";
-      } else if (entity.deliveryConfidence === 2) {
+      } else if (entity.deliveryConfidence == 1 || entity.hmgConfidence == 2) {
         color = "amber";
-      } else if (entity.deliveryConfidence === 3) {
+      } else if (entity.deliveryConfidence == 3) {
         color = "green";
       }
       entity.color = color || '';
@@ -185,17 +152,63 @@ class Theme extends Page {
     }
   }
 
-  async createEntityHierarchy(topLevelEntityPublicId) {
+  async mapProjectsToEntities(entitesInHierarchy) {
+    const projectsCategory = await Category.findOne({
+      where: { name: 'Project' }
+    });
+
+    if(!projectsCategory) {
+      throw new Error('Cannot find projects category');
+    }
+
     const dao = new DAO({
       sequelize: sequelize
     });
     const milestoneFieldDefinitions = await Milestone.fieldDefinitions();
     const projectFieldDefinitions = await Project.fieldDefinitions();
 
+    const getProjectUid = (uids, entity) => {
+      if(entity.children) {
+        return entity.children.reduce(getProjectUid, uids);
+      }
+
+      if(entity.categoryId === projectsCategory.id) {
+        uids.push(entity.publicId);
+      }
+
+      return uids;
+    }
+
+    const projectUids = entitesInHierarchy.children.reduce(getProjectUid, []);
+    if(!projectUids.length) {
+      return;
+    }
+
+    const projects = await dao.getAllData(undefined, { uid: projectUids });
+
+    const mapProjectsToEntites = (entity) => {
+      if(entity.children) {
+        return entity.children.forEach(mapProjectsToEntites);
+      }
+
+      if(entity.categoryId === projectsCategory.id) {
+        const project = projects.find(project => project.uid === entity.publicId);
+        this.mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
+        entity.isLastExpandable = true;
+      }
+    }
+
+    mapProjectsToEntites(entitesInHierarchy);
+  }
+
+  async createEntityHierarchy(topLevelEntityPublicId) {
     const allEntities = await Entity.findAll({
       include: [{
         model: Entity,
         as: 'children'
+      }, {
+        model: Entity,
+        as: 'parents'
       }, {
         model: EntityFieldEntry,
         include: {
@@ -204,9 +217,6 @@ class Theme extends Page {
         }
       }]
     });
-
-    const projects = await dao.getAllData();
-    const projectsUids = projects.map(project => project.uid);
 
     if(!allEntities.length) {
       throw new Error('No entited found in database');
@@ -240,20 +250,20 @@ class Theme extends Page {
           entityFieldMap.children.push(childEntityWithFieldValuesAndMappedChildren);
         });
 
-        // add a usesfull flag so frontend can change the style of the penaltimate hiarchy item
+        // add a useful flag so frontend can change the style of the penultimate hiarchy item
         if(!entityFieldMap.children[0].children) {
           entityFieldMap.isLastExpandable = true;
         }
-      } else if(projectsUids.includes(entity.publicId)) {
-        const project = projects.find(project => project.uid === entity.publicId);
-        this.mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entityFieldMap, project);
-        entityFieldMap.isLastExpandable = true;
       }
 
       return entityFieldMap;
     };
 
-    return mapEntityChildren(topLevelEntity);
+    const entitesInHierarchy = mapEntityChildren(topLevelEntity);
+
+    await this.mapProjectsToEntities(entitesInHierarchy);
+
+    return entitesInHierarchy;
   }
 
   async constructTopLevelCategories() {
@@ -286,109 +296,10 @@ class Theme extends Page {
     }];
   }
 
-  get subOutcomeData() {
-    return [
-      {
-        name: 'Empirical',
-        link: 'http:www.link.com"',
-        active: true,
-        color: 'red',
-        children: [
-          {
-            name: 'Import',
-            active: true,
-            color: 'amber',
-            children: [
-              {
-                name: 'UK Business Licensing',
-                active: true,
-                color: 'red',
-                isLastExpandable: true,
-                children: [
-                  {
-                    name: '% of EU traders that have an EORI number',
-                    link: 'http://www.bbc.co.uk"',
-                    color: 'amber',
-                    active: true,
-                  },
-                  {
-                    name: '% of Food business (by import value) that have registered on IPAFFS',
-                    link: 'http://www.bbc.co.uk"',
-                    color: 'green',
-                  }
-                  ,
-                  {
-                    name: '% of Excise business (by import value) that have completed E68/E69/E70/E71 form',
-                    link: 'http://www.bbc.co.uk"',
-                    color: 'green',
-                  }
-                ]
-              },
-              {
-                name: 'Logistics Readiness',
-                active: false,
-                color: 'green',
-              },
-              {
-                name: 'Customs Readiness',
-                active: false,
-                color: 'amber',
-              }
-            ]
-          },
-          {
-            name: 'Export',
-            active: false,
-            color: 'green',
-            isLastExpandable: true,
-            children: [
-              {
-                name: '% of EU traders that have an EORI number',
-                link: 'http://www.bbc.co.uk"',
-                color: 'amber',
-                active: true,
-              },
-              {
-                name: '% of Food business (by import value) that have registered on IPAFFS',
-                link: 'http://www.bbc.co.uk"',
-                color: 'green',
-              }
-              ,
-              {
-                name: '% of Excise business (by import value) that have completed E68/E69/E70/E71 form',
-                link: 'http://www.bbc.co.uk"',
-                color: 'green',
-              }
-            ]
-          }
-        ], 
-      },
-      {
-        name: 'Comms',
-        link: 'http:www.link.com"',
-        active: false,
-        color: 'amber',
-        children: [], 
-      },
-      {
-        name: 'HMG Delivery',
-        link: 'http:www.link.com"',
-        active: false,
-        color: 'green',
-        children: [], 
-      }
-    ]
-  }
-
-  async subOutcomeMeasures() {
+  async subOutcomeStatementsAndDatas(topLevelEntity) {
     let datas = [];
 
-    if(!this.req.params.statement) {
-      return datas;
-    }
-
     try {
-      const topLevelEntity = await this.createEntityHierarchy(this.req.params.statement);
       if(!topLevelEntity.children) {
         return datas;
       }
@@ -402,6 +313,9 @@ class Theme extends Page {
         data.children = topLevelEntityClone.children;
       });
 
+      // remove any categories without children
+      datas = datas.filter(data => data.children.length);
+
       // apply active items
       datas.forEach(this.applyActiveItems(this.req.params.selectedPublicId));
 
@@ -414,16 +328,17 @@ class Theme extends Page {
     return datas;
   }
 
-  async topLevelOutcomeStatements() {
+  async topLevelOutcomeStatements(topLevelEntity) {
     let datas = [];
 
-    if(!this.req.params.theme) {
-      return datas;
-    }
-
     try {
-      const topLevelEntity = await this.createEntityHierarchy(this.req.params.theme);
       datas = topLevelEntity.children;
+
+      // remove any categories without children
+      datas = datas.filter(data => data.children && data.children.length);
+
+      // remove any entities that have more than one parent
+      datas = datas.filter(data => data.parents.length <= 1);
 
       // apply rag roll ups
       datas.forEach(this.applyRagRollups.bind(this));
@@ -446,6 +361,28 @@ class Theme extends Page {
 
     return datas;
   }
+
+  async data() {
+    const topLevelEntityTheme = await this.createEntityHierarchy(this.req.params.theme);
+
+    const topLevelOutcomeStatements = await this.topLevelOutcomeStatements(cloneDeep(topLevelEntityTheme));
+
+    let subOutcomeStatementsAndDatas = [];
+    if (this.req.params.statement) {
+      const topLevelSelectedStatment = cloneDeep(topLevelEntityTheme).children.find(entity => entity.publicId === this.req.params.statement);
+      if(!topLevelSelectedStatment) {
+        throw new Error(`Cannot find entity with Public Id ${this.req.params.statement}`);
+      }
+      subOutcomeStatementsAndDatas = await this.subOutcomeStatementsAndDatas(topLevelSelectedStatment);
+    }
+
+    return {
+      topLevelOutcomeStatements,
+      subOutcomeStatementsAndDatas
+    }
+  }
+
+
 }
 
 module.exports = Theme;
