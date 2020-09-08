@@ -208,10 +208,9 @@ class Theme extends Page {
 
     if(childrenGrouped) {
       Object.keys(childrenGrouped).forEach(metricID => {
-
         // sort by date
         const sorted = childrenGrouped[metricID]
-          .sort((a, b) => moment(a, 'DD/MM/YYYY').valueOf() - moment(b, 'DD/MM/YYYY').valueOf());
+          .sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
 
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
@@ -233,6 +232,7 @@ class Theme extends Page {
         model: Entity,
         as: 'parents'
       }, {
+        seperate: true,
         model: EntityFieldEntry,
         include: {
           model: CategoryField,

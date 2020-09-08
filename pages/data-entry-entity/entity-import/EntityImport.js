@@ -13,6 +13,7 @@ const BulkImport = require('models/bulkImport');
 const Entity = require('models/entity');
 const Category = require('models/category');
 const { Op } = require('sequelize');
+const moment = require('moment');
 
 class EntityImport extends Page {
   static get isEnabled() {
@@ -62,8 +63,17 @@ class EntityImport extends Page {
 
   async validateEntities(category, entities) {
     const categoryFields = await Category.fieldDefinitions(category);
-
     const parsedEntities = parse.parseItems(entities, categoryFields);
+
+    categoryFields.forEach(categoryField => {
+      if(categoryField.type === 'date') {
+        parsedEntities.forEach(entity => {
+          if(moment(entity[categoryField.name], 'DD/MM/YYYY').isValid()) {
+            entity[categoryField.name] = moment(entity[categoryField.name], 'DD/MM/YYYY').format('YYYY-MM-DD');
+          }
+        });
+      }
+    })
 
     if (!parsedEntities || !parsedEntities.length) {
       const entityColumnErrors = [{ error: 'No entities found' }];
