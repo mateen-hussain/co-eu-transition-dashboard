@@ -15,10 +15,12 @@
         <div class="govuk-accordion__section section-{{ color }} govuk-accordion__section-{{ id }} {{ isLastExpandable }} {{ expanded }}">
           <div class="govuk-accordion__section-header section-header-{{ item.level }}">
             <h2 class="govuk-accordion__section-heading govuk-heading-s">
-              <span class="govuk-accordion__section-button" id="{{ id }}-heading-{{ loop.index }}">
+
+              <button type="button" id="accordion-default-{{ id }}-heading-{{ id }}" aria-controls="accordion-default-{{ id }}-content-{{ id }}" class="govuk-accordion__section-button" aria-expanded="{{ expanded }}">
                 {{ heading }}
-                {% if item.level != 1 %} ({{ childCount }}){% endif %}
-              </span>
+                {% if item.level > 1 %} ({{ childCount }}){% endif %}
+                <span class="govuk-accordion__icon" aria-hidden="true"></span>
+              </button>
             </h2>
             {% if item.summary.html or item.summary.text %}
               <div class="govuk-accordion__section-summary govuk-body" id="{{ id }}-summary-{{ loop.index }}">
