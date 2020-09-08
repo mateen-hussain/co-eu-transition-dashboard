@@ -1,4 +1,5 @@
 {% extends "template.njk" %}
+{% from "readiness-accordion.njk" import buildOutcomeMeasures %}
 
 {% set data = data() | await %}
 
@@ -8,23 +9,27 @@
 
 <div class="govuk-grid-row">
 
-  <div class="govuk-grid-column-one-quarter top-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
-        <h4 class="govuk-heading-s">{{ topOutcome.name }}
+        <h2 class="govuk-heading-s">{{ topOutcome.name }}
         {% if topOutcome.active %} <img src='/assets/images/arrow.png' class='active' alt='active' /> {% endif %}
-        </h4>
-        <p class="govuk-body">{{ topOutcome.description }}</p>
+        </h2>
+        <p class="govuk-body govuk-!-font-size-16">{{ topOutcome.description }}</p>
     </div>
    </a>
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter">
-    {% for subOutcome in data.subOutcomeStatementsAndDatas %}
-      {{ subOutcome.name }}: {{ subOutcome.color }}<br>
-    {% endfor %}
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
+    {% if data.subOutcomeStatementsAndDatas | length > 0%}
+      <div class="readiness-accordion-wrapper" >
+        {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1) }}
+      </div>
+    {% else %}
+      <h2 class="govuk-heading-s measures-message">To view data, select an outcome statement</h4>
+    {% endif %}
   </div>
 
   <div class="govuk-grid-column-one-half">
