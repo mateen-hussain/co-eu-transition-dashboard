@@ -13,6 +13,8 @@ const cloneDeep = require('lodash/cloneDeep');
 const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
 const logger = require('services/logger');
+const groupBy = require('lodash/groupBy');
+const moment = require('moment');
 
 class Theme extends Page {
   static get isEnabled() {
@@ -98,12 +100,12 @@ class Theme extends Page {
       entity.hasOwnProperty('aYThreshold') &&
       entity.hasOwnProperty('greenThreshold') &&
       entity.hasOwnProperty('value')) {
-      if (entity.value <= entity.redThreshold) {
-        color = "red";
-      } else if (entity.value <= entity.aYThreshold) {
-        color = "amber";
-      } else if (entity.value <= entity.greenThreshold) {
+      if (entity.value >= entity.greenThreshold) {
         color = "green";
+      } else if (entity.value >= entity.aYThreshold) {
+        color = "amber";
+      } else {
+        color = "red";
       }
     }
 
@@ -201,6 +203,27 @@ class Theme extends Page {
     mapProjectsToEntites(entitesInHierarchy);
   }
 
+  sortByMetricID(entity) {
+    const childrenGrouped = groupBy(entity.children, child => child.metricID);
+
+    if(childrenGrouped) {
+      Object.keys(childrenGrouped).forEach(metricID => {
+
+        // sort by date
+        const sorted = childrenGrouped[metricID]
+          .sort((a, b) => moment(a, 'DD/MM/YYYY').valueOf() - moment(b, 'DD/MM/YYYY').valueOf());
+
+        // only show the latest metric details
+        entity.children = entity.children.filter(child => {
+          if(child.metricID && child.metricID === metricID) {
+            return child.id === sorted[0].id;
+          }
+          return true;
+        });
+      })
+    }
+  }
+
   async createEntityHierarchy(topLevelEntityPublicId) {
     const allEntities = await Entity.findAll({
       include: [{
@@ -249,11 +272,6 @@ class Theme extends Page {
           const childEntityWithFieldValuesAndMappedChildren = mapEntityChildren(childEntityWithFieldValues);
           entityFieldMap.children.push(childEntityWithFieldValuesAndMappedChildren);
         });
-
-        // add a useful flag so frontend can change the style of the penultimate hiarchy item
-        if(!entityFieldMap.children[0].children) {
-          entityFieldMap.isLastExpandable = true;
-        }
       }
 
       return entityFieldMap;
@@ -296,6 +314,21 @@ class Theme extends Page {
     }];
   }
 
+  applyUIFlags(entity) {
+    if(entity.children && !entity.children[0].children) {
+      return entity.isLastExpandable = true;
+    }
+    entity.children.map(this.applyUIFlags.bind(this));
+  }
+
+  groupByMetricId(entity) {
+    if(entity.children && entity.children[0].metricID) {
+      this.sortByMetricID(entity);
+    } else if(entity.children) {
+      entity.children.map(this.groupByMetricId.bind(this));
+    }
+  }
+
   async subOutcomeStatementsAndDatas(topLevelEntity) {
     let datas = [];
 
@@ -315,6 +348,9 @@ class Theme extends Page {
 
       // remove any categories without children
       datas = datas.filter(data => data.children.length);
+
+      datas.forEach(this.applyUIFlags.bind(this));
+      datas.map(this.groupByMetricId.bind(this));
 
       // apply active items
       datas.forEach(this.applyActiveItems(this.req.params.selectedPublicId));
@@ -339,6 +375,8 @@ class Theme extends Page {
 
       // remove any entities that have more than one parent
       datas = datas.filter(data => data.parents.length <= 1);
+
+      datas.map(this.groupByMetricId.bind(this));
 
       // apply rag roll ups
       datas.forEach(this.applyRagRollups.bind(this));
