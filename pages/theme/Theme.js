@@ -16,6 +16,8 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 
+const rags = ['red', 'amber', 'green'];
+
 class Theme extends Page {
   static get isEnabled() {
     return config.features.transitionReadinessTheme;
@@ -60,8 +62,6 @@ class Theme extends Page {
   }
 
   applyRagRollups(entity) {
-    const rags = ['red', 'amber', 'green'];
-
     let color = '';
 
     if(entity.hmgConfidence) {
@@ -401,26 +401,30 @@ class Theme extends Page {
   }
 
   async data() {
-    const topLevelEntityTheme = await this.createEntityHierarchy(this.req.params.theme);
+    const theme = await this.createEntityHierarchy(this.req.params.theme);
 
-    const topLevelOutcomeStatements = await this.topLevelOutcomeStatements(cloneDeep(topLevelEntityTheme));
+    const topLevelOutcomeStatements = await this.topLevelOutcomeStatements(cloneDeep(theme));
 
     let subOutcomeStatementsAndDatas = [];
     if (this.req.params.statement) {
-      const topLevelSelectedStatment = cloneDeep(topLevelEntityTheme).children.find(entity => entity.publicId === this.req.params.statement);
+      const topLevelSelectedStatment = cloneDeep(theme).children
+        .find(entity => entity.publicId === this.req.params.statement);
       if(!topLevelSelectedStatment) {
         throw new Error(`Cannot find entity with Public Id ${this.req.params.statement}`);
       }
       subOutcomeStatementsAndDatas = await this.subOutcomeStatementsAndDatas(topLevelSelectedStatment);
     }
 
+    // set rag information on theme
+    const outcomeColors = topLevelOutcomeStatements.map(c => c.color);
+    theme.color = rags.find(rag => outcomeColors.includes(rag));
+
     return {
+      theme,
       topLevelOutcomeStatements,
       subOutcomeStatementsAndDatas
     }
   }
-
-
 }
 
 module.exports = Theme;
