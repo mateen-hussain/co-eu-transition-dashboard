@@ -221,7 +221,7 @@ class CategoryTemplate extends Page {
       if(moment(value, 'DD/MM/YYYY').isValid()) {
         cell
           .date(moment(value, 'DD/MM/YYYY').toDate())
-          .style({ numberFormat: 'd/mm/yy' });
+          .style({ numberFormat: 'd/mm/yyyy' });
       }
       break;
     case 'boolean':

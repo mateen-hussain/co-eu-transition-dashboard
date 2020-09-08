@@ -150,6 +150,11 @@
         Borders
         </a>
     </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/P' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/P">
+        People
+        </a>
+    </li>
     {% endif %}
     </ul>
 </nav>
