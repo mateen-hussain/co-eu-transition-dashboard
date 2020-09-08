@@ -7,7 +7,6 @@ import groupDisplay from './group-display';
 import fieldOrder from './field-order';
 import seeMore from './see-more';
 import ReadinessAccordion from './readiness-accordion';
-import countdown from './countdown';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
@@ -26,8 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if ($readinessAccordions) {
     $readinessAccordions.forEach($accordion => new ReadinessAccordion($accordion).init())
   }
-
-  countdown()
 }); 
 
 // The expanded state of individual instances of the accordion component persists across page loads using sessionStorage.
