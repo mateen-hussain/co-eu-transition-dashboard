@@ -10,6 +10,9 @@
 
 <div class="govuk-grid-row">
 
+  <h1 class="govuk-heading-xl theme-red theme-name">{{ data.topLevelEntityTheme.name }}</h1>
+  <span class="govuk-caption-l theme-description">{{ data.topLevelEntityTheme.description }}</span>
+
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
