@@ -25,7 +25,7 @@
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
     {% if data.subOutcomeStatementsAndDatas | length > 0%}
       <div class="readiness-accordion-wrapper" >
-        {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1) }}
+        {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1, req.params.statement) }}
       </div>
     {% else %}
       <h2 class="govuk-heading-s measures-message">To view data, select an outcome statement</h4>
