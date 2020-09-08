@@ -85,7 +85,7 @@ ReadinessAccordion.prototype.isExpanded = function (section) {
 }
 
 // Check for `window.sessionStorage`, and that it actually works.
-var helper = {
+const helper = {
   checkForSessionStorage: function () {
     const testString = 'this is the test string'
     let result
@@ -105,9 +105,6 @@ var helper = {
 // Set the state of the accordions in sessionStorage
 ReadinessAccordion.prototype.storeState = function (section) {
   if (this.browserSupportsSessionStorage) {
-    // We need a unique way of identifying each content in the accordion. Since
-    // an `#id` should be unique and an `id` is required for `aria-` attributes
-    // `id` can be safely used.
     const button = section.querySelector('.' + this.sectionButtonClass)
 
     if (button) {
