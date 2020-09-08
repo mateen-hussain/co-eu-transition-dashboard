@@ -147,8 +147,8 @@ class Page {
       hour = minute * 60,
       day = hour * 24;
 
-    const countDown = new Date('Jan 01, 2021 00:00:00').getTime();
-    const distance = countDown - new Date().getTime();
+    const finalTransitionDate = new Date('Jan 01, 2021 00:00:00').getTime();
+    const distance = finalTransitionDate - new Date().getTime();
 
     let daysToDate = Math.floor(distance / day);
 
