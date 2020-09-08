@@ -25,26 +25,24 @@ document.addEventListener('DOMContentLoaded', function() {
   if ($readinessAccordions) {
     $readinessAccordions.forEach($accordion => new ReadinessAccordion($accordion).init())
   }
+
+  // Countdown Timer
+  const second = 1000,
+    minute = second * 60,
+    hour = minute * 60,
+    day = hour * 24;
+
+  let countDown = new Date('Jan 01, 2021 00:00:00').getTime(),
+    x = setInterval(function() {    
+      let now = new Date().getTime(),
+        distance = countDown - now;
+      document.getElementById('countdown').innerHTML = `${Math.floor(distance / (day))} days`
+      if (distance < 0) {
+        clearInterval(x);
+        document.getElementById('countdown').innerHTML = '0 days'
+      }
+    }, 0)
 });
-
-
-// Countdown Timer
-const second = 1000,
-  minute = second * 60,
-  hour = minute * 60,
-  day = hour * 24;
-
-let countDown = new Date('Jan 01, 2021 00:00:00').getTime(),
-  x = setInterval(function() {    
-    let now = new Date().getTime(),
-      distance = countDown - now;
-    document.getElementById('countdown').innerHTML = `${Math.floor(distance / (day))} days`
-    if (distance < 0) {
-      clearInterval(x);
-      document.getElementById('countdown').innerHTML = '0 days'
-    }
-  }, 0)
-
 
 // The expanded state of individual instances of the accordion component persists across page loads using sessionStorage.
 // These will be removed from the session storage so the accordions will collapse rather than stay open.
