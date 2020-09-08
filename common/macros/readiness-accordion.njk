@@ -16,7 +16,7 @@
           <div class="govuk-accordion__section-header section-header-{{ item.level }}">
             <h2 class="govuk-accordion__section-heading govuk-heading-s">
 
-              <button type="button" id="accordion-default-{{ id }}-heading-{{ id }}" aria-controls="accordion-default-{{ id }}-content-{{ id }}" class="govuk-accordion__section-button" aria-expanded="{{ expanded }}">
+              <button type="button" id="accordion-default-{{ id }}-heading-{{ loop.index }}" aria-controls="accordion-default-{{ id }}-content-{{ loop.index }}" class="govuk-accordion__section-button" aria-expanded="{{ expanded }}">
                 {{ heading }}
                 {% if item.level > 1 %} ({{ childCount }}){% endif %}
                 <span class="govuk-accordion__icon" aria-hidden="true"></span>
@@ -48,12 +48,12 @@
   </ul>
 {% endmacro %}
 
-{% macro buildOutcomeMeasures(items, level) %}
+{% macro buildOutcomeMeasures(items, level, statement) %}
   {% set outcomeMeasuresData = [] %}
 
   {% for item in items %}
     {% if (item.children | length >= 1) and not item.isLastExpandable %}
-        {% set htmlContent = buildOutcomeMeasures(item.children, level + 1) %}
+        {% set htmlContent = buildOutcomeMeasures(item.children, level + 1, statement) %}
     {% elif item.children | length >= 1 and item.isLastExpandable %}
         {% set htmlContent = outcomeMeasuresContent(item.children) %}
     {% else %}
@@ -67,7 +67,7 @@
   {% endfor %}
 
   {{ accordion({
-    id: 'accordion-default-' + level,
+    id: statement +'-accordion-' + level,
     classes: 'accordion-level-' + level,
     items: outcomeMeasuresData
   }) }}
