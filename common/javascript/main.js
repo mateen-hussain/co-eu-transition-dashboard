@@ -35,22 +35,15 @@ const second = 1000,
   day = hour * 24;
 
 let countDown = new Date('Jan 01, 2021 00:00:00').getTime(),
-
   x = setInterval(function() {    
     let now = new Date().getTime(),
       distance = countDown - now;
-
-    document.getElementById('countdown').innerText = Math.floor(distance / (day)) + ' days'
-
+    document.getElementById('countdown').innerHTML = `${Math.floor(distance / (day))} days`
     if (distance < 0) {
       clearInterval(x);
-      var currentDate = Date.now();
-      var difference = now - currentDate;
-      var millisecondsPerDay = 24 * 60 * 60 * 1000;
-      document.getElementById('countdown').innerText = Math.floor(difference / millisecondsPerDay) + 'days of freedom';
+      document.getElementById('countdown').innerHTML = '0 days'
     }
-
-  }, second)
+  }, 0)
 
 
 // The expanded state of individual instances of the accordion component persists across page loads using sessionStorage.
