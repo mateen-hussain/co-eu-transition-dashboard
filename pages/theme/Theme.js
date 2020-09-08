@@ -335,7 +335,7 @@ class Theme extends Page {
       datas = topLevelEntity.children;
 
       // remove any categories without children
-      datas = datas.filter(data => data.children.length);
+      datas = datas.filter(data => data.children && data.children.length);
 
       // remove any entities that have more than one parent
       datas = datas.filter(data => data.parents.length <= 1);
