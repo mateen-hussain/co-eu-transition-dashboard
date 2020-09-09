@@ -356,7 +356,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
         sinon.assert.calledWith(sheet.style, 'some style');
 
         sinon.assert.calledWith(sheet.date, moment('02/02/2010', 'DD/MM/YYYY').toDate());
-        sinon.assert.calledWith(sheet.style, { numberFormat: 'd/mm/yy' });
+        sinon.assert.calledWith(sheet.style, { numberFormat: 'd/mm/yyyy' });
       });
 
       it('creates an item cell for a true boolean', () => {

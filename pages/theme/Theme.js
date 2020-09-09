@@ -64,7 +64,7 @@ class Theme extends Page {
   applyRagRollups(entity) {
     let color = '';
 
-    if(entity.hmgConfidence) {
+    if (entity.hasOwnProperty('hmgConfidence')) {
       if (entity.hmgConfidence == 0) {
         color = "red";
       } else if (entity.hmgConfidence == 1 || entity.hmgConfidence == 2) {
@@ -72,17 +72,19 @@ class Theme extends Page {
       } else if (entity.hmgConfidence == 3) {
         color = "green";
       }
+
       entity.color = color;
       entity.children.forEach(this.applyRagRollups.bind(this));
       return color;
-    } else if(entity.deliveryConfidence) {
+    } else if (entity.hasOwnProperty('deliveryConfidence')) {
       if (entity.deliveryConfidence == 0) {
         color = "red";
-      } else if (entity.deliveryConfidence == 1 || entity.hmgConfidence == 2) {
+      } else if (entity.deliveryConfidence == 1 || entity.deliveryConfidence == 2) {
         color = "amber";
       } else if (entity.deliveryConfidence == 3) {
         color = "green";
       }
+
       entity.color = color || '';
       return color;
     }
@@ -318,89 +320,82 @@ class Theme extends Page {
   }
 
   applyUIFlags(entity) {
-    if(entity.children && !entity.children[0].children) {
+    if (entity.children && entity.children.length && !entity.children[0].children) {
       return entity.isLastExpandable = true;
+    } else if(entity.children) {
+      entity.children.forEach(this.applyUIFlags.bind(this));
     }
-    entity.children.map(this.applyUIFlags.bind(this));
   }
 
   groupByMetricId(entity) {
-    if(entity.children && entity.children[0].metricID) {
+    if(entity.children && entity.children.length && entity.children[0].metricID) {
       this.sortByMetricID(entity);
     } else if(entity.children) {
-      entity.children.map(this.groupByMetricId.bind(this));
+      entity.children.forEach(this.groupByMetricId.bind(this));
     }
   }
 
   async subOutcomeStatementsAndDatas(topLevelEntity) {
-    let datas = [];
+    let entities = [];
 
     try {
       if(!topLevelEntity.children) {
-        return datas;
+        return entities;
       }
 
-      datas = await this.constructTopLevelCategories();
+      entities = await this.constructTopLevelCategories();
 
       // sort all entites into respective categories i.e. Empirical, Comms, HMG Delivery
-      datas.forEach(data => {
+      entities.forEach(data => {
         const topLevelEntityClone = cloneDeep(topLevelEntity);
         this.filterEntitiesByCategoryId(topLevelEntityClone.children, data.categoryId);
         data.children = topLevelEntityClone.children;
       });
 
       // remove any categories without children
-      datas = datas.filter(data => data.children.length);
+      entities = entities.filter(data => data.children.length);
 
-      datas.forEach(this.applyUIFlags.bind(this));
-      datas.map(this.groupByMetricId.bind(this));
+      entities.forEach(entity => {
+        this.applyUIFlags(entity);
+        this.groupByMetricId(entity);
+        this.applyRagRollups(entity);
 
-      // apply active items
-      datas.forEach(this.applyActiveItems(this.req.params.selectedPublicId));
-
-      // apply rag roll ups
-      datas.forEach(this.applyRagRollups.bind(this));
+        this.applyActiveItems(this.req.params.selectedPublicId)(entity);
+      });
     } catch (error) {
       logger.error(error);
     }
 
-    return datas;
+    return entities;
   }
 
   async topLevelOutcomeStatements(topLevelEntity) {
-    let datas = [];
+    let entities = topLevelEntity.children;
 
     try {
-      datas = topLevelEntity.children;
+      // remove entites with no children and has one parent or less
+      entities = entities.filter(entity => {
+        const hasChildren = entity.children && entity.children.length;
+        const hasOnlyParentOrLess = entity.parents.length <= 1;
+        return hasChildren && hasOnlyParentOrLess;
+      });
 
-      // remove any categories without children
-      datas = datas.filter(data => data.children && data.children.length);
+      entities.forEach(entity => {
+        this.groupByMetricId(entity);
+        this.applyRagRollups(entity);
 
-      // remove any entities that have more than one parent
-      datas = datas.filter(data => data.parents.length <= 1);
+        entity.link = `${this.url}/${this.req.params.theme}/${entity.publicId}`;
 
-      datas.map(this.groupByMetricId.bind(this));
-
-      // apply rag roll ups
-      datas.forEach(this.applyRagRollups.bind(this));
-
-      // remove all children for top level outcome statements
-      datas = datas.map(entity => {
         delete entity.children;
-        return entity;
+
+        this.applyActiveItems(this.req.params.statement)(entity);
       });
 
-      // apply active items
-      datas.forEach(this.applyActiveItems(this.req.params.statement));
-
-      datas.forEach(data => {
-        data.link = `${this.url}/${this.req.params.theme}/${data.publicId}`;
-      });
     } catch (error) {
       logger.error(error);
     }
 
-    return datas;
+    return entities;
   }
 
   async data() {
