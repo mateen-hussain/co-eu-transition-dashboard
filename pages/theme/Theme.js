@@ -195,6 +195,9 @@ class Theme extends Page {
 
       if(entity.categoryId === projectsCategory.id) {
         const project = projects.find(project => project.uid === entity.publicId);
+        if(!project) {
+          throw new Error(`Cannot find project with UID ${entity.publicId}`);
+        }
         this.mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
         entity.isLastExpandable = true;
       }
