@@ -79,7 +79,7 @@ class Theme extends Page {
     } else if (entity.hasOwnProperty('deliveryConfidence')) {
       if (entity.deliveryConfidence == 0) {
         color = "red";
-      } else if (entity.deliveryConfidence == 1 || entity.hmgConfidence == 2) {
+      } else if (entity.deliveryConfidence == 1 || entity.deliveryConfidence == 2) {
         color = "amber";
       } else if (entity.deliveryConfidence == 3) {
         color = "green";
