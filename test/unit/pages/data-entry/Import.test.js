@@ -141,6 +141,7 @@ describe('pages/data-entry/import/Import', () => {
       const projectColumnErrors = [{ foo: 'bar' }];
       const projectErrors = [{ baz: 'baz' }];
       const parsedProjects = [{ id: 1 }];
+      page.req.user.departments = [];
 
       page.validateItems = () => [projectColumnErrors, projectErrors];
       parse.parseItems.returns(parsedProjects);
