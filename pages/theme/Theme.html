@@ -6,12 +6,11 @@
 {% block pageTitle %}Theme{% endblock %}
 
 {% block content %}
-<h1>{{ data.theme.name }} {{ data.theme.color }}</h1>
 
 <div class="govuk-grid-row">
 
-  <h1 class="govuk-heading-xl theme-{{ data.topLevelEntityTheme.color }} theme-name">{{ data.topLevelEntityTheme.name }}</h1>
-  <span class="govuk-caption-l theme-description">{{ data.topLevelEntityTheme.description }}</span>
+  <h1 class="govuk-heading-xl theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
+  <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}

@@ -418,11 +418,7 @@ class Theme extends Page {
     theme.color = rags.find(rag => outcomeColors.includes(rag));
 
     return {
-<<<<<<< HEAD
       theme,
-=======
-      topLevelEntityTheme,
->>>>>>> theme title and description
       topLevelOutcomeStatements,
       subOutcomeStatementsAndDatas
     }
