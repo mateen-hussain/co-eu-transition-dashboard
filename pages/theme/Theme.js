@@ -15,8 +15,10 @@ const DAO = require('services/dao');
 const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
+const tableau = require('services/tableau');
+const { cache } = require('services/nodeCache');
 
-const rags = ['red', 'amber', 'green'];
+const rags = ['red', 'amber', 'yellow', 'green'];
 
 class Theme extends Page {
   static get isEnabled() {
@@ -35,6 +37,45 @@ class Theme extends Page {
     return [
       ...authentication.protect(['management_overview'])
     ];
+  }
+
+  async getIframeUrl(entity) {
+    if(!entity) {
+      return {};
+    }
+
+    let workbook = '';
+    let view = '';
+    let appendUrl = '';
+
+    switch(entity.category.name) {
+    case 'Measure':
+      workbook = 'Readiness';
+      view = entity.groupID;
+      break;
+    case 'Communication':
+      workbook = 'Comms';
+      view = 'Comms';
+      appendUrl = `?Comms%20ID=${entity.commsId}`;
+      break;
+    case 'Project':
+      workbook = 'HMG';
+      view = 'Milestones';
+      appendUrl = `?Milestone%20UID=${entity.publicId}`;
+      break;
+    }
+
+    let url;
+    try {
+      url = await tableau.getTableauUrl(this.req.user, workbook, view);
+    } catch (error) {
+      logger.error(`Error from tableau: ${error}`);
+      return { error: 'Error from tableau' };
+    }
+
+    url += appendUrl;
+
+    return { url };
   }
 
   mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entityFieldMap, project) {
@@ -57,6 +98,8 @@ class Theme extends Page {
         milestoneFieldMap[milestoneFieldEntry.milestoneField.name] = milestoneFieldEntry.value
       });
 
+      milestoneFieldMap.category = entityFieldMap.category;
+
       return milestoneFieldMap;
     });
   }
@@ -67,8 +110,10 @@ class Theme extends Page {
     if (entity.hasOwnProperty('hmgConfidence')) {
       if (entity.hmgConfidence == 0) {
         color = "red";
-      } else if (entity.hmgConfidence == 1 || entity.hmgConfidence == 2) {
+      } else if (entity.hmgConfidence == 1) {
         color = "amber";
+      } else if (entity.hmgConfidence == 2) {
+        color = "yellow";
       } else if (entity.hmgConfidence == 3) {
         color = "green";
       }
@@ -79,8 +124,10 @@ class Theme extends Page {
     } else if (entity.hasOwnProperty('deliveryConfidence')) {
       if (entity.deliveryConfidence == 0) {
         color = "red";
-      } else if (entity.deliveryConfidence == 1 || entity.deliveryConfidence == 2) {
+      } else if (entity.deliveryConfidence == 1) {
         color = "amber";
+      } else if (entity.deliveryConfidence == 2) {
+        color = "yellow";
       } else if (entity.deliveryConfidence == 3) {
         color = "green";
       }
@@ -102,9 +149,12 @@ class Theme extends Page {
       entity.hasOwnProperty('aYThreshold') &&
       entity.hasOwnProperty('greenThreshold') &&
       entity.hasOwnProperty('value')) {
-      if (entity.value >= entity.greenThreshold) {
+      const yellowThreshold = parseInt(entity.aYThreshold) + ((entity.greenThreshold - entity.aYThreshold) / 2);
+      if (parseInt(entity.value) >= parseInt(entity.greenThreshold)) {
         color = "green";
-      } else if (entity.value >= entity.aYThreshold) {
+      } else if (parseInt(entity.value) >= parseInt(yellowThreshold)) {
+        color = "yellow";
+      } else if (parseInt(entity.value) >= parseInt(entity.aYThreshold)) {
         color = "amber";
       } else {
         color = "red";
@@ -215,7 +265,7 @@ class Theme extends Page {
       Object.keys(childrenGrouped).forEach(metricID => {
         // sort by date
         const sorted = childrenGrouped[metricID]
-          .sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+          .sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
 
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
@@ -229,17 +279,28 @@ class Theme extends Page {
   }
 
   async createEntityHierarchy(topLevelEntityPublicId) {
+    const cached = cache.get(`entityHierarchy-${topLevelEntityPublicId}`);
+    if(cached) {
+      return JSON.parse(cached);
+    }
+
     const allEntities = await Entity.findAll({
       include: [{
+        attributes: ['name'],
+        model: Category
+      }, {
+        // attributes: ['id'],
         model: Entity,
         as: 'children'
       }, {
+        attributes: ['id'],
         model: Entity,
         as: 'parents'
       }, {
         seperate: true,
         model: EntityFieldEntry,
         include: {
+          attributes: ['name'],
           model: CategoryField,
           where: { isActive: true }
         }
@@ -285,6 +346,8 @@ class Theme extends Page {
     const entitesInHierarchy = mapEntityChildren(topLevelEntity);
 
     await this.mapProjectsToEntities(entitesInHierarchy);
+
+    cache.set(`entityHierarchy-${topLevelEntityPublicId}`, JSON.stringify(entitesInHierarchy));
 
     return entitesInHierarchy;
   }
@@ -398,6 +461,19 @@ class Theme extends Page {
     return entities;
   }
 
+  findSelected(item, entity) {
+    if(item) {
+      return item;
+    }
+    if(entity.active && entity.children) {
+      const found = entity.children.reduce(this.findSelected.bind(this), item);
+      return found;
+    } else if(entity.active) {
+      return entity;
+    }
+    return item;
+  }
+
   async data() {
     const theme = await this.createEntityHierarchy(this.req.params.theme);
 
@@ -417,7 +493,11 @@ class Theme extends Page {
     const outcomeColors = topLevelOutcomeStatements.map(c => c.color);
     theme.color = rags.find(rag => outcomeColors.includes(rag));
 
+    const selected = subOutcomeStatementsAndDatas.reduce(this.findSelected.bind(this), false);
+    const iframeUrl = await this.getIframeUrl(selected);
+
     return {
+      iframeUrl,
       theme,
       topLevelOutcomeStatements,
       subOutcomeStatementsAndDatas

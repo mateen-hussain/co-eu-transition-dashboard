@@ -36,12 +36,12 @@
   </div>
 
   <div class="govuk-grid-column-one-half">
-  {% if tableauIframeError %}
-    <p class="govuk-body govuk-!-font-weight-bold tableu-message">There has been an error accessing this data, please contact The Transition Taskforce Dashboard Team</p>
-  {% elseif topOutcomeSelected %}
+  {% if topOutcomeSelected %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
+  {% elseif data.iframeUrl.error %}
+    <p class="govuk-body govuk-!-font-weight-bold tableu-message">There has been an error accessing this data, please contact The Transition Taskforce Dashboard Team</p>
   {% else %}
-    <iframe src="{{ tableauIframeUrl }}" class="theme-tableu"></iframe>
+    <iframe src="{{ data.iframeUrl.url }}" class="theme-tableu"></iframe>
   {% endif %}
   </div>
 

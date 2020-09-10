@@ -20,6 +20,8 @@ describe('services/sequelize', () => {
   });
 
   it('throws error if no url set in config', async () => {
+    const setting = config.env;
+    config.env = '';
     let message = '';
     try{
       await tableau.getTableauUrl();
@@ -27,6 +29,7 @@ describe('services/sequelize', () => {
       message = thrownError.message;
     }
     expect(message).to.eql('No tableau url set');
+    config.env = setting;
   });
 
   it('throws error if response from tableau is -1', async () => {
