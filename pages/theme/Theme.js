@@ -38,7 +38,7 @@ class Theme extends Page {
   }
 
   mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entityFieldMap, project) {
-    entityFieldMap.name = project.title;
+    entityFieldMap.name = `${project.departmentName} - ${project.title}`;
     entityFieldMap.hmgConfidence = project.hmgConfidence;
 
     project.projectFieldEntries.forEach(projectFieldEntry => {
