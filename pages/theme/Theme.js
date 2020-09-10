@@ -16,8 +16,11 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 const tableau = require('services/tableau');
+const NodeCache = require( "node-cache" );
 
-const rags = ['red', 'amber', 'green'];
+const myCache = new NodeCache( { stdTTL: 3600 } );
+
+const rags = ['red', 'amber', 'yellow', 'green'];
 
 class Theme extends Page {
   static get isEnabled() {
@@ -50,7 +53,7 @@ class Theme extends Page {
     switch(entity.category.name) {
     case 'Measure':
       workbook = 'Readiness';
-      view = entity.metricID;
+      view = entity.groupID;
       break;
     case 'Communication':
       workbook = 'Comms';
@@ -59,8 +62,8 @@ class Theme extends Page {
       break;
     case 'Project':
       workbook = 'HMG';
-      view = 'Milestone';
-      appendUrl = `?Milestones%20UID=${entity.publicId}`;
+      view = 'Milestones';
+      appendUrl = `?Milestone%20UID=${entity.publicId}`;
       break;
     }
 
@@ -149,11 +152,11 @@ class Theme extends Page {
       entity.hasOwnProperty('greenThreshold') &&
       entity.hasOwnProperty('value')) {
       const yellowThreshold = parseInt(entity.aYThreshold) + ((entity.greenThreshold - entity.aYThreshold) / 2);
-      if (entity.value >= entity.greenThreshold) {
+      if (parseInt(entity.value) >= parseInt(entity.greenThreshold)) {
         color = "green";
-      } else if (entity.value >= yellowThreshold) {
+      } else if (parseInt(entity.value) >= parseInt(yellowThreshold)) {
         color = "yellow";
-      } else if (entity.value >= entity.aYThreshold) {
+      } else if (parseInt(entity.value) >= parseInt(entity.aYThreshold)) {
         color = "amber";
       } else {
         color = "red";
@@ -264,7 +267,7 @@ class Theme extends Page {
       Object.keys(childrenGrouped).forEach(metricID => {
         // sort by date
         const sorted = childrenGrouped[metricID]
-          .sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+          .sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
 
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
@@ -278,6 +281,11 @@ class Theme extends Page {
   }
 
   async createEntityHierarchy(topLevelEntityPublicId) {
+    const cached = myCache.get(`entityHierarchy-${topLevelEntityPublicId}`);
+    if(cached) {
+      return JSON.parse(cached);
+    }
+
     const allEntities = await Entity.findAll({
       include: [{
         attributes: ['name'],
@@ -340,6 +348,8 @@ class Theme extends Page {
     const entitesInHierarchy = mapEntityChildren(topLevelEntity);
 
     await this.mapProjectsToEntities(entitesInHierarchy);
+
+    myCache.set(`entityHierarchy-${topLevelEntityPublicId}`, JSON.stringify(entitesInHierarchy));
 
     return entitesInHierarchy;
   }
