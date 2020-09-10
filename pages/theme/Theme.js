@@ -55,12 +55,12 @@ class Theme extends Page {
     case 'Communication':
       workbook = 'Comms';
       view = 'Comms';
-      appendUrl = `?Comms%20ID=${entity.commsID}`;
+      appendUrl = `?Comms%20ID=${entity.commsId}`;
       break;
     case 'Project':
       workbook = 'HMG';
       view = 'Milestone';
-      appendUrl = `?Milestone%20UID=${entity.publicId}`;
+      appendUrl = `?Milestones%20UID=${entity.publicId}`;
       break;
     }
 
