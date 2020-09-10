@@ -15,6 +15,7 @@ const DAO = require('services/dao');
 const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
+const tableau = require('services/tableau');
 
 const rags = ['red', 'amber', 'green'];
 
@@ -37,6 +38,45 @@ class Theme extends Page {
     ];
   }
 
+  async getIframeUrl(entity) {
+    if(!entity) {
+      return {};
+    }
+
+    let workbook = '';
+    let view = '';
+    let appendUrl = '';
+
+    switch(entity.category.name) {
+    case 'Measure':
+      workbook = 'Readiness';
+      view = entity.metricID;
+      break;
+    case 'Communication':
+      workbook = 'Comms';
+      view = 'Comms';
+      appendUrl = `?Comms%20ID=${entity.commsID}`;
+      break;
+    case 'Project':
+      workbook = 'HMG';
+      view = 'Milestone';
+      appendUrl = `?Milestone%20UID=${entity.publicId}`;
+      break;
+    }
+
+    let url;
+    try {
+      url = await tableau.getTableauUrl(this.req.user, workbook, view);
+    } catch (error) {
+      logger.error(`Error from tableau: ${error}`);
+      return { error: 'Error from tableau' };
+    }
+
+    url += appendUrl;
+
+    return { url };
+  }
+
   mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entityFieldMap, project) {
     entityFieldMap.name = `${project.departmentName} - ${project.title}`;
     entityFieldMap.hmgConfidence = project.hmgConfidence;
@@ -56,6 +96,8 @@ class Theme extends Page {
       milestone.milestoneFieldEntries.forEach(milestoneFieldEntry => {
         milestoneFieldMap[milestoneFieldEntry.milestoneField.name] = milestoneFieldEntry.value
       });
+
+      milestoneFieldMap.category = entityFieldMap.category;
 
       return milestoneFieldMap;
     });
@@ -231,15 +273,21 @@ class Theme extends Page {
   async createEntityHierarchy(topLevelEntityPublicId) {
     const allEntities = await Entity.findAll({
       include: [{
+        attributes: ['name'],
+        model: Category
+      }, {
+        // attributes: ['id'],
         model: Entity,
         as: 'children'
       }, {
+        attributes: ['id'],
         model: Entity,
         as: 'parents'
       }, {
         seperate: true,
         model: EntityFieldEntry,
         include: {
+          attributes: ['name'],
           model: CategoryField,
           where: { isActive: true }
         }
@@ -398,6 +446,19 @@ class Theme extends Page {
     return entities;
   }
 
+  findSelected(item, entity) {
+    if(item) {
+      return item;
+    }
+    if(entity.active && entity.children) {
+      const found = entity.children.reduce(this.findSelected.bind(this), item);
+      return found;
+    } else if(entity.active) {
+      return entity;
+    }
+    return item;
+  }
+
   async data() {
     const theme = await this.createEntityHierarchy(this.req.params.theme);
 
@@ -417,7 +478,11 @@ class Theme extends Page {
     const outcomeColors = topLevelOutcomeStatements.map(c => c.color);
     theme.color = rags.find(rag => outcomeColors.includes(rag));
 
+    const selected = subOutcomeStatementsAndDatas.reduce(this.findSelected.bind(this), false);
+    const iframeUrl = await this.getIframeUrl(selected);
+
     return {
+      iframeUrl,
       theme,
       topLevelOutcomeStatements,
       subOutcomeStatementsAndDatas
