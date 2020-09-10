@@ -16,9 +16,7 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 const tableau = require('services/tableau');
-const NodeCache = require( "node-cache" );
-
-const myCache = new NodeCache( { stdTTL: 3600 } );
+const { cache } = require('services/nodeCache');
 
 const rags = ['red', 'amber', 'yellow', 'green'];
 
@@ -281,7 +279,7 @@ class Theme extends Page {
   }
 
   async createEntityHierarchy(topLevelEntityPublicId) {
-    const cached = myCache.get(`entityHierarchy-${topLevelEntityPublicId}`);
+    const cached = cache.get(`entityHierarchy-${topLevelEntityPublicId}`);
     if(cached) {
       return JSON.parse(cached);
     }
@@ -349,7 +347,7 @@ class Theme extends Page {
 
     await this.mapProjectsToEntities(entitesInHierarchy);
 
-    myCache.set(`entityHierarchy-${topLevelEntityPublicId}`, JSON.stringify(entitesInHierarchy));
+    cache.set(`entityHierarchy-${topLevelEntityPublicId}`, JSON.stringify(entitesInHierarchy));
 
     return entitesInHierarchy;
   }
