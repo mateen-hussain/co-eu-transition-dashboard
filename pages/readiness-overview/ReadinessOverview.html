@@ -1,198 +1,76 @@
 {% extends "template.njk" %}
+{% from "readiness-theme-card.njk" import readinessThemeCard %}
 
-{% block beforeContent %}
-{% include "navigation.njk" %}
-{% include "feedback.njk" %}
+{% block pageTitle %}Transition Readiness Overview{% endblock %}
+
+{% block content %}
+
+  {% set data = data() | await %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      <br><br>
       <h1 class="govuk-heading-l">Transition Readiness Overview</h1>
       <div class="govuk-grid-row">
 
         <div class="govuk-grid-column-one-quarter no-padding-right">
           <h3 class="govuk-heading-m">Headline figures</h3>
           <div class="overview-card-holder headline-figure top-statements">
-
-            <div class="overview-card green">
-              <a href="{{ config.paths.transitionReadinessThemeDetail }}/B">
-              <div class="overview-card--inner">
-                <p class="overview-card--title">Number of registrations to the Export Health Certificates online system</p>
-                <span class="overview-card--tag-theme govuk-heading-s">Borders</span>
-                <p class="overview-card--metric">44 additional registrations this week</p>
+            {% for item in data.headlineFigures %}
+              <div class="overview-card {{ item.color }}">
+                <a href="{{ item.link }}">
+                <div class="overview-card--inner">
+                  <p class="overview-card--title">{{ item.name }} </p>
+                  <span class="overview-card--tag-theme govuk-heading-s">{{ item.theme }}</span>
+                  <p class="overview-card--metric">{{ item.description }}</p>
+                </div>
+                </a>
               </div>
-              </a>
-            </div>
-
-            <div class="overview-card red">
-              <a href="{{ config.paths.transitionReadinessThemeDetail }}/B">
-              <div class="overview-card--inner">
-                <p class="overview-card--title">% of UK travellers who are aware that 'Due to changes in passport validity rules, some UK passport holders will need to renew their passports earlier than expected'</p>
-                <span class="overview-card--tag-theme govuk-heading-s">Borders</span>
-                <p class="overview-card--metric">34%</p>
-              </div>
-              </a>
-            </div>
-
-            <div class="overview-card green">
-              <a href="{{ config.paths.transitionReadinessThemeDetail }}/B">
-              <div class="overview-card--inner">
-                <p class="overview-card--title">Number of registrations to the IPAFFS system</p>
-                <span class="overview-card--tag-theme govuk-heading-s">Borders</span>
-                <p class="overview-card--metric">16 additional registrations this week</p>
-              </div>
-              </a>
-            </div>
-
-            <div class="overview-card red">
-              <a href="{{ config.paths.transitionReadinessThemeDetail }}/P">
-              <div class="overview-card--inner">
-                <p class="overview-card--title">EEA citizens in the UK who have applied to the EUSS to allow them to live/work/study in the UK as they do now after 30 June 2021</p>
-                <span class="overview-card--tag-theme govuk-heading-s">People</span>
-                <p class="overview-card--metric">2,041,200 granted settled status</p>
-              </div>
-              </a>
-            </div>
-
-            <div class="overview-card amber">
-              <a href="{{ config.paths.transitionReadinessThemeDetail }}/P">
-              <div class="overview-card--inner">
-                <p class="overview-card--title">% of EEA citizens who understand what the new immigration system means for them</p>
-                <span class="overview-card--tag-theme govuk-heading-s">People</span>
-                <p class="overview-card--metric">62%</p>
-              </div>
-              </a>
-            </div>
-
-            <div class="overview-card yellow">
-              <a href="{{ config.paths.transitionReadinessThemeDetail }}/B">
-              <div class="overview-card--inner">
-                <p class="overview-card--title">% of UK citizens living in the EU who are aware of changes to healthcare provisions and the actions needed to secure healthcare for after the transition</p>
-                <span class="overview-card--tag-theme govuk-heading-s">Borders</span>
-                <p class="overview-card--metric">68%</p>
-              </div>
-              </a>
-            </div>
-
+            {% endfor %}
           </div>
         </div>
-
 
         <div class="govuk-grid-column-three-quarters">
           <h3 class="govuk-heading-m">Themes</h3>
 
           <div class="govuk-grid-row">
+
+            {# High risk column #}
             <div class="govuk-grid-column-one-quarter no-padding-right risk-col">
               <h4 class="govuk-heading-s govuk-!-font-weight-regular">High Risk</h4>
-              {# High risk column #}
               <div class="overview-card-holder top-statements">
-                <div class="overview-card red">
-                  <div class="overview-card--inner">
-                    <a class="overview-card--link" href="{{ config.paths.transitionReadinessThemeDetail }}/B"> 
-                      <p class="overview-card--title">Borders</p>
-                    </a>
-                    <p>To minimise disruption to the movement of goods and people through borders</p>
-                  </div>
-                </div>
-
-                <div class="overview-card red">
-                  <div class="overview-card--inner">
-                    <a class="overview-card--link" href="{{ config.paths.transitionReadinessThemeDetail }}/p"> 
-                      <p class="overview-card--title">People</p>
-                    </a>
-                    <p>To protect professional, residential, educational, healthcare, law and economic rights of UK and EU citizens</p>
-                  </div>
-                </div>
-
-                <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Economy</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-
-                <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Data</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-
-                <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Energy / Environment</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
+                {% for item in data.themes.red %}
+                  {{ readinessThemeCard(item) }}
+                {% endfor %}
               </div>
             </div>
 
             {# Medium risk column #}
             <div class="govuk-grid-column-one-quarter no-padding-right risk-col">
               <h4 class="govuk-heading-s govuk-!-font-weight-regular">Medium Risk</h4>
-
               <div class="overview-card-holder top-statements">
+                {% for item in data.themes.amber %}
+                  {{ readinessThemeCard(item) }}
+                {% endfor %}
               </div>
             </div>
 
              {# Low risk column #}
             <div class="govuk-grid-column-one-quarter no-padding-right risk-col">
               <h4 class="govuk-heading-s govuk-!-font-weight-regular">Low Risk</h4>
-
               <div class="overview-card-holder top-statements">
-
-                <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Animals & food</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-
-                <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Fish</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-                
+                {% for item in data.themes.yellow %}
+                  {{ readinessThemeCard(item) }}
+                {% endfor %}
               </div>
             </div>
 
              {# Minimal risk column #}
             <div class="govuk-grid-column-one-quarter no-padding-right risk-col">
               <h4 class="govuk-heading-s govuk-!-font-weight-regular">Minimal/No Risk</h4>
-
               <div class="overview-card-holder top-statements">
-
-                <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Security</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-
-                 <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">International agreements</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-
-                 <div class="overview-card grey inactive">
-                  <div class="overview-card--inner">
-                    <p class="overview-card--title">Programmes</p>
-                    <p>Theme due online:<br>
-                      30/09/2020</p>
-                  </div>
-                </div>
-                
+                {% for item in data.themes.green %}
+                  {{ readinessThemeCard(item) }}
+                {% endfor %}
               </div>
             </div>
 
@@ -204,8 +82,3 @@
   </div>
  
 {% endblock %}
-
-{% block pageTitle %}Transition Readiness Overview{% endblock %}
-
-{% block content %}{% endblock %}
-

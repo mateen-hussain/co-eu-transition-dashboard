@@ -1,0 +1,10 @@
+{% macro readinessThemeCard(item) %}
+  <div class="overview-card {{ item.color if item.active else "grey inactive" }}  ">
+    <div class="overview-card--inner">
+      <a class="overview-card--link" href="{{ item.link if item.active else "#" }}"> 
+        <p class="overview-card--title">{{ item.name }}</p>
+      </a>
+      <p>{{ item.description }}</p>
+    </div>
+  </div>
+{% endmacro %}
