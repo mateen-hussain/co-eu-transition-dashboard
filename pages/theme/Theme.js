@@ -109,8 +109,10 @@ class Theme extends Page {
     if (entity.hasOwnProperty('hmgConfidence')) {
       if (entity.hmgConfidence == 0) {
         color = "red";
-      } else if (entity.hmgConfidence == 1 || entity.hmgConfidence == 2) {
+      } else if (entity.hmgConfidence == 1) {
         color = "amber";
+      } else if (entity.hmgConfidence == 2) {
+        color = "yellow";
       } else if (entity.hmgConfidence == 3) {
         color = "green";
       }
@@ -121,8 +123,10 @@ class Theme extends Page {
     } else if (entity.hasOwnProperty('deliveryConfidence')) {
       if (entity.deliveryConfidence == 0) {
         color = "red";
-      } else if (entity.deliveryConfidence == 1 || entity.deliveryConfidence == 2) {
+      } else if (entity.deliveryConfidence == 1) {
         color = "amber";
+      } else if (entity.deliveryConfidence == 2) {
+        color = "yellow";
       } else if (entity.deliveryConfidence == 3) {
         color = "green";
       }
@@ -144,8 +148,11 @@ class Theme extends Page {
       entity.hasOwnProperty('aYThreshold') &&
       entity.hasOwnProperty('greenThreshold') &&
       entity.hasOwnProperty('value')) {
+      const yellowThreshold = parseInt(entity.aYThreshold) + ((entity.greenThreshold - entity.aYThreshold) / 2);
       if (entity.value >= entity.greenThreshold) {
         color = "green";
+      } else if (entity.value >= yellowThreshold) {
+        color = "yellow";
       } else if (entity.value >= entity.aYThreshold) {
         color = "amber";
       } else {
