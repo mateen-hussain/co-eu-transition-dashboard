@@ -269,9 +269,17 @@ class Theme extends Page {
 
     if(childrenGrouped) {
       Object.keys(childrenGrouped).forEach(groupKey => {
-        // sort by date
-        const sorted = childrenGrouped[groupKey]
-          .sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
+        let sorted;
+
+        if(property === 'groupID') {
+          sorted = childrenGrouped[groupKey]
+            .sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
+        } else {
+          sorted = childrenGrouped[groupKey]
+            .sort((a, b) => a.value - b.value);
+        }
+
+
 
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
