@@ -36,7 +36,7 @@ class Theme extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['management_overview'])
+      ...authentication.protect(['viewer'])
     ];
   }
 
@@ -92,7 +92,8 @@ class Theme extends Page {
         name: milestone.description,
         publicId: milestone.uid,
         deliveryConfidence: milestone.deliveryConfidence,
-        categoryId: entityFieldMap.categoryId
+        categoryId: entityFieldMap.categoryId,
+        date: milestone.date
       };
 
       milestone.milestoneFieldEntries.forEach(milestoneFieldEntry => {
@@ -103,6 +104,11 @@ class Theme extends Page {
 
       return milestoneFieldMap;
     });
+
+    entityFieldMap.children = entityFieldMap.children
+      .sort((a, b) => {
+        return moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf();
+      });
   }
 
   applyRagRollups(entity) {

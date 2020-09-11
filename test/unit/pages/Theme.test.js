@@ -51,10 +51,10 @@ describe('pages/theme/Theme', () => {
 
   it('only management are allowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['management_overview'])
+      ...authentication.protect(['viewer'])
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['management_overview']);
+    sinon.assert.calledWith(authentication.protect, ['viewer']);
   });
 
 });
