@@ -6,6 +6,7 @@ const config = require('config');
 const Category = require('models/category');
 const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
+const EntityParent = require('models/entityParent');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const Project = require('models/project');
 const Milestone = require('models/milestone');
@@ -284,18 +285,27 @@ class Theme extends Page {
       return JSON.parse(cached);
     }
 
-    const allEntities = await Entity.findAll({
+    const result = await Entity.findAll({
       include: [{
         attributes: ['name'],
         model: Category
       }, {
         // attributes: ['id'],
-        model: Entity,
-        as: 'children'
+        model: EntityParent,
+        as: 'entityChildren',
+        separate: true,
+        include: {
+          model: Entity,
+          as: 'child'
+        }
       }, {
-        attributes: ['id'],
-        model: Entity,
-        as: 'parents'
+        model: EntityParent,
+        as: 'entityParents',
+        separate: true,
+        include: {
+          model: Entity,
+          as: 'parent'
+        }
       }, {
         seperate: true,
         model: EntityFieldEntry,
@@ -305,6 +315,30 @@ class Theme extends Page {
           where: { isActive: true }
         }
       }]
+    });
+
+
+    let allEntities = [];
+    result.forEach( entity => {
+      let finalEntity = entity;
+
+      finalEntity.children = [];
+      if (entity.entityChildren.length) {
+        entity.entityChildren.forEach( childEntity => {
+          finalEntity.children.push(childEntity.child);
+        });
+      }
+      finalEntity.dataValues.children = finalEntity.children;
+
+      finalEntity.parents = [];
+      if (entity.entityParents.length) {
+        entity.entityParents.forEach( parentEntity => {
+          finalEntity.parents.push(parentEntity.parent);
+        });
+      }
+      finalEntity.dataValues.parents = finalEntity.parents;
+
+      allEntities.push(finalEntity);
     });
 
     if(!allEntities.length) {
