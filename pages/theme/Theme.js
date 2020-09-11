@@ -156,12 +156,11 @@ class Theme extends Page {
       entity.hasOwnProperty('aYThreshold') &&
       entity.hasOwnProperty('greenThreshold') &&
       entity.hasOwnProperty('value')) {
-      const yellowThreshold = parseInt(entity.aYThreshold) + ((entity.greenThreshold - entity.aYThreshold) / 2);
       if (parseInt(entity.value) >= parseInt(entity.greenThreshold)) {
         color = "green";
-      } else if (parseInt(entity.value) >= parseInt(yellowThreshold)) {
-        color = "yellow";
       } else if (parseInt(entity.value) >= parseInt(entity.aYThreshold)) {
+        color = "yellow";
+      } else if (parseInt(entity.value) > parseInt(entity.redThreshold)) {
         color = "amber";
       } else {
         color = "red";
@@ -265,18 +264,18 @@ class Theme extends Page {
     mapProjectsToEntites(entitesInHierarchy);
   }
 
-  sortByGroupID(entity) {
-    const childrenGrouped = groupBy(entity.children, child => child.groupID);
+  sortById(entity, property) {
+    const childrenGrouped = groupBy(entity.children, child => child[property]);
 
     if(childrenGrouped) {
-      Object.keys(childrenGrouped).forEach(groupID => {
+      Object.keys(childrenGrouped).forEach(groupKey => {
         // sort by date
-        const sorted = childrenGrouped[groupID]
+        const sorted = childrenGrouped[groupKey]
           .sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
 
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
-          if(child.groupID && child.groupID === groupID) {
+          if(child[property] && child[property] === groupKey) {
             return child.id === sorted[0].id;
           }
           return true;
@@ -439,11 +438,13 @@ class Theme extends Page {
     }
   }
 
-  groupByGroupId(entity) {
+  groupById(entity) {
     if(entity.children && entity.children.length && entity.children[0].groupID) {
-      this.sortByGroupID(entity);
+      this.sortById(entity, 'groupID');
+    } else if(entity.children && entity.children.length && entity.children[0].commsId) {
+      this.sortById(entity, 'commsId');
     } else if(entity.children) {
-      entity.children.forEach(this.groupByGroupId.bind(this));
+      entity.children.forEach(this.groupById.bind(this));
     }
   }
 
@@ -469,7 +470,7 @@ class Theme extends Page {
 
       entities.forEach(entity => {
         this.applyUIFlags(entity);
-        this.groupByGroupId(entity);
+        this.groupById(entity);
         this.applyRagRollups(entity);
 
         this.applyActiveItems(this.req.params.selectedPublicId)(entity);
@@ -521,7 +522,7 @@ class Theme extends Page {
       });
 
       entities.forEach(entity => {
-        this.groupByGroupId(entity);
+        this.groupById(entity);
         this.applyRagRollups(entity);
 
         entity.link = `${this.url}/${this.req.params.theme}/${entity.publicId}`;
