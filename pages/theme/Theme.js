@@ -264,18 +264,18 @@ class Theme extends Page {
     mapProjectsToEntites(entitesInHierarchy);
   }
 
-  sortByMetricID(entity) {
-    const childrenGrouped = groupBy(entity.children, child => child.metricID);
+  sortByGroupID(entity) {
+    const childrenGrouped = groupBy(entity.children, child => child.groupID);
 
     if(childrenGrouped) {
-      Object.keys(childrenGrouped).forEach(metricID => {
+      Object.keys(childrenGrouped).forEach(groupID => {
         // sort by date
-        const sorted = childrenGrouped[metricID]
+        const sorted = childrenGrouped[groupID]
           .sort((a, b) => moment(b.date).valueOf() - moment(a.date).valueOf());
 
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
-          if(child.metricID && child.metricID === metricID) {
+          if(child.groupID && child.groupID === groupID) {
             return child.id === sorted[0].id;
           }
           return true;
@@ -332,6 +332,10 @@ class Theme extends Page {
         entityFieldMap[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
       }, {});
 
+      if(entityFieldMap.groupDescription) {
+        entityFieldMap.name = entityFieldMap.groupDescription;
+      }
+
       if(entity.children.length) {
         entityFieldMap.children = [];
         // assign and map children entities
@@ -344,6 +348,11 @@ class Theme extends Page {
           const childEntityWithFieldValuesAndMappedChildren = mapEntityChildren(childEntityWithFieldValues);
           entityFieldMap.children.push(childEntityWithFieldValuesAndMappedChildren);
         });
+
+        const isMeasure = entityFieldMap.children.find(entity => entity.category.name === "Measure");
+        if(isMeasure) {
+          entityFieldMap.children = entityFieldMap.children.filter(entity => entity.filter === 'RAYG');
+        }
       }
 
       return entityFieldMap;
@@ -396,11 +405,11 @@ class Theme extends Page {
     }
   }
 
-  groupByMetricId(entity) {
-    if(entity.children && entity.children.length && entity.children[0].metricID) {
-      this.sortByMetricID(entity);
+  groupByGroupId(entity) {
+    if(entity.children && entity.children.length && entity.children[0].groupID) {
+      this.sortByGroupID(entity);
     } else if(entity.children) {
-      entity.children.forEach(this.groupByMetricId.bind(this));
+      entity.children.forEach(this.groupByGroupId.bind(this));
     }
   }
 
@@ -415,10 +424,10 @@ class Theme extends Page {
       entities = await this.constructTopLevelCategories();
 
       // sort all entites into respective categories i.e. Empirical, Comms, HMG Delivery
-      entities.forEach(data => {
+      entities.forEach(entity => {
         const topLevelEntityClone = cloneDeep(topLevelEntity);
-        this.filterEntitiesByCategoryId(topLevelEntityClone.children, data.categoryId);
-        data.children = topLevelEntityClone.children;
+        this.filterEntitiesByCategoryId(topLevelEntityClone.children, entity.categoryId);
+        entity.children = topLevelEntityClone.children;
       });
 
       // remove any categories without children
@@ -426,7 +435,7 @@ class Theme extends Page {
 
       entities.forEach(entity => {
         this.applyUIFlags(entity);
-        this.groupByMetricId(entity);
+        this.groupByGroupId(entity);
         this.applyRagRollups(entity);
 
         this.applyActiveItems(this.req.params.selectedPublicId)(entity);
@@ -439,10 +448,38 @@ class Theme extends Page {
   }
 
   async topLevelOutcomeStatements(topLevelEntity) {
+    const statementCategory = await Category.findOne({
+      where: { name: 'Statement' }
+    });
+
     let entities = topLevelEntity.children;
 
     try {
-      // remove entites with no children and has one parent or less
+      const filterChildren = (entities = []) => {
+        for (var i = entities.length - 1; i >= 0; i--) {
+          const entity = entities[i];
+
+          if(entity.children) {
+            filterChildren(entity.children);
+
+            if(!entity.children.length) {
+              entities.splice(i, 1);
+            }
+            continue;
+          }
+
+          if(entity.categoryId === statementCategory.id) {
+            entities.splice(i, 1);
+          }
+        }
+      };
+
+      entities.forEach(entity => {
+        if(entity.children) {
+          filterChildren(entity.children);
+        }
+      });
+
       entities = entities.filter(entity => {
         const hasChildren = entity.children && entity.children.length;
         const hasOnlyParentOrLess = entity.parents.length <= 1;
@@ -450,7 +487,7 @@ class Theme extends Page {
       });
 
       entities.forEach(entity => {
-        this.groupByMetricId(entity);
+        this.groupByGroupId(entity);
         this.applyRagRollups(entity);
 
         entity.link = `${this.url}/${this.req.params.theme}/${entity.publicId}`;
@@ -472,8 +509,7 @@ class Theme extends Page {
       return item;
     }
     if(entity.active && entity.children) {
-      const found = entity.children.reduce(this.findSelected.bind(this), item);
-      return found;
+      return entity.children.reduce(this.findSelected.bind(this), item);
     } else if(entity.active) {
       return entity;
     }
