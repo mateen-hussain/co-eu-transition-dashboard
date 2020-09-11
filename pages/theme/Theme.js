@@ -158,7 +158,7 @@ class Theme extends Page {
       entity.hasOwnProperty('value')) {
       if (parseInt(entity.value) >= parseInt(entity.greenThreshold)) {
         color = "green";
-      } else if (parseInt(entity.value) >= parseInt(entity.aYThreshold)) {
+      } else if (parseInt(entity.value) > parseInt(entity.aYThreshold)) {
         color = "yellow";
       } else if (parseInt(entity.value) > parseInt(entity.redThreshold)) {
         color = "amber";
