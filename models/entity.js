@@ -139,6 +139,12 @@ Entity.init({
 Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'parentEntityId', as: 'children', otherKey: 'entityId' });
 Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'entityId', as: 'parents', otherKey: 'parentEntityId' });
 
+Entity.hasMany(EntityParent, { as: "entityParents", foreignKey: 'entityId' });
+Entity.hasMany(EntityParent, { as: "entityChildren", foreignKey: 'parentEntityId' });
+
+EntityParent.belongsTo(Entity, { as: "child", foreignKey: 'entityId' });
+EntityParent.belongsTo(Entity, { as: "parent", foreignKey: 'parentEntityId' });
+
 Entity.hasMany(EntityFieldEntry, { foreignKey: 'entityId' });
 EntityFieldEntry.belongsTo(Entity, { foreignKey: 'entityId' });
 
