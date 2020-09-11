@@ -156,11 +156,23 @@ class DAO {
         \`projectFieldEntries->projectField\`.description AS \`projectFieldEntries.projectField.description\`
 
       FROM
+    `;
+
+    if(userId) {
+      query += `
         user INNER JOIN department_user ON (user.id = department_user.user_id)
         INNER JOIN project ON (department_user.department_name = project.department_name)
-        INNER JOIN department ON (project.department_name = department.name)
-        LEFT OUTER JOIN project_field_entry AS \`projectFieldEntries\` ON (project.uid = \`projectFieldEntries\`.project_uid)
-        LEFT OUTER JOIN project_field AS \`projectFieldEntries->projectField\` ON (\`projectFieldEntries->projectField\`.id = \`projectFieldEntries\`.project_field_id)
+      `;
+    } else {
+      query += `
+        project
+      `;
+    }
+
+    query += `
+      INNER JOIN department ON (project.department_name = department.name)
+      LEFT OUTER JOIN project_field_entry AS \`projectFieldEntries\` ON (project.uid = \`projectFieldEntries\`.project_uid)
+      LEFT OUTER JOIN project_field AS \`projectFieldEntries->projectField\` ON (\`projectFieldEntries->projectField\`.id = \`projectFieldEntries\`.project_field_id)
     `;
 
     for (const filter of projectFieldFilters) {
@@ -261,12 +273,25 @@ class DAO {
         \`milestones->milestoneFieldEntries->milestoneField\`.description AS \`milestones.milestoneFieldEntries.milestoneField.description\`
 
       FROM
+    `;
+
+    if(userId) {
+      query += `
         user INNER JOIN department_user ON (user.id = department_user.user_id)
         INNER JOIN project ON (department_user.department_name = project.department_name)
         INNER JOIN department ON (project.department_name = department.name)
-        LEFT OUTER JOIN milestone AS milestones ON (project.uid = milestones.project_uid)
-        LEFT OUTER JOIN milestone_field_entry AS \`milestones->milestoneFieldEntries\` ON (milestones.uid = \`milestones->milestoneFieldEntries\`.milestone_uid)
-        LEFT OUTER JOIN milestone_field AS \`milestones->milestoneFieldEntries->milestoneField\` ON (\`milestones->milestoneFieldEntries->milestoneField\`.id = \`milestones->milestoneFieldEntries\`.milestone_field_id)
+      `;
+    } else {
+      query += `
+        project
+        INNER JOIN department ON (project.department_name = department.name)
+      `;
+    }
+
+    query += `
+      LEFT OUTER JOIN milestone AS milestones ON (project.uid = milestones.project_uid)
+      LEFT OUTER JOIN milestone_field_entry AS \`milestones->milestoneFieldEntries\` ON (milestones.uid = \`milestones->milestoneFieldEntries\`.milestone_uid)
+      LEFT OUTER JOIN milestone_field AS \`milestones->milestoneFieldEntries->milestoneField\` ON (\`milestones->milestoneFieldEntries->milestoneField\`.id = \`milestones->milestoneFieldEntries\`.milestone_field_id)
     `;
 
     for (const filter of projectFieldFilters) {
