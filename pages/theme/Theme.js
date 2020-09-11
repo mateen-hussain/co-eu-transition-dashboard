@@ -35,7 +35,7 @@ class Theme extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['management_overview'])
+      ...authentication.protect(['viewer'])
     ];
   }
 
