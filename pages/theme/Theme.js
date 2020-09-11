@@ -279,8 +279,6 @@ class Theme extends Page {
             .sort((a, b) => a.value - b.value);
         }
 
-
-
         // only show the latest metric details
         entity.children = entity.children.filter(child => {
           if(child[property] && child[property] === groupKey) {
