@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row left-spacing">
 
   <h1 class="govuk-heading-xl theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
   <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
@@ -35,7 +35,7 @@
     {% endif %}
   </div>
 
-  <div class="govuk-grid-column-one-half">
+  <div class="govuk-grid-column-one-half overflow-scroll">
   {% if topOutcomeSelected %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
   {% elseif data.iframeUrl.error %}
