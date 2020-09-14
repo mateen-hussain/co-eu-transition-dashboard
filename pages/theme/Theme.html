@@ -12,7 +12,7 @@
   <h1 class="govuk-heading-xl theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
   <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
@@ -25,8 +25,8 @@
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
-    {% if data.subOutcomeStatementsAndDatas | length > 0 %}
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-sub-statements">
+    {% if data.subOutcomeStatementsAndDatas | length > 0%}
       <div class="readiness-accordion-wrapper" >
         {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1, req.params.statement) }}
       </div>

@@ -23,12 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   var $readinessAccordions = document.querySelectorAll('[data-module="readiness-accordion"]')
 
-  if (document.getElementById('readiness-theme-page')) {
-    ClearOrRestoreScroll(document.getElementById('readiness-theme-page'))
-  }
+
 
   if ($readinessAccordions) {
     $readinessAccordions.forEach($accordion => new ReadinessAccordion($accordion).init())
+  }
+
+  if (document.getElementById('readiness-theme-page')) {
+    ClearOrRestoreScroll(document.getElementById('readiness-theme-page'))
   }
 });
 
