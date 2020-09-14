@@ -52,7 +52,7 @@
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">HMG delivery management information</a>
     </li>
     {% endif %}
-    {% if req.user.roles | includes(['uploader']) %}
+    {% if req.user.roles | includes(['uploader','admin']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
@@ -106,7 +106,7 @@
         Management information
         </a>
     </li>
-    {% if config.features.entityData %}
+    {% if config.features.entityData and req.user.roles | includes(['admin']) %}
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
         Entity data import
