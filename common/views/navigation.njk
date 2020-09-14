@@ -106,13 +106,11 @@
         Management information
         </a>
     </li>
-    {% if config.features.entityData and req.user.roles | includes(['admin']) %}
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
         Entity data import
         </a>
     </li>
-    {% endif %}
     </ul>
 </nav>
 {% endif %}

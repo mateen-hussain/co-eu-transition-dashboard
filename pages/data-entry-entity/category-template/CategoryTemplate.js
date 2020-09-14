@@ -42,7 +42,7 @@ class CategoryTemplate extends Page {
   }
 
   async getRequest(req, res) {
-    if(!this.req.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
