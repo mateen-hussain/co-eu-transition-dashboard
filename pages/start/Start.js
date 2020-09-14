@@ -12,11 +12,11 @@ class Start extends Page {
       return res.redirect(config.paths.authentication.passwordReset);
     }
 
-    if (req.user.roles.some(role => role.name === 'management')) {
-      return res.redirect(config.paths.allData);
+    if (req.user.roles.some(role => role.name === 'viewer')) {
+      return res.redirect(config.paths.readinessOverview);
     }
 
-    return res.redirect(config.paths.readinessOverview);
+    return res.redirect(config.paths.reportingOverview);
   }
 }
 
