@@ -1,0 +1,162 @@
+
+.risk-col {
+	border-left: 1px solid #979797;
+	height: 100vh;
+}
+
+.overview-card-holder {
+	display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
+
+  
+  @include govuk-media-query('tablet') {
+    max-height: 100vw;
+  }
+}
+
+.overview-card {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.headline-figure .overview-card  {
+	background-color: #F3F2F1;
+  margin-bottom: 2px;
+  
+  &:last-child {
+    margin-bottom: 20px;
+  }
+}
+
+.headline-figure .overview-card:hover {
+	background-color: white;
+	cursor: pointer;
+}
+
+.headline-figure .overview-card.red {
+	border-left: 12px solid #D4351C;
+}
+
+.headline-figure .overview-card.orange {
+	border-left: 12px solid #F47738;
+}
+
+.headline-figure .overview-card.yellow {
+	border-left: 12px solid #FFDD00;
+}
+
+.headline-figure .overview-card.green {
+	border-left: 12px solid #00703C;
+}
+
+.overview-card--link {
+  text-decoration: none;
+  
+  &:before {
+    content: '';
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+  }
+}
+
+.risk-col .overview-card  {
+	background: white;
+	border: 1px solid #6F777B;
+  border-left-width: 16px;
+}
+
+.risk-col .overview-card:hover  {
+	background: url(/assets/images/arrow.png) 96% 10px no-repeat white;
+	border: 1px solid #000000;
+	cursor: pointer;
+}
+
+.risk-col .overview-card.inactive {
+	border-left-color: #F3F2F1;
+	border-left-width: 16px;
+}
+
+.risk-col .overview-card.inactive:hover  {
+	border: 1px solid #6F777B;
+	border-left: 16px solid #F3F2F1;
+	background-image: none;
+	cursor: not-allowed;
+}
+
+.risk-col .overview-card.red {
+	border-left: 16px solid #D4351C;
+}
+
+.risk-col .overview-card.orange {
+	border-left: 16px solid #F47738;
+}
+
+.risk-col .overview-card.yellow {
+	border-left: 16px solid #FFDD00;
+}
+
+.risk-col .overview-card.green {
+	border-left: 16px solid #00703C;
+}
+
+
+.overview-card--inner {
+	margin-left: 0;
+	display: inline-block;
+	padding: 12px 12px 4px;
+	font-family: "GDS Transport",Arial,sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 1.11111;
+}
+
+.overview-card--title,
+.overview-card--metric {
+		color: #0b0c0c;
+	font-family: "GDS Transport",Arial,sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-weight: 700;
+	font-size: 20px;
+	font-size: 1.125rem;
+	line-height: 1.11111;
+	margin-top: 0;
+	margin-bottom: 10px;
+}
+
+.risk-col .overview-card .overview-card--title {
+	text-transform: uppercase;
+}
+
+.risk-col .overview-card p {
+	margin-top: 0;
+}
+
+.risk-col .overview-card.inactive,
+.risk-col .overview-card.inactive .overview-card--title {
+	color: #B1B4B6;
+}
+
+.overview-card--tag-theme {
+	display: inline-block;
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+	color: #fff;
+	background-color: #6F777B;
+	text-decoration: none;
+	text-transform: uppercase;
+	font-size: 16px;
+	line-height: 1;
+	padding: 5px 8px 4px;
+	margin-bottom: 10px;
+}

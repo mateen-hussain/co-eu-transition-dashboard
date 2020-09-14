@@ -119,7 +119,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
   describe('#exportMeasures', () => {
     it('gets all metrics and creats an object', async () => {
-      const resp = { data: 'data' };
+      const resp = [{ test: 'test' }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
       sinon.stub(page, 'responseAsCSV');
 
@@ -131,6 +131,21 @@ describe('pages/tableau-export/TableauExport', () => {
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
       sinon.assert.calledWith(page.responseAsCSV, resp, res);
+    });
+
+    it('filters items with filter=RAYG out', async () => {
+      const resp = [{ test: 'test' }, { Filter: 'RAYG' }];
+      sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
+      sinon.stub(page, 'responseAsCSV');
+
+      Category.findOne.resolves({
+        id: 1
+      });
+
+      await page.exportMeasures(req, res);
+
+      sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
+      sinon.assert.calledWith(page.responseAsCSV, [{ test: 'test' }], res);
     });
   });
 

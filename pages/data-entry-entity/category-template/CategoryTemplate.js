@@ -9,6 +9,7 @@ const xl = require('excel4node');
 const moment = require('moment');
 const get = require('lodash/get');
 const logger = require('services/logger');
+const CategoryField = require('models/categoryField');
 
 class CategoryTemplate extends Page {
   get url() {
@@ -220,7 +221,7 @@ class CategoryTemplate extends Page {
       if(moment(value, 'DD/MM/YYYY').isValid()) {
         cell
           .date(moment(value, 'DD/MM/YYYY').toDate())
-          .style({ numberFormat: 'd/mm/yy' });
+          .style({ numberFormat: 'd/mm/yyyy' });
       }
       break;
     case 'boolean':
@@ -241,7 +242,8 @@ class CategoryTemplate extends Page {
         categoryId: category.id
       },
       include: [{
-        model: EntityFieldEntry
+        model: EntityFieldEntry,
+        include: CategoryField
       },{
         model: Entity,
         as: 'parents',

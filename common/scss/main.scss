@@ -8,6 +8,8 @@
 @import 'pages/admin/project-field-list/ProjectFieldList.scss';
 @import 'pages/project-details/ProjectDetails.scss';
 @import 'pages/reporting-overview/ReportingOverview.scss';
+@import 'pages/theme/Theme.scss';
+@import 'pages/readiness-overview/ReadinessOverview.scss';
 
 .govuk-width-container {
     margin-right: 20px;
@@ -85,4 +87,17 @@ li.govuk-header__navigation-item.child-item, li.govuk-header__navigation-item {
 
 li.govuk-header__navigation-item.child-item:last-child, li.govuk-header__navigation-item:last-child {
     margin-right: 0px;
+}
+
+.timer {
+    display: inline;
+    color: white;
+    margin-left: 15px;
+}
+
+#countdown {
+    background-color: black;
+    font-size: 19px;
+    padding: 6px 6px 6px 6px;
+    margin-left: 5px;
 }

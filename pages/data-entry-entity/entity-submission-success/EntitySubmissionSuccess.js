@@ -2,6 +2,7 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const authentication = require('services/authentication');
 const config = require('config');
+const { clearCache } = require('services/nodeCache');
 
 class EntitySubmissionSuccess extends Page {
   static get isEnabled() {
@@ -14,7 +15,8 @@ class EntitySubmissionSuccess extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader'])
+      ...authentication.protect(['uploader']),
+      clearCache
     ];
   }
 }

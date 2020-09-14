@@ -35,18 +35,19 @@
 %}
 
 {% set transitionReadinessUrls = [
-    config.paths.readinessOverview
+    config.paths.readinessOverview,
+    config.paths.transitionReadinessThemeDetail
     ]
 %}
 
 <nav class="navigation">
     <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
-    {% if req.user.roles | includes(['viewer']) %}    
+    {% if req.user.roles | includes(['viewer']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in transitionReadinessUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.readinessOverview }}">Transition readiness</a>
     </li>
     {% endif %}
-    {% if req.user.roles | includes(['management']) %}    
+    {% if req.user.roles | includes(['management']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in managementInformationUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.allData }}">HMG delivery management information</a>
     </li>
@@ -71,7 +72,7 @@
 {% if url in managementInformationUrls %}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
-    {% if req.user.roles | includes(['management_overview']) %} 
+    {% if req.user.roles | includes(['management_overview']) %}
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.reportingOverview }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.reportingOverview }}">
         Reporting overview
@@ -138,11 +139,23 @@
 {% if url in transitionReadinessUrls%}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in transitionReadinessUrls }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.readinessOverview }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.readinessOverview }}">
         Overview
         </a>
     </li>
+    {% if config.features.transitionReadinessTheme %}
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/B' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/B">
+        Borders
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/P' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/P">
+        People
+        </a>
+    </li>
+    {% endif %}
     </ul>
 </nav>
 {% endif %}
