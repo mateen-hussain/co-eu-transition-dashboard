@@ -43,7 +43,7 @@
     {% for department in departmentsWithMissedMilestones %}
       <tbody class="govuk-table__body">
         {% for project in department.projects %}
-        {% for milestone in project.milestones | sort(attribute = 'date') %}
+        {% for milestone in project.milestones %}
           <tr class="govuk-table__row">
             {% for milestoneField in milestoneFields %}
               {% set field = milestone.fields.get(milestoneField.id) %}
