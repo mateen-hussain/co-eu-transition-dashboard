@@ -16,6 +16,10 @@ const Entity = require('./entity');
 const EntityUser = require('./entityUser');
 
 class User extends Model {
+  get isAdmin () {
+    return this.roles.map(role => role.name).includes('admin');
+  }
+
   get isDepartmentalViewer () {
     return this.departments.length === 1 ? true : false;
   }

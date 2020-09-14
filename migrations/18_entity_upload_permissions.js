@@ -5,7 +5,7 @@ const Sequelize = require('sequelize');
 const up = async (query) => {
   await query.createTable('entity_user', {
     entity_id: {
-      type: Sequelize.DataTypes.INTEGER,
+      type: Sequelize.INTEGER(10).UNSIGNED,
       references: {
         model: 'entity',
         key: 'id'
