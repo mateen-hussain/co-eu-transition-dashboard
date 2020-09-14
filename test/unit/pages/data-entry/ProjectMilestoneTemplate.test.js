@@ -28,12 +28,12 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
   });
 
   describe('#middleware', () => {
-    it('only admins are alowed to access this page', () => {
+    it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader', 'administrator'])
+        ...authentication.protect(['uploader'])
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader']);
     });
   });
 
@@ -462,7 +462,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
 
       FieldEntryGroup.findAll.returns(groups);
 
-      Project.fieldDefintions.returns([{ group: 'somename' }]);
+      Project.fieldDefinitions.returns([{ group: 'somename' }]);
 
       projectSheet = {
         row: sinon.stub(),
@@ -523,7 +523,7 @@ describe('pages/data-entry/project-milestone-template/ProjectMilestoneTemplate',
         getProjects: sinon.stub().returns(projects)
       };
 
-      Milestone.fieldDefintions.returns([{ config: { exportOptions: {} } }]);
+      Milestone.fieldDefinitions.returns([{ config: { exportOptions: {} } }]);
 
       milestoneSheet = {
         row: sinon.stub(),

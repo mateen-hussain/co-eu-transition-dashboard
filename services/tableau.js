@@ -3,6 +3,9 @@ const config = require('config');
 
 const getTableauUrl = async (user, workbook, view) => {
   if(!config.services.tableau.url) {
+    if(config.env === 'development') {
+      return `https://some-tableau-url.com/trusted/some-token/views/${workbook}/${view}`;
+    }
     throw new Error('No tableau url set');
   }
 

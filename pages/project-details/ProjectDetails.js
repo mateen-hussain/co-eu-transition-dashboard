@@ -3,10 +3,17 @@ const { paths } = require('config');
 const moment = require('moment');
 const ProjectField = require('models/projectField');
 const FieldEntryGroup = require('models/fieldEntryGroup');
+const authentication = require('services/authentication');
 
 class ProjectDetails extends Page {
   get url() {
     return paths.projectDetails;
+  }
+
+  get middleware() {
+    return [
+      ...authentication.protect(['management'])
+    ];
   }
 
   async project() {

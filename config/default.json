@@ -23,7 +23,10 @@
     "start": "/entry",
     "admin": {
       "projectFieldList": "/admin/project-field-list",
-      "projectField": "/admin/project-field"
+      "projectField": "/admin/project-field",
+      "categoryFieldList": "/admin/category-field-list",
+      "categoryField": "/admin/category-field",
+      "categoryList": "/admin/categories"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
@@ -52,14 +55,35 @@
       "import": "/import",
       "submissionSuccess": "/submission-success"
     },
+    "dataEntryEntity": {
+      "bulkUpload": "/bulk-upload-entity",
+      "bulkUploadEntity": "/bulk-upload-entity/entity",
+      "bulkUploadSignOff": "/bulk-upload-entity/sign-off",
+      "bulkUploadFile": "/bulk-upload-entity/upload-file",
+      "import": "/import-entity",
+      "submissionSuccess": "/entity-submission-success",
+      "categoryTemplate": "/category-template"
+    },
     "editMilestone": "/edit-milestone",
-    "reportingOverview": "/reporting-overview"
+    "reportingOverview": "/reporting-overview",
+    "editProject": "/edit-project",
+    "tableauExport": "/tableau-export",
+    "readinessOverview": "/readiness-overview",
+    "transitionReadinessThemeDetail": "/transition-readiness-detail"
   },
   "features": {
     "twoFactorAuth": true,
-    "missedMilestones": false
+    "missedMilestones": false,
+    "entityData": false,
+    "transitionReadinessTheme": true
   },
   "notify": {
-    "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289"
+    "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289",
+    "missedMilestonesKey": "81ac6df8-2e4a-4d33-9ba9-7d6d9bca46fb",
+    "summaryNotificationKey": "26be1793-7401-4541-b119-78ce1d6a729b",
+    "cron": "0 0 10 * * *"
+  },
+  "locks": {
+    "upcomingMilestonesNotifications": "upcoming milestones notifications"
   }
 }

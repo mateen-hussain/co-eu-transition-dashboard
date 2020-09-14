@@ -25,6 +25,11 @@ password: password
 
 ## Release/Deployment Workflow
 
+Releases to the various environments all happen automatically via [Concourse](https://cd.gds-reliability.engineering/teams/cabinet-office-transition/pipelines/co-eu-transition-dashboard).  There are branches for each environment (staging/production) and merges to these branches will automatically trigger a deployment.  The deployments use a rolling strategy to ensure no downtime to the service.
+
+Before merging to these branches you should ensure that the build is passing on [Travis](https://travis-ci.org/github/alphagov/co-eu-transition-dashboard/).
+[![Build Status](https://travis-ci.org/alphagov/co-eu-transition-dashboard.svg?branch=master)](https://travis-ci.org/alphagov/co-eu-transition-dashboard)
+
 ### Staging
 1. Make sure your repository is up to date `git fetch --all`
 2. Check out the staging branch `git checkout staging`
@@ -32,29 +37,13 @@ password: password
 4. Merge master to staging `git merge origin/master`
 5. Commit any changes `git commit -a`
 6. Push the new staging branch to remote `git push origin staging`
-7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-8. Deploy `npm run deploy-staging`
-9. Test your changes
-
-### Research
-1. Make sure your repository is up to date `git fetch --all`
-2. Check out the research branch `git checkout research`
-3. Update the research branch `git pull origin research`
-4. Merge master to research `git merge origin/master`
-5. Commit any changes `git commit -a`
-6. Push the new research branch to remote `git push origin research`
-7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-8. Deploy `npm run deploy-research`
-9. Test your changes
+7. Test your changes
 
 ### Production
-:warning: **These instructions will currently bring down the live service for a minute or two**
 1. Make sure your repository is up to date `git fetch --all`
 2. Check out the production branch `git checkout production`
 3. Update the production branch `git pull origin production`
 4. Merge staging to production `git merge origin/staging`
 5. Commit any changes `git commit -a`
 6. Push the new production branch to remote `git push origin production`
-7. Make sure you have access to the relevant org/space on the gov.uk PaaS (https://www.cloud.service.gov.uk/)
-8. Deploy `npm run deploy-production`
-9. Test your changes
+7. Test your changes

@@ -91,13 +91,13 @@ describe('pages/edit-milestone/EditMilestone', () => {
   });
 
   describe('#middleware', () => {
-    it('only admins and upladers are aloud to access this page', () => {
+    it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader', 'administrator']),
+        ...authentication.protect(['uploader']),
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader']);
     });
   });
 
@@ -136,7 +136,7 @@ describe('pages/edit-milestone/EditMilestone', () => {
       sequelize.transaction.returns(transaction);
 
       Milestone.import = sinon.stub();
-      Milestone.fieldDefintions = sinon.stub().returns('fields');
+      Milestone.fieldDefinitions = sinon.stub().returns('fields');
 
       const milestone = { uid: 'uid' };
 
@@ -156,7 +156,7 @@ describe('pages/edit-milestone/EditMilestone', () => {
       sequelize.transaction.returns(transaction);
 
       Milestone.import = sinon.stub().throws(new Error('error'));
-      Milestone.fieldDefintions = sinon.stub().returns('fields');
+      Milestone.fieldDefinitions = sinon.stub().returns('fields');
 
       const milestone = { uid: 'uid' };
 
@@ -173,7 +173,7 @@ describe('pages/edit-milestone/EditMilestone', () => {
         { type: 'date', name: 'date', importColumnName: 'date' },
         { type: 'string', name: 'name', importColumnName: 'name' },
       ];
-      Milestone.fieldDefintions = sinon.stub().returns(fields);
+      Milestone.fieldDefinitions = sinon.stub().returns(fields);
       sinon.stub(validation, 'validateItems');
 
     });
@@ -271,7 +271,7 @@ describe('pages/edit-milestone/EditMilestone', () => {
         }
       });
 
-      Milestone.fieldDefintions = sinon.stub().returns([{
+      Milestone.fieldDefinitions = sinon.stub().returns([{
         name: 'projectUid',
         config: {}
       }]);
@@ -309,7 +309,7 @@ describe('pages/edit-milestone/EditMilestone', () => {
 
   describe('#getMilestoneFields', () => {
     it('returns milestone field defintions', async () => {
-      Milestone.fieldDefintions = sinon.stub().returns([{
+      Milestone.fieldDefinitions = sinon.stub().returns([{
         name: 'projectUid',
         config: {}
       }]);
@@ -322,7 +322,7 @@ describe('pages/edit-milestone/EditMilestone', () => {
         type: 'group',
         config: { options: [1] }
       }]);
-      sinon.assert.called(Milestone.fieldDefintions);
+      sinon.assert.called(Milestone.fieldDefinitions);
     });
   });
 });

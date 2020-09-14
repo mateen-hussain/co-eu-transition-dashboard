@@ -5,12 +5,18 @@ const Project = require('models/project');
 const Milestone = require('models/milestone');
 const MilestoneField = require('models/milestoneField');
 const MilestoneFieldEntryAudit = require('models/milestoneFieldEntryAudit');
+const authentication = require('services/authentication');
 
 let page = {};
 
 describe('pages/milestone-details/MilestoneDetails', () => {
   beforeEach(() => {
     page = new MilestoneDetails('some path', {}, {});
+    sinon.stub(authentication, 'protect').returns([]);
+  });
+
+  afterEach(() => {
+    authentication.protect.restore();
   });
 
   describe('#url', () => {
@@ -19,14 +25,22 @@ describe('pages/milestone-details/MilestoneDetails', () => {
     });
   });
 
+  it('only management are allowed to access this page', () => {
+    expect(page.middleware).to.eql([
+      ...authentication.protect(['management'])
+    ]);
+
+    sinon.assert.calledWith(authentication.protect, ['management']);
+  });
+
   describe('#getMilestoneFields', () => {
     it('returns milestone field defintions', async () => {
-      Milestone.fieldDefintions = sinon.stub().returns('some defintions');
+      Milestone.fieldDefinitions = sinon.stub().returns('some defintions');
 
       const response = await page.getMilestoneFields();
 
       expect(response).to.eql('some defintions');
-      sinon.assert.called(Milestone.fieldDefintions);
+      sinon.assert.called(Milestone.fieldDefinitions);
     });
   });
 
@@ -62,7 +76,7 @@ describe('pages/milestone-details/MilestoneDetails', () => {
         random: 'random'
       };
 
-      Project.fieldDefintions = sinon.stub().returns([
+      Project.fieldDefinitions = sinon.stub().returns([
         { name: 'title', displayName: 'title' },
         { name: 'sro', displayName: 'sro' },
         { name: 'impact', displayName: 'impact' },

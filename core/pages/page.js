@@ -49,7 +49,7 @@ class Page {
   }
 
   get middleware() {
-    return [...protect(['uploader', 'viewer', 'administrator'])];
+    return [...protect([])];
   }
 
   get template() {
@@ -139,6 +139,24 @@ class Page {
 
         return obj;
       }, {});
+  }
+
+  get countDownTime() {
+    const second = 1000,
+      minute = second * 60,
+      hour = minute * 60,
+      day = hour * 24;
+
+    const finalTransitionDate = new Date('Jan 01, 2021 00:00:00').getTime();
+    const distance = finalTransitionDate - new Date().getTime();
+
+    let daysToDate = Math.floor(distance / day);
+
+    if (distance < 0) {
+      daysToDate = 0;
+    }
+
+    return daysToDate;
   }
 }
 

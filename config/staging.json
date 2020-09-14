@@ -14,6 +14,7 @@
     "tableau": {}
   },
   "features": {
-    "missedMilestones": true
+    "missedMilestones": true,
+    "entityData": true
   }
 }

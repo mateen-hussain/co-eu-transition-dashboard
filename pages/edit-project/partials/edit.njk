@@ -1,0 +1,54 @@
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+<div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">
+    <span class="govuk-caption-xl">{{ data.uid }}</span>
+    Edit project details
+  </h1>
+
+  {% if flash %}
+    {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [{
+          html: flash,
+          href: "#"
+        }]
+    }) }}
+  {% endif %}
+
+<form action='{{ editModeUrl }}' method='POST'>
+
+  {% for projectGroup in projectEntryGroups %}
+    <br>
+    <h2 class="govuk-heading-m">{{ projectGroup.name }}</h2>
+
+    {% for field in projectfields | sort(attribute='order') %}
+
+      {% if field.group === projectGroup.name %}
+
+        {% include "global-partials/fields.njk" %}
+        
+      {% endif %}
+
+    {% endfor %}
+
+  {% endfor %}
+
+  {{ govukButton({
+  text: "Submit changes to dashboard",
+  type: "submit",
+  preventDoubleClick: true
+  }) }}
+
+  </form>
+
+
+</div>

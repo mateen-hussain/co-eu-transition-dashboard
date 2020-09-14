@@ -54,7 +54,7 @@ module.exports = {
   },
 
   down: async (query) => {
-    await query.removeTable('bulk_import');
+    await query.dropTable('bulk_import');
 
     // logic for reverting the changes
     await query.removeColumn(

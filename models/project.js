@@ -9,7 +9,7 @@ const logger = require('services/logger');
 const sprintf = require('sprintf-js').sprintf;
 
 class Project extends Model {
-  static async fieldDefintions(user) {
+  static async fieldDefinitions(user) {
     let validDepartments = [];
     if (user) {
       validDepartments = await user.getDepartments({ raw: true });

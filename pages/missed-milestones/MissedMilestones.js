@@ -3,6 +3,7 @@ const config = require('config');
 const moment = require('moment');
 const Milestone = require('models/milestone');
 const Project = require('models/project');
+const authentication = require('services/authentication');
 
 class MissedMilestones extends Page {
   static get isEnabled() {
@@ -11,6 +12,12 @@ class MissedMilestones extends Page {
 
   get url() {
     return config.paths.missedMilestones;
+  }
+
+  get middleware() {
+    return [
+      ...authentication.protect(['management'])
+    ];
   }
 
   async getDepartmentsWithMissedMilestones() {

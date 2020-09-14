@@ -16,7 +16,7 @@ class BulkUpload extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader', 'administrator']),
+      ...authentication.protect(['uploader']),
       fileUpload({ safeFileNames: true }),
       flash
     ];
@@ -43,7 +43,8 @@ class BulkUpload extends Page {
     await BulkImport.create({
       id: uuid.v4(),
       userId: req.user.id,
-      data
+      data,
+      category: 'data-entry-old'
     });
   }
 
@@ -71,7 +72,8 @@ class BulkUpload extends Page {
   async getRequest(req, res) {
     const activeImport = await BulkImport.findOne({
       where: {
-        userId: req.user.id
+        userId: req.user.id,
+        category: 'data-entry-old'
       }
     });
 

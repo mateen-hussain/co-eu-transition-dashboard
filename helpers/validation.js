@@ -32,6 +32,10 @@ const validateDate = value => {
 const isValueInGroup = (value, options = []) => {
   const valueInGroup = options.includes(value);
 
+  if(!options.length) {
+    throw Error(`"${value}" is meant to match a drop down option, however, there are no drop down options to match.`);
+  }
+
   if(!valueInGroup) {
     throw Error(`Must match one of the following: ${options.join(', ')}`);
   }
@@ -99,7 +103,7 @@ const validateItems = (items, itemDefinitions) => {
   return items.reduce(validateItem, []);
 };
 
-const validateColumns = (columnsRecieved, requiredColumns) => {
+const validateColumns = (columnsRecieved = [], requiredColumns = [], allowedColumns = []) => {
   const errors = [];
 
   requiredColumns.forEach(requiredColumn => {
@@ -110,7 +114,7 @@ const validateColumns = (columnsRecieved, requiredColumns) => {
   });
 
   columnsRecieved.forEach(columnRecieved => {
-    const isExtraColumn = !requiredColumns.includes(columnRecieved);
+    const isExtraColumn = !allowedColumns.includes(columnRecieved);
     if(isExtraColumn) {
       errors.push({ error: `"${columnRecieved}" column is not recognised as a valid column, please either remove or rename.` });
     }

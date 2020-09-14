@@ -54,8 +54,8 @@ describe('models/milestone', () => {
     expect(Milestone.includes('uid')).to.be.ok;
   });
 
-  it('#fieldDefintions', async () => {
-    const definitions = await Milestone.fieldDefintions();
+  it('#fieldDefinitions', async () => {
+    const definitions = await Milestone.fieldDefinitions();
     const config = {
       exportOptions: {
         header: {

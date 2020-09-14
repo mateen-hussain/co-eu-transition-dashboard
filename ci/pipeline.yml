@@ -1,0 +1,107 @@
+---
+meta:
+  cf-cli-img: &cf-cli-img
+    type: registry-image
+    source:
+      repository: governmentpaas/cf-cli
+      tag: 864e80c4793e4fca17a2374e8075af119dd03162
+
+resources:
+  - name: co-eu-transition-dashboard-staging
+    type: git
+    icon: git
+    source:
+      branch: staging
+      uri: https://github.com/alphagov/co-eu-transition-dashboard.git
+
+  - name: co-eu-transition-dashboard-production
+    type: git
+    icon: git
+    source:
+      branch: production
+      uri: https://github.com/alphagov/co-eu-transition-dashboard.git
+
+jobs:
+  - name: deploy-staging
+    serial: true
+    plan:
+      - get: repo
+        resource: co-eu-transition-dashboard-staging
+        trigger: true
+
+      - task: deploy
+        config: &deploy-config
+          platform: linux
+
+          image_resource: *cf-cli-img
+
+          inputs:
+            - name: repo
+
+          run:
+            dir: repo
+            path: sh
+            args:
+              - -c
+              - |
+                set -eu
+
+                cf api "${CF_API_ENDPOINT}"
+                cf auth "${CF_USERNAME}" "${CF_PASSWORD}"
+                cf target -o "${CF_ORG}" -s "${CF_SPACE}"
+
+                cf push --vars-file "${CF_SPACE}.yml" --strategy=rolling
+
+          params: &deploy-config-params
+            CF_API_ENDPOINT: https://api.london.cloud.service.gov.uk
+            CF_USERNAME: ((cf-username))
+            CF_PASSWORD: ((cf-password))
+            CF_ORG: cabinet-office-transition-team
+            CF_SPACE: staging
+
+      - task: smoke-test
+        config: &smoke-test-config
+          platform: linux
+
+          image_resource: *cf-cli-img
+
+          run:
+            dir: repo
+            path: sh
+            args:
+              - -c
+              - |
+                set -eu
+
+                code="$(curl -s "$APP_URL" -o /dev/null -w "%{http_code}")"
+
+                if [ "$code" = "200" ]; then
+                  echo 'Login page returned HTTP 200'
+                  exit 0
+                else
+                  echo "Login page returned HTTP ${code}"
+                  exit 1
+                fi
+
+          params:
+            APP_URL: https://transition-dashboard-staging.london.cloudapps.digital/login
+
+  - name: deploy-production
+    serial: true
+    plan:
+      - get: repo
+        resource: co-eu-transition-dashboard-production
+        trigger: true
+
+      - task: deploy
+        config:
+          <<: *deploy-config
+          params:
+            <<: *deploy-config-params
+            CF_SPACE: production
+
+      - task: smoke-test
+        config:
+          <<: *smoke-test-config
+          params:
+            APP_URL: https://transition-dashboard.london.cloudapps.digital/login

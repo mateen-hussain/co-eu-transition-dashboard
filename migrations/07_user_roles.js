@@ -19,7 +19,7 @@ module.exports = {
     const transaction = await query.sequelize.transaction();
     try {
       await query.sequelize.query("UPDATE user SET `role`='user' WHERE `role`='viewer'", { transaction });
-      await query.sequelize.query("UPDATE user SET `role`='admin' WHERE `role`='uploader'", { transaction });
+      await query.sequelize.query("UPDATE user SET `role`='user' WHERE `role`='uploader'", { transaction });
       await query.sequelize.query("UPDATE user SET `role`='admin' WHERE `role`='administrator'", { transaction });
 
       await transaction.commit();

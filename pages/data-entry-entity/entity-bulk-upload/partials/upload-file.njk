@@ -1,0 +1,55 @@
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+
+{% set items = categories() | await %}
+
+<div class="govuk-grid-column-two-thirds">
+
+  <h1 class="govuk-heading-xl">Upload your file</h1>
+
+  {% if flash %}
+    {{ govukErrorSummary({
+      titleText: "There is a problem",
+      errorList: [
+        {
+          html: flash | escape,
+          href: "#file-upload"
+        }
+      ]
+    }) }}
+  {% endif %}
+
+  <p class="govuk-body">Upload the entity data for the category you are importing.<p>
+
+  {% for category in items %}
+    <a class="govuk-link" href="{{ config.paths.dataEntryEntity.categoryTemplate }}?category={{ category.value }}" target="_blank">Download the latest template for {{ category.text }}s.</a><br>
+  {% endfor %}
+
+  <form action="{{ config.paths.dataEntryEntity.bulkUploadFile }}" method="post" encType="multipart/form-data">
+    {{ govukSelect({
+      id: "category",
+      name: "category",
+      label: {
+        text: "Category"
+      },
+      items: items
+    }) }}
+
+    {{ govukFileUpload({
+      id: "file-upload",
+      name: "import",
+      label: {
+        text: "Upload a file"
+      }
+    }) }}
+
+    {{ govukButton({
+      text: "Upload",
+      type: "submit",
+      preventDoubleClick: true
+    }) }}
+  </form>
+</div>

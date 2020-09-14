@@ -18,7 +18,7 @@ class ProjectFieldList extends Page {
   }
 
   async getFields() {
-    return await Project.fieldDefintions();
+    return await Project.fieldDefinitions();
   }
 
   async getProjectGroups() {
@@ -33,7 +33,7 @@ class ProjectFieldList extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['administrator']),
+      ...authentication.protect(['admin']),
       flash
     ];
   }
@@ -57,7 +57,7 @@ class ProjectFieldList extends Page {
 
       await transaction.commit();
     } catch (error) {
-      this.req.flash(`Error saing field order: ${error}`);
+      this.req.flash(`Error saving field order: ${error}`);
       logger.error(error);
       await transaction.rollback();
     }

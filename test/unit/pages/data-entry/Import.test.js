@@ -24,7 +24,7 @@ let res = {};
 describe('pages/data-entry/import/Import', () => {
   beforeEach(() => {
     res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub() };
-    req = { cookies: [], user: { id: 1 }, flash: sinon.stub() };
+    req = { cookies: [], user: { id: 1, departments: [] }, flash: sinon.stub() };
 
     page = new Import('some path', req, res);
     page.req = req;
@@ -53,14 +53,14 @@ describe('pages/data-entry/import/Import', () => {
   });
 
   describe('#middleware', () => {
-    it('only admins are alowed to access this page', () => {
+    it('only uploader are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader', 'administrator']),
+        ...authentication.protect(['uploader']),
         fileUploadMock,
         flash
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader', 'administrator']);
+      sinon.assert.calledWith(authentication.protect, ['uploader']);
     });
   });
 
@@ -71,8 +71,8 @@ describe('pages/data-entry/import/Import', () => {
     beforeEach(() => {
       sinon.stub(Project, 'import');
       sinon.stub(Milestone, 'import');
-      Project.fieldDefintions = sinon.stub().returns(projectFields);
-      Milestone.fieldDefintions = sinon.stub().returns(milestoneFields);
+      Project.fieldDefinitions = sinon.stub().returns(projectFields);
+      Milestone.fieldDefinitions = sinon.stub().returns(milestoneFields);
     });
 
     afterEach(() => {
@@ -116,7 +116,7 @@ describe('pages/data-entry/import/Import', () => {
     it('validates each item parsed', () => {
       const items = [{ id: 1 }, { id: 2 }];
       const parsedItems = [{ foo: 'bar' }];
-      const fields = [{ importColumnName: 'some name' }];
+      const fields = [{ importColumnName: 'some name', isRequired: true }];
 
       validation.validateColumns.returns('validation.validateColumns');
       validation.validateItems.returns('validation.validateItems');
@@ -125,12 +125,16 @@ describe('pages/data-entry/import/Import', () => {
 
       expect(response).to.eql(['validation.validateColumns', 'validation.validateItems']);
 
-      sinon.assert.calledWith(validation.validateColumns, Object.keys(items[0]), [fields[0].importColumnName]);
+      sinon.assert.calledWith(validation.validateColumns, Object.keys(items[0]), [fields[0].importColumnName], [fields[0].importColumnName]);
       sinon.assert.calledWith(validation.validateItems, parsedItems, fields);
     });
   });
 
   describe('#validateProjects', () => {
+    beforeEach(() => {
+      Project.fieldDefinitions = sinon.stub();
+    });
+
     it('rejects if no project found', async () => {
       parse.parseItems.returns([])
       const response = await page.validateProjects();
@@ -144,6 +148,40 @@ describe('pages/data-entry/import/Import', () => {
       page.req.user.departments = [];
 
       page.validateItems = () => [projectColumnErrors, projectErrors];
+      parse.parseItems.returns(parsedProjects);
+
+      const response = await page.validateProjects();
+
+      expect(response).to.eql({ projectErrors, projectColumnErrors, parsedProjects });
+    });
+
+    it('rejects if deliveryTheme is Borders and user does not have access to BPDG', async () => {
+      req.user.departments = [{ name: 'DFT' }];
+      const projectColumnErrors = [];
+      const projectErrors = [{
+        error: 'Only BPDG can manage Border information',
+        item: {
+          deliveryTheme: 'Borders',
+          id: 1
+        }
+      }];
+      const parsedProjects = [{ id: 1, deliveryTheme: 'Borders' }];
+
+      page.validateItems = () => [[], []];
+      parse.parseItems.returns(parsedProjects);
+
+      const response = await page.validateProjects();
+
+      expect(response).to.eql({ projectErrors, projectColumnErrors, parsedProjects });
+    });
+
+    it('allows if deliveryTheme is Borders and has access to BPDG', async () => {
+      req.user.departments = [{ name: 'BPDG' }];
+      const projectColumnErrors = [];
+      const projectErrors = [];
+      const parsedProjects = [{ id: 1, deliveryTheme: 'Borders' }];
+
+      page.validateItems = () => [[], []];
       parse.parseItems.returns(parsedProjects);
 
       const response = await page.validateProjects();
@@ -284,7 +322,8 @@ describe('pages/data-entry/import/Import', () => {
       sinon.assert.calledWith(BulkImport.destroy, {
         where: {
           userId: page.req.user.id,
-          id: 1
+          id: 1,
+          category: "data-entry-old"
         }
       });
     });

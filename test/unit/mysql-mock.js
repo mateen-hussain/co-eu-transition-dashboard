@@ -22,6 +22,7 @@ Model.init = sinon.stub().callsFake(function(attributes) {
   this.getQueryInterface = sinon.stub();
   this.query = sinon.stub();
 });
+Model.removeAttribute = sinon.stub();
 Sequelize.getQueryInterface = sinon.stub();
 Sequelize.query = sinon.stub();
 Sequelize.fn = sinon.stub();

@@ -15,14 +15,21 @@ describe('pages/authentication/password-reset/PasswordReset', () => {
     req = { cookies: [], path: '/', user: {}, flash: sinon.stub(), body: {} };
 
     page = new PasswordReset('some path', req, res);
+
+    sinon.stub(authentication, 'protect').returns([]);
+  });
+
+  afterEach(() => {
+    authentication.protect.restore();
   });
 
   describe('#middleware', () => {
     it('loads correct middleware', () => {
-      expect(page.middleware.toString()).to.eql([
-        ...authentication.protect(['uploader', 'administrator', 'viewer']),
+      expect(page.middleware).to.eql([
+        ...authentication.protect([]),
         flash
-      ].toString());
+      ]);
+      sinon.assert.calledWith(authentication.protect, []);
     });
   });
 
