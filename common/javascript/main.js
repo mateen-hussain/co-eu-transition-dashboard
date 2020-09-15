@@ -7,6 +7,7 @@ import groupDisplay from './group-display';
 import fieldOrder from './field-order';
 import seeMore from './see-more';
 import ReadinessAccordion from './readiness-accordion';
+import ClearOrRestoreScroll from './readiness-scroll';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
@@ -21,6 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
   govukFrontend.initAll();
 
   var $readinessAccordions = document.querySelectorAll('[data-module="readiness-accordion"]')
+
+  if (document.getElementById('readiness-theme-page')) {
+    ClearOrRestoreScroll(document.getElementById('readiness-theme-page'))
+  }
 
   if ($readinessAccordions) {
     $readinessAccordions.forEach($accordion => new ReadinessAccordion($accordion).init())
