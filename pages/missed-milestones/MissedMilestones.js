@@ -27,15 +27,26 @@ class MissedMilestones extends Page {
       impact: [0, 1]
     });
 
+    const milestones = [];
+
     for(const department of departments) {
       department.totalMilestones = await this.totalMilestones(department);
       department.totalMilestonesMissed = department.projects.reduce((total, project) => {
         return total + project.milestones.length;
       }, 0);
+
+      department.projects.forEach(project => {
+        project.milestones.forEach(milestone => {
+          milestone.project = project;
+        });
+        milestones.push(...project.milestones)
+      });
     }
 
-    return departments
-      .sort((a, b) => (a.totalMilestonesMissed < b.totalMilestonesMissed) ? 1 : -1);
+    return {
+      departments: departments.sort((a, b) => (a.totalMilestonesMissed < b.totalMilestonesMissed) ? 1 : -1),
+      milestones: milestones.sort((a, b) => moment(a.date, 'YYYY-MM-DD').valueOf() - moment(b.date, 'YYYY-MM-DD').valueOf())
+    }
   }
 
   async totalMilestones(department) {

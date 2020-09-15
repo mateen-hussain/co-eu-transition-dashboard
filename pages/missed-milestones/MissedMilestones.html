@@ -5,7 +5,7 @@
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 
 {% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
-{% set data = chartData(departmentsWithMissedMilestones) %}
+{% set data = chartData(departmentsWithMissedMilestones.departments) %}
 {% set cellBlock = "cell-color-" %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
@@ -40,10 +40,8 @@
       {% endfor %}
     </thead>
 
-    {% for department in departmentsWithMissedMilestones %}
       <tbody class="govuk-table__body">
-        {% for project in department.projects %}
-        {% for milestone in project.milestones %}
+        {% for milestone in departmentsWithMissedMilestones.milestones %}
           <tr class="govuk-table__row">
             {% for milestoneField in milestoneFields %}
               {% set field = milestone.fields.get(milestoneField.id) %}
@@ -58,14 +56,12 @@
               {% endif %}
             {% endfor %}
             {% for projectField in projectFields %}
-            {% set field = project.fields.get(projectField.id) %}
+            {% set field = milestone.project.fields.get(projectField.id) %}
               <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
             {% endfor %}
           </tr>
         {% endfor %}
-        {% endfor %}
       </tbody>
-    {% endfor %}
     </table>
 
   </div>
