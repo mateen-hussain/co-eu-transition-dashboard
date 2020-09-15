@@ -85,7 +85,7 @@ const validateValue = (value, definition, allValues) => {
 };
 
 const validateItems = (items, itemDefinitions) => {
-  const validateItem = (errors, item) => {
+  const validateItem = (errors, item, itemIndex) => {
     itemDefinitions.forEach(itemDefinition => {
       const value = item[itemDefinition.name];
       const allValues = items.map(item => item[itemDefinition.name]);
@@ -93,7 +93,7 @@ const validateItems = (items, itemDefinitions) => {
       try {
         validateValue(value, itemDefinition, allValues);
       } catch (error) {
-        errors.push({ item, itemDefinition, value, error: error.message });
+        errors.push({ item, itemDefinition, value, error: error.message, itemIndex: itemIndex + 1, });
       }
     });
 

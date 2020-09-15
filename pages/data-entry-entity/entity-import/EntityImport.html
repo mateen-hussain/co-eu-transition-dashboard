@@ -65,7 +65,7 @@
   <table class="govuk-table">
     <thead class="govuk-table__head">
       <tr class="govuk-table__row">
-        <th scope="col" class="govuk-table__header">Public ID</th>
+        <th scope="col" class="govuk-table__header">Public ID / Item number</th>
         <th scope="col" class="govuk-table__header">Column Name</th>
         <th scope="col" class="govuk-table__header">Value</th>
         <th scope="col" class="govuk-table__header">Error</th>
@@ -74,7 +74,7 @@
     <tbody class="govuk-table__body">
       {% for error in errors.entityErrors %}
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell">{{ error.item.publicId }}</td>
+        <td class="govuk-table__cell">{{ error.item.publicId | default("Auto generated") | string }} / {{ error.itemIndex | string }}</td>
         <td class="govuk-table__cell">{{ error.itemDefinition.displayName }}</td>
         <td class="govuk-table__cell">{{ error.item[error.itemDefinition.name] }}</td>
         <td class="govuk-table__cell">{{ error.error }}</td>

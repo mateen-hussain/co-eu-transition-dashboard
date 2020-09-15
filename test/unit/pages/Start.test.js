@@ -27,10 +27,10 @@ describe('pages/start/Start', () => {
       sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
     });
 
-    it('redirects to reporting overview landing page if it does not have viewer role', async() => {
-      req.user.roles = [{ name: 'management_overview' }];
+    it('redirects to all data landing page if it does not have viewer role', async() => {
+      req.user.roles = [{ name: 'management' }];
       await page.handler(req, res);
-      sinon.assert.calledWith(res.redirect, config.paths.reportingOverview);
+      sinon.assert.calledWith(res.redirect, config.paths.allData);
     });
 
     it('redirects to readiness overview landing page if it has viewer role', async() => {

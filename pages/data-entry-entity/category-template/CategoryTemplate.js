@@ -10,6 +10,8 @@ const moment = require('moment');
 const get = require('lodash/get');
 const logger = require('services/logger');
 const CategoryField = require('models/categoryField');
+const { Op } = require('sequelize');
+const entityUserPermissions = require('middleware/entityUserPermissions');
 
 class CategoryTemplate extends Page {
   get url() {
@@ -18,7 +20,8 @@ class CategoryTemplate extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader'])
+      ...authentication.protect(['uploader']),
+      entityUserPermissions.assignEntityIdsUserCanAccessToLocals
     ];
   }
 
@@ -39,6 +42,10 @@ class CategoryTemplate extends Page {
   }
 
   async getRequest(req, res) {
+    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    }
+
     this.createExcelTemplate(req, res);
   }
 
@@ -165,6 +172,12 @@ class CategoryTemplate extends Page {
         options.push('Yes', 'No');
       } else if(field.config && field.config.options && field.config.options.length) {
         options.push(...field.config.options);
+
+        const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+        if(field.isParentField && !userIsAdmin) {
+          const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.publicId);
+          options = options.filter(option => entityIdsUserCanAccess.includes(option));
+        }
       }
 
       validationSheet
@@ -236,11 +249,17 @@ class CategoryTemplate extends Page {
 
   async createCategorySheet(category, workbook, entitySheet, validationSheet) {
     const categoryFields = await Category.fieldDefinitions(category.name);
+    const where = { categoryId: category.id };
+
+    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+
+    if(!userIsAdmin) {
+      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
+      where.id = { [Op.in]: entityIdsUserCanAccess };
+    }
 
     const entities = await Entity.findAll({
-      where: {
-        categoryId: category.id
-      },
+      where,
       include: [{
         model: EntityFieldEntry,
         include: CategoryField

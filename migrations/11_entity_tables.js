@@ -21,7 +21,7 @@ const up = async (query) => {
     }
   }, { charset: services.mysql.charset });
 
-  query.bulkInsert('category', categories.map(category => {
+  await query.bulkInsert('category', categories.map(category => {
     return {
       name: category,
       public_id_format: `${category.toLowerCase()}-`
@@ -77,7 +77,7 @@ const up = async (query) => {
     },
   }, { charset: services.mysql.charset });
 
-  query.bulkInsert('category_field', categories.reduce((items, category, index) => {
+  await query.bulkInsert('category_field', categories.reduce((items, category, index) => {
     items.push({
       category_id: index + 1,
       name: 'name',
@@ -124,7 +124,7 @@ const up = async (query) => {
     }
   }, { charset: services.mysql.charset });
 
-  query.bulkInsert('category_parent', [{
+  await query.bulkInsert('category_parent', [{
     category_id: 2,
     parent_category_id: 1
   },{
