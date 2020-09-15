@@ -81,16 +81,16 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     const departments = [{
       id: 1,
       projects: [{
-        milestones: [{},{},{}]
+        milestones: [{ id: 1, date: '2020-06-22' },{ id: 2, date: '2020-05-22' },{ id: 3, date: '2020-04-22' }]
       },{
-        milestones: [{}]
+        milestones: [{ id: 1, date: '2020-06-22' }]
       }]
     },{
       id: 2,
       projects: [{
-        milestones: [{}, {}, {}]
+        milestones: [{ id: 1, date: '2020-06-22' }, { id: 2, date: '2020-02-22' }, { id: 3, date: '2020-01-22' }]
       },{
-        milestones: [{}, {}, {}]
+        milestones: [{ id: 1, date: '2020-06-22' }, { id: 2, date: '2020-07-22' }, { id: 3, date: '2020-08-22' }]
       }]
     }];
 
@@ -112,18 +112,23 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
 
     it('adds total milestones to each department', () => {
-      expect(departmentsWithMissedMilestones[0].totalMilestones).to.eql(5);
-      expect(departmentsWithMissedMilestones[1].totalMilestones).to.eql(5);
+      expect(departmentsWithMissedMilestones.departments[0].totalMilestones).to.eql(5);
+      expect(departmentsWithMissedMilestones.departments[1].totalMilestones).to.eql(5);
     });
 
     it('sorts departments based on total missed milestones', () => {
-      expect(departmentsWithMissedMilestones[0].id).to.eql(2);
-      expect(departmentsWithMissedMilestones[1].id).to.eql(1);
+      expect(departmentsWithMissedMilestones.departments[0].id).to.eql(2);
+      expect(departmentsWithMissedMilestones.departments[1].id).to.eql(1);
     });
 
     it('adds up total missed milestones', () => {
-      expect(departmentsWithMissedMilestones[0].totalMilestonesMissed).to.eql(6);
-      expect(departmentsWithMissedMilestones[1].totalMilestonesMissed).to.eql(4);
+      expect(departmentsWithMissedMilestones.departments[0].totalMilestonesMissed).to.eql(6);
+      expect(departmentsWithMissedMilestones.departments[1].totalMilestonesMissed).to.eql(4);
+    });
+
+    it('sorts milestones based on due date', () => {
+      expect(departmentsWithMissedMilestones.milestones[0].id).to.eql(3);
+      expect(departmentsWithMissedMilestones.milestones[1].id).to.eql(2);
     });
   });
 
