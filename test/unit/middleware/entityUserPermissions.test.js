@@ -46,7 +46,6 @@ describe('middleware/entityUserPermissions', () => {
       sinon.assert.calledWith(Entity.findAll, {
         attributes: ['publicId', 'id'],
         include: {
-          seperate: true,
           attributes: ['publicId', 'id'],
           model: Entity,
           as: 'children'

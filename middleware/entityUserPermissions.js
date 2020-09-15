@@ -17,7 +17,6 @@ const assignEntityIdsUserCanAccessToLocals = async (req, res, next) => {
   const allEntities = await Entity.findAll({
     attributes: ['publicId', 'id'],
     include: {
-      seperate: true,
       attributes: ['publicId', 'id'],
       model: Entity,
       as: 'children'
