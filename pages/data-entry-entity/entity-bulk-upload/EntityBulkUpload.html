@@ -21,7 +21,11 @@
 
 <div class="govuk-grid-row">
 
-  {% include "data-entry-entity/entity-bulk-upload/partials/" + mode + ".njk" %}
+  {% ifAsync req.user.isAdmin %}
+    {% include "data-entry-entity/entity-bulk-upload/partials/admin/" + mode + ".njk" %}
+  {% else %}
+    {% include "data-entry-entity/entity-bulk-upload/partials/uploader/" + mode + ".njk" %}
+  {% endif %}
 
 </div>
 

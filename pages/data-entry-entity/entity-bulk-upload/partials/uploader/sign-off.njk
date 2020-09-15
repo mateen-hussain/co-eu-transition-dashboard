@@ -10,9 +10,7 @@
 
 <p class="govuk-body">Your file must match the template of the category you are importing. If your file does not match this template, the upload function will not work. <p>
 
-{% for category in categories() | await %}
-  <a class="govuk-link" href="{{ config.paths.dataEntryEntity.categoryTemplate }}?category={{ category.value }}" target="_blank">Download the latest template for {{ category.text }}s.</a><br>
-{% endfor %}
+<a class="govuk-link" href="{{ config.paths.dataEntryEntity.categoryTemplate }}?category=Measure" target="_blank">Download the latest template for Measures.</a><br>
 
 <br>
 
