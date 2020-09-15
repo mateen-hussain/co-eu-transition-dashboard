@@ -157,9 +157,8 @@ describe('pages/tableau-export/TableauExport', () => {
     });
 
     it('filters items with filter=RAYG out', async () => {
-      const resp = [{ test: 'test' }, { Filter: 'RAYG' }];
+      const resp = [{ test: { value: 'test' } }, { Filter: { value: 'RAYG' } }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
 
       Category.findOne.resolves({
         id: 1
@@ -168,7 +167,7 @@ describe('pages/tableau-export/TableauExport', () => {
       await page.exportMeasures(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, [{ test: 'test' }], res);
+      sinon.assert.calledWith(res.json, [{ test: { value: 'test' } }]);
     });
   });
 
@@ -176,7 +175,6 @@ describe('pages/tableau-export/TableauExport', () => {
     it('gets all comms and creats an object', async () => {
       const resp = { data: 'data' };
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
 
       Category.findOne.resolves({
         id: 1
@@ -185,7 +183,7 @@ describe('pages/tableau-export/TableauExport', () => {
       await page.exportCommunications(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+      sinon.assert.calledWith(res.json, resp);
     });
   });
 

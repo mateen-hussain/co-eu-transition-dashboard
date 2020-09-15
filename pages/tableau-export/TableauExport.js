@@ -43,13 +43,15 @@ class TableauExport extends Page {
   }
 
   get showForm() {
-    const pageType = this.exportingMeasures || this.exportingProjects;
-    return this.req.params && !this.req.params.mode && pageType;
+    return this.req.params && !this.req.params.mode && this.isValidPageType;
   }
 
   get exportSchema() {
-    const pageType = this.exportingMeasures || this.exportingProjects;
-    return this.req.params && this.req.params.mode === 'schema' && pageType;
+    return this.req.params && this.req.params.mode === 'schema' && this.isValidPageType;
+  }
+
+  get isValidPageType() {
+    return this.exportingMeasures || this.exportingProjects || this.exportingCommunications;
   }
 
   async addParents(entity, entityFieldMap, replaceArraysWithNumberedKeyValues = true) {
@@ -147,13 +149,13 @@ class TableauExport extends Page {
     let data = await this.getEntitiesFlatStructure(measuresCategory);
 
     data = data.filter(d => {
-      if (d.Filter && d.Filter === 'RAYG') {
+      if (d.Filter && d.Filter.value === 'RAYG') {
         return false;
       }
       return true;
     });
 
-    this.responseAsCSV(data, res);
+    return this.exportSchema ? res.json(data[0]) : res.json(data);
   }
 
   async exportCommunications(req, res) {
@@ -199,7 +201,7 @@ class TableauExport extends Page {
           });
 
           milestone.milestoneFieldEntries.forEach(field => {
-            milestoneData[`Milestone - ${field.milestoneField.displayName}`] =  { value: field.value, type: field.milestoneField.type }; 
+            milestoneData[`Milestone - ${field.milestoneField.displayName}`] =  { value: field.value, type: field.milestoneField.type };
           });
 
           milestoneDatas.push(milestoneData);
@@ -218,9 +220,9 @@ class TableauExport extends Page {
     });
 
     const entities = await this.getEntitiesFlatStructure(projectsCategory);
-    const entitiesWithProjects = await this.mergeProjectsWithEntities(entities);
+    const data = await this.mergeProjectsWithEntities(entities);
 
-    return res.json(entitiesWithProjects);
+    return this.exportSchema ? res.json(data[0]) : res.json(data)
   }
 
   responseAsCSV(data, res) {

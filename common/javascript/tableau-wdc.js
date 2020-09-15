@@ -72,4 +72,12 @@ const formatKey = key => key.replace(/[^a-zA-Z0-9_]/g, '');
       tableau.submit();
     });
   });
+
+  // alternatively you can skip the user interaction and have the function run on load
+  // myConnector.init = function(initCallback) {
+  //   tableau.connectionData = $("#ConnectionURL").val();
+  //   tableau.connectionName = $("#ConnectionName").val();
+  //   initCallback();
+  //   tableau.submit();
+  // };
 })();
