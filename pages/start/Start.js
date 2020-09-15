@@ -16,7 +16,7 @@ class Start extends Page {
       return res.redirect(config.paths.readinessOverview);
     }
 
-    return res.redirect(config.paths.reportingOverview);
+    return res.redirect(config.paths.allData);
   }
 }
 
