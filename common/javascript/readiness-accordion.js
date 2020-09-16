@@ -42,8 +42,6 @@ ReadinessAccordion.prototype.init = function () {
   }
 
   this.initSectionHeaders()
-  this.restoreScrollPosition()
-  window.addEventListener('scroll', this.setScrollPosition.bind(this))
 }
 
 // Initialise section headers
@@ -146,17 +144,6 @@ ReadinessAccordion.prototype.setInitialState = function (section) {
   }
 }
 
-ReadinessAccordion.prototype.setScrollPosition = function () {
-  if (this.browserSupportsSessionStorage) {
-    window.sessionStorage.setItem('scrollPosition', window.scrollY)
-  }
-}
 
-ReadinessAccordion.prototype.restoreScrollPosition = function () {
-  if (this.browserSupportsSessionStorage) {
-    let scrollPosition = window.sessionStorage.getItem('scrollPosition') || 0
-    window.scrollTo(0, scrollPosition);
-  }
-}
 
 export default ReadinessAccordion

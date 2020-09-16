@@ -27,16 +27,16 @@ describe('pages/start/Start', () => {
       sinon.assert.calledWith(res.redirect, config.paths.authentication.passwordReset);
     });
 
-    it('redirects to readiness overview if it does not have management role', async() => {
-      req.user.roles = [{ name: 'viewer' }];
-      await page.handler(req, res);
-      sinon.assert.calledWith(res.redirect, config.paths.readinessOverview);
-    });
-
-    it('redirects to all data landing page if it has management role', async() => {
+    it('redirects to all data landing page if it does not have viewer role', async() => {
       req.user.roles = [{ name: 'management' }];
       await page.handler(req, res);
       sinon.assert.calledWith(res.redirect, config.paths.allData);
+    });
+
+    it('redirects to readiness overview landing page if it has viewer role', async() => {
+      req.user.roles = [{ name: 'viewer' }];
+      await page.handler(req, res);
+      sinon.assert.calledWith(res.redirect, config.paths.readinessOverview);
     });
   });
 });

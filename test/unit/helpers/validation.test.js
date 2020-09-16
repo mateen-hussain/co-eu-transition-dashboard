@@ -106,6 +106,7 @@ describe('helpers/validation', () => {
             "name": "number",
             "type": "integer"
           },
+          "itemIndex": 2,
           "value": "should throw"
         }
       ]);

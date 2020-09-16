@@ -14,6 +14,7 @@ const Entity = require('models/entity');
 const Category = require('models/category');
 const { Op } = require('sequelize');
 const moment = require('moment');
+const entityUserPermissions = require('middleware/entityUserPermissions');
 
 class EntityImport extends Page {
   static get isEnabled() {
@@ -28,7 +29,8 @@ class EntityImport extends Page {
     return [
       ...authentication.protect(['uploader']),
       fileUpload({ safeFileNames: true }),
-      flash
+      flash,
+      entityUserPermissions.assignEntityIdsUserCanAccessToLocals
     ];
   }
 
@@ -61,6 +63,32 @@ class EntityImport extends Page {
     return [columnErrors, itemErrors];
   }
 
+  validateUserCanAccessEntities(parsedEntities, categoryFields) {
+    const entityAccessErrors = [];
+    const entityPublicIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.publicId);
+
+    parsedEntities.forEach((entity, itemIndex) => {
+      let userCanEditEntity = true;
+      if (entity.publicId) {
+        userCanEditEntity = entityPublicIdsUserCanAccess.includes(entity.publicId);
+      } else {
+        const categoryParentFields = categoryFields.filter(field => field.isParentField);
+        const parentPublicIds = categoryParentFields.map(field => entity[field.name]);
+        userCanEditEntity = entityPublicIdsUserCanAccess.find(entityIdUserCanAccess => parentPublicIds.includes(entityIdUserCanAccess))
+      }
+
+      if(!userCanEditEntity) {
+        entityAccessErrors.push({
+          item: entity,
+          itemIndex: itemIndex + 1,
+          error: 'You do not have permissions to edit this entity'
+        });
+      }
+    });
+
+    return entityAccessErrors;
+  }
+
   async validateEntities(category, entities) {
     const categoryFields = await Category.fieldDefinitions(category);
     const parsedEntities = parse.parseItems(entities, categoryFields);
@@ -80,10 +108,17 @@ class EntityImport extends Page {
       return { entityColumnErrors };
     }
 
-    const [
+    let [
       entityColumnErrors,
       entityErrors
     ] = this.validateItems(entities, parsedEntities, categoryFields);
+
+    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+
+    if (!userIsAdmin) {
+      const entityAccessErrors = this.validateUserCanAccessEntities(parsedEntities, categoryFields);
+      entityErrors.push(...entityAccessErrors);
+    }
 
     return { entityErrors, entityColumnErrors, parsedEntities };
   }
