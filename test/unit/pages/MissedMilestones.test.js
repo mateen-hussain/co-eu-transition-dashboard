@@ -81,16 +81,16 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     const departments = [{
       id: 1,
       projects: [{
-        milestones: [{ id: 1, date: '2020-06-22' },{ id: 2, date: '2020-05-22' },{ id: 3, date: '2020-04-22' }]
+        milestones: [{ id: 1, date: '13-06-2020' },{ id: 2, date: '10-05-2020' },{ id: 3, date: '05-04-2020' }]
       },{
-        milestones: [{ id: 1, date: '2020-06-22' }]
+        milestones: [{ id: 1, date: '15-06-2020' }]
       }]
     },{
       id: 2,
       projects: [{
-        milestones: [{ id: 1, date: '2020-06-22' }, { id: 2, date: '2020-02-22' }, { id: 3, date: '2020-01-22' }]
+        milestones: [{ id: 1, date: '13-06-2020' }, { id: 2, date: '15-04-2020' }, { id: 3, date: '01-01-2020' }]
       },{
-        milestones: [{ id: 1, date: '2020-06-22' }, { id: 2, date: '2020-07-22' }, { id: 3, date: '2020-08-22' }]
+        milestones: [{ id: 1, date: '06-06-2020' }, { id: 2, date: '25-03-2020' }, { id: 3, date: '04-04-2020' }]
       }]
     }];
 
