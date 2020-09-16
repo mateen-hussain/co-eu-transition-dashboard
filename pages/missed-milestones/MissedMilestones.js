@@ -27,15 +27,26 @@ class MissedMilestones extends Page {
       impact: [0, 1]
     });
 
+    const milestones = [];
+
     for(const department of departments) {
       department.totalMilestones = await this.totalMilestones(department);
       department.totalMilestonesMissed = department.projects.reduce((total, project) => {
         return total + project.milestones.length;
       }, 0);
+
+      department.projects.forEach(project => {
+        project.milestones.forEach(milestone => {
+          milestone.project = project;
+        });
+        milestones.push(...project.milestones)
+      });
     }
 
-    return departments
-      .sort((a, b) => (a.totalMilestonesMissed < b.totalMilestonesMissed) ? 1 : -1);
+    return {
+      departments: departments.sort((a, b) => (a.totalMilestonesMissed < b.totalMilestonesMissed) ? 1 : -1),
+      milestones: milestones.sort((a, b) => moment(a.date, 'YYYY-MM-DD').valueOf() - moment(b.date, 'YYYY-MM-DD').valueOf())
+    }
   }
 
   async totalMilestones(department) {
@@ -67,11 +78,11 @@ class MissedMilestones extends Page {
   }
 
   get projectFields() {
-    return [{ title:'Project UID', id: 'uid' }, { title:'Project Name', id: 'title' }, { title:'Impact', id: 'impact' }, { title:'HMG Confidence', id: 'hmgConfidence' }, { title:'Citizen Readiness', id: 'citizenReadiness' }, { title:'Business Readiness', id: 'businessReadiness' }, { title:'EU Member State Delivery Confidence', id: 'euStateConfidence' }];
+    return [{ title:'Project Impact', id: 'impact' }];
   }
 
   get milestoneFields() {
-    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Latest Comments', id: 'comments' }];
+    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }];
   }
 }
 

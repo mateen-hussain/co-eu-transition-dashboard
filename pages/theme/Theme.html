@@ -12,7 +12,7 @@
   <h1 class="govuk-heading-xl theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
   <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
@@ -25,7 +25,7 @@
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-sub-statements">
     {% if data.subOutcomeStatementsAndDatas | length > 0 %}
       <div class="readiness-accordion-wrapper" >
         {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1, req.params.statement) }}
@@ -36,7 +36,7 @@
   </div>
 
   <div class="govuk-grid-column-one-half overflow-scroll">
-  {% if not data.iframeUrl.error and data.subOutcomeStatementsAndDatas | length > 0 %}
+  {% if not data.iframeUrl.error and not data.iframeUrl.url %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
   {% elseif data.iframeUrl.error %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">There has been an error accessing this data, please contact The Transition Taskforce Dashboard Team</p>
