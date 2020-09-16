@@ -45,7 +45,7 @@ class MissedMilestones extends Page {
 
     return {
       departments: departments.sort((a, b) => (a.totalMilestonesMissed < b.totalMilestonesMissed) ? 1 : -1),
-      milestones: milestones.sort((a, b) => moment(a.date, 'YYYY-MM-DD').valueOf() - moment(b.date, 'YYYY-MM-DD').valueOf())
+      milestones: milestones.sort((a, b) => moment(a.date, 'DD-MM-YYYY').valueOf() - moment(b.date, 'DD-MM-YYYY').valueOf())
     }
   }
 
