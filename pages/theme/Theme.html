@@ -26,7 +26,7 @@
   </div>
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-sub-statements">
-    {% if data.subOutcomeStatementsAndDatas | length > 0%}
+    {% if data.subOutcomeStatementsAndDatas | length > 0 %}
       <div class="readiness-accordion-wrapper" >
         {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1, req.params.statement) }}
       </div>
