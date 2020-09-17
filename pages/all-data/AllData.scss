@@ -70,33 +70,40 @@ table.govuk-table.table-content {
 }
 
 #filterPanel, #hideFilter  {
-    display: none;
-}
-
-#show:target #filterPanel {
     display: block;
 }
 
-#show:target #showFilter {
+#showFilter {
     display: none;
 }
 
-#show:target #hideFilter {
+#hide:target #filterPanel {
+    display: none;
+}
+
+#hide:target #showFilter {
     display: block;
 }
 
-.govuk-checkboxes__label, .govuk-label, .govuk-hint, .govuk-summary-list__key, .govuk-table {
-    font-size: 1.100rem;
+#hide:target #hideFilter {
+    display: none;
 }
 
-#show:target #dataTable {
+#dataTable {
     width: 75%;
     div.scrollable {
         max-height: 150px;
         max-width: 80px;
-        overflow-x: scroll;
-        overflow-y: scroll;
+        overflow: scroll;
     }
+}
+
+#hide:target #dataTable {
+    width: 100%;
+}
+
+.govuk-checkboxes__label, .govuk-label, .govuk-hint, .govuk-summary-list__key, .govuk-table {
+    font-size: 1.100rem;
 }
 
 .govuk-table__header, .govuk-table__cell {
