@@ -35,12 +35,12 @@
       {% for milestoneField in milestoneFields %}
         {% if (milestoneField.id == 'uid') %}
         <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
-        <th scope="col" class="govuk-table__header">{{ projectTitle.title }}</th>
+        <th scope="col" class="govuk-table__header">{{ project.name.title }}</th>
         {% else %}
         <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
         {% endif %}
       {% endfor %}
-      <th scope="col" class="govuk-table__header">{{ projectImpact.title }}</th>
+        <th scope="col" class="govuk-table__header">{{ project.impact.title }}</th>
     </thead>
 
     <tbody class="govuk-table__body">
@@ -53,7 +53,7 @@
                 <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link'>{{ field.value | escape }}</a>
               </td>
               <td class="govuk-table__cell">
-                <a href="{{ config.paths.projectDetails | replace(':uid', milestone.project.fields.get(projectTitle.id).value | urlencode) }}" class='govuk-link'>{{ milestone.project.fields.get(projectTitle.id).value | escape }}</a>
+                <a href="{{ config.paths.projectDetails | replace(':uid', milestone.project.fields.get(project.uid.id).value | urlencode) }}" class='govuk-link'>{{ milestone.project.fields.get(project.name.id).value | escape }}</a>
               </td>
             {% elseif (field.id == 'date') %}
               <td class="govuk-table__cell">{{ field.value | date("D MMM YYYY") }}</td>
@@ -61,7 +61,7 @@
               <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
             {% endif %}
           {% endfor %}
-            <td class="govuk-table__cell"><span class="{{ cellBlock + milestone.project.fields.get(projectImpact.id).value }}">{{ milestone.project.fields.get(projectImpact.id).value | default('N/A') }}</span></td>
+            <td class="govuk-table__cell"><span class="{{ cellBlock + milestone.project.fields.get(project.impact.id).value }}">{{ milestone.project.fields.get(project.impact.id).value | default('N/A') }}</span></td>
           </tr>
         {% endfor %}
     </tbody>

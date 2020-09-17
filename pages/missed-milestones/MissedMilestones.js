@@ -22,9 +22,9 @@ class MissedMilestones extends Page {
 
   async getDepartmentsWithMissedMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects({
-      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') }
-      // complete: ['No'],
-      // impact: [0, 1]
+      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') },
+      complete: ['No'],
+      impact: [0, 1]
     });
 
     const milestones = [];
@@ -77,12 +77,12 @@ class MissedMilestones extends Page {
     return data;
   }
 
-  get projectTitle() {
-    return { title:'Project name', id: 'title' };
-  }
-
-  get projectImpact() {
-    return { title:'Project impact', id: 'impact' };
+  get project() {
+    return {
+      uid: { id: 'uid' },
+      name: { title:'Project name', id: 'title' },
+      impact: { title:'Project impact', id: 'impact' }
+    };
   }
 
   get milestoneFields() {
