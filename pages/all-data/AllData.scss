@@ -69,23 +69,23 @@ table.govuk-table.table-content {
     padding-bottom: 20px;
 }
 
-#filterPanel, #hideFilter  {
+#filterPanel, #hideFilters  {
     display: block;
 }
 
-#showFilter {
+#showFiltersBtn {
     display: none;
 }
 
-#hide:target #filterPanel {
+#hide-filters:target #filterPanel {
     display: none;
 }
 
-#hide:target #showFilter {
+#hide-filters:target #showFiltersBtn {
     display: block;
 }
 
-#hide:target #hideFilter {
+#hide-filters:target #hideFiltersBtn {
     display: none;
 }
 
@@ -98,7 +98,7 @@ table.govuk-table.table-content {
     }
 }
 
-#hide:target #dataTable {
+#hide-filters:target #dataTable {
     width: 100%;
 }
 

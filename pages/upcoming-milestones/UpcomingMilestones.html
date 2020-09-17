@@ -15,7 +15,7 @@
 
 {% block content %}
 
-<div class="govuk-grid-row" id="hide">
+<div class="govuk-grid-row" id="hide-filters">
 
   <div class="govuk-grid-column-one-quarter" id="filterPanel">
   {% include "upcoming-milestones/partials/filters/filters.njk" %}
@@ -25,12 +25,12 @@
 
   <h1 class="govuk-heading-xl">Upcoming milestones</h1>
 
-  <div id="showFilter">
-    <p class="govuk-body"><a href="#show" class="govuk-link">Show filters</a></p>
+  <div id="showFiltersBtn">
+    <p class="govuk-body"><a href="#show-filters" class="govuk-link">Show filters</a></p>
   </div>
 
-  <div id="hideFilter">
-      <p class="govuk-body"><a href="#hide" class="govuk-link">Hide filters</a></p>
+  <div id="hideFiltersBtn">
+      <p class="govuk-body"><a href="#hide-filters" class="govuk-link">Hide filters</a></p>
   </div>
 
   {% include "all-data/partials/filters/filter-summary.njk" %}
