@@ -33,35 +33,38 @@
   <table class="govuk-table">
     <thead class="govuk-table__head">
       {% for milestoneField in milestoneFields %}
+        {% if (milestoneField.id == 'uid') %}
         <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
+        <th scope="col" class="govuk-table__header">{{ projectTitle.title }}</th>
+        {% else %}
+        <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
+        {% endif %}
       {% endfor %}
-      {% for projectField in projectFields %}
-        <th scope="col" class="govuk-table__header">{{ projectField.title }}</th>
-      {% endfor %}
+      <th scope="col" class="govuk-table__header">{{ projectImpact.title }}</th>
     </thead>
 
-      <tbody class="govuk-table__body">
-        {% for milestone in departmentsWithMissedMilestones.milestones %}
-          <tr class="govuk-table__row">
-            {% for milestoneField in milestoneFields %}
-              {% set field = milestone.fields.get(milestoneField.id) %}
-              {% if (field.id == 'uid') %}
-                <td class="govuk-table__cell">
-                  <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link'>{{ field.value | escape }}</a>
-                </td>
-              {% elseif (field.id == 'date') %}
-                <td class="govuk-table__cell">{{ field.value | date("D MMM YYYY") }}</td>
-              {% else %}
-                <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
-              {% endif %}
-            {% endfor %}
-            {% for projectField in projectFields %}
-            {% set field = milestone.project.fields.get(projectField.id) %}
+    <tbody class="govuk-table__body">
+      {% for milestone in departmentsWithMissedMilestones.milestones %}
+        <tr class="govuk-table__row">
+          {% for milestoneField in milestoneFields %}
+            {% set field = milestone.fields.get(milestoneField.id) %}
+            {% if (field.id == 'uid') %}
+              <td class="govuk-table__cell">
+                <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link'>{{ field.value | escape }}</a>
+              </td>
+              <td class="govuk-table__cell">
+                <a href="{{ config.paths.projectDetails | replace(':uid', milestone.project.fields.get(projectTitle.id).value | urlencode) }}" class='govuk-link'>{{ milestone.project.fields.get(projectTitle.id).value | escape }}</a>
+              </td>
+            {% elseif (field.id == 'date') %}
+              <td class="govuk-table__cell">{{ field.value | date("D MMM YYYY") }}</td>
+            {% else %}
               <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
-            {% endfor %}
+            {% endif %}
+          {% endfor %}
+            <td class="govuk-table__cell"><span class="{{ cellBlock + milestone.project.fields.get(projectImpact.id).value }}">{{ milestone.project.fields.get(projectImpact.id).value | default('N/A') }}</span></td>
           </tr>
         {% endfor %}
-      </tbody>
+    </tbody>
     </table>
 
   </div>

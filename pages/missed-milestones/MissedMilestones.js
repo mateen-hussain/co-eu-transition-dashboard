@@ -22,9 +22,9 @@ class MissedMilestones extends Page {
 
   async getDepartmentsWithMissedMilestones() {
     const departments = await this.req.user.getDepartmentsWithProjects({
-      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') },
-      complete: ['No'],
-      impact: [0, 1]
+      date: { to: moment().subtract(1, 'days').format('DD/MM/YYYY') }
+      // complete: ['No'],
+      // impact: [0, 1]
     });
 
     const milestones = [];
@@ -45,7 +45,7 @@ class MissedMilestones extends Page {
 
     return {
       departments: departments.sort((a, b) => (a.totalMilestonesMissed < b.totalMilestonesMissed) ? 1 : -1),
-      milestones: milestones.sort((a, b) => moment(a.date, 'DD-MM-YYYY').valueOf() - moment(b.date, 'DD-MM-YYYY').valueOf())
+      milestones: milestones.sort((a, b) => moment(b.date, 'DD-MM-YYYY').valueOf() - moment(a.date, 'DD-MM-YYYY').valueOf())
     }
   }
 
@@ -77,12 +77,16 @@ class MissedMilestones extends Page {
     return data;
   }
 
-  get projectFields() {
-    return [{ title:'Project Impact', id: 'impact' }];
+  get projectTitle() {
+    return { title:'Project name', id: 'title' };
+  }
+
+  get projectImpact() {
+    return { title:'Project impact', id: 'impact' };
   }
 
   get milestoneFields() {
-    return [{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }];
+    return [{ title:'Milestone UID', id: 'uid' }, { title:'Due Date', id: 'date' }, { title:'Milestone Description', id: 'description' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }];
   }
 }
 
