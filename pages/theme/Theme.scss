@@ -58,7 +58,7 @@
     .govuk-accordion__section-header {
         border-top: none;
         margin-bottom:2px;
-        background-color: #f3f2f1
+        background-color: #f3f2f1;
     }
 
     .govuk-accordion__section--expanded > .govuk-accordion__section-header {
@@ -90,6 +90,10 @@
         .last-level-expandable .govuk-accordion__section-content {
             margin: -2px 0 2px 0;
             position: relative;
+            background-color: #f3f2f1;
+        }
+
+        .last-level-expandable > .govuk-accordion__section-header {
             background-color: #f3f2f1;
         }
     }
