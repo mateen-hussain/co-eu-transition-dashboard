@@ -90,7 +90,7 @@ describe('pages/missed-milestones/MissedMilestones', () => {
       projects: [{
         milestones: [{ id: 1, date: '13-06-2020' }, { id: 2, date: '15-04-2020' }, { id: 3, date: '01-01-2020' }]
       },{
-        milestones: [{ id: 1, date: '06-06-2020' }, { id: 2, date: '25-03-2020' }, { id: 3, date: '04-04-2020' }]
+        milestones: [{ id: 1, date: '06-06-2020' }, { id: 2, date: '25-08-2020' }, { id: 3, date: '04-04-2020' }]
       }]
     }];
 
@@ -127,8 +127,8 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
 
     it('sorts milestones based on due date', () => {
-      expect(departmentsWithMissedMilestones.milestones[0].id).to.eql(3);
-      expect(departmentsWithMissedMilestones.milestones[1].id).to.eql(2);
+      expect(departmentsWithMissedMilestones.milestones[0].id).to.eql(2);
+      expect(departmentsWithMissedMilestones.milestones[1].id).to.eql(1);
     });
   });
 
@@ -152,14 +152,18 @@ describe('pages/missed-milestones/MissedMilestones', () => {
   });
 
   describe('#projectFields', () => {
-    it('should return an array of project id and title', () => {
-      expect(page.projectFields).to.eql([{ title:'Project Impact', id: 'impact' }]);
+    it('should return an object of project id, title and impact', () => {
+      expect(page.project).to.eql({ 
+        uid: { id: 'uid' },
+        name: { title:'Project name', id: 'title' },
+        impact: { title:'Project impact', id: 'impact' }
+      });
     });
   });
 
   describe('#milestoneFields', () => {
     it('should return an array of milestone id and title', () => {
-      expect(page.milestoneFields).to.eql([{ title:'Milestone UID', id: 'uid' }, { title:'Milestone Description', id: 'description' }, { title:'Due Date', id: 'date' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }]);
+      expect(page.milestoneFields).to.eql([{ title:'Milestone UID', id: 'uid' }, { title:'Due Date', id: 'date' }, { title:'Milestone Description', id: 'description' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }]);
     });
   });
 
