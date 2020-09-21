@@ -9,15 +9,9 @@
     margin-bottom: 2px;
 }
 
-.statement:hover {
+.statement:hover, .active-statement {
     background-color: white;
 	background: url(/assets/images/arrow.png) 96% 10px no-repeat white;
-	cursor: pointer;
-}
-
-.active-statement {
-    background-color: white;
-    background: url(/assets/images/arrow.png) 96% 10px no-repeat white;
 }
 
 .statement-link {
