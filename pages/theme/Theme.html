@@ -16,9 +16,7 @@
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
-        <h2 class="govuk-heading-s">{{ topOutcome.name }}
-        {% if topOutcome.active %} <img src='/assets/images/arrow.png' class='active' alt='active' /> {% endif %}
-        </h2>
+        <h2 class="govuk-heading-s">{{ topOutcome.name }}</h2>
         <p class="govuk-body govuk-!-font-size-16">{{ topOutcome.description }}</p>
     </div>
    </a>
