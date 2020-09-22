@@ -16,6 +16,7 @@ Model.init = sinon.stub().callsFake(function(attributes) {
   this.upsert = sinon.stub().resolves();
   this.create = sinon.stub().resolves();
   this.destroy = sinon.stub().resolves();
+  this.bulkCreate = sinon.stub().resolves();
   this.findAll = sinon.stub().resolves([]);
   this.count = sinon.stub().resolves(0);
   this.rawAttributes = attributes;

@@ -30,7 +30,8 @@
     config.paths.admin.projectField,
     config.paths.admin.categoryFieldList,
     config.paths.admin.categoryField,
-    config.paths.admin.categoryList
+    config.paths.admin.categoryList,
+    config.paths.admin.headlineMeasures
     ]
 %}
 
@@ -130,6 +131,13 @@
         </a>
     </li>
     {% endif %}
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.admin.headlineMeasures }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.admin.headlineMeasures }}">
+        Manage Headline Measures
+        </a>
+    </li>
+
+
     </ul>
 </nav>
 {% endif %}

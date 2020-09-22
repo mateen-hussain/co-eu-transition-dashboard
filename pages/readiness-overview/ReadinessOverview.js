@@ -3,7 +3,7 @@ const { paths } = require('config');
 const authentication = require('services/authentication');
 const groupBy = require('lodash/groupBy');
 const transitionReadinessData = require('helpers/transitionReadinessData');
-const headlineFigures = require('models/headlineFigures');
+const HeadlineMeasures = require('models/headlineMeasures');
 
 class ReadinessOverview extends Page {
   get url() {
@@ -18,7 +18,7 @@ class ReadinessOverview extends Page {
   }
 
   async data() {
-    const headlinePublicIds = await headlineFigures.findAll({
+    const headlinePublicIds = await HeadlineMeasures.findAll({
       order: ['priority']
     });
     const data = await transitionReadinessData.overview(paths.transitionReadinessThemeDetail, headlinePublicIds.map(entity => entity.entityPublicId));
@@ -33,7 +33,7 @@ class ReadinessOverview extends Page {
     const themesGrouped = groupBy(themesWithStubs, theme => theme.color);
 
     return {
-      headlineFigures: data.headlineEntites,
+      headlineMeasures: data.headlineEntites,
       themes: themesGrouped
     };
   }

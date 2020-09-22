@@ -26,7 +26,8 @@
       "projectField": "/admin/project-field",
       "categoryFieldList": "/admin/category-field-list",
       "categoryField": "/admin/category-field",
-      "categoryList": "/admin/categories"
+      "categoryList": "/admin/categories",
+      "headlineMeasures": "/admin/headline-measures"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
