@@ -160,6 +160,7 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
         include: [{
           model: EntityFieldEntry,
           include: {
+            attributes: ['name'],
             model: CategoryField,
             where: { isActive: true },
             required: true

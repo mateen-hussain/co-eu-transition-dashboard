@@ -89,7 +89,7 @@ describe('pages/tableau-export/TableauExport', () => {
       Entity.findOne.resolves({
         entityFieldEntries: [{
           categoryField: {
-            name: 'name',
+            name: 'groupDescription',
             type: 'string'
           },
           value: 'Some name'
