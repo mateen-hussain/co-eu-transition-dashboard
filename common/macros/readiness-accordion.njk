@@ -41,7 +41,13 @@
   <ul class="govuk-body govuk-!-font-size-16 outcome-measures">
     {% for item in items %}
       <li class="outcome-measure__item item-{{ item.color }} {% if item.active %} outcome-measure__item--active {% endif %}">
+      {% if item.commentsOnly == 'yes' %}
+        <a href="{{ item.link }}" class="outcome-measure__link comments-only-measure">
+        <p class="govuk-body govuk-!-font-weight-bold comments-only">COMMENTS ONLY</p>
+          {{ item.name }}</a>
+      {% else %}
         <a href="{{ item.link }}" class="outcome-measure__link">{{ item.name }}</a>
+      {% endif %}  
       </li>
     
     {% endfor %}

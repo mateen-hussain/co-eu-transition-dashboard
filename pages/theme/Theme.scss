@@ -161,6 +161,17 @@
         color: #0b0c0c;
         display: block;
     }
+
+    .comments-only-measure {
+        font-style: italic;
+    }
+}
+
+.comments-only {
+    color: #505a5f;
+    margin-bottom: 2px;
+    font-size: 12px;
+    font-style: normal;
 }
 
 .js-enabled .govuk-accordion__section--expanded .govuk-accordion__section-content {
