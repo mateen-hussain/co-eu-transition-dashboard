@@ -74,7 +74,7 @@ class TableauExport extends Page {
       entityFieldMap[parentEntity.category.name] = entityFieldMap[parentEntity.category.name] || [];
 
       const name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
-        return entityFieldEntry.categoryField.name === 'name';
+        return entityFieldEntry.categoryField.name === 'groupDescription';
       });
 
       if(!entityFieldMap[parentEntity.category.name].some(item => item.value === name.value)){

@@ -76,13 +76,14 @@ class HeadlineMeasures extends Page {
       }
     });
 
-    const measures = await Entity.findAll({
+    let measures = await Entity.findAll({
       where: {
         categoryId: category.id
       },
       include: [{
         model: EntityFieldEntry,
         include: {
+          attributes: ['name'],
           model: CategoryField,
           where: { isActive: true },
           required: true
@@ -90,10 +91,18 @@ class HeadlineMeasures extends Page {
       }]
     });
 
+    measures = measures.filter(measure => {
+      return measure.entityFieldEntries.find(entry => {
+        return entry.categoryField.name === 'filter' && entry.value == 'RAYG';
+      });
+    });
+
     const measuresAsItems = measures.map(measure => {
       const measureName = measure.entityFieldEntries.find(entry => {
-        return entry.categoryField.name === 'name';
+        return entry.categoryField.name === 'groupDescription';
       });
+
+      if(!measureName) return;
 
       return {
         text: measureName.value,
