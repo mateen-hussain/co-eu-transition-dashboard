@@ -5,7 +5,6 @@ import removeAccordionCross from './remove-accordion-cross';
 import disableButton from './disable-button';
 import groupDisplay from './group-display';
 import fieldOrder from './field-order';
-import seeMore from './see-more';
 import ReadinessAccordion from './readiness-accordion';
 import ClearOrRestoreScroll from './readiness-scroll';
 
@@ -14,8 +13,7 @@ window.TRANSITIONDELIVERYDASHBOARD = {
   removeAccordionCross,
   disableButton,
   groupDisplay,
-  fieldOrder,
-  seeMore
+  fieldOrder
 };
 
 document.addEventListener('DOMContentLoaded', function() {

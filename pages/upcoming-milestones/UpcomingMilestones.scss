@@ -1,51 +1,12 @@
-.milestones {
-  background-color: #f3f2f1;
-}
-
 .milestone-count {
-  height: 28px;
-  width: 28px;
-  background-color: #5694ca;
+  height: 40px;
+  width: 40px;
+  background-color: #1d70b8;
   border-radius: 50%;
   display: inline-block;
   text-align: center;
   color: white;
-  font-weight: normal;
-  margin-left: 10px;
-  margin-top: 2px;
-  font-size: 18px;
+  font-weight: bold;
+  font-size: 26px;
   padding: 4px 3px 0 3px;
-}
-
-.milestone-count.department {
-  background-color: #1d70b8;
-}
-
-.milestone-count.milestone {
-  margin-bottom: -10px;
-  margin-left: 3px;
-}
-
-#timeline {
-  border-left: 6px solid #1d70b8;
-  padding-left: 15px; 
-}
-
-.milestone-date:before {
-  background-color: #1d70b8;
-  content: "";
-  display: inline-block;
-  height: 5px;
-  vertical-align: middle;
-  width: 15px;
-  margin-right: 5px;
-  margin-left: -15px;
-}
-
-.upcoming-milestones {
-  display: none;
-}
-
-.theme-caption {
-  display: inline;
 }

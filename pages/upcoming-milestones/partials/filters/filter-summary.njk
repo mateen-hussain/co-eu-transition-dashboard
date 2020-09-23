@@ -1,4 +1,4 @@
-{% set filterNames = [] %}
+{# {% set filterNames = [] %}
 {% set summary = [] %}
 
 {% set dateList %}
@@ -12,7 +12,7 @@
 {% if (data.filters['date']) %}
  {% set summary = (summary.push ({
     key: {
-      html: "<span class='date-name'>Showing milestone due dates </span>"
+      html: "<h3 class='govuk-heading-s'>Selected filters</h3><span class='date-name'>Showing milestone due dates </span>"
     },
     value: {
       html: dateList
@@ -66,4 +66,4 @@
 {{ govukSummaryList({
     classes: 'filter-list',
     rows: summary
-}) }}
+}) }} #}
