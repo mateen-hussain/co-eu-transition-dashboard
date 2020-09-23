@@ -278,7 +278,11 @@ const mapEntityChildren = (allEntities, entity) => {
   }, {});
 
   if(entityFieldMap.groupDescription) {
-    entityFieldMap.name = entityFieldMap.groupDescription;
+    if(entityFieldMap.unit === '%') {
+      entityFieldMap.name = `${entityFieldMap.value}${entityFieldMap.groupDescription}`;
+    } else {
+      entityFieldMap.name = entityFieldMap.groupDescription;
+    }
   }
 
   if(entity.children.length) {
