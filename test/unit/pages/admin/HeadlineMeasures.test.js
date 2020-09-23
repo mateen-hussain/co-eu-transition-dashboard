@@ -130,9 +130,14 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
         publicId: 1,
         entityFieldEntries: [{
           categoryField: {
-            name: 'name'
+            name: 'groupDescription'
           },
           value: 'some name'
+        },{
+          categoryField: {
+            name: 'filter'
+          },
+          value: 'RAYG'
         }]
       }];
       const category = { id: 1 };
