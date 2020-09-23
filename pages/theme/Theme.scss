@@ -67,6 +67,11 @@
         }
     }
 
+    .govuk-accordion__section-button:focus {
+        box-shadow: none;
+        background-color: transparent;
+    }
+
     .govuk-accordion {
         margin-bottom: 0;
         border-bottom: none;
