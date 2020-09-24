@@ -145,8 +145,9 @@
         }
     }
 
-    .outcome-measure__item--active, .outcome-measure__item:hover:not(.item-disabled) {
+    .outcome-measure__item--active, .outcome-measure__item:hover {
         background-color: white;
+        cursor: pointer;
 
         &:after {
             content: url('/assets/images/arrow.png');
@@ -154,10 +155,6 @@
             top: 12px;
             right: 10px;
         }
-    }
-
-    .item-disabled:hover {
-        cursor: not-allowed;
     }
 
     .outcome-measure__link {

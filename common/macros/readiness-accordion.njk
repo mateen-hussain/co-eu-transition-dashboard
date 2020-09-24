@@ -40,28 +40,19 @@
 {% macro outcomeMeasuresContent(items) %}
   <ul class="govuk-body govuk-!-font-size-16 outcome-measures">
     {% for item in items %}
-      {% if item.date and item.exist %}
-      <li class="outcome-measure__item item-disabled">
-        <div class="placeholder-measure">
-        <p class="govuk-body govuk-!-font-weight-bold placeholder-title">DATA EXPECTED: 01/01/1995</p>
-        {{ item.name }}</div>
-      </li>
-      {% else %}
-      {# <li class="outcome-measure__item item-{{ item.color }} {% if item.active %} outcome-measure__item--active {% endif %}">
-      {% if item.commentsOnly == 'yes' %}
+      <li class="outcome-measure__item {% if item.activeFrom %} item-disabled {% else %} item-{{ item.color }} {% endif %} {% if item.active %} outcome-measure__item--active {% endif %}">
+      {% if item.activeFrom %}
+        <a href="{{ item.link }}" class="outcome-measure__link placeholder-measure">
+        <p class="govuk-body govuk-!-font-weight-bold placeholder-title">DATA EXPECTED: {{ item.activeFrom | formatDate("DD/MM/YYYY") }}</p>
+        {{ item.name }}</a>
+      {% elseif item.commentsOnly == 'yes' %}
         <a href="{{ item.link }}" class="outcome-measure__link comments-measure">
         <p class="govuk-body govuk-!-font-weight-bold comments-title">COMMENTS ONLY</p>
           {{ item.name }}</a>
       {% else %}
         <a href="{{ item.link }}" class="outcome-measure__link">{{ item.name }}</a>
       {% endif %}  
-      </li> #}
-      <li class="outcome-measure__item item-disabled">
-        <div class="placeholder-measure">
-        <p class="govuk-body govuk-!-font-weight-bold placeholder-title">DATA EXPECTED: 01/01/1995</p>
-        {{ item.name }}</div>
       </li>
-    {% endif %}  
     {% endfor %}
   </ul>
 {% endmacro %}
