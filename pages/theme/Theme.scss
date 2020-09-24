@@ -147,7 +147,6 @@
 
     .outcome-measure__item--active, .outcome-measure__item:hover {
         background-color: white;
-        cursor: pointer;
 
         &:after {
             content: url('/assets/images/arrow.png');
