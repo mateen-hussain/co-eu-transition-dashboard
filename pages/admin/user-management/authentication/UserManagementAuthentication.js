@@ -57,7 +57,6 @@ class UserManagementAuthentication extends Page {
 
   async notifyUser(user, temporaryPassword) {
     if (!config.notify.apiKey) {
-      console.log('here');
       throw new Error('No notify API key set');
     }
 
