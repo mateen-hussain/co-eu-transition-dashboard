@@ -11,6 +11,7 @@
 <div class="govuk-grid-column-full">
   <h1 class="govuk-heading-xl theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
   <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
+  <p class="govuk-body-s"><a class="govuk-link" href="{{ config.paths.raygDefinitions }}">View RAYG definitions and how they are calculated</a></p>
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
