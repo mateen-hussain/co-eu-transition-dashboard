@@ -13,7 +13,7 @@ class ReadinessOverview extends Page {
   get middleware() {
     return [
       ...super.middleware,
-      ...authentication.protect(['management_overview'])
+      ...authentication.protect(['viewer'])
     ];
   }
 
