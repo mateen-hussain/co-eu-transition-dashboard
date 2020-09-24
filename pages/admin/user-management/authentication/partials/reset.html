@@ -1,0 +1,53 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+<h1 class="govuk-heading-xl">Reset User Authentication</h1>
+
+{% if flash %}
+  {{ govukErrorSummary({
+    titleText: "There is a problem",
+    errorList: [
+      {
+        text: flash
+      }
+    ]
+  }) }}
+{% endif %}
+
+<p class="govuk-body">Reset the password for <strong>{{ user.email }}</strong>. The user will be sent an email with a temporary password and asked to change their password upon sign in.<p>
+
+<form action="{{ url }}/{{ user.id }}" method="post">
+  {{ govukRadios({
+    name: "reset-tfa",
+    classes: "govuk-radios--inline",
+    fieldset: {
+      legend: {
+        text: "Reset two factor authentication?",
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    hint: {
+      text: "This will reset the users two factor authentication so they will need to register again with the Google Authenticator app."
+    },
+    items: [
+      {
+        value: "yes",
+        text: "Yes"
+      },
+      {
+        value: "no",
+        text: "No",
+        checked: true
+      }
+    ]
+  }) }}
+
+  {{
+    govukButton({
+      text: "Reset",
+      type: "submit",
+      preventDoubleClick: true
+    })
+  }}
+</form>
