@@ -55,5 +55,4 @@ describe('pages/theme/Theme', () => {
     ]);
     sinon.assert.calledWith(authentication.protect, ['viewer']);
   });
-  
 });
