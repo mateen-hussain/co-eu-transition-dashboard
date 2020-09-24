@@ -27,7 +27,9 @@
       "categoryFieldList": "/admin/category-field-list",
       "categoryField": "/admin/category-field",
       "categoryList": "/admin/categories",
-      "headlineMeasures": "/admin/headline-measures"
+      "headlineMeasures": "/admin/headline-measures",
+      "userManagementList": "/admin/manage-users-list",
+      "userManagementAuthentication": "/admin/manage-users-authentication"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
