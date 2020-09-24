@@ -53,6 +53,8 @@ describe('pages/theme/Theme', () => {
     expect(page.middleware).to.eql([
       ...authentication.protect(['viewer'])
     ]);
+
     sinon.assert.calledWith(authentication.protect, ['viewer']);
   });
+
 });
