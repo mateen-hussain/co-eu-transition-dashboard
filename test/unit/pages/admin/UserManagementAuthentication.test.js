@@ -130,14 +130,21 @@ describe.only('pages/admin/user-management/authentication/UserManagementAuthenti
   });
 
   describe('#notifyUser', () => {
+    const prevKey = config.notify.apiKey;
+    beforeEach(() => {
+      config.notify.apiKey = 'some-key';
+    });
+
+    after(() => {
+      config.notify.apiKey = prevKey;
+    });
+
     beforeEach(() => {
       sendEmailStub.resolves();
     });
 
     it('if no config.notify.apiKey throw error', async () => {
       page.notifyUser();
-
-      const prevKey = config.notify.apiKey;
       delete config.notify.apiKey;
 
       let message = '';
@@ -147,8 +154,6 @@ describe.only('pages/admin/user-management/authentication/UserManagementAuthenti
         message = thrownError.message;
       }
       expect(message).to.eql('No notify API key set');
-
-      config.notify.apiKey = prevKey;
     });
 
     it('sends email successfully', async () => {
@@ -176,6 +181,9 @@ describe.only('pages/admin/user-management/authentication/UserManagementAuthenti
     });
 
     it('throws error if send email fails', async () => {
+      if(!config.notify.apiKey) {
+        config.notify.apiKey = 'some-key';
+      }
       const user = {
         id: 1,
         email: 'email@email.com'
