@@ -162,15 +162,27 @@
         display: block;
     }
 
-    .comments-only-measure {
+    .comments-measure {
         font-style: italic;
+    }
+
+    .placeholder-measure {
+        font-style: italic;
+        color: #b1b4b6;
     }
 }
 
-.comments-only {
+.placeholder-title {
+    color: #b1b4b6;
+    margin-bottom: 2px;
+    font-size: 13px;
+    font-style: normal;
+}
+
+.comments-title {
     color: #505a5f;
     margin-bottom: 2px;
-    font-size: 12px;
+    font-size: 13px;
     font-style: normal;
 }
 
@@ -225,6 +237,10 @@
     background-color: #ffdd00
 }
 
+.outcome-measure__item.item-disabled::before {
+    background-color: #b1b4b6;
+}
+
 .tableu-message,
 .measures-message {
     border: 1px solid #979797;
@@ -248,8 +264,4 @@
 
 .overflow-scroll {
     overflow: scroll;
-}
-
-.left-spacing {
-    margin-left: 0px;
 }
