@@ -279,9 +279,9 @@ const mapEntityChildren = (allEntities, entity) => {
 
   if(entityFieldMap.groupDescription) {
     if(entityFieldMap.unit === '%') {
-      entityFieldMap.name = `${entityFieldMap.value}${entityFieldMap.groupDescription}`;
+      entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}%`;
     } else {
-      entityFieldMap.name = entityFieldMap.groupDescription;
+      entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}`;
     }
   }
 
