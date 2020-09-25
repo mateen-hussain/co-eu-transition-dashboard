@@ -9,7 +9,7 @@
     },
     "tableau": {
       "url": "TABLEAU_URL",
-      "ipAddress": "TABLEAU_IP_ADDRESS"
+      "whiteListedIpRange": "TABLEAU_WHITELIST_IP_RANGE"
     }
   },
   "port": "PORT",

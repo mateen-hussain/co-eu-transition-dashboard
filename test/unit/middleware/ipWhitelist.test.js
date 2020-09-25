@@ -4,7 +4,7 @@ const ipWhitelist = require('middleware/ipWhitelist');
 
 describe('middleware/ipWhitelist', () => {
   it('adds ipWhitelisted to locals on IP match', () => {
-    config.services.tableau.ipAddress = '192.168.1.1';
+    config.services.tableau.whiteListedIpRange = ['192.168.1.1'];
     const req = { ip: '192.168.1.1' };
     const res = { locals: {} };
     const next = sinon.stub();
@@ -16,7 +16,7 @@ describe('middleware/ipWhitelist', () => {
   });
 
   it('doesnt add ipWhitelisted to locals on IP mismatch', () => {
-    config.services.tableau.ipAddress = '192.168.1.100';
+    config.services.tableau.whiteListedIpRange = ['192.168.1.100'];
     const req = { ip: '192.168.1.1' };
     const res = { locals: {} };
     const next = sinon.stub();
