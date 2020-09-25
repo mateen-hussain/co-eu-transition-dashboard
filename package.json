@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "NODE_PATH=. node server.js",
-    "dev": "TABLEAU_IP_ADDRESSES=\"[\"test\", \"test\"]\" NODE_PATH=. nodemon server.js",
+    "dev": "NODE_PATH=. nodemon server.js",
     "install": "bash build.sh",
     "test:lint": "eslint .",
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
