@@ -15,6 +15,9 @@ require('./notifications');
 
 const app = module.exports = express();
 
+// May need to specify an IP here
+app.set('trust proxy', true);
+
 helmet.attach(app);
 
 app.use(bodyParser.urlencoded({ extended: true }));

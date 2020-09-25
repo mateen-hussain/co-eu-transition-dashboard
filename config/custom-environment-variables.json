@@ -9,7 +9,10 @@
     },
     "tableau": {
       "url": "TABLEAU_URL",
-      "whiteListedIpRange": "TABLEAU_WHITELIST_IP_RANGE"
+      "whiteListedIpRange": {
+        "__name": "TABLEAU_WHITELIST_IP_RANGE",
+        "__format": "json"
+      }
     }
   },
   "port": "PORT",
