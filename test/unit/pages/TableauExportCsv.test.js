@@ -33,7 +33,7 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
 
   describe('#pathToBind', () => {
     it('returns correct url', () => {
-      expect(page.pathToBind).to.eql(`${paths.tableauExport}/:type`);
+      expect(page.pathToBind).to.eql(`${paths.tableauExportCsv}/:type`);
     });
   });
 
