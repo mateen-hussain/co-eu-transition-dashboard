@@ -69,6 +69,7 @@
     "reportingOverview": "/reporting-overview",
     "editProject": "/edit-project",
     "tableauExport": "/tableau-export",
+    "tableauExportCsv": "/tableau-export-csv",
     "readinessOverview": "/readiness-overview",
     "transitionReadinessThemeDetail": "/transition-readiness-detail"
   },
