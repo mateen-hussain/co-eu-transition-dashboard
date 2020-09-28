@@ -31,9 +31,9 @@ describe('pages/rayg-definitions/RaygDefinitions', () => {
 
   it('only viewer are allowed to access this page', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['management'])
+      ...authentication.protect(['viewer'])
     ]);
 
-    sinon.assert.calledWith(authentication.protect, ['management']);
+    sinon.assert.calledWith(authentication.protect, ['viewer']);
   });
 });
