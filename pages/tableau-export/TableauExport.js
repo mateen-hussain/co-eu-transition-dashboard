@@ -73,9 +73,15 @@ class TableauExport extends Page {
 
       entityFieldMap[parentEntity.category.name] = entityFieldMap[parentEntity.category.name] || [];
 
-      const name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
+      let name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
         return entityFieldEntry.categoryField.name === 'groupDescription';
       });
+
+      if(!name) {
+        name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
+          return entityFieldEntry.categoryField.name === 'name';
+        });
+      }
 
       if(!entityFieldMap[parentEntity.category.name].some(item => item.value === name.value)){
         entityFieldMap[parentEntity.category.name].push({ value: name.value, type: name.categoryField.type });
@@ -116,13 +122,21 @@ class TableauExport extends Page {
       }]
     });
 
+    const categoryFields = await CategoryField.findAll({
+      where: {
+        isActive: true,
+        categoryId: startingCategory.id
+      }
+    });
+
     const entityFieldMaps = [];
 
     for(const entity of entities) {
-      const entityFieldMap = entity.entityFieldEntries.reduce((object, entityFieldEntry) => {
-        object[entityFieldEntry.categoryField.displayName] = {
-          value: entityFieldEntry.value,
-          type: entityFieldEntry.categoryField.type
+      const entityFieldMap = categoryFields.reduce((object, categoryField) => {
+        const value = entity.entityFieldEntries.find(fieldEntry => fieldEntry.categoryFieldId == categoryField.id);
+        object[categoryField.displayName] = {
+          value: value && value.value,
+          type: categoryField.type
         }
         return object;
       }, {});
