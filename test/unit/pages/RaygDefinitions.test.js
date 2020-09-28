@@ -9,9 +9,9 @@ let req = {};
 
 describe('pages/rayg-definitions/RaygDefinitions', () => {
   beforeEach(() => {
-    const ImpactDefinitions = require('pages/rayg-definitions/RaygDefinitions');
+    const RaygDefinitions = require('pages/rayg-definitions/RaygDefinitions');
 
-    page = new ImpactDefinitions('some path', req, res);
+    page = new RaygDefinitions('some path', req, res);
 
     sinon.stub(jwt, 'restoreData');
 
