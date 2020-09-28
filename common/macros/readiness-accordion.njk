@@ -45,7 +45,7 @@
         <a href="{{ item.link }}" class="outcome-measure__link placeholder-measure">
         <p class="govuk-body govuk-!-font-weight-bold placeholder-title">DATA EXPECTED: {{ item.activeFrom | formatDate("DD/MM/YYYY") }}</p>
         {{ item.name }}</a>
-      {% elseif item.commentsOnly == 'yes' %}
+      {% elseif item.commentsOnly == 'Yes' %}
         <a href="{{ item.link }}" class="outcome-measure__link comments-measure">
         <p class="govuk-body govuk-!-font-weight-bold comments-title">COMMENTS ONLY</p>
           {{ item.name }}</a>
