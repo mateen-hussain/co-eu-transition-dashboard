@@ -282,10 +282,13 @@ const mapEntityChildren = (allEntities, entity) => {
     entityFieldMap[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
   }, {});
 
+  // only append the value to the description if the group description is set
   const hasGroupDescription = !!entityFieldMap.groupDescription;
+  // only append the value to the description if the unit is none
   const shouldAppendValue = entityFieldMap.unit !== 'none';
 
   if(hasGroupDescription && shouldAppendValue) {
+    // if the unit is a percentage append the value to the description as well as a percent symbol, otherwise just append value
     if(entityFieldMap.unit === '%') {
       entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}%`;
     } else {
