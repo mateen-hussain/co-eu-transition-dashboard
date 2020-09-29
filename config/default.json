@@ -73,7 +73,8 @@
     "tableauExport": "/tableau-export",
     "tableauExportCsv": "/tableau-export-csv",
     "readinessOverview": "/readiness-overview",
-    "transitionReadinessThemeDetail": "/transition-readiness-detail"
+    "transitionReadinessThemeDetail": "/transition-readiness-detail",
+    "raygDefinitions": "/rayg-definitions"
   },
   "features": {
     "twoFactorAuth": true,
