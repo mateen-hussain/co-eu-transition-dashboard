@@ -6,6 +6,7 @@ const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const { Parser } = require('json2csv');
+const xl = require('excel4node');
 const sequelize = require('services/sequelize');
 const DAO = require('services/dao');
 const Milestone = require('models/milestone');
@@ -18,7 +19,7 @@ class TableauExportCsv extends Page {
   }
 
   get pathToBind() {
-    return `${this.url}/:type`;
+    return `${this.url}/:type/:format?`;
   }
 
   get exportingMeasures() {
@@ -31,6 +32,10 @@ class TableauExportCsv extends Page {
 
   get exportingCommunications() {
     return this.req.params && this.req.params.type === 'communications';
+  }
+
+  get exportAsExcel() {
+    return this.req.params && this.req.params.format === 'excel'; 
   }
 
   async addParents(entity, entityFieldMap, replaceArraysWithNumberedKeyValues = true) {
@@ -131,7 +136,7 @@ class TableauExportCsv extends Page {
       return true;
     });
 
-    this.responseAsCSV(data, res);
+    this.sendResponse(data, res);
   }
 
   async exportCommunications(req, res) {
@@ -143,7 +148,7 @@ class TableauExportCsv extends Page {
 
     const data = await this.getEntitiesFlatStructure(measuresCategory);
 
-    this.responseAsCSV(data, res);
+    this.sendResponse(data, res);
   }
 
   async mergeProjectsWithEntities(entities) {
@@ -198,7 +203,15 @@ class TableauExportCsv extends Page {
     const entities = await this.getEntitiesFlatStructure(projectsCategory);
     const entitiesWithProjects = await this.mergeProjectsWithEntities(entities);
 
-    this.responseAsCSV(entitiesWithProjects, res);
+    this.sendResponse(entitiesWithProjects, res);
+  }
+
+  sendResponse(data, res) {
+    if (this.exportAsExcel) {
+      this.responseAsExcel(data, res);
+    } else {
+      this.responseAsCSV(data, res);
+    }
   }
 
   responseAsCSV(data, res) {
@@ -209,6 +222,28 @@ class TableauExportCsv extends Page {
     res.attachment(`${moment().format('YYYY.MM.DD')}_${this.req.params.type}.csv`);
     res.status(200);
     res.send(csv);
+  }
+
+  responseAsExcel(data, res) {
+    const wb = new xl.Workbook();
+    const ws = wb.addWorksheet(this.req.params.type);
+
+    // Write Column Title
+    let headingColumnIdx = 1;
+    Object.keys(data[0]).forEach(heading => {
+      ws.cell(1, headingColumnIdx++).string(heading)
+    });
+
+    let rowIdx = 2;
+    data.forEach(record => {
+      let columnIdx = 1;
+      Object.keys(record).forEach(columnName => {
+        ws.cell(rowIdx,columnIdx++).string(record[columnName])
+      });
+      rowIdx++;
+    }); 
+     
+    wb.write(`${moment().format('YYYY.MM.DD')}_${this.req.params.type}.xlsx`, res);
   }
 
   async getRequest(req, res) {

@@ -33,7 +33,7 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
 
   describe('#pathToBind', () => {
     it('returns correct url', () => {
-      expect(page.pathToBind).to.eql(`${paths.tableauExportCsv}/:type`);
+      expect(page.pathToBind).to.eql(`${paths.tableauExportCsv}/:type/:format?`);
     });
   });
 
@@ -55,6 +55,13 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
     it('returns correct url', () => {
       page.req = { params: { type: 'communications' } };
       expect(page.exportingCommunications).to.be.ok;
+    });
+  });
+
+  describe('#exportAsExcel', () => {
+    it('returns true when format is excel', () => {
+      page.req = { params: { format: 'excel' } };
+      expect(page.exportAsExcel).to.be.ok;
     });
   });
 
@@ -121,7 +128,7 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
     it('gets all metrics and creats an object', async () => {
       const resp = [{ test: 'test' }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
+      sinon.stub(page, 'sendResponse');
 
       Category.findOne.resolves({
         id: 1
@@ -130,13 +137,13 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
       await page.exportMeasures(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+      sinon.assert.calledWith(page.sendResponse, resp, res);
     });
 
     it('filters items with filter=RAYG out', async () => {
       const resp = [{ test: 'test' }, { Filter: 'RAYG' }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
+      sinon.stub(page, 'sendResponse');
 
       Category.findOne.resolves({
         id: 1
@@ -145,7 +152,7 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
       await page.exportMeasures(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, [{ test: 'test' }], res);
+      sinon.assert.calledWith(page.sendResponse, [{ test: 'test' }], res);
     });
   });
 
@@ -153,7 +160,7 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
     it('gets all comms and creats an object', async () => {
       const resp = { data: 'data' };
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
+      sinon.stub(page, 'sendResponse');
 
       Category.findOne.resolves({
         id: 1
@@ -162,13 +169,13 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
       await page.exportCommunications(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+      sinon.assert.calledWith(page.sendResponse, resp, res);
     });
   });
 
   describe('#mergeProjectsWithEntities', () => {
     beforeEach(() => {
-      Milestone.fieldDefinitions.returns([{
+      Milestone.fieldDefinitions = sinon.stub().returns([{
         name: 'name',
         displayName: 'Name'
       }]);
@@ -236,7 +243,7 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
       const entitiesWithProjects = [{ data: 'data', data1: 'data 1' }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(entities);
       sinon.stub(page, 'mergeProjectsWithEntities').resolves(entitiesWithProjects);
-      sinon.stub(page, 'responseAsCSV');
+      sinon.stub(page, 'sendResponse');
 
       Category.findOne.resolves({
         id: 1
@@ -246,7 +253,26 @@ describe('pages/tableau-export-csv/TableauExportCsv', () => {
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
       sinon.assert.calledWith(page.mergeProjectsWithEntities, entities);
-      sinon.assert.calledWith(page.responseAsCSV, entitiesWithProjects, res);
+      sinon.assert.calledWith(page.sendResponse, entitiesWithProjects, res);
+    });
+  });
+
+  describe('#sendResponse', () => {
+    it('should call responseAsExcel when format is excel', async () => {
+      const entities = [{ data: 'data' }];
+      sinon.stub(page, 'responseAsExcel');
+      page.req = { params: { format: 'excel' } };
+
+      page.sendResponse(entities, res);
+      sinon.assert.calledWith(page.responseAsExcel, entities, res);
+    });
+
+    it('should call responseAsCSV when format is not set', async () => {
+      const entities = [{ data: 'data' }];
+      sinon.stub(page, 'responseAsCSV');
+
+      page.sendResponse(entities, res);
+      sinon.assert.calledWith(page.responseAsCSV, entities, res);
     });
   });
 });

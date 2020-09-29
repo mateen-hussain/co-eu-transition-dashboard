@@ -189,7 +189,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
   describe('#mergeProjectsWithEntities', () => {
     beforeEach(() => {
-      Milestone.fieldDefinitions.returns([{
+      Milestone.fieldDefinitions = sinon.stub().returns([{
         name: 'name',
         displayName: 'Name'
       }]);
