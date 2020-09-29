@@ -282,7 +282,10 @@ const mapEntityChildren = (allEntities, entity) => {
     entityFieldMap[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
   }, {});
 
-  if(entityFieldMap.groupDescription && entityFieldMap.commentsOnly !== 'Yes') {
+  const hasGroupDescription = !!entityFieldMap.groupDescription;
+  const shouldAppendValue = entityFieldMap.unit !== 'none';
+
+  if(hasGroupDescription && shouldAppendValue) {
     if(entityFieldMap.unit === '%') {
       entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}%`;
     } else {
