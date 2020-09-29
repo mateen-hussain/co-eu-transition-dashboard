@@ -35,13 +35,13 @@ const formatKey = key => key.replace(/[^a-zA-Z0-9_]/g, '');
           alias: key
         });
       }
-  
+
       var tableSchema = {
         id: `${formatKey(tableau.connectionName)}feed`,
         alias: `${tableau.connectionName} feed`,
         columns: cols
       };
-  
+
       schemaCallback([tableSchema]);
     });
   };
@@ -53,11 +53,11 @@ const formatKey = key => key.replace(/[^a-zA-Z0-9_]/g, '');
       for (var i = 0, len = data.length; i < len; i++) {
         const tableEntry = {};
         for (const [key, entryValue] of Object.entries(data[i])) {
-          tableEntry[formatKey(key)] = entryValue.value || entryValue
+          tableEntry[formatKey(key)] = entryValue.value !== undefined ? entryValue.value : entryValue
         }
         tableData.push(tableEntry);
       }
-  
+
       table.appendRows(tableData);
       doneCallback();
     });

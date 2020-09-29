@@ -30,6 +30,11 @@ const getIframeUrl = async (req, entity) => {
   case 'Measure':
     workbook = 'Readiness';
     view = entity.groupID;
+    if(entity.commentsOnly == 'Yes') {
+      workbook = 'Placeholders';
+      view = 'Placeholder';
+      appendUrl = `?Group%20ID=${entity.groupID}`;
+    }
     break;
   case 'Communication':
     workbook = 'Comms';
@@ -277,7 +282,7 @@ const mapEntityChildren = (allEntities, entity) => {
     entityFieldMap[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
   }, {});
 
-  if(entityFieldMap.groupDescription) {
+  if(entityFieldMap.groupDescription && entityFieldMap.commentsOnly !== 'Yes') {
     if(entityFieldMap.unit === '%') {
       entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}%`;
     } else {
