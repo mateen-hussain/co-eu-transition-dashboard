@@ -387,7 +387,7 @@ const createEntityHierarchy = async (category) => {
   let entitesInHierarchy = [];
   for(const topLevelEntity of topLevelEntites) {
     const entitesMapped = mapEntityChildren(allEntities, topLevelEntity);
-    if(entitesMapped.length) {
+    if(entitesMapped && entitesMapped.children && entitesMapped.children.length) {
       await mapProjectsToEntities(entitesMapped);
     }
     entitesInHierarchy.push(entitesMapped)
