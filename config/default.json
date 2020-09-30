@@ -26,7 +26,10 @@
       "projectField": "/admin/project-field",
       "categoryFieldList": "/admin/category-field-list",
       "categoryField": "/admin/category-field",
-      "categoryList": "/admin/categories"
+      "categoryList": "/admin/categories",
+      "headlineMeasures": "/admin/headline-measures",
+      "userManagementList": "/admin/manage-users-list",
+      "userManagementAuthentication": "/admin/manage-users-authentication"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
@@ -68,8 +71,10 @@
     "reportingOverview": "/reporting-overview",
     "editProject": "/edit-project",
     "tableauExport": "/tableau-export",
+    "tableauExportCsv": "/tableau-export-csv",
     "readinessOverview": "/readiness-overview",
-    "transitionReadinessThemeDetail": "/transition-readiness-detail"
+    "transitionReadinessThemeDetail": "/transition-readiness-detail",
+    "raygDefinitions": "/rayg-definitions"
   },
   "features": {
     "twoFactorAuth": true,

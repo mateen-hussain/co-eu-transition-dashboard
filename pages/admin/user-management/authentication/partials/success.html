@@ -1,0 +1,7 @@
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{{ govukPanel({
+  titleText: "The user has been sent a temporary password via email."
+}) }}
+
+<a  class="govuk-link" href="{{ config.paths.admin.userManagementList }}">Back to user list</a>

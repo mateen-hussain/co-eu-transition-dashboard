@@ -25,12 +25,8 @@
 }
 
 .headline-figure .overview-card  {
-	background-color: #F3F2F1;
+  background-color: #F3F2F1;
   margin-bottom: 2px;
-  
-  &:last-child {
-    margin-bottom: 20px;
-  }
 }
 
 .headline-figure .overview-card:hover {
@@ -42,7 +38,7 @@
 	border-left: 12px solid #D4351C;
 }
 
-.headline-figure .overview-card.orange {
+.headline-figure .overview-card.amber {
 	border-left: 12px solid #F47738;
 }
 
@@ -85,17 +81,17 @@
 }
 
 .risk-col .overview-card.inactive:hover  {
-	border: 1px solid #6F777B;
-	border-left: 16px solid #F3F2F1;
 	background-image: none;
-	cursor: not-allowed;
+	a {
+		cursor: not-allowed;
+	}
 }
 
 .risk-col .overview-card.red {
 	border-left: 16px solid #D4351C;
 }
 
-.risk-col .overview-card.orange {
+.risk-col .overview-card.amber {
 	border-left: 16px solid #F47738;
 }
 

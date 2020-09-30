@@ -1,6 +1,7 @@
 const { sinon, expect } = require('test/unit/util/chai');
 const User = require("models/user");
 const Department = require("models/department");
+const Role = require("models/role");
 const proxyquire = require('proxyquire');
 const config = require('config');
 const moment = require('moment');
@@ -82,10 +83,13 @@ describe('notifications/upcomingMilestones', () => {
           where: {
             name: departmentName
           }
-        }],
-        where: {
-          role: 'uploader'
-        }
+        },{
+          model: Role,
+          required: true,
+          where: {
+            name: 'uploader'
+          } 
+        }]
       });
     });
   });

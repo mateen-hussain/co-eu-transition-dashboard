@@ -8,7 +8,11 @@
       "uri": "DATABASE_URL"
     },
     "tableau": {
-      "url": "TABLEAU_URL"
+      "url": "TABLEAU_URL",
+      "whiteListedIpRange": {
+        "__name": "TABLEAU_WHITELIST_IP_RANGE",
+        "__format": "json"
+      }
     }
   },
   "port": "PORT",

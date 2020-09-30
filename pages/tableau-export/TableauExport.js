@@ -11,14 +11,23 @@ const DAO = require('services/dao');
 const Milestone = require('models/milestone');
 const moment = require('moment');
 const cloneDeep = require('lodash/cloneDeep');
+const authentication = require('services/authentication');
+const ipWhitelist = require('middleware/ipWhitelist');
 
 class TableauExport extends Page {
   get url() {
     return paths.tableauExport;
   }
 
+  get middleware() {
+    return [
+      ipWhitelist,
+      ...authentication.protect(['management'])
+    ];
+  }
+
   get pathToBind() {
-    return `${this.url}/:type`;
+    return `${this.url}/:type/:mode?`;
   }
 
   get exportingMeasures() {
@@ -31,6 +40,18 @@ class TableauExport extends Page {
 
   get exportingCommunications() {
     return this.req.params && this.req.params.type === 'communications';
+  }
+
+  get showForm() {
+    return this.req.params && !this.req.params.mode && this.isValidPageType;
+  }
+
+  get exportSchema() {
+    return this.req.params && this.req.params.mode === 'schema' && this.isValidPageType;
+  }
+
+  get isValidPageType() {
+    return this.exportingMeasures || this.exportingProjects || this.exportingCommunications;
   }
 
   async addParents(entity, entityFieldMap, replaceArraysWithNumberedKeyValues = true) {
@@ -52,12 +73,24 @@ class TableauExport extends Page {
 
       entityFieldMap[parentEntity.category.name] = entityFieldMap[parentEntity.category.name] || [];
 
-      const name = parentEntity.entityFieldEntries.find(entityFieldEntry => {
-        return entityFieldEntry.categoryField.name === 'name';
+      let nameEntry;
+      let groupDescriptionEntry;
+
+
+      parentEntity.entityFieldEntries.forEach(entityFieldEntry => {
+        if(entityFieldEntry.categoryField.name === 'groupDescription') {
+          groupDescriptionEntry = entityFieldEntry;
+        }
+
+        if(entityFieldEntry.categoryField.name === 'name') {
+          nameEntry = entityFieldEntry;
+        }
       });
 
-      if(!entityFieldMap[parentEntity.category.name].includes(name.value)){
-        entityFieldMap[parentEntity.category.name].push(name.value);
+      const name = groupDescriptionEntry || nameEntry;
+
+      if(!entityFieldMap[parentEntity.category.name].some(item => item.value === name.value)){
+        entityFieldMap[parentEntity.category.name].push({ value: name.value, type: name.categoryField.type });
       }
 
       if(parentEntity.parents.length) {
@@ -95,15 +128,26 @@ class TableauExport extends Page {
       }]
     });
 
+    const categoryFields = await CategoryField.findAll({
+      where: {
+        isActive: true,
+        categoryId: startingCategory.id
+      }
+    });
+
     const entityFieldMaps = [];
 
     for(const entity of entities) {
-      const entityFieldMap = entity.entityFieldEntries.reduce((object, entityFieldEntry) => {
-        object[entityFieldEntry.categoryField.displayName] = entityFieldEntry.value;
+      const entityFieldMap = categoryFields.reduce((object, categoryField) => {
+        const value = entity.entityFieldEntries.find(fieldEntry => fieldEntry.categoryFieldId == categoryField.id);
+        object[categoryField.displayName] = {
+          value: value === undefined ? undefined : value.value,
+          type: categoryField.type
+        }
         return object;
       }, {});
 
-      entityFieldMap['Public ID'] = entity.publicId;
+      entityFieldMap['Public ID'] = { value: entity.publicId, type: 'string' };
 
       if(entity.parents.length) {
         await this.addParents(entity, entityFieldMap);
@@ -125,13 +169,13 @@ class TableauExport extends Page {
     let data = await this.getEntitiesFlatStructure(measuresCategory);
 
     data = data.filter(d => {
-      if (d.Filter && d.Filter === 'RAYG') {
+      if (d.Filter && d.Filter.value === 'RAYG') {
         return false;
       }
       return true;
     });
 
-    this.responseAsCSV(data, res);
+    return this.exportSchema ? res.json(data[0]) : res.json(data);
   }
 
   async exportCommunications(req, res) {
@@ -143,7 +187,7 @@ class TableauExport extends Page {
 
     const data = await this.getEntitiesFlatStructure(measuresCategory);
 
-    this.responseAsCSV(data, res);
+    return this.exportSchema ? res.json(data[0]) : res.json(data);
   }
 
   async mergeProjectsWithEntities(entities) {
@@ -152,7 +196,7 @@ class TableauExport extends Page {
     });
     const milestoneFieldDefinitions = await Milestone.fieldDefinitions();
 
-    const projectIds = entities.map(d => d['Public ID']);
+    const projectIds = entities.map(d => d['Public ID'].value);
     const projects = await dao.getAllData(this.id, {
       uid: projectIds
     });
@@ -160,24 +204,24 @@ class TableauExport extends Page {
     const milestoneDatas = [];
 
     for(const entity of entities) {
-      const project = projects.find(project => entity['Public ID'] === project.uid);
+      const project = projects.find(project => entity['Public ID'].value === project.uid);
 
       if(project) {
 
         for(const milestone of project.milestones) {
           const milestoneData = cloneDeep(entity);
 
-          milestoneData['Project - Name'] = project.title;
-          milestoneData['Project - UID'] = project.uid;
+          milestoneData['Project - Name'] = { value: project.title, type: 'string' };
+          milestoneData['Project - UID'] = { value: project.uid, type: 'string' };
 
           milestoneFieldDefinitions.forEach(field => {
             if(milestone[field.name]) {
-              milestoneData[`Milestone - ${field.displayName || field.name}`] = milestone[field.name];
+              milestoneData[`Milestone - ${field.displayName || field.name}`] = { value:  milestone[field.name], type: 'string' };
             }
           });
 
           milestone.milestoneFieldEntries.forEach(field => {
-            milestoneData[`Milestone - ${field.milestoneField.displayName}`] = field.value;
+            milestoneData[`Milestone - ${field.milestoneField.displayName}`] =  { value: field.value, type: field.milestoneField.type };
           });
 
           milestoneDatas.push(milestoneData);
@@ -196,9 +240,9 @@ class TableauExport extends Page {
     });
 
     const entities = await this.getEntitiesFlatStructure(projectsCategory);
-    const entitiesWithProjects = await this.mergeProjectsWithEntities(entities);
+    const data = await this.mergeProjectsWithEntities(entities);
 
-    this.responseAsCSV(entitiesWithProjects, res);
+    return this.exportSchema ? res.json(data[0]) : res.json(data)
   }
 
   responseAsCSV(data, res) {
@@ -212,6 +256,11 @@ class TableauExport extends Page {
   }
 
   async getRequest(req, res) {
+
+    if (this.showForm) {
+      return super.getRequest(req, res);
+    }
+
     if(this.exportingMeasures) {
       return await this.exportMeasures(req, res);
     } else if(this.exportingProjects) {

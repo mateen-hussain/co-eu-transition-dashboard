@@ -12,8 +12,8 @@ const nunjucksDefaults = {
   noCache: isDev,
   loader: nunjucks.FileSystemLoader,
   filters: {
-    date: (date, format) => {
-      const momentDate = moment(date, 'DD/MM/YYYY');
+    date: (date, format, inputFormat = 'DD/MM/YYYY' ) => {
+      const momentDate = moment(date, inputFormat);
       if(momentDate.isValid()) {
         return momentDate.format(format);
       }
@@ -28,7 +28,13 @@ const nunjucksDefaults = {
       return roles.filter(role =>
         rolesToMatch.includes(role.name)
       ).length > 0 ? true : false;
-    }
+    },
+    formatDate: (date, format) => {
+      const dateValue = moment(date);
+      if(dateValue.isValid()) {
+        return dateValue.format(format);
+      }
+    },
   }
 };
 

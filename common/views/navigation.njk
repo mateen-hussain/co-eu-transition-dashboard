@@ -30,7 +30,16 @@
     config.paths.admin.projectField,
     config.paths.admin.categoryFieldList,
     config.paths.admin.categoryField,
-    config.paths.admin.categoryList
+    config.paths.admin.categoryList,
+    config.paths.admin.headlineMeasures,
+    config.paths.admin.userManagementList,
+    config.paths.admin.userManagementAuthentication
+    ]
+%}
+
+{% set adminUserManagementUrls = [
+    config.paths.admin.userManagementList,
+    config.paths.admin.userManagementAuthentication
     ]
 %}
 
@@ -130,6 +139,17 @@
         </a>
     </li>
     {% endif %}
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.admin.headlineMeasures }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.admin.headlineMeasures }}">
+        Manage Headline Measures
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in adminUserManagementUrls }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.admin.userManagementList }}">
+        Manage Users
+        </a>
+    </li>
+
     </ul>
 </nav>
 {% endif %}
@@ -148,9 +168,44 @@
         Borders
         </a>
     </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/E' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/E">
+        Economy
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/EE' in req.originalUrl and config.paths.transitionReadinessThemeDetail + '/EE' !== config.paths.transitionReadinessThemeDetail + '/E' }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/EE">
+        Energy / Environment
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/F' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/F">
+        Fish
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/AF' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/AF">
+        Animals &amp; Food
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/D' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/D">
+        Data
+        </a>
+    </li>
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/P' in req.originalUrl }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/P">
         People
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/IA' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/IA">
+        International Agreements
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/S' in req.originalUrl }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/S">
+        Security
         </a>
     </li>
     {% endif %}

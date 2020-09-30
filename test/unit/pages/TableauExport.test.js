@@ -6,7 +6,9 @@ const proxyquire = require('proxyquire');
 const Milestone = require('models/milestone');
 
 let page = {};
-let res = {};
+let res = {
+  json:  sinon.stub()
+};
 let req = {};
 
 let getAllDataStub = sinon.stub();
@@ -33,11 +35,16 @@ describe('pages/tableau-export/TableauExport', () => {
 
   describe('#pathToBind', () => {
     it('returns correct url', () => {
-      expect(page.pathToBind).to.eql(`${paths.tableauExport}/:type`);
+      expect(page.pathToBind).to.eql(`${paths.tableauExport}/:type/:mode?`);
     });
   });
 
   describe('#exportingMeasures', () => {
+    it('returns correct url', () => {
+      page.req = { params: { type: 'measures' } };
+      expect(page.exportingMeasures).to.be.ok;
+    });
+
     it('returns correct url', () => {
       page.req = { params: { type: 'measures' } };
       expect(page.exportingMeasures).to.be.ok;
@@ -58,6 +65,20 @@ describe('pages/tableau-export/TableauExport', () => {
     });
   });
 
+  describe('#showForm', () => {
+    it('should return true when type is set and mode is not', () => {
+      page.req = { params: { type: 'measures',  } };
+      expect(page.showForm).to.be.ok;
+    });
+  });
+
+  describe('#exportSchema', () => {
+    it('should return true when type is set and mode is set to schema', () => {
+      page.req = { params: { type: 'measures', mode: 'schema' } };
+      expect(page.exportSchema).to.be.ok;
+    });
+  });
+
   describe('#addParents', () => {
     it('add parents category name for each entity parent', async () => {
       const entityObject = {};
@@ -68,7 +89,8 @@ describe('pages/tableau-export/TableauExport', () => {
       Entity.findOne.resolves({
         entityFieldEntries: [{
           categoryField: {
-            name: 'name'
+            name: 'groupDescription',
+            type: 'string'
           },
           value: 'Some name'
         }],
@@ -80,7 +102,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
       await page.addParents(entity, entityObject);
 
-      expect(entityObject).to.eql({ ['Category name - 1']: 'Some name' });
+      expect(entityObject).to.eql({ ['Category name - 1']: { value:'Some name', type: 'string' } });
     });
   });
 
@@ -92,7 +114,8 @@ describe('pages/tableau-export/TableauExport', () => {
         publicId: '1',
         entityFieldEntries: [{
           categoryField: {
-            displayName: 'name'
+            displayName: 'name',
+            type: 'string'
           },
           value: 'some name'
         }],
@@ -101,7 +124,8 @@ describe('pages/tableau-export/TableauExport', () => {
         publicId: '1',
         entityFieldEntries: [{
           categoryField: {
-            displayName: 'name'
+            displayName: 'name',
+            type: 'string'
           },
           value: 'some name'
         }],
@@ -111,8 +135,8 @@ describe('pages/tableau-export/TableauExport', () => {
       const entityObjects = await page.getEntitiesFlatStructure({ id: 1 });
 
       expect(entityObjects).to.eql([
-        { name: 'some name', 'Public ID': '1' },
-        { name: 'some name', 'Public ID': '1' }
+        { name: { value: 'some name', type: 'string' }, 'Public ID': { value: '1', type: 'string' } },
+        { name: { value: 'some name', type: 'string' }, 'Public ID': { value: '1', type: 'string' } },
       ]);
     });
   });
@@ -121,7 +145,6 @@ describe('pages/tableau-export/TableauExport', () => {
     it('gets all metrics and creats an object', async () => {
       const resp = [{ test: 'test' }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
 
       Category.findOne.resolves({
         id: 1
@@ -130,13 +153,12 @@ describe('pages/tableau-export/TableauExport', () => {
       await page.exportMeasures(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+      sinon.assert.calledWith(res.json, resp);
     });
 
     it('filters items with filter=RAYG out', async () => {
-      const resp = [{ test: 'test' }, { Filter: 'RAYG' }];
+      const resp = [{ test: { value: 'test' } }, { Filter: { value: 'RAYG' } }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
 
       Category.findOne.resolves({
         id: 1
@@ -145,7 +167,7 @@ describe('pages/tableau-export/TableauExport', () => {
       await page.exportMeasures(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, [{ test: 'test' }], res);
+      sinon.assert.calledWith(res.json, [{ test: { value: 'test' } }]);
     });
   });
 
@@ -153,7 +175,6 @@ describe('pages/tableau-export/TableauExport', () => {
     it('gets all comms and creats an object', async () => {
       const resp = { data: 'data' };
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-      sinon.stub(page, 'responseAsCSV');
 
       Category.findOne.resolves({
         id: 1
@@ -162,13 +183,13 @@ describe('pages/tableau-export/TableauExport', () => {
       await page.exportCommunications(req, res);
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(page.responseAsCSV, resp, res);
+      sinon.assert.calledWith(res.json, resp);
     });
   });
 
   describe('#mergeProjectsWithEntities', () => {
     beforeEach(() => {
-      Milestone.fieldDefinitions.returns([{
+      Milestone.fieldDefinitions = sinon.stub().returns([{
         name: 'name',
         displayName: 'Name'
       }]);
@@ -176,9 +197,9 @@ describe('pages/tableau-export/TableauExport', () => {
 
     it('get projects and merge with project entities', async () => {
       const entities = [{
-        'Public ID': 1
+        'Public ID': { value: 1, type: 'int' }
       },{
-        'Public ID': 2
+        'Public ID': { value: 2, type: 'int' }
       }];
 
       const projects = [{
@@ -195,7 +216,8 @@ describe('pages/tableau-export/TableauExport', () => {
           name: 'milestone 1',
           milestoneFieldEntries: [{
             milestoneField: {
-              displayName: 'date'
+              displayName: 'date',
+              type: 'string'
             },
             value: 'date 1'
           }]
@@ -214,7 +236,8 @@ describe('pages/tableau-export/TableauExport', () => {
           name: 'milestone 2',
           milestoneFieldEntries: [{
             milestoneField: {
-              displayName: 'date'
+              displayName: 'date',
+              type: 'string'
             },
             value: 'date 2'
           }]
@@ -224,8 +247,20 @@ describe('pages/tableau-export/TableauExport', () => {
 
       const mergedEntities = await page.mergeProjectsWithEntities(entities);
       expect(mergedEntities).to.eql([
-        { 'Public ID': 1, 'Project - UID': 1, 'Milestone - Name': 'milestone 1', 'Milestone - date': 'date 1', 'Project - Name': 'project 1' },
-        { 'Public ID': 2, 'Project - UID': 2, 'Milestone - Name': 'milestone 2', 'Milestone - date': 'date 2', 'Project - Name': 'project 2' }
+        {
+          'Public ID': { value: 1, type: 'int' },
+          'Project - UID': { value: 1, type: 'string' },
+          'Milestone - Name': { value: 'milestone 1', type: 'string' },
+          'Milestone - date': { value: 'date 1', type: 'string' },
+          'Project - Name': { value: 'project 1', type: 'string' }
+        },
+        {
+          'Public ID': { value: 2, type: 'int' },
+          'Project - UID': { value: 2, type: 'string' },
+          'Milestone - Name': { value: 'milestone 2', type: 'string' },
+          'Milestone - date': { value: 'date 2', type: 'string' },
+          'Project - Name': { value: 'project 2', type: 'string' }
+        },
       ]);
     });
   });
@@ -236,7 +271,6 @@ describe('pages/tableau-export/TableauExport', () => {
       const entitiesWithProjects = [{ data: 'data', data1: 'data 1' }];
       sinon.stub(page, 'getEntitiesFlatStructure').resolves(entities);
       sinon.stub(page, 'mergeProjectsWithEntities').resolves(entitiesWithProjects);
-      sinon.stub(page, 'responseAsCSV');
 
       Category.findOne.resolves({
         id: 1
@@ -246,7 +280,7 @@ describe('pages/tableau-export/TableauExport', () => {
 
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
       sinon.assert.calledWith(page.mergeProjectsWithEntities, entities);
-      sinon.assert.calledWith(page.responseAsCSV, entitiesWithProjects, res);
+      sinon.assert.calledWith(res.json, entitiesWithProjects);
     });
   });
 });

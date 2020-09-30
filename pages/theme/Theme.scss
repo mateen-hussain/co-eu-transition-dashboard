@@ -9,13 +9,9 @@
     margin-bottom: 2px;
 }
 
-.active {
-    float: right;
-    margin-right: 10px;
-}
-
-.active-statement {
+.statement:hover, .active-statement {
     background-color: white;
+	background: url(/assets/images/arrow.png) 96% 10px no-repeat white;
 }
 
 .statement-link {
@@ -56,7 +52,24 @@
     .govuk-accordion__section-header {
         border-top: none;
         margin-bottom:2px;
-        background-color: #f3f2f1
+        background-color: #f3f2f1;
+    }
+
+    .govuk-accordion__section--expanded > .govuk-accordion__section-header {
+        background-color: #ffffff;
+    }
+
+    .govuk-accordion__section-header:hover {
+        background-color: white;
+        text-decoration: none;
+        .govuk-accordion__section-button   {
+            text-decoration: none;
+        }
+    }
+
+    .govuk-accordion__section-button:focus {
+        box-shadow: none;
+        background-color: transparent;
     }
 
     .govuk-accordion {
@@ -76,6 +89,10 @@
         .last-level-expandable .govuk-accordion__section-content {
             margin: -2px 0 2px 0;
             position: relative;
+            background-color: #f3f2f1;
+        }
+
+        .last-level-expandable > .govuk-accordion__section-header {
             background-color: #f3f2f1;
         }
     }
@@ -128,7 +145,7 @@
         }
     }
 
-    .outcome-measure__item--active {
+    .outcome-measure__item--active, .outcome-measure__item:hover {
         background-color: white;
 
         &:after {
@@ -144,6 +161,29 @@
         color: #0b0c0c;
         display: block;
     }
+
+    .comments-measure {
+        font-style: italic;
+    }
+
+    .placeholder-measure {
+        font-style: italic;
+        color: #b1b4b6;
+    }
+}
+
+.placeholder-title {
+    color: #b1b4b6;
+    margin-bottom: 2px;
+    font-size: 13px;
+    font-style: normal;
+}
+
+.comments-title {
+    color: #505a5f;
+    margin-bottom: 2px;
+    font-size: 13px;
+    font-style: normal;
 }
 
 .js-enabled .govuk-accordion__section--expanded .govuk-accordion__section-content {
@@ -170,7 +210,7 @@
 }
 
 .theme-description {
-    margin-bottom: 30px;
+    margin-bottom: 12px;
 }
 
 .theme-name.theme-red::before,
@@ -197,6 +237,10 @@
     background-color: #ffdd00
 }
 
+.outcome-measure__item.item-disabled::before {
+    background-color: #b1b4b6;
+}
+
 .tableu-message,
 .measures-message {
     border: 1px solid #979797;
@@ -220,8 +264,4 @@
 
 .overflow-scroll {
     overflow: scroll;
-}
-
-.left-spacing {
-    margin-left: 0px;
 }

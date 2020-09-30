@@ -1,0 +1,53 @@
+{% extends "template.njk" %}
+
+{% set users = getUsers() | await %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% block pageTitle %}Manage Users{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row" id="hide-filters">
+  <div class="govuk-grid-column-full">
+    <h1 class="govuk-heading-xl">Manage Users</h1>
+
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th scope="col" class="govuk-table__header">Email</th>
+          <th scope="col" class="govuk-table__header">Roles</th>
+          <th scope="col" class="govuk-table__header">Last login</th>
+          <th scope="col" class="govuk-table__header"></th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for user in users %}
+          <tr class="govuk-table__row">
+            <td class="govuk-table__cell">{{ user.email }}</td>
+            <td class="govuk-table__cell">
+              {%- for role in user.roles -%}
+                {% if loop.index > 1 %}, {% endif %}{{ role.name }}
+              {%- endfor -%}
+            </td>
+            <td class="govuk-table__cell">{{ user.lastLoginAt | date('DD/MM/YYYY HH:MM') }}</td>
+            <td class="govuk-table__cell">
+              <a href="{{ config.paths.admin.userManagementAuthentication }}/{{ user.id }}" class="govuk-link">Reset password</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+
+
+

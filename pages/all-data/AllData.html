@@ -36,11 +36,8 @@
 {% block pageTitle %}{{ title }}{% endblock %}
 
 {% block content %}
-<h1 class="govuk-heading-xl">
-  {{ title }}
-</h1>
 
-<div class="govuk-grid-row" id="show">
+<div class="govuk-grid-row" id="hide-filters">
 
 <div class="govuk-grid-column-one-quarter" id="filterPanel">
   {% include "all-data/partials/filters/filters.njk" %}
@@ -48,11 +45,15 @@
 
 <div class="govuk-grid-column-full" id="dataTable">
 
-  <div id="showFilter">
+<h1 class="govuk-heading-xl">
+  {{ title }}
+</h1>
+
+  <div id="showFiltersBtn">
   {% include "all-data/partials/filters/show-filter-btn.njk" %}
   </div>
 
-  <div id="hideFilter">
+  <div id="hideFiltersBtn">
   {% include "all-data/partials/filters/hide-filter-btn.njk" %}
   </div>
 

@@ -69,34 +69,41 @@ table.govuk-table.table-content {
     padding-bottom: 20px;
 }
 
-#filterPanel, #hideFilter  {
-    display: none;
-}
-
-#show:target #filterPanel {
+#filterPanel, #hideFilters  {
     display: block;
 }
 
-#show:target #showFilter {
+#showFiltersBtn {
     display: none;
 }
 
-#show:target #hideFilter {
+#hide-filters:target #filterPanel {
+    display: none;
+}
+
+#hide-filters:target #showFiltersBtn {
     display: block;
 }
 
-.govuk-checkboxes__label, .govuk-label, .govuk-hint, .govuk-summary-list__key, .govuk-table {
-    font-size: 1.100rem;
+#hide-filters:target #hideFiltersBtn {
+    display: none;
 }
 
-#show:target #dataTable {
+#dataTable {
     width: 75%;
     div.scrollable {
         max-height: 150px;
         max-width: 80px;
-        overflow-x: scroll;
-        overflow-y: scroll;
+        overflow: scroll;
     }
+}
+
+#hide-filters:target #dataTable {
+    width: 100%;
+}
+
+.govuk-checkboxes__label, .govuk-label, .govuk-hint, .govuk-summary-list__key, .govuk-table {
+    font-size: 1.100rem;
 }
 
 .govuk-table__header, .govuk-table__cell {

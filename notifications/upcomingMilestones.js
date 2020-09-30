@@ -1,6 +1,7 @@
 const config = require('config');
 const User = require("models/user");
 const Department = require("models/department");
+const Role = require("models/role");
 const moment = require('moment');
 const NotifyClient = require('notifications-node-client').NotifyClient;
 const sequelize = require('services/sequelize');
@@ -39,10 +40,13 @@ const getUsers = async (departmentName) => {
       where: {
         name: departmentName
       }
-    }],
-    where: {
-      role: 'uploader'
-    }
+    },{
+      model: Role,
+      required: true,
+      where: {
+        name: 'uploader'
+      } 
+    }]
   });
 };
 

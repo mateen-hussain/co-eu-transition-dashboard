@@ -1,0 +1,70 @@
+{% extends "template.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block beforeContent %}
+{% include "feedback.njk" %}
+{{ govukBackLink({
+  text: "Back",
+  href: "#",
+  attributes: {
+    onclick: "history.go(-1);"
+  }
+}) }}
+{% endblock %}
+
+{% block pageTitle %}RAYG Definitions{% endblock %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+
+  <h1 class="govuk-heading-l">Understanding the RAYG status
+    <span class="govuk-caption-l">An explanation on how the various statuses are calculated and applied to themes, outcome statements and measures.</span></h1>
+
+    <table class="govuk-table">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+        <th scope="col" class="govuk-table__header">Status</th>
+        <th scope="col" class="govuk-table__header">Definition</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><span class='rag-red'></span></td>
+        <td class="govuk-table__cell">High risk</td>
+        </tr>
+        <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><span class='rag-amber'></span></td>
+        <td class="govuk-table__cell">Medium risk</td>
+        </tr>
+        <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><span class='rag-yellow'></span></td>
+        <td class="govuk-table__cell">Low risk</td>
+        </tr>
+        <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><span class='rag-green'></span></td>
+        <td class="govuk-table__cell">Minimal/Low risk</td>
+        </tr>
+        <tr class="govuk-table__row">
+        <td class="govuk-table__cell"><span class='rag-grey'></span></td>
+        <td class="govuk-table__cell">Unassigned risk status</td>
+        </tr>
+    </tbody>
+    </table>
+
+    <h3 class="govuk-heading-m">How RAYG statuses are calculated</h3>
+
+    <p class="govuk-body">The RAYG status for a theme reflects an assessment by the Cabinet Office of the level of risk based on the data provided by departments and the ratings for the outcomes.</p>
+
+    <p class="govuk-body">The RAYG status for each outcome is calculated by taking whichever of the HMG overall delivery status rating or the empirical measures overall rating is the lowest.</p>
+
+    <p class="govuk-body">The RAYG status for a project represents the department's confidence that that project will be delivered. Each project is then given an impact rating which reflects how heavily that project is weighted in its contribution to the current overall HMG delivery confidence of achieving that outcome.</p>
+
+    <p class="govuk-body">In the same way departments have provided an assessment of when an empirical measure should be assessed to be Green and therefore confidence that the outcome will be achieved.</p>
+
+ </div>
+</div>
+
+{% endblock %}
