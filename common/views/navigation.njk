@@ -168,12 +168,12 @@
         Borders
         </a>
     </li>
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/E' in req.originalUrl }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/E' in req.originalUrl and req.originalUrl !== config.paths.transitionReadinessThemeDetail + '/EE' }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/E">
         Economy
         </a>
     </li>
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/EE' in req.originalUrl and config.paths.transitionReadinessThemeDetail + '/EE' !== config.paths.transitionReadinessThemeDetail + '/E' }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if config.paths.transitionReadinessThemeDetail + '/EE' in req.originalUrl }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.transitionReadinessThemeDetail }}/EE">
         Energy / Environment
         </a>

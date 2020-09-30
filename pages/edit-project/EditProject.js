@@ -10,7 +10,7 @@ const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const { transformDeliveryConfidenceValue } = require('helpers/display');
-const { cache } = require('services/nodeCache');
+const { clearCache } = require('services/redis');
 
 class EditProject extends Page {
   get url() {
@@ -115,7 +115,7 @@ class EditProject extends Page {
       }
 
       await this.saveFieldToDatabase(data);
-      return cache.flushAll();
+      return await clearCache();
     }
 
     return res.redirect(this.req.originalUrl);

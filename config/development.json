@@ -7,6 +7,9 @@
     "expires": 86400000
   },
   "services": {
+    "redis": {
+      "url": "redis://127.0.0.1:6379"
+    },
     "mysql": {
       "uri": "mysql://root:password@127.0.0.1:3306/dashboard",
       "sslCertificate": null,

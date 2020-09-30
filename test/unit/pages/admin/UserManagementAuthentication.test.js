@@ -18,7 +18,7 @@ const notificationsNodeClientStub = {
   }
 };
 
-describe.only('pages/admin/user-management/authentication/UserManagementAuthentication', () => {
+describe('pages/admin/user-management/authentication/UserManagementAuthentication', () => {
   beforeEach(() => {
     const UserManagementAuthentication = proxyquire('pages/admin/user-management/authentication/UserManagementAuthentication', {
       'notifications-node-client': notificationsNodeClientStub,

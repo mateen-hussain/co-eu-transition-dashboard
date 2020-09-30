@@ -135,9 +135,16 @@ describe('pages/tableau-export/TableauExport', () => {
       const entityObjects = await page.getEntitiesFlatStructure({ id: 1 });
 
       expect(entityObjects).to.eql([
-        { name: { value: 'some name', type: 'string' }, 'Public ID': { value: '1', type: 'string' } },
-        { name: { value: 'some name', type: 'string' }, 'Public ID': { value: '1', type: 'string' } },
+        {
+          'Field 1': { value: 'some name', type: 'string' },
+          'Public ID': { value: '1', type: 'string' }
+        },
+        {
+          'Field 1': { value: 'some name', type: 'string' },
+          'Public ID': { value: '1', type: 'string' }
+        }
       ]);
+
     });
   });
 

@@ -13,7 +13,8 @@
         "__name": "TABLEAU_WHITELIST_IP_RANGE",
         "__format": "json"
       }
-    }
+    },
+    "vcapServices": { "__name": "VCAP_SERVICES", "__format": "json" }
   },
   "port": "PORT",
   "features": {
