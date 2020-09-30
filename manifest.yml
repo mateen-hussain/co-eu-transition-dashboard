@@ -7,3 +7,4 @@ applications:
     - https://github.com/cloudfoundry/nodejs-buildpack
     services:
     - co-eu-transition-database
+    - transition-dashboard-cache
