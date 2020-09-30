@@ -13,7 +13,7 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 const tableau = require('services/tableau');
-const { cache } = require('services/nodeCache');
+const redis = require('services/redis');
 
 const rags = ['red', 'amber', 'yellow', 'green'];
 
@@ -381,7 +381,7 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  const cached = cache.get(`entityHierarchy-all`);
+  const cached = await redis.get(`cache-transition-overview`);
   if(cached) {
     return JSON.parse(cached);
   }
@@ -403,13 +403,13 @@ const createEntityHierarchy = async (category) => {
     entitesInHierarchy.push(entitesMapped)
   }
 
-  cache.set(`entityHierarchy-all`, JSON.stringify(entitesInHierarchy));
+  await redis.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy));
 
   return entitesInHierarchy;
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  const cached = cache.get(`entityHierarchy-${topLevelEntityPublicId}`);
+  const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
   if(cached) {
     return JSON.parse(cached);
   }
@@ -427,7 +427,7 @@ const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
   const topLevelEntityMapped = mapEntityChildren(allEntities, topLevelEntity);
   await mapProjectsToEntities(topLevelEntityMapped);
 
-  cache.set(`entityHierarchy-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped));
+  await redis.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped));
 
   return topLevelEntityMapped;
 }
