@@ -309,10 +309,14 @@ const mapEntityChildren = (allEntities, entity) => {
       entityFieldMap.children.push(childEntityWithFieldValuesAndMappedChildren);
     });
 
-    const isMeasure = entityFieldMap.children.find(entity => entity.category.name === "Measure");
-    if(isMeasure) {
-      entityFieldMap.children = entityFieldMap.children.filter(entity => entity.filter === 'RAYG');
-    }
+    entityFieldMap.children = entityFieldMap.children.filter(entity => {
+      // only show measure entities if filter equals RAYG
+      const isMeasure = entity.category.name === "Measure";
+      if(!isMeasure) {
+        return true;
+      }
+      return entity.filter === 'RAYG'
+    });
   }
 
   return entityFieldMap;
