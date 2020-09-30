@@ -51,7 +51,7 @@ class Project extends Model {
       name: 'sro',
       type: 'string',
       displayName: 'SRO name',
-      importColumnName: 'Project SRO + email address',
+      importColumnName: 'Project SRO + email',
       group: 'Department and Project Information',
       order: 6,
       description: 'Please provide the name + email of the SRO per project.',
