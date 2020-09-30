@@ -15,6 +15,12 @@ services:
   #   environment:
   #     POSTGRES_URL: postgres://postgres:postgres@postgres:5432/postgres
   #     NODE_ENV: development
+  redis:
+    image: "redis:alpine"
+    expose:
+      - '6379'
+    ports:
+      - "6379:6379"
 
   db:
     image: mysql:8.0

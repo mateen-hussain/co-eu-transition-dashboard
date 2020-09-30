@@ -5,6 +5,7 @@
     "expires": 3600000
   },
   "services": {
+    "redis": {},
     "mysql": {},
     "tfa": {
       "name": "Transition Taskforce Dashboard"
