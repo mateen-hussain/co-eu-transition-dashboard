@@ -226,22 +226,35 @@ const mapProjectsToEntities = async (entitesInHierarchy) => {
     return;
   }
 
-  const projects = await dao.getAllData(undefined, { uid: projectUids });
+  const projects = await dao.getAllData(undefined, {
+    uid: projectUids,
+    complete: ['Yes', 'No'] // Only include milestones that are completed Yes or No ( dont include decommissioned milestones )
+  });
 
   const mapProjectsToEntites = (entity) => {
     if(entity.children) {
-      return entity.children.forEach(mapProjectsToEntites);
+      entity.children.forEach(mapProjectsToEntites);
+
+      // remove projects without milestones
+      entity.children = entity.children.filter(entity => {
+        const isProject = entity.categoryId === projectsCategory.id;
+        if(isProject) {
+          return entity.children && entity.children.length;
+        }
+        return true;
+      });
+
+      return entity;
     }
 
     if(entity.categoryId === projectsCategory.id) {
       const project = projects.find(project => project.uid === entity.publicId);
-      if(!project) {
-        throw new Error(`Cannot find project with UID ${entity.publicId}`);
+      if(project) {
+        mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
+        entity.isLastExpandable = true;
       }
-      mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
-      entity.isLastExpandable = true;
     }
-  }
+  };
 
   mapProjectsToEntites(entitesInHierarchy);
 }
@@ -381,10 +394,10 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  const cached = await redis.get(`cache-transition-overview`);
-  if(cached) {
-    return JSON.parse(cached);
-  }
+  // const cached = await redis.get(`cache-transition-overview`);
+  // if(cached) {
+  //   return JSON.parse(cached);
+  // }
 
   const allEntities = await getAllEntities();
 
@@ -409,10 +422,10 @@ const createEntityHierarchy = async (category) => {
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
-  if(cached) {
-    return JSON.parse(cached);
-  }
+  // const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
+  // if(cached) {
+  //   return JSON.parse(cached);
+  // }
 
   const allEntities = await getAllEntities();
   if(!allEntities.length) {
