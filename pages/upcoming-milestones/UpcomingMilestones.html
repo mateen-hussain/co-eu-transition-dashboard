@@ -18,7 +18,7 @@
 
   <div class="govuk-grid-column-one-quarter" id="filterPanel">
     <h1 class="govuk-heading-l">Upcoming milestones</h1>
-    {% include "upcoming-milestones/partials/filters/filters.njk" %}
+    {% include "all-data/partials/filters/filters.njk" %}
   </div>
 
   <div class="govuk-grid-column-three-quarters">
@@ -37,18 +37,14 @@
       <th scope="col" class="govuk-table__header">Project Impact</th>
     </tr>
   </thead>
-
     <tbody class="govuk-table__body">
-      {% for date in dates %}
-        <tr class="govuk-table__row">
-          <th rowspan="{{ loop.index0 }}" class="govuk-table__cell">
+        {% for date in dates %}
+        <tr class="govuk-table__row date-row">
+          <td rowspan="{{ date.totalMilestones * 2 }}" class="govuk-table__cell">
             <p class="govuk-body govuk-!-font-weight-bold">{{ date.date }}</p>
             <span class="milestone-count">{{ date.totalMilestones }}</span>
-          </th>
-        </tr>
-
+          </td>
         {% for department in date.departments %} {% for project in department.projects %} {% for milestone in project.milestones %}
-        <tr>
           <td class="govuk-table__cell">
             <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
           </td>
@@ -61,13 +57,18 @@
           <td class="govuk-table__cell">
             <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a></p>
           </td>
-          <td class="govuk-table__cell">
+          <td class="govuk-table__cell number-cell">
             <span class="{{ cellBlock + project.impact }}">{{ project.impact | default('N/A') }}</span>
           </td>
-          <td class="govuk-table__cell">
+          <td class="govuk-table__cell number-cell">
             <span class="{{ cellBlock + milestone.fields.get('deliveryConfidence').value }}">{{ milestone.fields.get('deliveryConfidence').value | default('N/A') }}</span>
           </td>
         </tr>
+        <tr>
+          <td colspan="4" class="description-row govuk-table__cell">
+            <p class="govuk-body">{{ milestone.description }}</p>
+          </td>
+        <tr>
         {% endfor %} {% endfor %} {% endfor %}
       {% endfor %}
     </tbody>

@@ -6,7 +6,15 @@
 {% endset %}
 
 {% if (data.filters | length) %}
-  <h3 class="govuk-heading-s">Selected filters</h3>
+   {% set summary = (summary.push ({
+    key: {
+      html: "<p class='govuk-body govuk-!-font-weight-bold selected-filters'>Selected filters</h3>"
+    },
+    value: {
+      text: ''
+    }
+  }), summary)
+%}
 {% endif %}
 
 {% if (data.filters['date']) %}

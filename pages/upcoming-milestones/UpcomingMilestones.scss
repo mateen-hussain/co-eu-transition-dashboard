@@ -10,3 +10,16 @@
   font-size: 26px;
   padding: 4px 3px 0 3px;
 }
+
+.description-row {
+  border-top: hidden;
+}
+
+.number-cell {
+  border-bottom: hidden;
+  border-top: 1px solid #b1b4b6;
+}
+
+.upcoming-milestones-table tr > *:nth-child(5) {
+  width: 40%;
+}

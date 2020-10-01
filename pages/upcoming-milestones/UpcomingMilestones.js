@@ -16,7 +16,7 @@ class UpcomingMilestones extends Page {
       filters: {
         date: {
           from: moment().format('DD/MM/YYYY'),
-          to: moment().add('6', 'weeks').format('DD/MM/YYYY')
+          to: moment().add('500', 'weeks').format('DD/MM/YYYY')
         }
       }
     };
