@@ -24,7 +24,7 @@ describe('pages/logout/Logout', () => {
     it('clears the cookie and redirects', () => {
       page.getRequest(req, res);
       sinon.assert.calledWith(page.res.redirect, config.paths.authentication.login);
-      sinon.assert.calledWith(page.res.clearCookie, "jwt");
+      sinon.assert.calledWith(page.res.clearCookie, "jwt" , { domain: config.cookie.domain });
     });
   });
 });

@@ -1,14 +1,14 @@
 const Page = require('core/pages/page');
-const { paths } = require('config');
+const config = require('config');
 
 class Logout extends Page {
   get url() {
-    return paths.authentication.logout;
+    return config.paths.authentication.logout;
   }
 
   async getRequest(req, res) {
-    res.clearCookie("jwt");
-    res.redirect(paths.authentication.login);
+    res.clearCookie("jwt", { domain: config.cookie.domain })
+    res.redirect(config.paths.authentication.login);
   }
 }
 
