@@ -400,9 +400,11 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  const cached = await cache.get(`cache-transition-overview`);
-  if(config.features.transitionReadinessCache && cached) {
-    return JSON.parse(cached);
+  if(config.features.transitionReadinessCache) {
+    const cached = await cache.get(`cache-transition-overview`);
+    if(cached) {
+      return JSON.parse(cached);
+    }
   }
 
   const allEntities = await getAllEntities();
@@ -428,9 +430,11 @@ const createEntityHierarchy = async (category) => {
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  const cached = await cache.get(`cache-transition-${topLevelEntityPublicId}`);
-  if(config.features.transitionReadinessCache && cached) {
-    return JSON.parse(cached);
+  if(config.features.transitionReadinessCache) {
+    const cached = await cache.get(`cache-transition-${topLevelEntityPublicId}`);
+    if(cached) {
+      return JSON.parse(cached);
+    }
   }
 
   const allEntities = await getAllEntities();
