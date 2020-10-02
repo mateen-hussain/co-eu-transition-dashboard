@@ -96,6 +96,7 @@ const mapProjectToEntity = (milestoneFieldDefinitions, projectFieldDefinitions, 
 const applyRagRollups = (entity) => {
   let color = '';
 
+  // entity is a project
   if (entity.hasOwnProperty('hmgConfidence')) {
     if (entity.hmgConfidence == 0) {
       color = "red";
@@ -110,6 +111,9 @@ const applyRagRollups = (entity) => {
     entity.color = color;
     entity.children.forEach(applyRagRollups);
     return color;
+
+  // entity is a milestone
+  // do not roll up status to project
   } else if (entity.hasOwnProperty('deliveryConfidence')) {
     if (entity.deliveryConfidence == 0) {
       color = "red";
@@ -394,10 +398,10 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  // const cached = await redis.get(`cache-transition-overview`);
-  // if(cached) {
-  //   return JSON.parse(cached);
-  // }
+  const cached = await redis.get(`cache-transition-overview`);
+  if(cached) {
+    return JSON.parse(cached);
+  }
 
   const allEntities = await getAllEntities();
 
@@ -422,10 +426,10 @@ const createEntityHierarchy = async (category) => {
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  // const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
-  // if(cached) {
-  //   return JSON.parse(cached);
-  // }
+  const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
+  if(cached) {
+    return JSON.parse(cached);
+  }
 
   const allEntities = await getAllEntities();
   if(!allEntities.length) {
