@@ -30,7 +30,7 @@ const restoreData = (req, res) => {
     try {
       return jwt.verify(req.cookies['jwt'], config.cookie.secret);
     } catch (error) {
-      res.clearCookie("jwt");
+      clearCookie(res)
       return {};
     }
   } else {
@@ -38,8 +38,13 @@ const restoreData = (req, res) => {
   }
 };
 
+const clearCookie = res => {
+  res.clearCookie("jwt", { domain: config.cookie.domain })
+}
+
 module.exports = {
   saveData,
   restoreData,
-  token
+  token,
+  clearCookie
 };
