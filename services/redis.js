@@ -6,7 +6,7 @@ const { promisify } = require("util");
 let redisUrl = config.services.redis.url;
 
 if(config.services.vcapServices && config.services.vcapServices.redis.length) {
-  redisUrl = config.services.vcapServices.redis[0].credentials.uri
+  redisUrl = config.services.vcapServices.redis[0].credentials.uri;
 }
 
 const client = redis.createClient({
@@ -19,7 +19,7 @@ client.on("error", function(error) {
 
 const clearCache = async () => {
   client.flushall();
-}
+};
 
 const clearCacheMiddleware = async (req, res, next) => {
   await clearCache();

@@ -53,3 +53,16 @@ const umzug = sinon.stub().returns({
 });
 mock('umzug', umzug);
 
+const createClientStub = {
+  on: sinon.stub(),
+  set: sinon.stub(),
+  get: sinon.stub(),
+  flushall: sinon.stub()
+};
+
+const redis = {
+  createClient: () => createClientStub
+};
+
+mock('redis', redis);
+
