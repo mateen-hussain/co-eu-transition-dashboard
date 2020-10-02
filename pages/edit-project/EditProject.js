@@ -10,7 +10,6 @@ const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
 const FieldEntryGroup = require('models/fieldEntryGroup');
 const { transformDeliveryConfidenceValue } = require('helpers/display');
-const { clearCache } = require('services/redis');
 
 class EditProject extends Page {
   get url() {
@@ -114,8 +113,7 @@ class EditProject extends Page {
         return res.redirect(this.editModeUrl);
       }
 
-      await this.saveFieldToDatabase(data);
-      return await clearCache();
+      return await this.saveFieldToDatabase(data);
     }
 
     return res.redirect(this.req.originalUrl);

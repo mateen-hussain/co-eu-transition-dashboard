@@ -17,17 +17,11 @@ client.on("error", function(error) {
   logger.error(error);
 });
 
-const clearCache = async () => {
-  client.flushall();
-};
-
-const clearCacheMiddleware = async (req, res, next) => {
-  await clearCache();
-  next();
-};
-
-const set = async (key, value) => {
+const set = async (key, value, expire) => {
   client.set(key, value);
+  if(expire) {
+    client.expireat(key, expire);
+  }
 };
 
 const get = async (key) => {
@@ -36,8 +30,6 @@ const get = async (key) => {
 };
 
 module.exports = {
-  clearCache,
-  clearCacheMiddleware,
   set,
   get
 };
