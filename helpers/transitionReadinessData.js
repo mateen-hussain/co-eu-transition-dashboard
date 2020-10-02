@@ -75,7 +75,8 @@ const mapProjectToEntity = (milestoneFieldDefinitions, projectFieldDefinitions, 
       publicId: milestone.uid,
       deliveryConfidence: milestone.deliveryConfidence,
       categoryId: entityFieldMap.categoryId,
-      date: milestone.date
+      date: milestone.date,
+      complete: milestone.complete,
     };
 
     milestone.milestoneFieldEntries.forEach(milestoneFieldEntry => {
