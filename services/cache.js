@@ -17,10 +17,10 @@ client.on("error", function(error) {
   logger.error(error);
 });
 
-const set = async (key, value, expire) => {
+const set = async (key, value, momentDate) => {
   client.set(key, value);
-  if(expire) {
-    client.expireat(key, expire);
+  if(momentDate) {
+    client.expireat(key, momentDate.unix());
   }
 };
 

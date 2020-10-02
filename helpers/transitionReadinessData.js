@@ -13,7 +13,7 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 const tableau = require('services/tableau');
-const redis = require('services/redis');
+const cache = require('services/cache');
 const config = require('config');
 
 const rags = ['red', 'amber', 'yellow', 'green'];
@@ -400,8 +400,8 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  const cached = await redis.get(`cache-transition-overview`);
-  if(cached && config.features.transitionReadinessCache) {
+  const cached = await cache.get(`cache-transition-overview`);
+  if(config.features.transitionReadinessCache && cached) {
     return JSON.parse(cached);
   }
 
@@ -422,14 +422,14 @@ const createEntityHierarchy = async (category) => {
     entitesInHierarchy.push(entitesMapped)
   }
 
-  await redis.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy), moment().endOf('day').format('x'));
+  await cache.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy), moment().endOf('day'));
 
   return entitesInHierarchy;
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
-  if(cached && config.features.transitionReadinessCache) {
+  const cached = await cache.get(`cache-transition-${topLevelEntityPublicId}`);
+  if(config.features.transitionReadinessCache && cached) {
     return JSON.parse(cached);
   }
 
@@ -446,7 +446,7 @@ const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
   const topLevelEntityMapped = mapEntityChildren(allEntities, topLevelEntity);
   await mapProjectsToEntities(topLevelEntityMapped);
 
-  await redis.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped), moment().endOf('day').format('x'));
+  await cache.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped), moment().endOf('day'));
 
   return topLevelEntityMapped;
 }
