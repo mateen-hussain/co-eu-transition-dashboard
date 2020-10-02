@@ -40,7 +40,7 @@
 {% macro outcomeMeasuresContent(items) %}
   <ul class="govuk-body govuk-!-font-size-16 outcome-measures">
     {% for item in items %}
-      {% set raygColor = "item-complete" if item.complete else "item-" + item.color %}
+      {% set raygColor = "item-complete" if item.complete == "Yes" else "item-" + item.color %}
       <li class="outcome-measure__item {% if item.activeFrom %} item-disabled {% else %} {{ raygColor }} {% endif %} {% if item.active %} outcome-measure__item--active {% endif %}">
       {% if item.activeFrom %}
         <a href="{{ item.link }}" class="outcome-measure__link placeholder-measure">
