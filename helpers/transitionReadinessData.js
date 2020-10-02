@@ -75,7 +75,8 @@ const mapProjectToEntity = (milestoneFieldDefinitions, projectFieldDefinitions, 
       publicId: milestone.uid,
       deliveryConfidence: milestone.deliveryConfidence,
       categoryId: entityFieldMap.categoryId,
-      date: milestone.date
+      date: milestone.date,
+      complete: milestone.complete,
     };
 
     milestone.milestoneFieldEntries.forEach(milestoneFieldEntry => {
@@ -96,6 +97,7 @@ const mapProjectToEntity = (milestoneFieldDefinitions, projectFieldDefinitions, 
 const applyRagRollups = (entity) => {
   let color = '';
 
+  // entity is a project
   if (entity.hasOwnProperty('hmgConfidence')) {
     if (entity.hmgConfidence == 0) {
       color = "red";
@@ -110,6 +112,9 @@ const applyRagRollups = (entity) => {
     entity.color = color;
     entity.children.forEach(applyRagRollups);
     return color;
+
+  // entity is a milestone
+  // do not roll up status to project
   } else if (entity.hasOwnProperty('deliveryConfidence')) {
     if (entity.deliveryConfidence == 0) {
       color = "red";
@@ -226,22 +231,35 @@ const mapProjectsToEntities = async (entitesInHierarchy) => {
     return;
   }
 
-  const projects = await dao.getAllData(undefined, { uid: projectUids });
+  const projects = await dao.getAllData(undefined, {
+    uid: projectUids,
+    complete: ['Yes', 'No'] // Only include milestones that are completed Yes or No ( dont include decommissioned milestones )
+  });
 
   const mapProjectsToEntites = (entity) => {
     if(entity.children) {
-      return entity.children.forEach(mapProjectsToEntites);
+      entity.children.forEach(mapProjectsToEntites);
+
+      // remove projects without milestones
+      entity.children = entity.children.filter(entity => {
+        const isProject = entity.categoryId === projectsCategory.id;
+        if(isProject) {
+          return entity.children && entity.children.length;
+        }
+        return true;
+      });
+
+      return entity;
     }
 
     if(entity.categoryId === projectsCategory.id) {
       const project = projects.find(project => project.uid === entity.publicId);
-      if(!project) {
-        throw new Error(`Cannot find project with UID ${entity.publicId}`);
+      if(project) {
+        mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
+        entity.isLastExpandable = true;
       }
-      mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
-      entity.isLastExpandable = true;
     }
-  }
+  };
 
   mapProjectsToEntites(entitesInHierarchy);
 }
