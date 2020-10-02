@@ -7,13 +7,15 @@ import groupDisplay from './group-display';
 import fieldOrder from './field-order';
 import ReadinessAccordion from './readiness-accordion';
 import ClearOrRestoreScroll from './readiness-scroll';
+import sortTable from './sort-table';
 
 window.TRANSITIONDELIVERYDASHBOARD = {
   missedMilestonesChart,
   removeAccordionCross,
   disableButton,
   groupDisplay,
-  fieldOrder
+  fieldOrder,
+  sortTable
 };
 
 document.addEventListener('DOMContentLoaded', function() {

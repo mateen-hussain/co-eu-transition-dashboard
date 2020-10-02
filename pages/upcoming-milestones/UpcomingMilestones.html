@@ -17,28 +17,30 @@
 <div class="govuk-grid-row">
 
   <div class="govuk-grid-column-one-quarter" id="filterPanel">
-    <h1 class="govuk-heading-l">Upcoming milestones</h1>
+    <h1 class="govuk-heading-l">Upcoming milestones</h1><br>
     {% include "all-data/partials/filters/filters.njk" %}
   </div>
 
   <div class="govuk-grid-column-three-quarters">
+    <br><br><br><br>
     {% include "all-data/partials/filters/filter-summary.njk" %}
 
   <table class="govuk-table upcoming-milestones-table">
 
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header">Due date</th>
+      <th scope="col" class="govuk-table__header sort-coloumn">Due date</th>
       <th scope="col" class="govuk-table__header">Milestone UID</th>
       <th scope="col" class="govuk-table__header">Department</th>
       <th scope="col" class="govuk-table__header">Theme</th>
       <th scope="col" class="govuk-table__header">Project Name</th>
-      <th scope="col" class="govuk-table__header">Delivery Confidence</th>
-      <th scope="col" class="govuk-table__header">Project Impact</th>
+      <th scope="col" class="govuk-table__header sort-coloumn">Delivery Confidence</th>
+      <th scope="col" class="govuk-table__header sort-coloumn">Project Impact</th>
     </tr>
   </thead>
+
+  {% for date in dates %}
     <tbody class="govuk-table__body">
-        {% for date in dates %}
         <tr class="govuk-table__row date-row">
           <td rowspan="{{ date.totalMilestones * 2 }}" class="govuk-table__cell">
             <p class="govuk-body govuk-!-font-weight-bold">{{ date.date }}</p>
@@ -63,17 +65,23 @@
           <td class="govuk-table__cell number-cell">
             <span class="{{ cellBlock + milestone.fields.get('deliveryConfidence').value }}">{{ milestone.fields.get('deliveryConfidence').value | default('N/A') }}</span>
           </td>
-        </tr>
         <tr>
           <td colspan="4" class="description-row govuk-table__cell">
             <p class="govuk-body">{{ milestone.description }}</p>
           </td>
-        <tr>
+        </tr>
         {% endfor %} {% endfor %} {% endfor %}
-      {% endfor %}
+        </tr>
     </tbody>
+          {% endfor %}
   </table>
   </div>
 </div>
 
+{% endblock %}
+
+{% block afterScript %}
+  <script>
+    TRANSITIONDELIVERYDASHBOARD.sortTable();
+  </script>
 {% endblock %}
