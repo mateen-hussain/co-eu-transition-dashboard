@@ -24,6 +24,17 @@
   width: 40%;
 }
 
-.upcoming-milestones-table th {
+.sort-coloumn {
   cursor: pointer;
 }
+
+.up-sort:after {
+  content: url('/assets/images/up-sort.png');
+  padding: 10px;
+}
+
+.down-sort:after {
+  content: url('/assets/images/down-sort.png');
+  padding: 10px;
+}
+
