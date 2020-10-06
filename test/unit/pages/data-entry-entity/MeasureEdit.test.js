@@ -5,6 +5,7 @@ const rayg = require('helpers/rayg');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
+const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const { Op } = require('sequelize');
@@ -17,7 +18,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   beforeEach(() => {
     const MeasureEdit = require('pages/data-entry-entity/measure-edit/MeasureEdit');
 
-    res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
+    res = { cookies: sinon.stub(), redirect: sinon.stub(),  sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
     req = { cookies: [], params: { metricId: 'measure-1' }, user: { roles: [] } };
     res.status.returns(res);
 
@@ -138,10 +139,15 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       }]);
 
       sinon.assert.calledWith(Entity.findAll, {
-        where: { categoryId, '$entityFieldEntries.value$': req.params.metricId },
+        where: { categoryId },
         order: [['created_at', 'DESC']],
         include: [{
-          model: EntityFieldEntry,  
+          model: EntityFieldEntry,
+          where: { value: req.params.metricId },
+          include: {
+            model: CategoryField,
+            where: { name: 'metricId' },
+          }
         },{
           model: Entity,
           as: 'parents',
@@ -165,14 +171,18 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.assert.calledWith(Entity.findAll, {
         where: {
           categoryId, 
-          '$entityFieldEntries.value$': req.params.metricId,
           id: {
             [Op.in]: [10]
           }
         },
         order: [['created_at', 'DESC']],
         include: [{
-          model: EntityFieldEntry, 
+          model: EntityFieldEntry,
+          where: { value: req.params.metricId },
+          include: {
+            model: CategoryField,
+            where: { name: 'metricId' },
+          }
         },{
           model: Entity,
           as: 'parents',
@@ -188,19 +198,36 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const themeEntities = [{ id: 'some-entity' }];
 
     beforeEach(() => {
-      sinon.stub(page, 'getCategory').returns(measureCategory);
-      sinon.stub(page, 'getMeasureEntities').returns(measureEntities);
+      sinon.stub(page, 'getCategory').returns(measureCategory);  
       sinon.stub(page, 'getMeasureTheme').returns(themeEntities);
       sinon.stub(rayg, 'getRaygColour')
     });
 
+    afterEach(() => {
+      page.getCategory.restore();
+      page.getMeasureEntities.restore();
+      page.getMeasureTheme.restore();
+      rayg.getRaygColour.restore();
+    });
+
     it('Get measures and applying rayg', async () => {
+      sinon.stub(page, 'getMeasureEntities').returns(measureEntities);
+
       await page.getMeasure();
 
       sinon.assert.calledOnce(page.getCategory);
       sinon.assert.calledWith(page.getMeasureEntities, measureCategory.id);
       sinon.assert.calledWith(page.getMeasureTheme, measureEntities[0].parents);
       sinon.assert.calledOnce(rayg.getRaygColour);
+    });
+
+    it('redirects to list if no entity data', async () => {
+      sinon.stub(page, 'getMeasureEntities').returns([]);
+      await page.getMeasure();
+
+      sinon.assert.calledOnce(page.getCategory);
+      sinon.assert.calledWith(page.getMeasureEntities, measureCategory.id);
+      sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
     });
   });
 

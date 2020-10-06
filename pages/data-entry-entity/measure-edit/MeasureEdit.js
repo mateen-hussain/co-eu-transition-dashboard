@@ -37,7 +37,7 @@ class MeasureEdit extends Page {
   }
 
   async getMeasureEntities(categoryId) {
-    const where = { categoryId, '$entityFieldEntries.value$': this.req.params.metricId  };
+    const where = { categoryId };
     const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
 
     if(!userIsAdmin) {
@@ -50,6 +50,11 @@ class MeasureEdit extends Page {
       order: [['created_at', 'DESC']],
       include: [{
         model: EntityFieldEntry,
+        where: { value: this.req.params.metricId },
+        include: {
+          model: CategoryField,
+          where: { name: 'metricId' },
+        }
       },{
         model: Entity,
         as: 'parents',
@@ -142,6 +147,11 @@ class MeasureEdit extends Page {
   async getMeasure() {
     const category = await this.getCategory();
     const entities = await this.getMeasureEntities(category.id);
+
+    if (entities.length === 0) {
+      return this.res.redirect(paths.dataEntryEntity.measureList);
+    }
+
     const theme = await this.getMeasureTheme(entities[0].parents);
 
     return entities.map(entity => {
