@@ -151,7 +151,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         },{
           model: Entity,
           as: 'parents',
-          include: Category
+          include: [{
+            model: Category
+          }, {
+            model: Entity,
+            as: 'parents',
+            include: Category
+          }]
         }]
       });
     });
@@ -186,7 +192,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         },{
           model: Entity,
           as: 'parents',
-          include: Category
+          include: [{
+            model: Category
+          }, {
+            model: Entity,
+            as: 'parents',
+            include: Category
+          }]
         }]
       });
     });
@@ -234,17 +246,16 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#getMeasureTheme', () => {
     it('gets theme data', async () => {
       const categories = [{ id: 1, name: 'Theme' }, { id: 2, name: 'Statement' }];
-      const entity = { id: 123, parents: [{ id: 456, categoryId: 1 }] };
       const entityFields =  [{ categoryField: { name: 'name' }, value: 'new-value' }];
 
       Category.findAll.resolves(categories);
-      Entity.findOne.resolves(entity);
       sinon.stub(page, 'getEntityFields').returns(entityFields);
 
-      const parents = [{ categoryId: 2 }]
-      const response = await page.getMeasureTheme(parents);
+      const themeParents = [{ id: 456, categoryId: 1 }]
+      const statementParents = [{ categoryId: 2, parents: themeParents }]
+      const response = await page.getMeasureTheme(statementParents);
 
-      sinon.assert.calledWith(page.getEntityFields, entity.parents[0].id);
+      sinon.assert.calledWith(page.getEntityFields, themeParents[0].id);
       expect(response).to.eql({
         id: 456,
         name: 'new-value',

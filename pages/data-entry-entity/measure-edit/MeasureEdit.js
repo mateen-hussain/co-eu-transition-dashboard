@@ -58,7 +58,13 @@ class MeasureEdit extends Page {
       },{
         model: Entity,
         as: 'parents',
-        include: Category
+        include: [{
+          model: Category
+        }, {
+          model: Entity,
+          as: 'parents',
+          include: Category
+        }]
       }]
     });
 
@@ -110,18 +116,9 @@ class MeasureEdit extends Page {
       return acc
     }, {})
 
-    const parentIsStatement = parents.find(parent => parent.categoryId === categoriesSorted.Statement);
-    
-    if (parentIsStatement) {
-      const statementEntity = await Entity.findOne({
-        where: { id: parentIsStatement.id },
-        include: [{
-          model: Entity,
-          as: 'parents',
-          include: Category
-        }]
-      });
+    const statementEntity = parents.find(parent => parent.categoryId === categoriesSorted.Statement);
 
+    if (statementEntity) {
       const themeEntity = statementEntity.parents.find(parent => parent.categoryId === categoriesSorted.Theme);
 
       if (!themeEntity) {
