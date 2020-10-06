@@ -21,7 +21,12 @@
     config.paths.dataEntryEntity.bulkUploadFile,
     config.paths.dataEntryEntity.import,
     config.paths.dataEntryEntity.submissionSuccess,
-    config.paths.dataEntryEntity.output,
+    config.paths.dataEntryEntity.output
+    ]
+%}
+
+{% set addMeasuresUrls = [
+    config.paths.dataEntryEntity.measureList,
     config.paths.dataEntryEntity.measureEdit
     ]
 %}
@@ -108,7 +113,7 @@
 </nav>
 {% endif %}
 
-{% if url in addProjectMilestonesUrls or url in addEntitiesUrls %}
+{% if url in addProjectMilestonesUrls or url in addEntitiesUrls  or url in addMeasuresUrls%}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">
@@ -116,12 +121,12 @@
         Management information
         </a>
     </li>
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls and not config.paths.dataEntryEntity.measureEdit }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
         Entity data import
         </a>
     </li>
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.dataEntryEntity.measureEdit }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addMeasuresUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.measureEdit }}">
         Measure edit
         </a>
