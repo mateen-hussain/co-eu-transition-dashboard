@@ -238,18 +238,5 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       expect(error).to.eql('No parent statement found');
     });
-
-    // it('returns error when no entity fields data ', async () => {
-    //   EntityFieldEntry.findAll.resolves();
-
-    //   let error = {};
-    //   try {
-    //     await page.getEntityFields('measure-1');
-    //   } catch (err) {
-    //     error = err.message;
-    //   }
-
-    //   expect(error).to.eql('EntityFieldEntry export, error finding entityFieldEntries');
-    // });
   });
 });
