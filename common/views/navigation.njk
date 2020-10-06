@@ -21,7 +21,8 @@
     config.paths.dataEntryEntity.bulkUploadFile,
     config.paths.dataEntryEntity.import,
     config.paths.dataEntryEntity.submissionSuccess,
-    config.paths.dataEntryEntity.output
+    config.paths.dataEntryEntity.output,
+    config.paths.dataEntryEntity.measureEdit
     ]
 %}
 
@@ -115,9 +116,14 @@
         Management information
         </a>
     </li>
-    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls }}">
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addEntitiesUrls and not config.paths.dataEntryEntity.measureEdit }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.bulkUpload }}">
         Entity data import
+        </a>
+    </li>
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url == config.paths.dataEntryEntity.measureEdit }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.measureEdit }}">
+        Measure edit
         </a>
     </li>
     </ul>

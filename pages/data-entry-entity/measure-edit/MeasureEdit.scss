@@ -1,0 +1,29 @@
+.measures-table {
+  .govuk-table__header,
+  .govuk-table__cell {
+    text-align: center;
+  }
+}
+
+.measure-rayg {
+  border-left: 0;
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+
+  &.red {
+    background-color: #D4351C;
+  }
+
+  &.amber {
+    background-color: #F47738;
+  }
+
+  &.yellow {
+    background-color: #FFDD00;
+  }
+
+  &.green {
+    background-color: #00703C;
+  }
+}
