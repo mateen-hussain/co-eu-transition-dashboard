@@ -85,12 +85,12 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
-  describe('#getMeasureCategory', () => {
+  describe('#getCategory', () => {
     it('gets and returns category', async () => {
-      const category = { name: 'some-name' };
+      const category = { name: 'Theme' };
       Category.findOne.resolves(category);
 
-      const response = await page.getCategory();
+      const response = await page.getCategory('Theme');
 
       expect(response).to.eql(category);
     });
@@ -113,33 +113,51 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const entities = {
       id: 'some-id',
       publicId: 'some-public-id-1',
+      parents: [
+        {
+          parents: [ {
+            categoryId: 1,
+            entityFieldEntries: [{
+              categoryField: {
+                name: 'name',
+              },
+              value: 'borders'
+            }]
+          }]
+        }
+      ]
     };
-    const categoryId = 1;
-    const entityFieldEntries = [{ entityfieldEntry: { value: 'new value', categoryField: { name: 'test' } } }];
+    const category = { id: 2 };
+    const theme = { id: 1 };
+    const entityFieldEntries = [{ value: 'new value', categoryField: { name: 'test' } }];
 
     beforeEach(() => {
       sinon.stub(page, 'getEntityFields').returns(entityFieldEntries)
       Entity.findAll.returns([entities]);
+      sinon.stub(rayg, 'getRaygColour').returns('green')
     });
 
     afterEach(() => {
       page.getEntityFields.restore();
+      rayg.getRaygColour.restore();
     });
 
     it('gets entities for a given category if admin', async () => {
       page.req.user.roles.push({ name: 'admin' });
 
       
-      const response = await page.getMeasureEntities(categoryId);
+      const response = await page.getMeasureEntities(category, theme);
 
       expect(response).to.eql([{
         id: 'some-id',
         publicId: 'some-public-id-1',
-        entityFieldEntries,
+        colour: 'green',
+        theme: 'borders',
+        test: 'new value',
       }]);
 
       sinon.assert.calledWith(Entity.findAll, {
-        where: { categoryId },
+        where: { categoryId: category.id },
         order: [['created_at', 'DESC']],
         include: [{
           model: EntityFieldEntry,
@@ -156,7 +174,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
           }, {
             model: Entity,
             as: 'parents',
-            include: Category
+            include: [{
+              separate: true,
+              model: EntityFieldEntry,
+              include: CategoryField
+            }, {
+              model: Category
+            }]
           }]
         }]
       });
@@ -167,16 +191,18 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         id: 10
       }];
 
-      const response = await page.getMeasureEntities(categoryId);
+      const response = await page.getMeasureEntities(category, theme);
       expect(response).to.eql([{
         id: 'some-id',
         publicId: 'some-public-id-1',
-        entityFieldEntries,
+        colour: 'green',
+        theme: 'borders',
+        test: 'new value',
       }]);
 
       sinon.assert.calledWith(Entity.findAll, {
         where: {
-          categoryId, 
+          categoryId: category.id,
           id: {
             [Op.in]: [10]
           }
@@ -197,7 +223,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
           }, {
             model: Entity,
             as: 'parents',
-            include: Category
+            include: [{
+              separate: true,
+              model: EntityFieldEntry,
+              include: CategoryField
+            }, {
+              model: Category
+            }]
           }]
         }]
       });
@@ -207,19 +239,14 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#getMeasure', () => {
     const measureCategory = { id: 'some-category' };
     const measureEntities = [{ id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }];
-    const themeEntities = [{ id: 'some-entity' }];
 
     beforeEach(() => {
       sinon.stub(page, 'getCategory').returns(measureCategory);  
-      sinon.stub(page, 'getMeasureTheme').returns(themeEntities);
-      sinon.stub(rayg, 'getRaygColour')
     });
 
     afterEach(() => {
       page.getCategory.restore();
       page.getMeasureEntities.restore();
-      page.getMeasureTheme.restore();
-      rayg.getRaygColour.restore();
     });
 
     it('Get measures and applying rayg', async () => {
@@ -227,54 +254,17 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       await page.getMeasure();
 
-      sinon.assert.calledOnce(page.getCategory);
-      sinon.assert.calledWith(page.getMeasureEntities, measureCategory.id);
-      sinon.assert.calledWith(page.getMeasureTheme, measureEntities[0].parents);
-      sinon.assert.calledOnce(rayg.getRaygColour);
+      sinon.assert.calledTwice(page.getCategory);
+      sinon.assert.calledOnce(page.getMeasureEntities);
     });
 
     it('redirects to list if no entity data', async () => {
       sinon.stub(page, 'getMeasureEntities').returns([]);
       await page.getMeasure();
 
-      sinon.assert.calledOnce(page.getCategory);
-      sinon.assert.calledWith(page.getMeasureEntities, measureCategory.id);
+      sinon.assert.calledTwice(page.getCategory);
+      sinon.assert.calledOnce(page.getMeasureEntities);
       sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
-    });
-  });
-
-  describe('#getMeasureTheme', () => {
-    it('gets theme data', async () => {
-      const categories = [{ id: 1, name: 'Theme' }, { id: 2, name: 'Statement' }];
-      const entityFields =  [{ categoryField: { name: 'name' }, value: 'new-value' }];
-
-      Category.findAll.resolves(categories);
-      sinon.stub(page, 'getEntityFields').returns(entityFields);
-
-      const themeParents = [{ id: 456, categoryId: 1 }]
-      const statementParents = [{ categoryId: 2, parents: themeParents }]
-      const response = await page.getMeasureTheme(statementParents);
-
-      sinon.assert.calledWith(page.getEntityFields, themeParents[0].id);
-      expect(response).to.eql({
-        id: 456,
-        name: 'new-value',
-      });
-    });
-
-    it('return error if statement id not set in parents object', async () => {
-      const categories = [{ id: 1, name: 'Theme' }, { id: 2, name: 'Statement' }];
-      Category.findAll.resolves(categories);
-      
-      let error = {};
-      try {
-        const parents = [{ categoryId: 3 }]
-        await page.getMeasureTheme(parents);
-      } catch (err) {
-        error = err.message;
-      }
-
-      expect(error).to.eql('No parent statement found');
     });
   });
 });

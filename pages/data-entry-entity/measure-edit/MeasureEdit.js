@@ -11,6 +11,7 @@ const CategoryField = require('models/categoryField');
 const { Op } = require('sequelize');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const rayg = require('helpers/rayg');
+const get = require('lodash/get');
 
 class MeasureEdit extends Page {
   get url() {
@@ -36,8 +37,8 @@ class MeasureEdit extends Page {
     super.getRequest(req, res);
   }
 
-  async getMeasureEntities(categoryId) {
-    const where = { categoryId };
+  async getMeasureEntities(measureCategory, themeCategory) {
+    const where = { categoryId: measureCategory.id };
     const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
 
     if(!userIsAdmin) {
@@ -56,14 +57,22 @@ class MeasureEdit extends Page {
           where: { name: 'metricId' },
         }
       },{
+        // get direct parent of measure i.e. outcome statement
         model: Entity,
         as: 'parents',
         include: [{
           model: Category
         }, {
+          // get direct parents of outcome statement i.e. theme ( and possibly another outcome statement )
           model: Entity,
           as: 'parents',
-          include: Category
+          include: [{
+            separate: true,
+            model: EntityFieldEntry,
+            include: CategoryField
+          }, {
+            model: Category
+          }]
         }]
       }]
     });
@@ -72,7 +81,11 @@ class MeasureEdit extends Page {
       entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
     }
 
-    return entities;
+    const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
+
+    return measureEntitiesMapped.filter(measure => {
+      return measure.filter !== 'RAYG';
+    });
   }
 
   async getEntityFields (entityId) {
@@ -89,11 +102,9 @@ class MeasureEdit extends Page {
     return entityFieldEntries;
   }
 
-  async getCategory() {
+  async getCategory(name) {
     const category = await Category.findOne({
-      where: {
-        name: 'Measure'
-      }
+      where: { name }
     });
 
     if (!category) {
@@ -104,58 +115,20 @@ class MeasureEdit extends Page {
     return category;
   }
 
-  async getMeasureTheme(parents) {
-    const categories = await Category.findAll({
-      where: {
-        name: ['Statement', 'Theme']
-      }
-    });
-
-    const categoriesSorted = categories.reduce((acc, category) => {
-      acc[category.name] = category.id 
-      return acc
-    }, {})
-
-    const statementEntity = parents.find(parent => parent.categoryId === categoriesSorted.Statement);
-
-    if (statementEntity) {
-      const themeEntity = statementEntity.parents.find(parent => parent.categoryId === categoriesSorted.Theme);
-
-      if (!themeEntity) {
-        return this.getMeasureTheme(statementEntity.parents);
-      }
-
-      themeEntity['entityFieldEntries'] = await this.getEntityFields(themeEntity.id);
-
-      const themeEntityMapped = {
-        id: themeEntity.id,
-      }
-        
-      themeEntity.entityFieldEntries.map(entityfieldEntry => {
-        themeEntityMapped[entityfieldEntry.categoryField.name] = entityfieldEntry.value;
+  mapMeasureFieldsToEntity(measureEntities, themeCategory) {
+    return measureEntities.map(entity => {
+      const theme = get(entity, 'parents[0].parents').find(parentEntity => {
+        return parentEntity.categoryId === themeCategory.id;
       });
 
-      return themeEntityMapped
-    }
-    
-    throw new Error('No parent statement found'); 
-  }
+      const themeName = theme.entityFieldEntries.find(fieldEntry => {
+        return fieldEntry.categoryField.name === 'name';
+      });
 
-  async getMeasure() {
-    const category = await this.getCategory();
-    const entities = await this.getMeasureEntities(category.id);
-
-    if (entities.length === 0) {
-      return this.res.redirect(paths.dataEntryEntity.measureList);
-    }
-
-    const theme = await this.getMeasureTheme(entities[0].parents);
-
-    return entities.map(entity => {
       const entityMapped = {
         id: entity.id,
         publicId: entity.publicId,
-        theme
+        theme: themeName.value
       };
 
       entity.entityFieldEntries.map(entityfieldEntry => {
@@ -166,6 +139,18 @@ class MeasureEdit extends Page {
 
       return entityMapped;
     });
+  }
+
+  async getMeasure() {
+    const measureCategory = await this.getCategory('Measure');
+    const themeCategory = await this.getCategory('Theme');
+    const entities = await this.getMeasureEntities(measureCategory, themeCategory);
+
+    if (entities.length === 0) {
+      return this.res.redirect(paths.dataEntryEntity.measureList);
+    }
+
+    return entities;
   }
 
 
