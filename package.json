@@ -7,6 +7,7 @@
     "start": "NODE_PATH=. node server.js",
     "dev": "NODE_PATH=. nodemon server.js",
     "install": "bash build.sh",
+    "test:single": "NODE_PATH=. FEATURE_2FA=true mocha $1 --opts 'test/unit/mocha.opts'",
     "test:lint": "eslint .",
     "test:unit": "NODE_PATH=. FEATURE_2FA=true mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",
     "test:coverage": "NODE_PATH=. FEATURE_2FA=true nyc mocha 'test/unit/**/*.test.js' --opts 'test/unit/mocha.opts'",

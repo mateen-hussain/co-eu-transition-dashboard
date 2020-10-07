@@ -9,7 +9,6 @@ const moment = require('moment');
 const sequelize = require('services/sequelize');
 const authentication = require('services/authentication');
 const { transformDeliveryConfidenceValue } = require('helpers/display');
-const { clearCache } = require('services/redis');
 
 class EditMilestone extends Page {
   get url() {
@@ -130,8 +129,7 @@ class EditMilestone extends Page {
         return res.redirect(this.req.originalUrl);
       }
 
-      await this.saveFieldToDatabase(parsedData);
-      return await clearCache();
+      return await this.saveFieldToDatabase(parsedData);
     }
 
     return res.redirect(this.req.originalUrl);

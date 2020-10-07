@@ -241,6 +241,10 @@
     background-color: #b1b4b6;
 }
 
+.outcome-measure__item.item-complete::before {
+    background-color: #1d70b8;
+}
+
 .tableu-message,
 .measures-message {
     border: 1px solid #979797;

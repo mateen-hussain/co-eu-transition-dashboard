@@ -1,5 +1,6 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
+const jwt = require('services/jwt');
 
 class Logout extends Page {
   get url() {
@@ -7,7 +8,7 @@ class Logout extends Page {
   }
 
   async getRequest(req, res) {
-    res.clearCookie("jwt");
+    jwt.clearCookie(res)
     res.redirect(paths.authentication.login);
   }
 }

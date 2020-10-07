@@ -13,7 +13,8 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 const tableau = require('services/tableau');
-const redis = require('services/redis');
+const cache = require('services/cache');
+const config = require('config');
 
 const rags = ['red', 'amber', 'yellow', 'green'];
 
@@ -75,7 +76,8 @@ const mapProjectToEntity = (milestoneFieldDefinitions, projectFieldDefinitions, 
       publicId: milestone.uid,
       deliveryConfidence: milestone.deliveryConfidence,
       categoryId: entityFieldMap.categoryId,
-      date: milestone.date
+      date: milestone.date,
+      complete: milestone.complete,
     };
 
     milestone.milestoneFieldEntries.forEach(milestoneFieldEntry => {
@@ -398,9 +400,11 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  const cached = await redis.get(`cache-transition-overview`);
-  if(cached) {
-    return JSON.parse(cached);
+  if(config.features.transitionReadinessCache) {
+    const cached = await cache.get(`cache-transition-overview`);
+    if(cached) {
+      return JSON.parse(cached);
+    }
   }
 
   const allEntities = await getAllEntities();
@@ -420,15 +424,17 @@ const createEntityHierarchy = async (category) => {
     entitesInHierarchy.push(entitesMapped)
   }
 
-  await redis.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy));
+  await cache.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy), moment().endOf('day'));
 
   return entitesInHierarchy;
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
-  if(cached) {
-    return JSON.parse(cached);
+  if(config.features.transitionReadinessCache) {
+    const cached = await cache.get(`cache-transition-${topLevelEntityPublicId}`);
+    if(cached) {
+      return JSON.parse(cached);
+    }
   }
 
   const allEntities = await getAllEntities();
@@ -444,7 +450,7 @@ const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
   const topLevelEntityMapped = mapEntityChildren(allEntities, topLevelEntity);
   await mapProjectsToEntities(topLevelEntityMapped);
 
-  await redis.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped));
+  await cache.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped), moment().endOf('day'));
 
   return topLevelEntityMapped;
 }

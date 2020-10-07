@@ -265,6 +265,19 @@ div.scrollable {
     overflow-y: scroll;
 }
 
+.selected-filters {
+    margin-bottom: -20px;
+}
+
+.filter-form {
+    display: inline;
+}
+
+.filter-form > button {
+    margin-right: 10px;
+    width: 150px;
+}
+
 
 
 
