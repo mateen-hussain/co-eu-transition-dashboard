@@ -1,5 +1,3 @@
-const compact = require('lodash/compact');
-
 const removeNulls = (obj, maxDepth, currentDepth = -1) => {
   currentDepth ++;
 
@@ -25,7 +23,8 @@ const removeNulls = (obj, maxDepth, currentDepth = -1) => {
     if(!obj.length) {
       return undefined;
     }
-    obj = compact(obj);
+    obj.filter(function(e) { return e === 0 || e });
+
   } else {
     for (var k in obj){
       if (typeof obj[k] === "object") {
