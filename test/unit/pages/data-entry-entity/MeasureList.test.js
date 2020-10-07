@@ -218,7 +218,6 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
       sinon.stub(page, 'getCategory').returns(category);
       sinon.stub(page, 'getMeasureEntities').returns(measureEntities);
       sinon.stub(page, 'latestMeasures').returns(latestMeasures);
-      sinon.stub(page, 'getRaygColour');
     });
 
     it('orchastrates getting measures and applying rayg colours', async () => {
@@ -228,7 +227,6 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
       sinon.assert.calledWith(page.getCategory, 'Theme');
       sinon.assert.calledWith(page.getMeasureEntities, category, category);
       sinon.assert.calledWith(page.latestMeasures, measureEntities);
-      sinon.assert.calledWith(page.getRaygColour, latestMeasures[0]);
     });
   });
 });
