@@ -5,6 +5,17 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: "#",
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% endblock %}
 
 {% block pageTitle %}Measures Edit{% endblock %}
 

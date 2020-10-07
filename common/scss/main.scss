@@ -13,6 +13,31 @@
 @import 'pages/rayg-definitions/RaygDefinitions.scss';
 @import 'pages/data-entry-entity/measure-edit/MeasureEdit.scss';
 
+.rayg-status {
+  &.rayg-block {
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    border: none;
+  }
+
+  &.red {
+    background-color: #D4351C;
+  }
+
+  &.amber {
+    background-color: #F47738;
+  }
+
+  &.yellow {
+    background-color: #FFDD00;
+  }
+
+  &.green {
+    background-color: #00703C;
+  }
+}
+
 .govuk-width-container {
     margin-right: 20px;
     margin-left: 20px;

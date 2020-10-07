@@ -67,8 +67,8 @@
       "import": "/import-entity",
       "submissionSuccess": "/entity-submission-success",
       "categoryTemplate": "/category-template",
-      "measureList": "/measure-list",
-      "measureEdit": "/edit-measure"
+      "measureList": "/measures/list",
+      "measureEdit": "/measures/edit"
     },
     "editMilestone": "/edit-milestone",
     "reportingOverview": "/reporting-overview",
