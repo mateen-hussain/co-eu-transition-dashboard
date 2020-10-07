@@ -13,7 +13,7 @@ const logger = require('services/logger');
 const groupBy = require('lodash/groupBy');
 const moment = require('moment');
 const tableau = require('services/tableau');
-const { cache } = require('services/nodeCache');
+const redis = require('services/redis');
 
 const rags = ['red', 'amber', 'yellow', 'green'];
 
@@ -44,7 +44,7 @@ const getIframeUrl = async (req, entity) => {
   case 'Project':
     workbook = 'HMG';
     view = 'Milestones';
-    appendUrl = `?Milestone%20UID=${entity.publicId}`;
+    appendUrl = `?Milestone%20-%20uid=${entity.publicId}`;
     break;
   }
 
@@ -96,6 +96,7 @@ const mapProjectToEntity = (milestoneFieldDefinitions, projectFieldDefinitions, 
 const applyRagRollups = (entity) => {
   let color = '';
 
+  // entity is a project
   if (entity.hasOwnProperty('hmgConfidence')) {
     if (entity.hmgConfidence == 0) {
       color = "red";
@@ -110,6 +111,9 @@ const applyRagRollups = (entity) => {
     entity.color = color;
     entity.children.forEach(applyRagRollups);
     return color;
+
+  // entity is a milestone
+  // do not roll up status to project
   } else if (entity.hasOwnProperty('deliveryConfidence')) {
     if (entity.deliveryConfidence == 0) {
       color = "red";
@@ -226,22 +230,35 @@ const mapProjectsToEntities = async (entitesInHierarchy) => {
     return;
   }
 
-  const projects = await dao.getAllData(undefined, { uid: projectUids });
+  const projects = await dao.getAllData(undefined, {
+    uid: projectUids,
+    complete: ['Yes', 'No'] // Only include milestones that are completed Yes or No ( dont include decommissioned milestones )
+  });
 
   const mapProjectsToEntites = (entity) => {
     if(entity.children) {
-      return entity.children.forEach(mapProjectsToEntites);
+      entity.children.forEach(mapProjectsToEntites);
+
+      // remove projects without milestones
+      entity.children = entity.children.filter(entity => {
+        const isProject = entity.categoryId === projectsCategory.id;
+        if(isProject) {
+          return entity.children && entity.children.length;
+        }
+        return true;
+      });
+
+      return entity;
     }
 
     if(entity.categoryId === projectsCategory.id) {
       const project = projects.find(project => project.uid === entity.publicId);
-      if(!project) {
-        throw new Error(`Cannot find project with UID ${entity.publicId}`);
+      if(project) {
+        mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
+        entity.isLastExpandable = true;
       }
-      mapProjectToEntity(milestoneFieldDefinitions, projectFieldDefinitions, entity, project);
-      entity.isLastExpandable = true;
     }
-  }
+  };
 
   mapProjectsToEntites(entitesInHierarchy);
 }
@@ -282,10 +299,13 @@ const mapEntityChildren = (allEntities, entity) => {
     entityFieldMap[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
   }, {});
 
+  // only append the value to the description if the group description is set
   const hasGroupDescription = !!entityFieldMap.groupDescription;
+  // only append the value to the description if the unit is none
   const shouldAppendValue = entityFieldMap.unit !== 'none';
 
   if(hasGroupDescription && shouldAppendValue) {
+    // if the unit is a percentage append the value to the description as well as a percent symbol, otherwise just append value
     if(entityFieldMap.unit === '%') {
       entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}%`;
     } else {
@@ -306,10 +326,14 @@ const mapEntityChildren = (allEntities, entity) => {
       entityFieldMap.children.push(childEntityWithFieldValuesAndMappedChildren);
     });
 
-    const isMeasure = entityFieldMap.children.find(entity => entity.category.name === "Measure");
-    if(isMeasure) {
-      entityFieldMap.children = entityFieldMap.children.filter(entity => entity.filter === 'RAYG');
-    }
+    entityFieldMap.children = entityFieldMap.children.filter(entity => {
+      // only show measure entities if filter equals RAYG
+      const isMeasure = entity.category.name === "Measure";
+      if(!isMeasure) {
+        return true;
+      }
+      return entity.filter === 'RAYG'
+    });
   }
 
   return entityFieldMap;
@@ -374,7 +398,7 @@ const getAllEntities = async () => {
 }
 
 const createEntityHierarchy = async (category) => {
-  const cached = cache.get(`entityHierarchy-all`);
+  const cached = await redis.get(`cache-transition-overview`);
   if(cached) {
     return JSON.parse(cached);
   }
@@ -390,19 +414,19 @@ const createEntityHierarchy = async (category) => {
   let entitesInHierarchy = [];
   for(const topLevelEntity of topLevelEntites) {
     const entitesMapped = mapEntityChildren(allEntities, topLevelEntity);
-    if(entitesMapped.length) {
+    if(entitesMapped && entitesMapped.children && entitesMapped.children.length) {
       await mapProjectsToEntities(entitesMapped);
     }
     entitesInHierarchy.push(entitesMapped)
   }
 
-  cache.set(`entityHierarchy-all`, JSON.stringify(entitesInHierarchy));
+  await redis.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy));
 
   return entitesInHierarchy;
 }
 
 const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
-  const cached = cache.get(`entityHierarchy-${topLevelEntityPublicId}`);
+  const cached = await redis.get(`cache-transition-${topLevelEntityPublicId}`);
   if(cached) {
     return JSON.parse(cached);
   }
@@ -420,7 +444,7 @@ const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
   const topLevelEntityMapped = mapEntityChildren(allEntities, topLevelEntity);
   await mapProjectsToEntities(topLevelEntityMapped);
 
-  cache.set(`entityHierarchy-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped));
+  await redis.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped));
 
   return topLevelEntityMapped;
 }

@@ -70,6 +70,7 @@
     "qrcode": "^1.4.4",
     "randomstring": "^1.1.5",
     "readline-sync": "^1.4.10",
+    "redis": "^3.0.2",
     "request-promise-native": "^1.0.9",
     "sass-loader": "^8.0.2",
     "sequelize": "^5.22.3",
