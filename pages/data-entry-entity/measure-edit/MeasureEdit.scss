@@ -41,7 +41,9 @@
 }
 
 .filter-value {
-  margin-left: 50px;
+  &:not(:first-of-type) {
+    margin-left: 50px;
+  }
   &:first-of-type {
     margin-left: 20px;
   };
