@@ -2,19 +2,21 @@
 
 {% macro dataEntriesContent(groupMeasures, url, metricId, data) %}
   <div>
+    <p class="govuk-body govuk-!-font-weight-bold">Current Value</p>
     {% for date, measureByFilter in groupMeasures %}
-      <div class="flex">
-        {{ date }} 
+        <div class="current-value">
         {% for filter, measures in measureByFilter %}
-          <div>
+            <p class="govuk-body">{{ date }}
             {% for measure in measures %}
-              {{ measure.label + " - " + measure.value if measure.label else measure.value }}<br>
+              <span class="filter-value">{{ measure.label + ": " + measure.value if measure.label else measure.value }}</span>
             {% endfor %}
-          </div>
+            </p>
         {% endfor %}
-      </div>
+        </div>
     {% endfor %}
 
+  <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
+  <div class="data-entry">
     <form action="{{ url }}/{{ metricId }}" method="post">
       <input type="hidden" name="type" value="entries" />
 
@@ -24,24 +26,19 @@
 
       {% for date, measureByFilter in groupMeasures %}
         {% if loop.last %}
-          <div class="flex">
             {% for filter, measures in measureByFilter %}
-              <div>
-                {% for measure in measures %}
-                  <br>
-                  <label for="entity-{{ measure.id }}">{{ measure.label }}</label>
-                  <input type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
-
-                  
-
+              {% for measure in measures %}
+                <div class="govuk-form-group">
+                {% if measure.label %} <p class="govuk-body govuk-!-font-weight-bold measure-label">{{ measure.label }}</p>{% endif %}
+                <label class="govuk-label measure-input" for="entity-{{ measure.id }}">Value
+                  <br><input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" /></label><br>
+                </div>
                 {% endfor %}
-              </div>
-            {% endfor %}
-          </div>
+              {% endfor %}
         {% endif %}
       {% endfor %}
-
-       <input type="submit" value="Submit">
+    <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     </form>
+   </div> 
   </div>
 {% endmacro %}

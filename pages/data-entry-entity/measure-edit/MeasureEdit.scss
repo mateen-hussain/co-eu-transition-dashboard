@@ -1,8 +1,9 @@
 .measures-table {
   .govuk-table__header,
   .govuk-table__cell {
-    text-align: center;
+    border: none;
   }
+  width: 50%;
 }
 
 .measure-rayg {
@@ -10,6 +11,7 @@
   height: 20px;
   width: 20px;
   display: inline-block;
+  margin-left: 15px;
 
   &.red {
     background-color: #D4351C;
@@ -28,6 +30,35 @@
   }
 }
 
-.flex {
-  display: flex;
+.current-value {
+  background-color: #f3f2f1;
+  padding: 10px 10px 5px 5px;
+  margin-bottom: 20px;
+}
+
+.current-value p {
+  margin-bottom: 5px;
+}
+
+.filter-value {
+  margin-left: 50px;
+  &:first-of-type {
+    margin-left: 20px;
+  };
+}
+
+.data-entry {
+  border: 1px solid #b1b4b6;
+  padding: 20px 20px 0 20px;
+  margin-top: -20px;
+}
+
+.measure-input {
+    display: inline-block;
+}
+
+.measure-label {
+  display: inline-block;
+  width: 100px;
+  text-align: left;
 }
