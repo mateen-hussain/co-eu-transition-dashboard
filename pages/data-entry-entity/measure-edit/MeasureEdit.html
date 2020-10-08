@@ -4,6 +4,8 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "data-entry-content.njk" import dataEntriesContent %}
 
 {% block beforeContent %}
   {% include "navigation.njk" %}
@@ -20,13 +22,24 @@
 {% block pageTitle %}Measures Edit{% endblock %}
 
 {% set measure = getMeasureData() | await %}
+{% set latestMEasure = measure.latest %}
+{% set groupedMeasures = measure.grouped %}
 
 {% block content %}
+
+  {% if flash %}
+    {{ govukErrorSummary({
+        titleText: "There was a problem saving your data",
+        errorList: [{
+            text: flash
+        }]
+    }) }}
+  {% endif %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-      <h1 class="govuk-heading-xl">{{ measure.name }}</h1>
+      <h1 class="govuk-heading-xl">{{ latestMEasure.name }}</h1>
 
       <table class="govuk-table measures-table">
         <thead class="govuk-table__head">
@@ -39,13 +52,33 @@
         </thead>
         <tbody class="govuk-table__body">
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell">{{ measure.publicId }}</td>
-            <td class="govuk-table__cell">{{ measure.theme }}</td>
-            <td class="govuk-table__cell "><span class="measure-rayg {{ measure.colour }}"></span></td>
-            <td class="govuk-table__cell">{{ measure.date }}</td>
+            <td class="govuk-table__cell">{{ latestMEasure.publicId }}</td>
+            <td class="govuk-table__cell">{{ latestMEasure.theme }}</td>
+            <td class="govuk-table__cell "><span class="measure-rayg {{ latestMEasure.colour }}"></span></td>
+            <td class="govuk-table__cell">{{ latestMEasure.date }}</td>
           </tr>
         </tbody>
       </table>
+
+      {{ govukTabs({
+        items: [
+          {
+            label: "Data entries",
+            id: "data-entries",
+            panel: {
+              html: dataEntriesContent(groupedMeasures, url, req.params.metricId, data)
+            }
+          },
+          {
+            label: "Measure information",
+            id: "measure-information",
+            panel: {
+              html: "<p class='govuk-body'>ergerg</p>"
+            }
+          }
+        ]
+      }) }}
+
     </div>
   </div>
 

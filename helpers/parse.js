@@ -36,10 +36,15 @@ const parseValue = (value, definition = {}) => {
   }
 };
 
-const parseItems = (items, itemDefinitions) => {
+const parseItems = (items, itemDefinitions, cloned = false) => {
   const parseItem = item => {
     const parsed = itemDefinitions.reduce((parsedItem, itemDefinition) => {
-      const value = item[itemDefinition.importColumnName || itemDefinition.displayName];
+      let value = item[itemDefinition.importColumnName || itemDefinition.displayName];
+
+      if (cloned) {
+        value = item[itemDefinition.name];
+      }
+      
       parsedItem[itemDefinition.name] = parseValue(value, itemDefinition);
       return parsedItem;
     }, {});
