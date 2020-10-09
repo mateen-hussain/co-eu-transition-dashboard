@@ -9,6 +9,7 @@ const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const { Op } = require('sequelize');
+const flash = require('middleware/flash');
 
 let page = {};
 let res = {};
@@ -39,10 +40,22 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
+  describe('#successfulMode', () => {
+    it('returns true when in successful mode', () => {
+      page.req.params = { metricId: '123', successful: 'successful' };
+      expect(page.successfulMode).to.be.ok;
+    });
+
+    it('returns false when not in successful mode', () => {
+      expect(page.successfulMode).to.be.not.ok;
+    });
+  });
+
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
         ...authentication.protect(['uploader']),
+        flash,
         entityUserPermissions.assignEntityIdsUserCanAccessToLocals
       ]);
 
@@ -144,8 +157,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('gets entities for a given category if admin', async () => {
       page.req.user.roles.push({ name: 'admin' });
-
-      
       const response = await page.getMeasureEntities(category, theme);
 
       expect(response).to.eql([{
@@ -158,7 +169,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledWith(Entity.findAll, {
         where: { categoryId: category.id },
-        order: [['created_at', 'DESC']],
         include: [{
           model: EntityFieldEntry,
           where: { value: req.params.metricId },
@@ -207,7 +217,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
             [Op.in]: [10]
           }
         },
-        order: [['created_at', 'DESC']],
         include: [{
           model: EntityFieldEntry,
           where: { value: req.params.metricId },
@@ -267,4 +276,178 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
     });
   });
+
+  describe('#applyFilterLabel', () => {
+    it('Should create label with filtervalue and filtervalue2 when both filter and filter2 exist', async () => {
+      const measures = [{ filter: 'filter1', filterValue: 'value1', filter2: 'filter2', filterValue2: 'value2' }];
+      page.applyFilterLabel(measures);
+      expect(measures[0].label).to.eql('value1 - value2');
+    });
+
+    it('Should create label with filtervalue if only filter exists', async () => {
+      const measures = [{ filter: 'filter1', filterValue: 'value1' }];
+      page.applyFilterLabel(measures);
+      expect(measures[0].label).to.eql('value1');
+    });
+
+    it('Should not create label when there are no filters', async () => {
+      const measures = [{ other: 'other values', }];
+      page.applyFilterLabel(measures);
+      expect(measures[0].label).not.to.exist;
+    });
+  });
+
+  describe('#sortMeasureData', () => {
+    it('Should sort data by date and filter', async () => {
+      const entity1 = { filterValue: 'value1', date: '04/10/2020' };
+      const entity2 = { filterValue: 'value2', date: '05/10/2020' };
+      const measures = [entity1, entity2];
+      const response = page.sortMeasureData(measures);
+
+      expect(response).to.eql({
+        [entity1.date]: {
+          [entity1.filterValue]: [entity1]
+        },
+        [entity2.date]: {
+          [entity2.filterValue]: [entity2]
+        }
+      });
+    });
+
+    it('Should sort data by date and metricID when filter does not exist', async () => {
+      const entity1 = { metricID: 'metric1', date: '04/10/2020' };
+      const entity2 = { metricID: 'metric1', date: '05/10/2020' };
+      const measures = [entity1, entity2];
+      const response = page.sortMeasureData(measures);
+
+      expect(response).to.eql({
+        [entity1.date]: {
+          [entity1.metricID]: [entity1]
+        },
+        [entity2.date]: {
+          [entity2.metricID]: [entity2]
+        }
+      });
+    });
+  });
+  
+  describe('#getMeasureData', () => {
+    const measureEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { metricID: 'metric1', date: '04/10/2020', value: 1 }];
+
+    beforeEach(() => {
+      sinon.stub(page, 'getMeasure').returns(measureEntities);  
+      sinon.stub(page, 'sortMeasureData').returns({});  
+    });
+
+    afterEach(() => {
+      page.getMeasure.restore();
+      page.sortMeasureData.restore();
+    });
+
+    it('getMeasureData should call getMeasure and sortMeasureData', async () => {
+      await page.getMeasureData();
+      sinon.assert.calledOnce(page.getMeasure);
+      sinon.assert.calledWith(page.sortMeasureData, measureEntities);
+    });
+  });
+
+  describe('#getEntitiesToBeCloned', () => {
+    const entities = {
+      id: 123,
+      publicId: 'some-public-id-1',
+      entityFieldEntries: [{ 
+        value: 'new value',
+        categoryField: { 
+          name: 'test'
+        }
+      }],
+      parents: [
+        {
+          categoryId: 2,
+          publicId: 'stat-1',
+          entityFieldEntries: [{
+            categoryField: {
+              name: 'name',
+            },
+            value: 'test'
+          }]
+        }
+      ]
+    };
+    const statementCategory = { id: 2 };
+    const entityIds = [123]
+
+    beforeEach(() => {
+      sinon.stub(page, 'getCategory').returns(statementCategory)
+      Entity.findAll.returns([entities]);
+    });
+
+    afterEach(() => {
+      page.getCategory.restore();
+    });
+
+    it('gets entities to be cloned if admin', async () => {
+      page.req.user.roles.push({ name: 'admin' });
+      const response = await page.getEntitiesToBeCloned(entityIds);
+
+      expect(response).to.eql([{
+        id: 123,
+        parentStatementPublicId: 'stat-1',
+        test: 'new value',
+      }]);
+
+      sinon.assert.calledWith(Entity.findAll, {
+        where: { id: entityIds },
+        include: [{
+          model: EntityFieldEntry,
+          include: CategoryField
+        },{
+          model: Entity,
+          as: 'parents',
+          include: [{
+            separate: true,
+            model: EntityFieldEntry,
+            include: CategoryField
+          }, {
+            model: Category
+          }]
+        }]
+      });
+    });
+
+    it('throw error when non-admin doesnt have correct access to all entities', async () => {
+      page.res.locals.entitiesUserCanAccess = [{ id: 123 }];
+      const entityIds = [123, 456]
+
+      let error = {};
+      try {
+        await page.getEntitiesToBeCloned(entityIds);
+      } catch (err) {
+        error = err.message;
+      }
+
+      expect(error).to.eql('Permissions error, user does not have access to all entities');
+    });
+  });
+
+  describe('#CreateEntitiesFromClonedData', () => {
+    const entities = [{
+      id: 123,
+      publicId: 'some-public-id-1',
+      value: 10
+    }];
+    const formData = { day: 1, month: 10, year: 2020, type: 'entries', entities: { 123: 100 }};
+
+    it('should return the correct data structure', async () => {
+      const response = await page.CreateEntitiesFromClonedData(entities, formData);
+
+      expect(response).to.eql([{
+        publicId: 'some-public-id-1',
+        date: '2020-10-01',
+        value: 100
+      }]);
+    });
+  });
+
+  
 });

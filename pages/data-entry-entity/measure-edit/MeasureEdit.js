@@ -1,24 +1,26 @@
 /* eslint-disable no-prototype-builtins */
 const Page = require('core/pages/page');
 const { paths } = require('config');
-const authentication = require('services/authentication');
+const { Op } = require('sequelize');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
+const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
-const CategoryField = require('models/categoryField');
-const { Op } = require('sequelize');
-const entityUserPermissions = require('middleware/entityUserPermissions');
-const rayg = require('helpers/rayg');
-const get = require('lodash/get');
-const groupBy = require('lodash/groupBy');
+const authentication = require('services/authentication');
 const sequelize = require('services/sequelize');
-const moment = require('moment');
+const entityUserPermissions = require('middleware/entityUserPermissions');
+const flash = require('middleware/flash');
+const rayg = require('helpers/rayg');
 const validation = require('helpers/validation');
 const parse = require('helpers/parse');
-const flash = require('middleware/flash');
-const { removeNulls } = require('helpers/utils');
+const { buildDateString, removeNulls } = require('helpers/utils');
+const get = require('lodash/get');
+const groupBy = require('lodash/groupBy');
+const uniqWith = require('lodash/uniqWith');
+
+const moment = require('moment');
 
 class MeasureEdit extends Page {
   get url() {
@@ -26,7 +28,11 @@ class MeasureEdit extends Page {
   }
 
   get pathToBind() {
-    return `${this.url}/:metricId`;
+    return `${this.url}/:metricId/:successful(successful)?`;
+  }
+
+  get successfulMode() {
+    return this.req.params && this.req.params.successful;
   }
 
   get middleware() {
@@ -157,48 +163,101 @@ class MeasureEdit extends Page {
       return this.res.redirect(paths.dataEntryEntity.measureList);
     }
 
-    return entities;
+    const sortedEntities = entities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+    return sortedEntities;
   }
 
-  applyFilterLabel(measures) {
-    measures.forEach(measure => {
-      if (measure.filter && measure.filter2) {
-        measure.label = `${measure.filterValue} - ${measure.filterValue2}`
-      } else if (measure.filter) {
-        measure.label = measure.filterValue
+  applyLabelToEntities(entities) {
+    entities.forEach(entity => {
+      if (entity.filter && entity.filter2) {
+        entity.label = `${entity.filterValue} - ${entity.filterValue2}`
+      } else if (entity.filter) {
+        entity.label = entity.filterValue
       }
     })
   }
 
-  sortMeasureData (measures) {
-    this.applyFilterLabel(measures)
-
+  groupEntitiesByDateAndFilter(measures) {
     const measureByDate = groupBy(measures, measure => measure.date);
     // Grouped by date And filter
     return Object.keys(measureByDate).reduce((acc, key) => {
-      acc[key] = groupBy(measureByDate[key], measure => measure.filterValue);
+      const dataGroupedByFilterOrMetric = groupBy(measureByDate[key], measure => measure.filterValue || measure.metricID);
+      acc[key] = this.sortGroupedEntityData(dataGroupedByFilterOrMetric);
       return acc
     }, {})
   }
 
+  sortGroupedEntityData(groupedEntityData) {
+    // Ensure the order within the group is the same
+    Object.keys(groupedEntityData).forEach(group => {
+      if (groupedEntityData[group][0].filter && groupedEntityData[group][0].filter2) {
+        groupedEntityData[group] = groupedEntityData[group].sort((a, b) => a.filterValue2.localeCompare(b.filterValue2))
+      } else if (groupedEntityData[group][0].filter) {
+        groupedEntityData[group] = groupedEntityData[group].sort((a, b) => a.filterValue.localeCompare(b.filterValue))
+      }
+    });
+    return groupedEntityData;
+  }
+
+  calculateUiInputs(measureEntities) {
+    const lastestEntitiyEntry = measureEntities[measureEntities.length - 1];
+    const filterdEntities = measureEntities.filter(measure => measure.date === lastestEntitiyEntry.date);
+
+    return uniqWith(
+      filterdEntities,
+      (locationA, locationB) => {
+        if (locationA.filter && locationA.filter2) {
+          return locationA.filterValue === locationB.filterValue && locationA.filterValue2 === locationB.filterValue2
+        } else if (locationA.filter) {
+          return locationA.filterValue === locationB.filterValue
+        } else {
+          return locationA.metricID
+        }
+      }
+    );
+  }
+
+  groupAndOrderUiInputs (uiInputs) {
+    const groupedInputs = groupBy(uiInputs, measure => measure.filterValue || measure.metricID);
+    const groupedAndSortedEntityData = this.sortGroupedEntityData(groupedInputs);
+    return groupedAndSortedEntityData;
+  }
+
   async getMeasureData() {
-    const measures = await this.getMeasure();
-    const sortedMeasures = this.sortMeasureData(measures)
+    const measuresEntities = await this.getMeasure();
+    this.applyLabelToEntities(measuresEntities)
+    const groupedMeasureEntities = this.groupEntitiesByDateAndFilter(measuresEntities)
+    
+    const uiInputs = this.calculateUiInputs(measuresEntities)
+    const measureFields = this.groupAndOrderUiInputs(uiInputs)
 
     return {
-      latest: measures[measures.length - 1],
-      grouped: sortedMeasures 
+      latest: measuresEntities[measuresEntities.length - 1],
+      grouped: groupedMeasureEntities,
+      fields: measureFields
     }
   }
 
   async getEntitiesToBeCloned(entityIds) {
+    const where = { id: entityIds }
+    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+
+    if (!userIsAdmin) {
+      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
+      const cansUserAccessAllRequiredEntities = entityIds.every(id => entityIdsUserCanAccess.includes(id));
+
+      if (!cansUserAccessAllRequiredEntities) {
+        logger.error(`Permissions error , user does not have access to all entities`);
+        throw new Error(`Permissions error, user does not have access to all entities`);
+      }
+    }
+    
     const entities = await Entity.findAll({
-      where: { id: entityIds },
+      where,
       include: [{
         model: EntityFieldEntry,
         include: CategoryField
       },{
-        // get direct parents of outcome statement i.e. theme ( and possibly another outcome statement )
         model: Entity,
         as: 'parents',
         include: [{
@@ -221,7 +280,6 @@ class MeasureEdit extends Page {
 
       const entityMapped = {
         id: entity.id,
-        publicId: entity.publicId,
         parentStatementPublicId: statementEntity.publicId,
       };
 
@@ -236,39 +294,42 @@ class MeasureEdit extends Page {
   CreateEntitiesFromClonedData(merticEntities, formData) {
     const { entities } = formData;
     return merticEntities.map(entity => {
-      const id = entity.id; 
-      delete entity['id'];
-      delete entity['publicId'];
+      const { id, ...entityNoId } = entity; 
       return { 
-        ...entity, 
+        ...entityNoId, 
         value: entities[id],
-        date: this.formatDate(formData)
+        date: buildDateString(formData)
       }
     });
   }
 
-  formatDate(formData) {
-    const { day, month, year } = formData;
-
-    // Ensure day and month are always 2 digits
-    const padStart = (d) => ('0' + d).slice(-2);
-
-    return `${year}-${padStart(month)}-${padStart(day)}`;
-  }
-
-  validateFormData(formData) {
-    const newDate = this.formatDate(formData)
+  async validateFormData(formData) {
+    const measuresEntities = await this.getMeasure();
+    const uiInputs = this.calculateUiInputs(measuresEntities) 
     const errors = [];
 
-    if (!moment(newDate, 'YYYY-MM-DD').isValid()) {
-      errors.push('Invalid date');
+    if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
+      errors.push({ error: 'Invalid date', input: 'date' });
     }
-
-    Object.keys(formData.entities).forEach(entityId => {
-      if (formData.entities[entityId].length === 0) {
-        errors.push('Invalid value')
+    
+    if (formData.entities) {
+      // Check the number of submitted entities matches the expected number
+      const submittedEntityId = Object.keys(formData.entities);
+      const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
+     
+      if (!haveAllEntitesBeenSubmitted) {
+        errors.push({ error: 'Mssing entity values', input: 'entities' });
       }
-    })
+      
+      submittedEntityId.forEach(entityId => {
+        const entityValue = formData.entities[entityId]
+        if (entityValue.length === 0 || isNaN(entityValue)) {
+          errors.push({ error: 'Invalid value', input: entityId });
+        }
+      })
+    } else {
+      errors.push({ error: 'Mssing entity values', input: 'entities' });
+    }
 
     return errors;
   }
@@ -291,18 +352,28 @@ class MeasureEdit extends Page {
     }
   }
 
-  async addMeasureEntityData (formData) {
-    const formErrors = this.validateFormData(formData);
+  async postRequest(req, res) {
+    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    }
 
-    if (formErrors.length > 0) {
-      this.saveData(removeNulls(formData));
-      this.req.flash('Missing form data');
+    if (req.body.type === 'entries') {
+      this.saveData(removeNulls(req.body));
+      return await this.addMeasureEntityData(req.body)
+    }
+
+    return res.redirect(`${this.url}/${this.req.params.metricId}`);
+  }
+
+  async addMeasureEntityData (formData) {
+    const formValidationErrors = await this.validateFormData(formData);
+    if (formValidationErrors.length > 0) {
+      this.req.flash('Missing / invalid form data');
       return this.res.redirect(`${this.url}/${this.req.params.metricId}`);
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
     const newEntities = await this.CreateEntitiesFromClonedData(clonedEntities, formData)
-
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
     if (errors.length > 0) {
@@ -310,20 +381,7 @@ class MeasureEdit extends Page {
       return this.res.redirect(`${this.url}/${this.req.params.metricId}`); 
     }
  
-    await this.saveMeasureData(parsedEntities);
-    return this.res.redirect(`${this.url}/${this.req.params.metricId}`);
-  }
-
-  async postRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
-      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
-    }
-
-    if (req.body.type === 'entries') {
-      return await this.addMeasureEntityData(req.body, req.params.metricId)
-    }
-
-    return res.redirect(`${this.url}/${this.req.params.metricId}`);
+    return await this.saveMeasureData(parsedEntities);  
   }
 
   async saveMeasureData(entities) {
@@ -332,19 +390,21 @@ class MeasureEdit extends Page {
       where: { name: categoryName }
     });
     const categoryFields = await Category.fieldDefinitions(categoryName);
-
     const transaction = await sequelize.transaction();
+    let redirectUrl =`${this.url}/${this.req.params.metricId}`;
+
     try {
       for(const entity of entities) {
         await Entity.import(entity, category, categoryFields, { transaction });
       }
       await transaction.commit();
       this.clearData();
-      this.req.flash('Data successfully added');
+      redirectUrl += '/successful';
     } catch (error) {
       this.req.flash('Error saving measure data');
       await transaction.rollback();
     }
+    return this.res.redirect(redirectUrl);
   }
 }
 
