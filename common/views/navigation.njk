@@ -126,11 +126,13 @@
         Entity data import
         </a>
     </li>
+    {% if config.features.measureUpload %}
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addMeasuresUrls }}">
         <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.measureList }}">
         Measures
         </a>
     </li>
+    {% endif %}
     </ul>
 </nav>
 {% endif %}
