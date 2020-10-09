@@ -31,9 +31,13 @@
     {% endset -%}
 
     {% if filter.name in filterTitles %}
+      {% set filterName = filter.name %}
+      {% if (filter.id === 'deliveryConfidence') or (filter.id === 'category') %}
+        {% set filterName = 'Milestone ' + filter.name %}
+      {% endif %}
        {% set items = (items.push ({
           heading: {
-            text: filter.name
+            text: filterName
           },
           content: {
             html: filterCheckboxes
@@ -48,13 +52,13 @@
 
   {% endfor %}
 
-  <form action="{{ url }}" method="post">
+  <form action="{{ url }}" class="filter-form" method="post">
     <h3 class="govuk-heading-s panelTitle">Filters</h3>
     {% include "all-data/partials/filters/all-filters.njk" %}
     {% include "all-data/partials/filters/filter-btn.njk" %}
   </form>
 
-  <form action="{{ url }}" method="post">
+  <form action="{{ url }}" class="filter-form" method="post">
     {{ govukButton({
       text: "Clear all filters",
       name: "clear",

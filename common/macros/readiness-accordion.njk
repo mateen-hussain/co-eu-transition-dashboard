@@ -40,7 +40,8 @@
 {% macro outcomeMeasuresContent(items) %}
   <ul class="govuk-body govuk-!-font-size-16 outcome-measures">
     {% for item in items %}
-      <li class="outcome-measure__item {% if item.activeFrom %} item-disabled {% else %} item-{{ item.color }} {% endif %} {% if item.active %} outcome-measure__item--active {% endif %}">
+      {% set raygColor = "item-complete" if item.complete == "Yes" else "item-" + item.color %}
+      <li class="outcome-measure__item {% if item.activeFrom %} item-disabled {% else %} {{ raygColor }} {% endif %} {% if item.active %} outcome-measure__item--active {% endif %}">
       {% if item.activeFrom %}
         <a href="{{ item.link }}" class="outcome-measure__link placeholder-measure">
         <p class="govuk-body govuk-!-font-weight-bold placeholder-title">DATA EXPECTED: {{ item.activeFrom | formatDate("DD/MM/YYYY") }}</p>

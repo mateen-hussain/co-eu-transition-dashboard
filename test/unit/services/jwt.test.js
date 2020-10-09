@@ -68,4 +68,12 @@ describe('services/jwt', () => {
       expect(token).to.be.undefined;
     });
   });
+
+  describe('#clearCookie', () => {
+    it('clearCookie shoould be called', () => {
+      const res = { clearCookie: sinon.stub() };
+      jwt.clearCookie(res);
+      sinon.assert.calledWith(res.clearCookie, 'jwt', { domain: config.cookie.domain });
+    });
+  });
 });

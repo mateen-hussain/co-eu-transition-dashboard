@@ -1,51 +1,44 @@
-.milestones {
-  background-color: #f3f2f1;
-}
-
 .milestone-count {
-  height: 28px;
-  width: 28px;
-  background-color: #5694ca;
+  height: 40px;
+  width: 40px;
+  background-color: #1d70b8;
   border-radius: 50%;
   display: inline-block;
   text-align: center;
   color: white;
-  font-weight: normal;
-  margin-left: 10px;
-  margin-top: 2px;
-  font-size: 18px;
+  font-weight: bold;
+  font-size: 26px;
   padding: 4px 3px 0 3px;
 }
 
-.milestone-count.department {
-  background-color: #1d70b8;
+.description-row {
+  border-top: hidden;
 }
 
-.milestone-count.milestone {
-  margin-bottom: -10px;
-  margin-left: 3px;
+.number-cell {
+  border-bottom: hidden;
+  border-top: 1px solid #b1b4b6;
 }
 
-#timeline {
-  border-left: 6px solid #1d70b8;
-  padding-left: 15px; 
+.upcoming-milestones-table tr > *:nth-child(5) {
+  width: 40%;
 }
 
-.milestone-date:before {
-  background-color: #1d70b8;
-  content: "";
-  display: inline-block;
-  height: 5px;
-  vertical-align: middle;
-  width: 15px;
-  margin-right: 5px;
-  margin-left: -15px;
+.sort-coloumn {
+  cursor: pointer;
 }
 
-.upcoming-milestones {
-  display: none;
+.up-sort:after {
+  content: url('/assets/images/up-sort.png');
+  padding: 10px;
 }
 
-.theme-caption {
-  display: inline;
+.down-sort:after {
+  content: url('/assets/images/down-sort.png');
+  padding: 10px;
 }
+
+.impact-def-title {
+  margin-top: 8px;
+}
+

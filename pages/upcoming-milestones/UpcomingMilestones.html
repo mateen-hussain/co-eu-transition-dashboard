@@ -1,6 +1,4 @@
 {% extends "template.njk" %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -10,62 +8,78 @@
 
 {% set filters = filters() | await %}
 {% set dates = getDepartmentsWithUpcomingMilestones() | await  %}
+{% set cellBlock = "cell-color-" %}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
 {% block content %}
 
-<div class="govuk-grid-row" id="hide-filters">
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Upcoming milestones</h1>
+  </div>
+</div>
 
-  <div class="govuk-grid-column-one-quarter" id="filterPanel">
-  {% include "upcoming-milestones/partials/filters/filters.njk" %}
+<div class="govuk-grid-row">
+
+  <div class="govuk-grid-column-one-quarter">
+    {% include "all-data/partials/filters/filters.njk" %}
   </div>
 
-  <div class="govuk-grid-column-full" id="dataTable">
+  <div class="govuk-grid-column-three-quarters">
+    <p class="govuk-body-s impact-def-title"><a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a></p>
+    {% include "all-data/partials/filters/filter-summary.njk" %}
 
-  <h1 class="govuk-heading-xl">Upcoming milestones</h1>
+  <table class="govuk-table upcoming-milestones-table">
 
-  <div id="showFiltersBtn">
-    <p class="govuk-body"><a href="#show-filters" class="govuk-link">Show filters</a></p>
-  </div>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header sort-coloumn up-sort">Due date</th>
+      <th scope="col" class="govuk-table__header">Milestone UID</th>
+      <th scope="col" class="govuk-table__header">Department</th>
+      <th scope="col" class="govuk-table__header">Theme</th>
+      <th scope="col" class="govuk-table__header">Project Name</th>
+      <th scope="col" class="govuk-table__header">Delivery Confidence</th>
+      <th scope="col" class="govuk-table__header">Project Impact</th>
+    </tr>
+  </thead>
 
-  <div id="hideFiltersBtn">
-      <p class="govuk-body"><a href="#hide-filters" class="govuk-link">Hide filters</a></p>
-  </div>
-
-  {% include "all-data/partials/filters/filter-summary.njk" %}
-
-  <div id="timeline">
-    {% for date in dates %}
-
-      <h3 class="govuk-heading-m milestone-date">{{ date.date }}
-      <span class="milestone-count department">{{ date.totalMilestones }}</span>
-      {% for i in range(1, date.totalMilestones) -%}
-        <span class="milestone-count milestone"></span>
-      {%- endfor %}
-      </h3>
-
-      <p class="govuk-body"><a href="#" class="govuk-link see-more" onclick="return false;">See more</a></p>
-      <div class="upcoming-milestones">
-        <hr class="govuk-section-break govuk-section-break--visible">
-        {% for department in date.departments %}
-          <h4 class="govuk-heading-s">{{ department.name }} <span class="milestone-count">{{ department.totalMilestones }}</span> </h4>
-          {% for project in department.projects %}
-            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a> <span class="govuk-caption-m theme-caption">{{ project.fields.get('deliveryTheme').value }}</span></p>
-            {% for milestone in project.milestones %}
-              <div class="milestones">
-                <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
-                <span class="govuk-caption-m">Milestone delivery confidence: {{ milestone.fields.get('deliveryConfidence').value }}</span>
-                <p class="govuk-body">{{ milestone.description }}</p>
-              </div>
-            {% endfor %}
-          {% endfor %}
-        {% endfor %}
-      </div>
-      
+  {% for date in dates %}
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row date-row">
+          <td rowspan="{{ date.totalMilestones * 2 }}" class="govuk-table__cell">
+            <p class="govuk-body govuk-!-font-weight-bold">{{ date.date }}</p>
+            <span class="milestone-count">{{ date.totalMilestones }}</span>
+          </td>
+        {% for department in date.departments %} {% for project in department.projects %} {% for milestone in project.milestones %}
+          <td class="govuk-table__cell">
+            <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
+          </td>
+          <td class="govuk-table__cell">
+            <p class="govuk-body govuk-!-font-weight-bold">{{ department.name }}</p>
+          </td>
+          <td class="govuk-table__cell">
+            <span class="govuk-caption-m">{{ project.fields.get('deliveryTheme').value | default('N/A') }}</span></p>
+          </td>
+          <td class="govuk-table__cell">
+            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a></p>
+          </td>
+          <td class="govuk-table__cell number-cell">
+            <span class="{{ cellBlock + milestone.fields.get('deliveryConfidence').value }}">{{ milestone.fields.get('deliveryConfidence').value | default('N/A') }}</span>
+          </td>
+          <td class="govuk-table__cell number-cell">
+            <span class="{{ cellBlock + project.impact }}">{{ project.impact | default('N/A') }}</span>
+          </td>
+        <tr>
+          <td colspan="4" class="description-row govuk-table__cell">
+            <p class="govuk-body">{{ milestone.description }}</p>
+          </td>
+        </tr>
+        {% endfor %} {% endfor %} {% endfor %}
+        </tr>
+    </tbody>
     {% endfor %}
-  </div>
-
+  </table>
   </div>
 </div>
 
@@ -73,6 +87,6 @@
 
 {% block afterScript %}
   <script>
-    TRANSITIONDELIVERYDASHBOARD.seeMore();
+    TRANSITIONDELIVERYDASHBOARD.sortTable();
   </script>
 {% endblock %}

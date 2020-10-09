@@ -34,7 +34,7 @@
       </div>
     {% endif %}
 
-    <h1 class="govuk-heading-xl">Edit Headline Measures</h1>
+    <h1 class="govuk-heading-l">Edit Headline Measures</h1>
 
     <form action='{{ req.originalUrl }}' method='POST' id="headline-measures">
       {% for headlineMeasure in getHeadlineMeasures() | await %}

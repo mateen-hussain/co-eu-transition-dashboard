@@ -1,0 +1,53 @@
+{% extends "template.njk" %}
+
+{% set measures = getMeasures() | await %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+{% endblock %}
+
+{% block pageTitle %}Measures{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row" id="hide-filters">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-xl">Measures</h1>
+
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Measure UID</th>
+            <th scope="col" class="govuk-table__header">Theme</th>
+            <th scope="col" class="govuk-table__header">Title</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+            <th scope="col" class="govuk-table__header">Last updated</th>
+            <th scope="col" class="govuk-table__header"></th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for measure in measures %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ measure.metricID }}</td>
+              <td class="govuk-table__cell">{{ measure.theme }}</td>
+              <td class="govuk-table__cell">{{ measure.name }}</td>
+              <td class="govuk-table__cell">
+                <div class="rayg-status rayg-block {{ measure.colour }}" alt="RAYG status is: {{ measure.colour }}"></div>
+              </td>
+              <td class="govuk-table__cell">{{ measure.date }}</td>
+              <td class="govuk-table__cell">
+                <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link">Edit</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

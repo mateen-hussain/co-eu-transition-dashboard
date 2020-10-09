@@ -25,6 +25,12 @@
     ]
 %}
 
+{% set addMeasuresUrls = [
+    config.paths.dataEntryEntity.measureList,
+    config.paths.dataEntryEntity.measureEdit
+    ]
+%}
+
 {% set adminUrls = [
     config.paths.admin.projectFieldList,
     config.paths.admin.projectField,
@@ -62,7 +68,7 @@
     </li>
     {% endif %}
     {% if req.user.roles | includes(['uploader','admin']) %}
-    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls }}">
+    <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls or url in addEntitiesUrls or url in addMeasuresUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.dataEntry.bulkUploadProjectMilestone }}">
         Add data
         </a>
@@ -107,7 +113,7 @@
 </nav>
 {% endif %}
 
-{% if url in addProjectMilestonesUrls or url in addEntitiesUrls %}
+{% if url in addProjectMilestonesUrls or url in addEntitiesUrls  or url in addMeasuresUrls %}
 <nav class="child-navigation">
     <ul id="childNavigation" class="govuk-header__navigation" aria-label="Second Level Navigation">
     <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addProjectMilestonesUrls }}">
@@ -120,6 +126,13 @@
         Entity data import
         </a>
     </li>
+    {% if config.features.measureUpload %}
+    <li class="govuk-header__navigation-item child-item {{ 'govuk-header__navigation-item--active' if url in addMeasuresUrls }}">
+        <a class="govuk-header__link child-nav" href="{{ config.paths.dataEntryEntity.measureList }}">
+        Measures
+        </a>
+    </li>
+    {% endif %}
     </ul>
 </nav>
 {% endif %}

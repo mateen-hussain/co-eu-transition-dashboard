@@ -2,7 +2,6 @@ const { expect, sinon } = require('test/unit/util/chai');
 const config = require('config');
 const jwt = require('services/jwt');
 const authentication = require('services/authentication');
-const { clearCacheMiddleware } = require('services/redis');
 
 let page = {};
 let EntitySubmissionSuccess;
@@ -56,8 +55,7 @@ describe('pages/data-entry-entity/entity-submission-success/EntitySubmissionSucc
 
   it('only uploaders are allowed to access this page and clears internal cache', () => {
     expect(page.middleware).to.eql([
-      ...authentication.protect(['uploader']),
-      clearCacheMiddleware
+      ...authentication.protect(['uploader'])
     ]);
 
     sinon.assert.calledWith(authentication.protect, ['uploader']);
