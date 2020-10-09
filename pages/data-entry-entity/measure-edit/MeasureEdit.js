@@ -101,7 +101,7 @@ class MeasureEdit extends Page {
     });
   }
 
-  async getEntityFields (entityId) {
+  async getEntityFields(entityId) {
     const entityFieldEntries = await EntityFieldEntry.findAll({
       where: { entity_id: entityId },
       include: CategoryField
@@ -309,7 +309,11 @@ class MeasureEdit extends Page {
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
-      errors.push({ error: 'Invalid date', input: 'date' });
+      errors.push({ error: 'Invalid date' });
+    }
+
+    if (!formData.entities) {
+      errors.push({ error: 'Mssing entity values' });
     }
     
     if (formData.entities) {
@@ -318,18 +322,16 @@ class MeasureEdit extends Page {
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
      
       if (!haveAllEntitesBeenSubmitted) {
-        errors.push({ error: 'Mssing entity values', input: 'entities' });
+        errors.push({ error: 'Mssing entity values' });
       }
       
       submittedEntityId.forEach(entityId => {
         const entityValue = formData.entities[entityId]
         if (entityValue.length === 0 || isNaN(entityValue)) {
-          errors.push({ error: 'Invalid value', input: entityId });
+          errors.push({ error: 'Invalid field value' });
         }
       })
-    } else {
-      errors.push({ error: 'Mssing entity values', input: 'entities' });
-    }
+    }  
 
     return errors;
   }
