@@ -1,21 +1,22 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
-{% macro dataEntriesContent(groupMeasures, url, metricId, data) %}
+{% macro dataEntriesContent(groupMeasures, url, metricId, data, formFields) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
 
     <p class="govuk-body govuk-!-font-weight-bold">Current Value</p>
+    <table class="current-value">
     {% for date, measureByFilter in groupMeasures %}
-        <div class="current-value">
+        <tr>
+        <td rowspan="{{ measureByFilter | length }}" class="date-value"><p class="govuk-body">{{ date }}</p></td>
         {% for filter, measures in measureByFilter %}
-            <p class="govuk-body">{{ date }}
-            {% for measure in measures %}
-              <span class="filter-value">{{ measure.label + ": " + measure.value if measure.label else measure.value }}</span>
-            {% endfor %}
-            </p>
+          {% for measure in measures %}
+            <td><p class="govuk-body">{{ measure.label + ": " + measure.value if measure.label else measure.value }}</p></td>
+          {% endfor %}
+        </tr>
         {% endfor %}
-        </div>
     {% endfor %}
+    </table>
 
   <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
   <div class="data-entry">
@@ -26,19 +27,17 @@
         name: "field-date"
       }) }}
 
-      {% for date, measureByFilter in groupMeasures %}
-        {% if loop.last %}
-            {% for filter, measures in measureByFilter %}
-              {% for measure in measures %}
-                <div class="govuk-form-group">
-                {% if measure.label %} <p class="govuk-body govuk-!-font-weight-bold measure-label">{{ measure.label }}</p>{% endif %}
-                <label class="govuk-label measure-input" for="entity-{{ measure.id }}">Value
-                  <br><input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" /></label><br>
-                </div>
-                {% endfor %}
-              {% endfor %}
-        {% endif %}
+    <table>
+      {% for key, value in formFields %}
+        <tr>
+        {% for measure in value %}
+          {% if measure.label %} <td class="measure-label"><p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p><td>{% endif %}
+          <td><label class="govuk-label" for="entity-{{ measure.id }}">Value
+          <br><input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" /></label></td>
+        {% endfor %}
+        </tr>
       {% endfor %}
+      </table><br>
     <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     </form>
    </div> 

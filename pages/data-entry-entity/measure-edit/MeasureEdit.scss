@@ -34,19 +34,22 @@
   background-color: #f3f2f1;
   padding: 10px 10px 5px 5px;
   margin-bottom: 20px;
+  width: 100%;
+}
+
+.current-value tr td {
+  width: 20%;
+  &:first-of-type {
+    width: 5%;
+  }
 }
 
 .current-value p {
   margin-bottom: 5px;
 }
 
-.filter-value {
-  &:not(:first-of-type) {
-    margin-left: 50px;
-  }
-  &:first-of-type {
-    margin-left: 20px;
-  };
+.date-value {
+  vertical-align: initial;
 }
 
 .data-entry {
@@ -55,12 +58,11 @@
   margin-top: -20px;
 }
 
-.measure-input {
-    display: inline-block;
-}
-
 .measure-label {
-  display: inline-block;
-  width: 100px;
+  vertical-align: bottom;
+  max-width: 100px;
   text-align: left;
+  &:not(:first-of-type) {
+    padding-left: 30px;
+  }
 }
