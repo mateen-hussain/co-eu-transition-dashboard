@@ -24,6 +24,7 @@
 {% set measure = getMeasureData() | await %}
 {% set latestMEasure = measure.latest %}
 {% set groupedMeasures = measure.grouped %}
+{% set formFields = measure.fields %}
 
 {% block content %}
 
@@ -66,7 +67,7 @@
             label: "Data entries",
             id: "data-entries",
             panel: {
-              html: dataEntriesContent(groupedMeasures, url, req.params.metricId, data)
+              html: dataEntriesContent(groupedMeasures, url, req.params.metricId, data, formFields)
             }
           },
           {
