@@ -12,6 +12,7 @@ const { Op } = require('sequelize');
 const flash = require('middleware/flash');
 const parse = require('helpers/parse');
 const validation = require('helpers/validation');
+const sequelize = require('services/sequelize');
 
 let page = {};
 let res = {};
@@ -516,6 +517,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an error when date is not valid', async () => {
       const formData = { day: '10', month: '14', year: '2020', entities:{} };
+      
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -525,6 +527,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an error when no entities data is present', async () => {
       const formData = { day: '10', month: '12', year: '2020' };
+
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -534,6 +537,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an error when entities data is missing ids', async () => {
       const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 10 } };
+
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -543,6 +547,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an error when entities data is empty', async () => {
       const formData = { day: '10', month: '12', year: '2020', entities:{ 123: '', 456: 10 } };
+
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -552,6 +557,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an error when entities data is NaN', async () => {
       const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 'hello', 456: 10 } };
+
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -561,6 +567,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an empty array when data is valid', async () => {
       const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 5, 456: 10 } };
+
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -574,14 +581,18 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     beforeEach(() => {
       Category.fieldDefinitions = sinon.stub().returns(categoryFields);
+      sinon.stub(validation, 'validateItems');
+      sinon.stub(parse, 'parseItems')
     });
 
     afterEach(() => {
       parse.parseItems.restore();
+      validation.validateItems.restore();
     });
-
+    
     it('rejects if no entities found', async () => {
-      sinon.stub(parse, 'parseItems').returns([]);
+      parse.parseItems.returns([]);
+      validation.validateItems.returns([])
       const response = await page.validateEntities();
       expect(response.errors).to.eql([{ error: 'No entities found' }]);
     });
@@ -589,10 +600,11 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     it('validates each item parsed', async () => {
       const items = [{ id: 1 }, { id: 2 }];
       const parsedItems = [{ foo: 'bar' }];
+      parse.parseItems.returns(parsedItems);
+      validation.validateItems.returns([])
 
-      sinon.stub(parse, 'parseItems').returns(parsedItems);
-      sinon.stub(validation, 'validateItems').returns([])
       const response = await page.validateEntities(items);
+
       expect(response).to.eql({ errors: [], parsedEntities: [ { foo: 'bar' } ] });
       sinon.assert.calledWith(validation.validateItems, parsedItems, categoryFields);
     });
@@ -614,6 +626,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         entitiesUserCanAccess: []
       }
       await page.postRequest({}, res);
+
       sinon.assert.calledWith(res.status, METHOD_NOT_ALLOWED);
       sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
     });
@@ -623,13 +636,16 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       req.user = { isAdmin: true }
 
       await page.postRequest(req, res);
+
       sinon.assert.calledOnce(page.saveData);
       sinon.assert.calledWith(page.addMeasureEntityData, req.body);
     });
 
     it('should call redirect if no error and no post data', async () => {
       req.user = { isAdmin: true }
+
       await page.postRequest(req, res);
+
       sinon.assert.calledOnce(res.redirect);
     });
   });
@@ -644,7 +660,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.stub(page, 'getEntitiesToBeCloned').returns(clonedEntities)
       sinon.stub(page, 'CreateEntitiesFromClonedData').returns(newEntities)
       sinon.stub(page, 'saveMeasureData').returns({})
-      
     });
 
     afterEach(() => {
@@ -657,7 +672,9 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     it('should call flash and redirect when missing form data', async () => {
       const formData = { day: 1,  year: 2020, type: 'entries', entities: { 123: 100 } };
       sinon.stub(page, 'validateFormData').returns([{ error: 'error' }])
+
       await page.addMeasureEntityData(formData);
+
       sinon.assert.calledWith(page.validateFormData, formData);
       sinon.assert.calledWith(req.flash, 'Missing / invalid form data');
     });
@@ -666,6 +683,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.stub(page, 'validateFormData').returns([])
       sinon.stub(page, 'validateEntities').returns({ errors, parsedEntities })
       const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
+
       await page.addMeasureEntityData(formData);
 
       sinon.assert.calledWith(req.flash, 'Error in entity data');
@@ -676,28 +694,57 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.stub(page, 'validateFormData').returns([])
       sinon.stub(page, 'validateEntities').returns({ errors: [], parsedEntities })
       const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
+
       await page.addMeasureEntityData(formData);
+
       sinon.assert.calledWith(page.getEntitiesToBeCloned, ["123"]);
       sinon.assert.calledWith(page.CreateEntitiesFromClonedData, clonedEntities, formData);
       sinon.assert.calledWith(page.validateEntities, newEntities);
       sinon.assert.calledWith(page.saveMeasureData, parsedEntities);
     });
-
-
-    // const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
-    // const newEntities = await this.CreateEntitiesFromClonedData(clonedEntities, formData)
-    // const { errors, parsedEntities } = await this.validateEntities(newEntities);
-
-    // if (errors.length > 0) {
-    //   this.req.flash('Error in entity data');
-    //   return this.res.redirect(`${this.url}/${this.req.params.metricId}`); 
-    // }
- 
-    // return await this.saveMeasureData(parsedEntities);  
-
   });
 
+  describe('#saveMeasureData', () => {
+    const categoryFields = [{ id: 1 }];
+    const category = { name: 'Measure' };
+    const entities  = [{ id: 1, value: 'some-value' }];
 
-
+    beforeEach(() => {
+      Category.fieldDefinitions = sinon.stub().returns(categoryFields);
+      Category.findOne.resolves(category);
+    });
   
+    it('save entities to the database', async () => {
+      const transaction = {
+        commit: sinon.stub(),
+        rollback: sinon.stub()
+      };
+      sequelize.transaction.returns(transaction);
+      page.clearData = sinon.stub();
+
+      Entity.import = sinon.stub();
+
+      await page.saveMeasureData(entities);
+
+      sinon.assert.calledWith(Entity.import, entities[0], category, categoryFields, { transaction });
+      sinon.assert.calledOnce(transaction.commit);
+      sinon.assert.calledOnce(page.clearData);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}/successful`);
+    });
+
+    it('rollback transaction on error', async () => {
+      const transaction = {
+        commit: sinon.stub(),
+        rollback: sinon.stub()
+      };
+      sequelize.transaction.returns(transaction);
+
+      Entity.import = sinon.stub().throws(new Error('error'));
+
+      await page.saveMeasureData(entities);
+
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}`);
+      sinon.assert.calledOnce(transaction.rollback);
+    });
+  });
 });
