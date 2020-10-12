@@ -30,7 +30,8 @@
       "categoryList": "/admin/categories",
       "headlineMeasures": "/admin/headline-measures",
       "userManagementList": "/admin/manage-users-list",
-      "userManagementAuthentication": "/admin/manage-users-authentication"
+      "userManagementAuthentication": "/admin/manage-users-authentication",
+      "clearCache": "/admin/clear-cache"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",

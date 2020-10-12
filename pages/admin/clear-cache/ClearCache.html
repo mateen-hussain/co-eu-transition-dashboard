@@ -1,0 +1,20 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+{% endblock %}
+
+{% block pageTitle %}Admin - Clear cache{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukPanel({
+          titleText: "Cache successfully cleared"
+      }) }}
+    </div>
+  </div>
+{% endblock %}
