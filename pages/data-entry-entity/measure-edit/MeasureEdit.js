@@ -2,13 +2,14 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const { Op } = require('sequelize');
+const config = require('config');
+const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
-const authentication = require('services/authentication');
 const sequelize = require('services/sequelize');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const flash = require('middleware/flash');
@@ -23,9 +24,17 @@ const uniqWith = require('lodash/uniqWith');
 const moment = require('moment');
 
 class MeasureEdit extends Page {
+  static get isEnabled() {
+    return config.features.measureUpload;
+  }
+
   get url() {
     return paths.dataEntryEntity.measureEdit;
   }
+
+  get measureUrl() {
+    return `${this.url}/${this.req.params.metricId}`
+  } 
 
   get pathToBind() {
     return `${this.url}/:metricId/:successful(successful)?`;
@@ -53,7 +62,7 @@ class MeasureEdit extends Page {
 
   async getMeasureEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
-    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+    const userIsAdmin = this.req.user.isAdmin;
 
     if(!userIsAdmin) {
       const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
@@ -101,7 +110,7 @@ class MeasureEdit extends Page {
     });
   }
 
-  async getEntityFields (entityId) {
+  async getEntityFields(entityId) {
     const entityFieldEntries = await EntityFieldEntry.findAll({
       where: { entity_id: entityId },
       include: CategoryField
@@ -240,7 +249,7 @@ class MeasureEdit extends Page {
 
   async getEntitiesToBeCloned(entityIds) {
     const where = { id: entityIds }
-    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+    const userIsAdmin = this.req.user.isAdmin;
 
     if (!userIsAdmin) {
       const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
@@ -291,7 +300,7 @@ class MeasureEdit extends Page {
     });
   }
 
-  CreateEntitiesFromClonedData(merticEntities, formData) {
+  createEntitiesFromClonedData(merticEntities, formData) {
     const { entities } = formData;
     return merticEntities.map(entity => {
       const { id, ...entityNoId } = entity; 
@@ -309,7 +318,11 @@ class MeasureEdit extends Page {
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
-      errors.push({ error: 'Invalid date', input: 'date' });
+      errors.push({ error: 'Invalid date' });
+    }
+
+    if (!formData.entities) {
+      errors.push({ error: 'Mssing entity values' });
     }
     
     if (formData.entities) {
@@ -318,18 +331,16 @@ class MeasureEdit extends Page {
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
      
       if (!haveAllEntitesBeenSubmitted) {
-        errors.push({ error: 'Mssing entity values', input: 'entities' });
+        errors.push({ error: 'Mssing entity values' });
       }
       
       submittedEntityId.forEach(entityId => {
         const entityValue = formData.entities[entityId]
         if (entityValue.length === 0 || isNaN(entityValue)) {
-          errors.push({ error: 'Invalid value', input: entityId });
+          errors.push({ error: 'Invalid field value' });
         }
       })
-    } else {
-      errors.push({ error: 'Mssing entity values', input: 'entities' });
-    }
+    }  
 
     return errors;
   }
@@ -362,23 +373,24 @@ class MeasureEdit extends Page {
       return await this.addMeasureEntityData(req.body)
     }
 
-    return res.redirect(`${this.url}/${this.req.params.metricId}`);
+    return res.redirect(this.measureUrl);
   }
 
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      this.req.flash('Missing / invalid form data');
-      return this.res.redirect(`${this.url}/${this.req.params.metricId}`);
+      // this.req.flash('Missing / invalid form data');
+      this.req.flash(formValidationErrors.map(error => `${error.error}`));
+      return this.res.redirect(this.measureUrl);
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
-    const newEntities = await this.CreateEntitiesFromClonedData(clonedEntities, formData)
+    const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
     if (errors.length > 0) {
       this.req.flash('Error in entity data');
-      return this.res.redirect(`${this.url}/${this.req.params.metricId}`); 
+      return this.res.redirect(this.measureUrl); 
     }
  
     return await this.saveMeasureData(parsedEntities);  
@@ -391,7 +403,7 @@ class MeasureEdit extends Page {
     });
     const categoryFields = await Category.fieldDefinitions(categoryName);
     const transaction = await sequelize.transaction();
-    let redirectUrl =`${this.url}/${this.req.params.metricId}`;
+    let redirectUrl = this.measureUrl;
 
     try {
       for(const entity of entities) {
