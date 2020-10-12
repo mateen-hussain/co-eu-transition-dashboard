@@ -65,7 +65,7 @@
                 <td class="govuk-table__cell govuk-table__cell__small">
                   <div class="rayg-status rayg-block {{ measure.colour }}" alt="RAYG status is: {{ measure.colour }}"></div>
                 </td>
-                <td class="govuk-table__cell">{{ measure.commentsOnly | default('No') }}</td>
+                <td class="govuk-table__cell">{{ "Yes" if measure.commentsOnly else "No" }}</td>
                 <td class="govuk-table__cell">{{ measure.date }}</td>
                 <td class="govuk-table__cell govuk-table__cell__actions">
                   <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link">Edit</a>
@@ -122,7 +122,7 @@
               <td class="govuk-table__cell govuk-table__cell__small">
                 <div class="rayg-status rayg-block {{ measure.colour }}" alt="RAYG status is: {{ measure.colour }}"></div>
               </td>
-              <td class="govuk-table__cell">{{ measure.commentsOnly | default('No') }}</td>
+              <td class="govuk-table__cell">{{ "Yes" if measure.commentsOnly else "No" }}</td>
               <td class="govuk-table__cell">{{ measure.date }}</td>
               <td class="govuk-table__cell govuk-table__cell__actions">
                 <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link">Edit</a>
