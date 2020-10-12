@@ -33,6 +33,8 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
+    <h1 class="govuk-heading-l">{{ latestMeasure.name }}</h1>
+
   {% if flash %}
     {{ govukErrorSummary({
         titleText: "There was a problem saving your data",
@@ -42,8 +44,6 @@
     }) }}
   {% endif %}
 
-      <h1 class="govuk-heading-l">{{ latestMEasure.name }}</h1>
-{{ latestMEasure.comment }}
       <table class="govuk-table measures-table">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
@@ -76,7 +76,7 @@
             label: "Measure information",
             id: "measure-information",
             panel: {
-              html: measureInformation(latestMEasure, url, req.params.metricId, data)
+              html: measureInformation(latestMeasure, url, req.params.metricId, data, formFields)
             }
           }
         ]

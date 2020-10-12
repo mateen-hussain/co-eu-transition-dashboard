@@ -1,15 +1,48 @@
-{% macro measureInformation(latestMeasure, url, metricId, data) %}
+{% macro measureInformation(latestMeasure, url, metricId, data, formFields) %}
+
+  <form action="{{ url }}/{{ metricId }}" method="post">
+  <input type="hidden" name="type" value="entries" />
 
   <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Name</label>
-    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.name }}]" value="{{ latestMeasure.name }}" />
+    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Name</label>
+    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.name }}" />
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Description</label>
-    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.name }}]" value="{{ latestMeasure.description }}" />
+    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Description</label>
+    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.description }}" />
   </div>
 
+  <div class="govuk-form-group">
+    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Comment</label>
+    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.comment }}" />
+  </div>
+
+<label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Measure RAYG Values</label>
+  <div class="govuk-date-input__item">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Red</label>
+      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.redThreshold }}" />
+    </div>
+  </div>
+
+  <div class="govuk-date-input__item">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Amber</label>
+      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.aYThreshold }}" />
+    </div>
+  </div>
+
+  <div class="govuk-date-input__item">
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Green</label>
+      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.greenThreshold }}" />
+    </div>
+  </div>
+
+  <br>
   <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
+
+  </form>
 
 {% endmacro %}

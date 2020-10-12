@@ -24,20 +24,45 @@
       <input type="hidden" name="type" value="entries" />
 
       {{ govukDateInput({
-        name: "field-date"
+        name: "field-date",
+        items: [
+        {
+          name: "day",
+          classes: "govuk-input--width-2",
+          autocomplete: "bday-day",
+          mix: "1",
+          max: "5"
+        },
+        {
+          name: "month",
+          classes: "govuk-input--width-2",
+          autocomplete: "bday-month"
+        },
+        {
+          name: "year",
+          classes: "govuk-input--width-4",
+          autocomplete: "bday-year"
+        }
+      ]
       }) }}
 
     <table>
       {% for key, value in formFields %}
         <tr>
         {% for measure in value %}
-          {% if measure.label %} <td class="measure-label"><p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p><td>{% endif %}
-          <td><label class="govuk-label" for="entity-{{ measure.id }}">Value
-          <br><input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" /></label></td>
+        {% if measure.label %} <td class="measure-label"><p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p><td>{% endif %}
+        <td>
+          <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Value</label>
+              <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
+            </div>
+          </div>
+        </td> 
         {% endfor %}
         </tr>
       {% endfor %}
-      </table><br>
+    </table>
     <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     </form>
    </div> 

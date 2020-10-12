@@ -59,8 +59,8 @@
 }
 
 .measure-label {
-  vertical-align: bottom;
-  max-width: 100px;
+  vertical-align: inherit;
+  max-width: 90px;
   text-align: left;
   &:not(:first-of-type) {
     padding-left: 30px;
