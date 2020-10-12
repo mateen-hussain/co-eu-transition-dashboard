@@ -69,7 +69,8 @@
       "submissionSuccess": "/entity-submission-success",
       "categoryTemplate": "/category-template",
       "measureList": "/measures/list",
-      "measureEdit": "/measures/edit"
+      "measureEdit": "/measures/edit-measure",
+      "measureGroup": "/measures/edit-group"
     },
     "editMilestone": "/edit-milestone",
     "reportingOverview": "/reporting-overview",

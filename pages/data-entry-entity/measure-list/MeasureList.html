@@ -1,11 +1,13 @@
 {% extends "template.njk" %}
 
 {% set measures = getMeasures() | await %}
+{% set accordionItems = [] %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 
 {% block beforeContent %}
   {% include "navigation.njk" %}
@@ -16,32 +18,113 @@
 
 {% block content %}
 
-  <div class="govuk-grid-row" id="hide-filters">
+  <div id="measures-list" class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <h1 class="govuk-heading-xl">Measures</h1>
 
-      <table class="govuk-table">
+      <h2 class="govuk-heading-s">Grouped measures</h2>
+
+      {% for group in measures.grouped %}
+        {% set bodyHtml %}
+
+        <table class="govuk-table govuk-!-margin-bottom-0">
+          <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell fix-width-75 govuk-!-padding-0">
+                <p class="govuk-body govuk-!-font-size-16">
+                  <strong>Group status</strong>: <span class="rayg-status rayg-block {{ group.colour }} govuk-!-margin-right-5" alt="RAYG status is: {{ group.colour }}"></span>
+                  <strong>Group theme</strong>: <span class="govuk-!-margin-right-5">{{ group.theme }}</span>
+                  <strong>Last updated</strong>: <span>{{ group.date }}</span>
+                </p>
+              </td>
+              <td class="govuk-table__cell govuk-table__cell__actions govuk-!-padding-0" style="max-width: 150px">
+                <a class="govuk-link govuk-!-font-size-16" href="{{ config.paths.dataEntryEntity.measureGroup }}/{{ group.publicId }}">
+                  Edit group
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="govuk-table  govuk-!-font-size-16">
+          <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Measure UID</th>
+              <th scope="col" class="govuk-table__header">Title</th>
+              <th scope="col" class="govuk-table__header govuk-table__cell__small">Status</th>
+              <th scope="col" class="govuk-table__header">Comment only</th>
+              <th scope="col" class="govuk-table__header">Last updated</th>
+              <th scope="col" class="govuk-table__header"></th>
+            </tr>
+          </thead>
+          <tbody class="govuk-table__body">
+            {% for measure in group.children %}
+              <tr class="govuk-table__row">
+                <td class="govuk-table__cell">{{ measure.metricID }}</td>
+                <td class="govuk-table__cell">{{ measure.name }}</td>
+                <td class="govuk-table__cell govuk-table__cell__small">
+                  <div class="rayg-status rayg-block {{ measure.colour }}" alt="RAYG status is: {{ measure.colour }}"></div>
+                </td>
+                <td class="govuk-table__cell">{{ measure.commentsOnly | default('No') }}</td>
+                <td class="govuk-table__cell">{{ measure.date }}</td>
+                <td class="govuk-table__cell govuk-table__cell__actions">
+                  <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link">Edit</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endset %}
+
+        {% set headingHtml %}
+          <span class="govuk-accordion__section-button" id="accordion-with-summary-sections-heading-4">
+            {{ group.groupDescription }} ({{ group.children | length }})
+          </span>
+
+        {% endset %}
+
+        {% set item = {
+          heading: {
+            html: headingHtml
+          },
+          content: {
+            html: bodyHtml
+          }
+         } %}
+
+        {% set accordionItems = (accordionItems.push(item), accordionItems) %}
+
+      {% endfor %}
+
+      {{ govukAccordion({
+        id: "accordion-default",
+        items: accordionItems
+      }) }}
+
+      <h2 class="govuk-heading-s">Measures without groups</h2>
+
+      <table class="govuk-table  govuk-!-font-size-16">
         <thead class="govuk-table__head">
           <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Measure UID</th>
-            <th scope="col" class="govuk-table__header">Theme</th>
             <th scope="col" class="govuk-table__header">Title</th>
-            <th scope="col" class="govuk-table__header">Status</th>
+            <th scope="col" class="govuk-table__header govuk-table__cell__small">Status</th>
+            <th scope="col" class="govuk-table__header">Comment only</th>
             <th scope="col" class="govuk-table__header">Last updated</th>
             <th scope="col" class="govuk-table__header"></th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
-          {% for measure in measures %}
+          {% for measure in measures.notGrouped %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell">{{ measure.metricID }}</td>
-              <td class="govuk-table__cell">{{ measure.theme }}</td>
               <td class="govuk-table__cell">{{ measure.name }}</td>
-              <td class="govuk-table__cell">
+              <td class="govuk-table__cell govuk-table__cell__small">
                 <div class="rayg-status rayg-block {{ measure.colour }}" alt="RAYG status is: {{ measure.colour }}"></div>
               </td>
+              <td class="govuk-table__cell">{{ measure.commentsOnly | default('No') }}</td>
               <td class="govuk-table__cell">{{ measure.date }}</td>
-              <td class="govuk-table__cell">
+              <td class="govuk-table__cell govuk-table__cell__actions">
                 <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link">Edit</a>
               </td>
             </tr>
