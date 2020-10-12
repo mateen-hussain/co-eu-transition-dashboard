@@ -134,7 +134,7 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
 
       const errors = page.validateGroup(group);
 
-      expect(errors).to.eql(["You must entere a group description"]);
+      expect(errors).to.eql(["You must enter a group description"]);
     });
 
     it('returns error if no redThreshold', () => {
