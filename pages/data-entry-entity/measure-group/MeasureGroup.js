@@ -65,7 +65,7 @@ class MeasureGroup extends Page {
     const errors = [];
 
     if(!group.groupDescription || !group.groupDescription.trim().length) {
-      errors.push("You must entere a group description");
+      errors.push("You must enter a group description");
     }
 
     if(!group.redThreshold || isNaN(group.redThreshold)) {
@@ -118,6 +118,10 @@ class MeasureGroup extends Page {
     const measureEntity = await this.getMeasure();
     if(!measureEntity) {
       throw new Error('Could not find measure');
+    }
+
+    if(measureEntity.error) {
+      throw new Error(measureEntity.error);
     }
 
     const measureToSave = Object.assign({}, measureEntity, {
