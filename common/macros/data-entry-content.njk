@@ -1,6 +1,6 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
-{% macro dataEntriesContent(groupMeasures, url, metricId, data) %}
+{% macro dataEntriesContent(groupMeasures, url, metricId, data, formFields) %}
   <div>
     {% for date, measureByFilter in groupMeasures %}
       <div class="flex">
@@ -22,23 +22,18 @@
         name: "field-date"
       }) }}
 
-      {% for date, measureByFilter in groupMeasures %}
-        {% if loop.last %}
+      
+
+      {% for key, value in formFields %}
           <div class="flex">
-            {% for filter, measures in measureByFilter %}
-              <div>
-                {% for measure in measures %}
-                  <br>
-                  <label for="entity-{{ measure.id }}">{{ measure.label }}</label>
-                  <input type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
-
-                  
-
-                {% endfor %}
-              </div>
-            {% endfor %}
+            <div>
+              {% for measure in value %}
+                <br>
+                <label for="entity-{{ measure.id }}">{{ measure.label }}</label>
+                <input type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
+              {% endfor %}
+            </div>
           </div>
-        {% endif %}
       {% endfor %}
 
        <input type="submit" value="Submit">
