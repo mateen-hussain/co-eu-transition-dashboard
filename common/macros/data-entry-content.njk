@@ -1,15 +1,11 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
 {% macro dataEntriesContent(groupMeasures, url, metricId, data, formFields) %}
-<<<<<<< HEAD
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
 
     <p class="govuk-body govuk-!-font-weight-bold">Current Value</p>
     <table class="current-value">
-=======
-  <div>
->>>>>>> origin/DDB-884-add-data-entires-backend
     {% for date, measureByFilter in groupMeasures %}
         <tr>
         <td rowspan="{{ measureByFilter | length }}" class="date-value"><p class="govuk-body">{{ date }}</p></td>
