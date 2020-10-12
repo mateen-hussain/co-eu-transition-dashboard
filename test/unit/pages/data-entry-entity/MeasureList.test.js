@@ -1,5 +1,7 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
+const config = require('config');
+const MeasureList = require('pages/data-entry-entity/measure-list/MeasureList');
 const authentication = require('services/authentication');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
@@ -15,7 +17,6 @@ let req = {};
 
 describe('pages/data-entry-entity/measure-list/MeasureList', () => {
   beforeEach(() => {
-    const MeasureList = require('pages/data-entry-entity/measure-list/MeasureList');
 
     res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
     req = { cookies: [], query: { category: 'category' }, user: { roles: [] } };
@@ -229,4 +230,31 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
       sinon.assert.calledWith(page.latestMeasures, measureEntities);
     });
   });
+
+  describe('#isEnabled', () => {
+    let sandbox = {};
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    it('should be enabled if measureUpload feature is active', () => {
+      sandbox.stub(config, 'features').value({
+        measureUpload: true
+      });
+
+      expect(MeasureList.isEnabled).to.be.ok;
+    });
+
+    it('should be enabled if measureUpload feature is not active', () => {
+      sandbox.stub(config, 'features').value({
+        measureUpload: false
+      });
+
+      expect(MeasureList.isEnabled).to.not.be.ok;
+    })
+  })
 });

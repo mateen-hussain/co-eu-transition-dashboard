@@ -2,13 +2,14 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const { Op } = require('sequelize');
+const config = require('config');
+const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
-const authentication = require('services/authentication');
 const sequelize = require('services/sequelize');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const flash = require('middleware/flash');
@@ -23,6 +24,10 @@ const uniqWith = require('lodash/uniqWith');
 const moment = require('moment');
 
 class MeasureEdit extends Page {
+  static get isEnabled() {
+    return config.features.measureUpload;
+  }
+
   get url() {
     return paths.dataEntryEntity.measureEdit;
   }
