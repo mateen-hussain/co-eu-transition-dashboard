@@ -20,7 +20,6 @@
     }
   },
   "features": {
-    "missedMilestones": true,
-    "measureUpload": true
+    "missedMilestones": true
   }
 }

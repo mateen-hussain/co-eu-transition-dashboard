@@ -160,7 +160,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('gets entities for a given category if admin', async () => {
-      page.req.user.roles.push({ name: 'admin' });
+      req.user = { isAdmin: true }
+      
       const response = await page.getMeasureEntities(category, theme);
 
       expect(response).to.eql([{
@@ -443,7 +444,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('gets entities to be cloned if admin', async () => {
-      page.req.user.roles.push({ name: 'admin' });
+      req.user = { isAdmin: true }
       const response = await page.getEntitiesToBeCloned(entityIds);
 
       expect(response).to.eql([{
@@ -486,7 +487,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
-  describe('#CreateEntitiesFromClonedData', () => {
+  describe('#createEntitiesFromClonedData', () => {
     const entities = [{
       id: 123,
       publicId: 'some-public-id-1',
@@ -495,7 +496,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const formData = { day: 1, month: 10, year: 2020, type: 'entries', entities: { 123: 100 } };
 
     it('should return the correct data structure', async () => {
-      const response = await page.CreateEntitiesFromClonedData(entities, formData);
+      const response = await page.createEntitiesFromClonedData(entities, formData);
 
       expect(response).to.eql([{
         publicId: 'some-public-id-1',
@@ -659,14 +660,14 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     beforeEach(() => {
       sinon.stub(page, 'getEntitiesToBeCloned').returns(clonedEntities)
-      sinon.stub(page, 'CreateEntitiesFromClonedData').returns(newEntities)
+      sinon.stub(page, 'createEntitiesFromClonedData').returns(newEntities)
       sinon.stub(page, 'saveMeasureData').returns({})
     });
 
     afterEach(() => {
       page.validateFormData.restore();
       page.getEntitiesToBeCloned.restore();
-      page.CreateEntitiesFromClonedData.restore();
+      page.createEntitiesFromClonedData.restore();
       page.saveMeasureData.restore();
     });
     
@@ -677,7 +678,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       await page.addMeasureEntityData(formData);
 
       sinon.assert.calledWith(page.validateFormData, formData);
-      sinon.assert.calledWith(req.flash, 'Missing / invalid form data');
+      sinon.assert.calledWith(req.flash, ["error"]);
     });
 
     it('should call flash and redirect when validateEntities returns errors', async () => {
@@ -699,7 +700,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       await page.addMeasureEntityData(formData);
 
       sinon.assert.calledWith(page.getEntitiesToBeCloned, ["123"]);
-      sinon.assert.calledWith(page.CreateEntitiesFromClonedData, clonedEntities, formData);
+      sinon.assert.calledWith(page.createEntitiesFromClonedData, clonedEntities, formData);
       sinon.assert.calledWith(page.validateEntities, newEntities);
       sinon.assert.calledWith(page.saveMeasureData, parsedEntities);
     });
@@ -748,7 +749,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.assert.calledOnce(transaction.rollback);
     });
   });
-  
+
   describe('#isEnabled', () => {
     let sandbox = {};
     beforeEach(() => {

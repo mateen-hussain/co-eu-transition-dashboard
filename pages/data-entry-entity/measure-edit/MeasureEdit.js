@@ -32,6 +32,10 @@ class MeasureEdit extends Page {
     return paths.dataEntryEntity.measureEdit;
   }
 
+  get measureUrl() {
+    return `${this.url}/${this.req.params.metricId}`
+  } 
+
   get pathToBind() {
     return `${this.url}/:metricId/:successful(successful)?`;
   }
@@ -58,7 +62,7 @@ class MeasureEdit extends Page {
 
   async getMeasureEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
-    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+    const userIsAdmin = this.req.user.isAdmin;
 
     if(!userIsAdmin) {
       const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
@@ -245,7 +249,7 @@ class MeasureEdit extends Page {
 
   async getEntitiesToBeCloned(entityIds) {
     const where = { id: entityIds }
-    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+    const userIsAdmin = this.req.user.isAdmin;
 
     if (!userIsAdmin) {
       const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
@@ -296,7 +300,7 @@ class MeasureEdit extends Page {
     });
   }
 
-  CreateEntitiesFromClonedData(merticEntities, formData) {
+  createEntitiesFromClonedData(merticEntities, formData) {
     const { entities } = formData;
     return merticEntities.map(entity => {
       const { id, ...entityNoId } = entity; 
@@ -369,23 +373,24 @@ class MeasureEdit extends Page {
       return await this.addMeasureEntityData(req.body)
     }
 
-    return res.redirect(`${this.url}/${this.req.params.metricId}`);
+    return res.redirect(this.measureUrl);
   }
 
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      this.req.flash('Missing / invalid form data');
-      return this.res.redirect(`${this.url}/${this.req.params.metricId}`);
+      // this.req.flash('Missing / invalid form data');
+      this.req.flash(formValidationErrors.map(error => `${error.error}`));
+      return this.res.redirect(this.measureUrl);
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
-    const newEntities = await this.CreateEntitiesFromClonedData(clonedEntities, formData)
+    const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
     if (errors.length > 0) {
       this.req.flash('Error in entity data');
-      return this.res.redirect(`${this.url}/${this.req.params.metricId}`); 
+      return this.res.redirect(this.measureUrl); 
     }
  
     return await this.saveMeasureData(parsedEntities);  
@@ -398,7 +403,7 @@ class MeasureEdit extends Page {
     });
     const categoryFields = await Category.fieldDefinitions(categoryName);
     const transaction = await sequelize.transaction();
-    let redirectUrl =`${this.url}/${this.req.params.metricId}`;
+    let redirectUrl = this.measureUrl;
 
     try {
       for(const entity of entities) {
