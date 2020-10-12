@@ -1,4 +1,4 @@
-{% macro measureInformation(latestMeasure, url, metricId, data, formFields) %}
+{% macro measureInformation(latestMeasure, url, metricId, data) %}
 
   <form action="{{ url }}/{{ metricId }}" method="post">
   <input type="hidden" name="type" value="entries" />
@@ -41,7 +41,7 @@
   </div>
 
   <br>
-  <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
+  <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
 
   </form>
 

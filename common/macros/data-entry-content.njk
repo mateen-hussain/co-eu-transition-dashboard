@@ -24,26 +24,7 @@
       <input type="hidden" name="type" value="entries" />
 
       {{ govukDateInput({
-        name: "field-date",
-        items: [
-        {
-          name: "day",
-          classes: "govuk-input--width-2",
-          autocomplete: "bday-day",
-          mix: "1",
-          max: "5"
-        },
-        {
-          name: "month",
-          classes: "govuk-input--width-2",
-          autocomplete: "bday-month"
-        },
-        {
-          name: "year",
-          classes: "govuk-input--width-4",
-          autocomplete: "bday-year"
-        }
-      ]
+        name: "field-date"
       }) }}
 
     <table>
