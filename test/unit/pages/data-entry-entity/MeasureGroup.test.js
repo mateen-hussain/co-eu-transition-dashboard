@@ -259,6 +259,7 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
       value: 1,
       commentsOnly: true
     };
+    const entity = { id: 1 };
 
     const category = { id: 1 };
     const categoryFields = [{ id: 1 }];
@@ -269,17 +270,20 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     beforeEach(() => {
       sinon.stub(page, 'getCategory').returns(category);
       sinon.stub(page, 'getMeasure').returns(measureEntity);
-      sinon.stub(Entity, 'import');
-      Category.fieldDefinitions.returns(categoryFields);
+      sinon.stub(Entity, 'import').returns(entity);
+      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
 
       transaction.commit.reset();
+      transaction.rollback.reset();
     });
 
     afterEach(() => {
       Entity.import.restore();
+      Category.fieldDefinitions.restore();
     });
 
     it('imports group data if no errors', async () => {
+      console.log('here 1');
       await page.updateGroup(data);
 
       sinon.assert.called(transaction.commit);

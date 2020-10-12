@@ -129,11 +129,9 @@ describe('pages/edit-project/EditProject', () => {
   describe('#saveFieldToDatabase', () => {
     it('saves data to database', async () => {
       page.next = sinon.stub();
-      const transaction = {
-        commit: sinon.stub(),
-        rollback: sinon.stub()
-      };
-      sequelize.transaction.returns(transaction);
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
 
       Project.import = sinon.stub();
       Project.fieldDefinitions = sinon.stub().returns('fields');
@@ -149,11 +147,9 @@ describe('pages/edit-project/EditProject', () => {
 
     it('redirects with error if problem', async () => {
       page.next = sinon.stub();
-      const transaction = {
-        commit: sinon.stub(),
-        rollback: sinon.stub()
-      };
-      sequelize.transaction.returns(transaction);
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
 
       Project.import = sinon.stub().throws(new Error('error'));
       Project.fieldDefinitions = sinon.stub().returns('fields');

@@ -113,6 +113,8 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
     it('correctly imports all entities', async () => {
       const entity = 'entity';
       const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
 
       await page.import(categoryName, [entity]);
 
@@ -123,6 +125,8 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
     it('rolls back transaction if anything fails', async () => {
       const entity = 'entity';
       const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
       Entity.import.throws(new Error('Some error'));
 
       let error = {};

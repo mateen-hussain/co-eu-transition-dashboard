@@ -59,8 +59,15 @@ describe('pages/admin/category-field-list/CategoryFieldList', () => {
   });
 
   describe('#getFields', () => {
+    beforeEach(() => {
+      sinon.stub(Category, 'fieldDefinitions').returns('test');
+    });
+
+    afterEach(() => {
+      Category.fieldDefinitions.restore();
+    });
+
     it('gets fields for given category', async () => {
-      Category.fieldDefinitions = sinon.stub().returns('test');
       const fields = await page.getFields();
       expect(fields).to.eql('test');
     });
