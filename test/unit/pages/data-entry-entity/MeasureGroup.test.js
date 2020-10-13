@@ -283,7 +283,6 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     });
 
     it('imports group data if no errors', async () => {
-      console.log('here 1');
       await page.updateGroup(data);
 
       sinon.assert.called(transaction.commit);
