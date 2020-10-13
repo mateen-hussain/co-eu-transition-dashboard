@@ -40,15 +40,17 @@ class EntityImport extends Page {
     });
     const categoryFields = await Category.fieldDefinitions(categoryName);
 
-    const transaction = await sequelize.transaction();
-    try {
-      for(const entity of entities) {
+    for(const entity of entities) {
+      const transaction = await sequelize.transaction();
+      try {
+        throw new Error('error');
         await Entity.import(entity, category, categoryFields, { transaction });
+        await transaction.commit();
+      } catch (error) {
+        logger.error(`Error importing entity ${JSON.stringify(entity)}`);
+        await transaction.rollback();
+        throw error;
       }
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
     }
   }
 
@@ -164,6 +166,7 @@ class EntityImport extends Page {
       await this.import(activeImport.category, entities);
       await this.removeTemporaryBulkImport(importId);
     } catch (error) {
+      this.clearData();
       logger.error(error);
       this.req.flash('Failed to import data');
       return this.res.redirect(this.url);
