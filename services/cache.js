@@ -29,7 +29,12 @@ const get = async (key) => {
   return await getAsync(key);
 };
 
+const clear = () => {
+  client.flushall();
+};
+
 module.exports = {
   set,
-  get
+  get,
+  clear
 };

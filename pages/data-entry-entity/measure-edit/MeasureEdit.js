@@ -1,18 +1,27 @@
 /* eslint-disable no-prototype-builtins */
 const Page = require('core/pages/page');
 const { paths } = require('config');
+const { Op } = require('sequelize');
 const config = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
+const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
-const CategoryField = require('models/categoryField');
-const { Op } = require('sequelize');
+const sequelize = require('services/sequelize');
 const entityUserPermissions = require('middleware/entityUserPermissions');
+const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
+const validation = require('helpers/validation');
+const parse = require('helpers/parse');
+const { buildDateString, removeNulls } = require('helpers/utils');
 const get = require('lodash/get');
+const groupBy = require('lodash/groupBy');
+const uniqWith = require('lodash/uniqWith');
+
+const moment = require('moment');
 
 class MeasureEdit extends Page {
   static get isEnabled() {
@@ -23,13 +32,22 @@ class MeasureEdit extends Page {
     return paths.dataEntryEntity.measureEdit;
   }
 
+  get measureUrl() {
+    return `${this.url}/${this.req.params.metricId}`
+  } 
+
   get pathToBind() {
-    return `${this.url}/:metricId`;
+    return `${this.url}/:metricId/:successful(successful)?`;
+  }
+
+  get successfulMode() {
+    return this.req.params && this.req.params.successful;
   }
 
   get middleware() {
     return [
       ...authentication.protect(['uploader']),
+      flash,
       entityUserPermissions.assignEntityIdsUserCanAccessToLocals
     ];
   }
@@ -44,7 +62,7 @@ class MeasureEdit extends Page {
 
   async getMeasureEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
-    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
+    const userIsAdmin = this.req.user.isAdmin;
 
     if(!userIsAdmin) {
       const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
@@ -53,7 +71,6 @@ class MeasureEdit extends Page {
 
     const entities = await Entity.findAll({
       where,
-      order: [['created_at', 'DESC']],
       include: [{
         model: EntityFieldEntry,
         where: { value: this.req.params.metricId },
@@ -93,7 +110,7 @@ class MeasureEdit extends Page {
     });
   }
 
-  async getEntityFields (entityId) {
+  async getEntityFields(entityId) {
     const entityFieldEntries = await EntityFieldEntry.findAll({
       where: { entity_id: entityId },
       include: CategoryField
@@ -155,14 +172,251 @@ class MeasureEdit extends Page {
       return this.res.redirect(paths.dataEntryEntity.measureList);
     }
 
-    return entities;
+    const sortedEntities = entities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+    return sortedEntities;
   }
 
+  applyLabelToEntities(entities) {
+    entities.forEach(entity => {
+      if (entity.filter && entity.filter2) {
+        entity.label = `${entity.filterValue} - ${entity.filterValue2}`
+      } else if (entity.filter) {
+        entity.label = entity.filterValue
+      }
+    })
+  }
+
+  groupEntitiesByDateAndFilter(measures) {
+    const measureByDate = groupBy(measures, measure => measure.date);
+    // Grouped by date And filter
+    return Object.keys(measureByDate).reduce((acc, key) => {
+      const dataGroupedByFilterOrMetric = groupBy(measureByDate[key], measure => measure.filterValue || measure.metricID);
+      acc[key] = this.sortGroupedEntityData(dataGroupedByFilterOrMetric);
+      return acc
+    }, {})
+  }
+
+  sortGroupedEntityData(groupedEntityData) {
+    // Ensure the order within the group is the same
+    Object.keys(groupedEntityData).forEach(group => {
+      if (groupedEntityData[group][0].filter && groupedEntityData[group][0].filter2) {
+        groupedEntityData[group] = groupedEntityData[group].sort((a, b) => a.filterValue2.localeCompare(b.filterValue2))
+      } else if (groupedEntityData[group][0].filter) {
+        groupedEntityData[group] = groupedEntityData[group].sort((a, b) => a.filterValue.localeCompare(b.filterValue))
+      }
+    });
+    return groupedEntityData;
+  }
+
+  calculateUiInputs(measureEntities) {
+    const lastestEntitiyEntry = measureEntities[measureEntities.length - 1];
+    const filterdEntities = measureEntities.filter(measure => measure.date === lastestEntitiyEntry.date);
+
+    return uniqWith(
+      filterdEntities,
+      (locationA, locationB) => {
+        if (locationA.filter && locationA.filter2) {
+          return locationA.filterValue === locationB.filterValue && locationA.filterValue2 === locationB.filterValue2
+        } else if (locationA.filter) {
+          return locationA.filterValue === locationB.filterValue
+        } else {
+          return locationA.metricID
+        }
+      }
+    );
+  }
+
+  groupAndOrderUiInputs (uiInputs) {
+    const groupedInputs = groupBy(uiInputs, measure => measure.filterValue || measure.metricID);
+    const groupedAndSortedEntityData = this.sortGroupedEntityData(groupedInputs);
+    return groupedAndSortedEntityData;
+  }
 
   async getMeasureData() {
-    const measures = await this.getMeasure();
-    // Latest measure is first on the array as defined by the 'order by' in the query
-    return measures[0];
+    const measuresEntities = await this.getMeasure();
+    this.applyLabelToEntities(measuresEntities)
+    const groupedMeasureEntities = this.groupEntitiesByDateAndFilter(measuresEntities)
+    
+    const uiInputs = this.calculateUiInputs(measuresEntities)
+    const measureFields = this.groupAndOrderUiInputs(uiInputs)
+
+    return {
+      latest: measuresEntities[measuresEntities.length - 1],
+      grouped: groupedMeasureEntities,
+      fields: measureFields
+    }
+  }
+
+  async getEntitiesToBeCloned(entityIds) {
+    const where = { id: entityIds }
+    const userIsAdmin = this.req.user.isAdmin;
+
+    if (!userIsAdmin) {
+      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
+      const cansUserAccessAllRequiredEntities = entityIds.every(id => entityIdsUserCanAccess.includes(id));
+
+      if (!cansUserAccessAllRequiredEntities) {
+        logger.error(`Permissions error , user does not have access to all entities`);
+        throw new Error(`Permissions error, user does not have access to all entities`);
+      }
+    }
+    
+    const entities = await Entity.findAll({
+      where,
+      include: [{
+        model: EntityFieldEntry,
+        include: CategoryField
+      },{
+        model: Entity,
+        as: 'parents',
+        include: [{
+          separate: true,
+          model: EntityFieldEntry,
+          include: CategoryField
+        }, {
+          model: Category
+        }]
+      }]
+    });
+
+    const statementCategory = await this.getCategory('Statement');
+
+    return entities.map(entity => {
+      
+      const statementEntity = entity.parents.find(parent => {
+        return parent.categoryId === statementCategory.id;
+      });
+
+      const entityMapped = {
+        id: entity.id,
+        parentStatementPublicId: statementEntity.publicId,
+      };
+
+      entity.entityFieldEntries.map(entityfieldEntry => {
+        entityMapped[entityfieldEntry.categoryField.name] = entityfieldEntry.value;
+      });
+
+      return entityMapped;
+    });
+  }
+
+  createEntitiesFromClonedData(merticEntities, formData) {
+    const { entities } = formData;
+    return merticEntities.map(entity => {
+      const { id, ...entityNoId } = entity; 
+      return { 
+        ...entityNoId, 
+        value: entities[id],
+        date: buildDateString(formData)
+      }
+    });
+  }
+
+  async validateFormData(formData) {
+    const measuresEntities = await this.getMeasure();
+    const uiInputs = this.calculateUiInputs(measuresEntities) 
+    const errors = [];
+
+    if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
+      errors.push({ error: 'Invalid date' });
+    }
+
+    if (!formData.entities) {
+      errors.push({ error: 'Mssing entity values' });
+    }
+    
+    if (formData.entities) {
+      // Check the number of submitted entities matches the expected number
+      const submittedEntityId = Object.keys(formData.entities);
+      const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
+     
+      if (!haveAllEntitesBeenSubmitted) {
+        errors.push({ error: 'Mssing entity values' });
+      }
+      
+      submittedEntityId.forEach(entityId => {
+        const entityValue = formData.entities[entityId]
+        if (entityValue.length === 0 || isNaN(entityValue)) {
+          errors.push({ error: 'Invalid field value' });
+        }
+      })
+    }  
+
+    return errors;
+  }
+
+  async validateEntities(entities) {
+    const categoryFields = await Category.fieldDefinitions('Measure');
+    const parsedEntities = parse.parseItems(entities, categoryFields, true);
+
+    const errors = [];
+    if (!parsedEntities || !parsedEntities.length) {
+      errors.push({ error: 'No entities found' });
+    }
+
+    const entityErrors = validation.validateItems(parsedEntities, categoryFields);
+    errors.push(...entityErrors)
+
+    return {
+      errors,
+      parsedEntities
+    }
+  }
+
+  async postRequest(req, res) {
+    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    }
+
+    if (req.body.type === 'entries') {
+      this.saveData(removeNulls(req.body));
+      return await this.addMeasureEntityData(req.body)
+    }
+
+    return res.redirect(this.measureUrl);
+  }
+
+  async addMeasureEntityData (formData) {
+    const formValidationErrors = await this.validateFormData(formData);
+    if (formValidationErrors.length > 0) {
+      // this.req.flash('Missing / invalid form data');
+      this.req.flash(formValidationErrors.map(error => `${error.error}`));
+      return this.res.redirect(this.measureUrl);
+    }
+
+    const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
+    const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
+    const { errors, parsedEntities } = await this.validateEntities(newEntities);
+
+    if (errors.length > 0) {
+      this.req.flash('Error in entity data');
+      return this.res.redirect(this.measureUrl); 
+    }
+ 
+    return await this.saveMeasureData(parsedEntities);  
+  }
+
+  async saveMeasureData(entities) {
+    const categoryName = 'Measure'
+    const category = await Category.findOne({
+      where: { name: categoryName }
+    });
+    const categoryFields = await Category.fieldDefinitions(categoryName);
+    const transaction = await sequelize.transaction();
+    let redirectUrl = this.measureUrl;
+
+    try {
+      for(const entity of entities) {
+        await Entity.import(entity, category, categoryFields, { transaction });
+      }
+      await transaction.commit();
+      this.clearData();
+      redirectUrl += '/successful';
+    } catch (error) {
+      this.req.flash('Error saving measure data');
+      await transaction.rollback();
+    }
+    return this.res.redirect(redirectUrl);
   }
 }
 

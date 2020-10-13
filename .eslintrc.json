@@ -9,7 +9,7 @@
   ],
   "parserOptions": {
     "sourceType": "module",
-    "ecmaVersion": 2017
+    "ecmaVersion": 2018
   },
   "rules": {
     "require-atomic-updates": "off",
