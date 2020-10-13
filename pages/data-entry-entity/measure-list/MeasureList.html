@@ -17,7 +17,7 @@
 {% block content %}
 
   <div class="govuk-grid-row" id="hide-filters">
-    <div class="govuk-grid-column-full">
+    <div class="govuk-grid-column-two-thirds">
       <h1 class="govuk-heading-l">Measures</h1>
 
       <table class="govuk-table">
@@ -42,7 +42,7 @@
               </td>
               <td class="govuk-table__cell">{{ measure.date }}</td>
               <td class="govuk-table__cell">
-                <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link">Edit</a>
+                <a href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}" class="govuk-link edit-link">Edit</a>
               </td>
             </tr>
           {% endfor %}

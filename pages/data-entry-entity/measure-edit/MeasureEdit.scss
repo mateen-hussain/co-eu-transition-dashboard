@@ -38,9 +38,9 @@
 }
 
 .current-value tr td {
-  width: 20%;
+  min-width: 20%;
   &:first-of-type {
-    width: 5%;
+    width: 20%;
   }
 }
 

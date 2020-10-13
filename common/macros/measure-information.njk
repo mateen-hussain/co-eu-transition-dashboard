@@ -1,42 +1,34 @@
-{% macro measureInformation(latestMeasure, url, metricId, data) %}
-
-  <form action="{{ url }}/{{ metricId }}" method="post">
-  <input type="hidden" name="type" value="entries" />
+{% macro measureInformation(measure, url, metricId, data) %}
 
   <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Name</label>
-    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.name }}" />
+    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Description</label>
+    <textarea class="govuk-textarea" id="entity-{{ measure.id }}" name="description" rows="5">{{ data.description | default(measure.description) }}</textarea>
   </div>
 
   <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Description</label>
-    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.description }}" />
+    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Comment</label>
+    <textarea class="govuk-textarea" id="entity-{{ measure.id }}" name="comment" rows="5">{{ data.comment | default(measure.comment) }}</textarea>
   </div>
 
-  <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Comment</label>
-    <input class="govuk-input govuk-!-width-three-quarters" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.comment }}" />
-  </div>
-
-<label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ latestMeasure.id }}">Measure RAYG Values</label>
+<label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Measure RAYG Values</label>
   <div class="govuk-date-input__item">
     <div class="govuk-form-group">
-      <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Red</label>
-      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.redThreshold }}" />
+      <label class="govuk-label" for="entity-{{ measure.id }}">Red</label>
+      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="red" value="{{ data.redThreshold | default(measure.redThreshold) }}" />
     </div>
   </div>
 
   <div class="govuk-date-input__item">
     <div class="govuk-form-group">
-      <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Amber</label>
-      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.aYThreshold }}" />
+      <label class="govuk-label" for="entity-{{ measure.id }}">Amber</label>
+      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="amber" value="{{ data.aYThreshold | default(measure.aYThreshold) }}" />
     </div>
   </div>
 
   <div class="govuk-date-input__item">
     <div class="govuk-form-group">
-      <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Green</label>
-      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ latestMeasure.id }}" name="entities[{{ latestMeasure.name }}]" value="{{ latestMeasure.greenThreshold }}" />
+      <label class="govuk-label" for="entity-{{ measure.id }}">Green</label>
+      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="green" value="{{ data.greenThreshold | default(measure.greenThreshold) }}" />
     </div>
   </div>
 
