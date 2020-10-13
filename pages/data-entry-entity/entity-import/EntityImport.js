@@ -165,7 +165,6 @@ class EntityImport extends Page {
       await this.import(activeImport.category, entities);
       await this.removeTemporaryBulkImport(importId);
     } catch (error) {
-      this.clearData();
       logger.error(error);
       this.req.flash('Failed to import data');
       return this.res.redirect(this.url);
