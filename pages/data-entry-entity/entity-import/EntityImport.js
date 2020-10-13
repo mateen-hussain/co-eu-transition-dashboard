@@ -43,7 +43,6 @@ class EntityImport extends Page {
     for(const entity of entities) {
       const transaction = await sequelize.transaction();
       try {
-        throw new Error('error');
         await Entity.import(entity, category, categoryFields, { transaction });
         await transaction.commit();
       } catch (error) {
