@@ -49,6 +49,8 @@ const getIframeUrl = async (req, entity) => {
     break;
   }
 
+  workbook = `${config.services.tableau.prependUrl}${workbook}`;
+
   let url;
   try {
     url = await tableau.getTableauUrl(req.user, workbook, view);
