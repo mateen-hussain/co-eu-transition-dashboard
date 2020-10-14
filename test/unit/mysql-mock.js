@@ -30,7 +30,7 @@ Sequelize.fn = sinon.stub();
 
 const transaction = {
   rollback: sinon.stub(),
-  commit: sinon.stub()
+  commit: sinon.stub().resolves()
 };
 Sequelize.query = sinon.stub();
 Sequelize.transaction = sinon.stub().returns(transaction);

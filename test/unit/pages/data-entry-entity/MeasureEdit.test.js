@@ -161,7 +161,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('gets entities for a given category if admin', async () => {
       req.user = { isAdmin: true }
-      
+
       const response = await page.getMeasureEntities(category, theme);
 
       expect(response).to.eql([{
@@ -255,7 +255,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const measureEntities = [{ id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }];
 
     beforeEach(() => {
-      sinon.stub(page, 'getCategory').returns(measureCategory);  
+      sinon.stub(page, 'getCategory').returns(measureCategory);
     });
 
     afterEach(() => {
@@ -361,8 +361,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#calculateUiInputs', () => {
     it('should filter list of entities by date and return data for unique entities when filter and filter2 are set', async () => {
       const measureEntities = [
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', filter2: 'area', filterValue2: 'north', value: 10 }, 
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', filter2: 'area', filterValue2: 'north', value: 5 }, 
+        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', filter2: 'area', filterValue2: 'north', value: 10 },
+        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', filter2: 'area', filterValue2: 'north', value: 5 },
       ];
 
       const response = await page.calculateUiInputs(measureEntities);
@@ -371,8 +371,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should filter list of entities by date and return data for unique entities when only filter is set', async () => {
       const measureEntities = [
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', value: 100 }, 
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', value: 50 }, 
+        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', value: 100 },
+        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', value: 50 },
       ];
       const response = await page.calculateUiInputs(measureEntities);
       expect(response).to.eql([measureEntities[0]]);
@@ -380,20 +380,20 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should filter list of entities by date and return data for unique entities when neither filter or filter2 is set', async () => {
       const measureEntities = [
-        { metricID: 'metric1', date: '05/10/2020', value: 20 }, 
-        { metricID: 'metric1', date: '05/10/2020', value: 10 }, 
+        { metricID: 'metric1', date: '05/10/2020', value: 20 },
+        { metricID: 'metric1', date: '05/10/2020', value: 10 },
       ];
       const response = await page.calculateUiInputs(measureEntities);
       expect(response).to.eql([measureEntities[0]]);
     });
   });
-  
+
   describe('#getMeasureData', () => {
     const measureEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { metricID: 'metric1', date: '04/10/2020', value: 1 }];
 
     beforeEach(() => {
-      sinon.stub(page, 'getMeasure').returns(measureEntities);  
-      sinon.stub(page, 'groupEntitiesByDateAndFilter').returns({});  
+      sinon.stub(page, 'getMeasure').returns(measureEntities);
+      sinon.stub(page, 'groupEntitiesByDateAndFilter').returns({});
     });
 
     afterEach(() => {
@@ -412,9 +412,9 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const entities = {
       id: 123,
       publicId: 'some-public-id-1',
-      entityFieldEntries: [{ 
+      entityFieldEntries: [{
         value: 'new value',
-        categoryField: { 
+        categoryField: {
           name: 'test'
         }
       }],
@@ -508,8 +508,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#validateFormData', () => {
     beforeEach(() => {
-      sinon.stub(page, 'getMeasure').returns([]);  
-      sinon.stub(page, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);  
+      sinon.stub(page, 'getMeasure').returns([]);
+      sinon.stub(page, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);
     });
 
     afterEach(() => {
@@ -519,7 +519,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return an error when date is not valid', async () => {
       const formData = { day: '10', month: '14', year: '2020', entities:{} };
-      
+
       const response = await page.validateFormData(formData);
 
       sinon.assert.calledOnce(page.getMeasure);
@@ -582,7 +582,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const categoryFields = [{ id: 1 }];
 
     beforeEach(() => {
-      Category.fieldDefinitions = sinon.stub().returns(categoryFields);
+      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
       sinon.stub(validation, 'validateItems');
       sinon.stub(parse, 'parseItems')
     });
@@ -590,8 +590,9 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     afterEach(() => {
       parse.parseItems.restore();
       validation.validateItems.restore();
+      Category.fieldDefinitions.restore();
     });
-    
+
     it('rejects if no entities found', async () => {
       parse.parseItems.returns([]);
       validation.validateItems.returns([])
@@ -622,7 +623,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       page.saveData.restore();
       page.addMeasureEntityData.restore();
     });
-    
+
     it('should return method not allowed when no admin and entitiesUserCanAccess is empty', async () => {
       res.locals = {
         entitiesUserCanAccess: []
@@ -670,7 +671,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       page.createEntitiesFromClonedData.restore();
       page.saveMeasureData.restore();
     });
-    
+
     it('should call flash and redirect when missing form data', async () => {
       const formData = { day: 1,  year: 2020, type: 'entries', entities: { 123: 100 } };
       sinon.stub(page, 'validateFormData').returns([{ error: 'error' }])
@@ -712,19 +713,22 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const entities  = [{ id: 1, value: 'some-value' }];
 
     beforeEach(() => {
-      Category.fieldDefinitions = sinon.stub().returns(categoryFields);
+      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
       Category.findOne.resolves(category);
-    });
-  
-    it('save entities to the database', async () => {
-      const transaction = {
-        commit: sinon.stub(),
-        rollback: sinon.stub()
-      };
-      sequelize.transaction.returns(transaction);
-      page.clearData = sinon.stub();
+      sinon.stub(Entity, 'import');
 
-      Entity.import = sinon.stub();
+    });
+
+    afterEach(() => {
+      Entity.import.restore();
+      Category.fieldDefinitions.restore();
+    });
+
+    it('save entities to the database', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+      page.clearData = sinon.stub();
 
       await page.saveMeasureData(entities);
 
@@ -735,13 +739,11 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('rollback transaction on error', async () => {
-      const transaction = {
-        commit: sinon.stub(),
-        rollback: sinon.stub()
-      };
-      sequelize.transaction.returns(transaction);
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
 
-      Entity.import = sinon.stub().throws(new Error('error'));
+      Entity.import.throws(new Error('error'));
 
       await page.saveMeasureData(entities);
 

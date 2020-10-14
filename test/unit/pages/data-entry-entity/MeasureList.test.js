@@ -137,6 +137,12 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
         name: "some name",
         publicId: "some-public-id-1",
         theme: "theme name"
+      },{
+        filter: "RAYG",
+        id: "some-id",
+        name: "some name",
+        publicId: "some-public-id-2",
+        theme: "theme name"
       }]);
 
       sinon.assert.calledWith(Entity.findAll, {
@@ -176,6 +182,12 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
         name: "some name",
         publicId: "some-public-id-1",
         theme: "theme name"
+      },{
+        filter: "RAYG",
+        id: "some-id",
+        name: "some name",
+        publicId: "some-public-id-2",
+        theme: "theme name"
       }]);
 
       sinon.assert.calledWith(Entity.findAll, {
@@ -210,24 +222,97 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
     });
   });
 
+  describe('#groupMeasures', () => {
+    const measures = [{
+      id: "some-id",
+      name: "some name",
+      publicId: "some-public-id-1",
+      theme: "theme name",
+      groupID: 'Group 1',
+      redThreshold: 1,
+      aYThreshold: 2,
+      greenThreshold: 3,
+      value: 1
+    },{
+      filter: "RAYG",
+      id: "some-id",
+      name: "some name",
+      publicId: "some-public-id-2",
+      theme: "theme name",
+      groupID: 'Group 1',
+      redThreshold: 1,
+      aYThreshold: 2,
+      greenThreshold: 3,
+      value: 1
+    }];
+
+    it('groups measures by rayg row, sets rayg colour', () => {
+      const measureGroups = page.groupMeasures(measures);
+      expect(measureGroups).to.eql([{
+        aYThreshold: 2,
+        children: [
+          {
+            aYThreshold: 2,
+            colour: "red",
+            greenThreshold: 3,
+            groupID: "Group 1",
+            id: "some-id",
+            name: "some name",
+            publicId: "some-public-id-1",
+            redThreshold: 1,
+            theme: "theme name",
+            value: 1
+          }
+        ],
+        colour: "red",
+        filter: "RAYG",
+        greenThreshold: 3,
+        groupID: "Group 1",
+        id: "some-id",
+        name: "some name",
+        publicId: "some-public-id-2",
+        redThreshold: 1,
+        theme: "theme name",
+        value: 1
+      }]);
+    })
+  });
+
   describe('#getMeasures', () => {
     const category = { id: 'some-category' };
     const measureEntities = [{ id: 'some-entity' }];
-    const latestMeasures = [{ id: 'some-entity' }];
+    const measureEntitiesGrouped = [{
+      id: 'some-entity',
+      children: [{
+        id: 'some-entity-1'
+      },{
+        id: 'some-entity-2'
+      }]
+    },{
+      id: 'some-entity',
+      children: [{
+        id: 'some-entity-1'
+      }]
+    }];
 
     beforeEach(() => {
       sinon.stub(page, 'getCategory').returns(category);
       sinon.stub(page, 'getMeasureEntities').returns(measureEntities);
-      sinon.stub(page, 'latestMeasures').returns(latestMeasures);
+      sinon.stub(page, 'groupMeasures').returns(measureEntitiesGrouped);
     });
 
     it('orchastrates getting measures and applying rayg colours', async () => {
-      await page.getMeasures();
+      const measures = await page.getMeasures();
 
       sinon.assert.calledWith(page.getCategory, 'Measure');
       sinon.assert.calledWith(page.getCategory, 'Theme');
       sinon.assert.calledWith(page.getMeasureEntities, category, category);
-      sinon.assert.calledWith(page.latestMeasures, measureEntities);
+      sinon.assert.calledWith(page.groupMeasures, measureEntities);
+
+      expect(measures).to.eql({
+        grouped: [measureEntitiesGrouped[0]],
+        notGrouped: [measureEntitiesGrouped[1]],
+      });
     });
   });
 

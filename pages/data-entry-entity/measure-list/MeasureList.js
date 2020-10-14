@@ -53,30 +53,6 @@ class MeasureList extends Page {
     return category;
   }
 
-  mapMeasureFieldsToEntity(measureEntities, themeCategory) {
-    return measureEntities.map(entity => {
-      const theme = get(entity, 'parents[0].parents').find(parentEntity => {
-        return parentEntity.categoryId === themeCategory.id;
-      });
-
-      const themeName = theme.entityFieldEntries.find(fieldEntry => {
-        return fieldEntry.categoryField.name === 'name';
-      });
-
-      const entityMapped = {
-        id: entity.id,
-        publicId: entity.publicId,
-        theme: themeName.value
-      };
-
-      entity.entityFieldEntries.map(entityfieldEntry => {
-        entityMapped[entityfieldEntry.categoryField.name] = entityfieldEntry.value;
-      });
-
-      return entityMapped;
-    });
-  }
-
   async getMeasureEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
 
@@ -114,32 +90,70 @@ class MeasureList extends Page {
       }]
     });
 
-    const measureEntitiesMapped = this.mapMeasureFieldsToEntity(measureEntities, themeCategory);
+    return measureEntities.map(entity => {
+      const theme = get(entity, 'parents[0].parents').find(parentEntity => {
+        return parentEntity.categoryId === themeCategory.id;
+      });
 
-    return measureEntitiesMapped.filter(measure => {
-      return measure.filter !== 'RAYG';
+      const themeName = theme.entityFieldEntries.find(fieldEntry => {
+        return fieldEntry.categoryField.name === 'name';
+      });
+
+      const entityMapped = {
+        id: entity.id,
+        publicId: entity.publicId,
+        theme: themeName.value
+      };
+
+      entity.entityFieldEntries.map(entityfieldEntry => {
+        entityMapped[entityfieldEntry.categoryField.name] = entityfieldEntry.value;
+      });
+
+      return entityMapped;
     });
   }
 
-  latestMeasures(measureEntities) {
-    const measuresGroupedByGroupId = groupBy(measureEntities, entity => entity.groupID);
-    return Object.keys(measuresGroupedByGroupId).map(measureGroupDate => {
-      const measures = measuresGroupedByGroupId[measureGroupDate];
-      const measuresSorted = measures.sort((a, b) => moment(b.date, 'DD/MM/YYYY').valueOf() - moment(a.date, 'DD/MM/YYYY').valueOf());
-      return measuresSorted[0];
+  groupMeasures(measures) {
+    const measureEntitiesGrouped = groupBy(measures, measure => {
+      return measure.groupID;
     });
+
+    const measureGroups = Object.values(measureEntitiesGrouped).reduce((measureGroups, group) => {
+      const groupMeasure = group.find(measure => measure.filter === 'RAYG');
+      // if no RAYG row then ignore as its not shown on dashboard
+      if(!groupMeasure) {
+        return measureGroups;
+      }
+
+      const nonRaygRows = group.filter(measure => measure.filter !== 'RAYG');
+
+      const measuresGroupedByMetricId = groupBy(nonRaygRows, entity => entity.metricID);
+      groupMeasure.children = Object.values(measuresGroupedByMetricId).map(measures => {
+        const measuresSortedByDate = measures.sort((a, b) => moment(b.date, 'DD/MM/YYYY').valueOf() - moment(a.date, 'DD/MM/YYYY').valueOf());
+        measuresSortedByDate[0].colour = rayg.getRaygColour(measuresSortedByDate[0]);
+        return measuresSortedByDate[0];
+      });
+
+      groupMeasure.colour = rayg.getRaygColour(groupMeasure);
+
+      measureGroups.push(groupMeasure);
+
+      return measureGroups;
+    }, []);
+
+    return measureGroups;
   }
 
   async getMeasures() {
     const measureCategory = await this.getCategory('Measure');
     const themeCategory = await this.getCategory('Theme');
     const measureEntities = await this.getMeasureEntities(measureCategory, themeCategory);
-    const latestMeasures = await this.latestMeasures(measureEntities);
+    const measureEntitiesGrouped = await this.groupMeasures(measureEntities);
 
-    return latestMeasures.map(measure => {
-      measure.colour = rayg.getRaygColour(measure);
-      return measure;
-    });
+    return {
+      grouped: measureEntitiesGrouped.filter(measure => measure.children.length > 1),
+      notGrouped: measureEntitiesGrouped.filter(measure => measure.children.length === 1)
+    }
   }
 }
 
