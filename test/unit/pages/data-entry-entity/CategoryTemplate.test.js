@@ -432,7 +432,7 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
     };
 
     beforeEach(() => {
-      Category.fieldDefinitions.returns([{
+      sinon.stub(Category, 'fieldDefinitions').returns([{
         name: 'publicId'
       }]);
       Entity.findAll.returns([{
@@ -457,6 +457,10 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
       sinon.stub(page, 'addItem');
 
       res.locals.entitiesUserCanAccess = [];
+    });
+
+    afterEach(() => {
+      Category.fieldDefinitions.restore();
     });
 
     it('creates entity sheet', async () => {

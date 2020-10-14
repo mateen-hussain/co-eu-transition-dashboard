@@ -38,29 +38,31 @@ class Entity extends Model {
 
     const parentPublicFields = entityFields.filter(field => field.isParentField);
 
-    await EntityParent.destroy({
-      where: {
-        entityId: entity.id
-      }
-    }, options);
+    if(!options.ignoreParents) {
+      await EntityParent.destroy({
+        where: {
+          entityId: entity.id
+        }
+      }, options);
 
-    for(const parentPublicField of parentPublicFields) {
-      if(entity[parentPublicField.name]) {
-        const parent = await this.findOne({
-          where: {
-            publicId: entity[parentPublicField.name]
-          }
-        }, options);
-
-        // currently no way to support multiple parents through excel import to remove previous parent
-        if (parent) {
-          await EntityParent.create({
-            entityId: entity.id,
-            parentEntityId: parent.id
+      for(const parentPublicField of parentPublicFields) {
+        if(entity[parentPublicField.name]) {
+          const parent = await this.findOne({
+            where: {
+              publicId: entity[parentPublicField.name]
+            }
           }, options);
-        } else {
-          // this should not happen as its validated in a previous step.
-          throw new Error(`Parent ${entity[parentPublicField.name]} was not found in the database`);
+
+          // currently no way to support multiple parents through excel import to remove previous parent
+          if (parent) {
+            await EntityParent.create({
+              entityId: entity.id,
+              parentEntityId: parent.id
+            }, options);
+          } else {
+            // this should not happen as its validated in a previous step.
+            throw new Error(`Parent ${entity[parentPublicField.name]} was not found in the database`);
+          }
         }
       }
     }

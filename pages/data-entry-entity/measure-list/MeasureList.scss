@@ -1,0 +1,27 @@
+#measures-list {
+  .govuk-table__cell__actions {
+    text-align: right;
+  }
+
+  .govuk-table__body  {
+     tr:last-child > td, tr:last-child > th {
+      border-bottom: none;
+    }
+  }
+
+  .rayg-status {
+    margin-bottom: -10px;
+  }
+
+  .govuk-table__header, .govuk-table__cell {
+    width: 20%;
+  }
+
+  .govuk-table__cell.fix-width-75 {
+    width: 75%;
+  }
+
+  .govuk-table__cell__small {
+    width: 10%;
+  }
+}
