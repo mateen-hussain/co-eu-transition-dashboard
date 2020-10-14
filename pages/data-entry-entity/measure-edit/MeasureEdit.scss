@@ -30,26 +30,21 @@
   }
 }
 
-.current-value {
+.grey-bg {
   background-color: #f3f2f1;
-  padding: 10px 10px 5px 5px;
-  margin-bottom: 20px;
   width: 100%;
 }
 
-.current-value tr td {
-  min-width: 20%;
-  &:first-of-type {
-    width: 20%;
+.current-value {
+  padding: 10px 10px 5px 5px;
+  margin-bottom: 20px;
+  tr td {
+    width: 22%;
+    vertical-align: initial;
   }
-}
-
-.current-value p {
-  margin-bottom: 5px;
-}
-
-.date-value {
-  vertical-align: initial;
+  p {
+    margin-bottom: 5px;
+  }
 }
 
 .data-entry {
