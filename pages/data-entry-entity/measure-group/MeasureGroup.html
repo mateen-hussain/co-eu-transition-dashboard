@@ -1,0 +1,38 @@
+{% extends "template.njk" %}
+
+{% set measure = getMeasure() | await %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+
+
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: config.paths.dataEntryEntity.measureList,
+    attributes: {
+      onclick: "history.go(-1);"
+    }
+  }) }}
+{% endblock %}
+
+{% block pageTitle %}Measures{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row" id="hide-filters">
+    <div class="govuk-grid-column-two-thirds">
+      {% if successfulMode %}
+        {% include "data-entry-entity/measure-group/partials/success.njk" %}
+      {% else %}
+        {% include "data-entry-entity/measure-group/partials/edit.njk" %}
+      {% endif  %}
+    </div>
+  </div>
+{% endblock %}

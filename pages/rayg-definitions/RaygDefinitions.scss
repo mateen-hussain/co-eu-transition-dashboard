@@ -1,29 +1,30 @@
-.rag-red {
-    border: 1px solid #d4351c;
-    background-color: #d4351c;
+.rayg-def {
     padding: 4px 15px 4px 15px;
-}
+    border-left: 0;
+    height: 20px;
+    width: 20px;
+  
+    &.red {
+      background-color: #D4351C;
+    }
+  
+    &.amber {
+      background-color: #F47738;
+    }
+  
+    &.yellow {
+      background-color: #FFDD00;
+    }
+  
+    &.green {
+      background-color: #00703C;
+    }
 
-.rag-amber {
-    border: 1px solid #f47738;
-    background-color: #f47738;
-    padding: 4px 15px 4px 15px;
-}
+    &.grey {
+      background-color: #b1b4b6;
+    }
 
-.rag-yellow {
-    border: 1px solid #ffdd00;
-    background-color: #ffdd00;
-    padding: 4px 15px 4px 15px;
-}
-
-.rag-green {
-    border: 1px solid #00703c;
-    background-color: #00703c;
-    padding: 4px 15px 4px 15px;
-}
-
-.rag-grey {
-    border: 1px solid #b1b4b6;
-    background-color: #b1b4b6;
-    padding: 4px 15px 4px 15px;
-}
+    &.blue {
+      background-color: #1d70b8;
+    }
+  }

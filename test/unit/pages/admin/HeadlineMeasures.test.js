@@ -52,6 +52,7 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
     beforeEach(() => {
       HeadlineMeasuresModel.bulkCreate.reset();
       transaction.commit.reset();
+      transaction.rollback.reset();
     });
 
     afterEach(() => {

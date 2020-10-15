@@ -57,9 +57,17 @@ const camelCase = (str = '') => {
 const truthy = [true, 'true', 'yes', 1, '1', 'y'];
 const falsey = ['false', 'no', '0', 'n'];
 
+const buildDateString = data => {
+  const { day, month, year } = data;
+  // Ensure day and month are always 2 digits
+  const padStart = (d) => ('0' + d).slice(-2);
+  return `${year}-${padStart(month)}-${padStart(day)}`;
+}
+
 module.exports = {
   removeNulls,
   truthy,
   falsey,
-  camelCase
+  camelCase,
+  buildDateString
 };

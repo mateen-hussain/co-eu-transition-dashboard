@@ -1,0 +1,92 @@
+{% if data.error | default(measure.error) %}
+  {{ govukErrorSummary({
+    titleText: data.error | default(measure.error)
+  }) }}
+{% else %}
+
+  {% if flash %}
+    {{ govukErrorSummary({
+        titleText: "There is a problem",
+        errorList: [{
+          html: flash,
+          href: "#"
+        }]
+    }) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-xl">{{ data.groupDescription | default(measure.groupDescription) }}</h1>
+
+  <form action='{{ editUrl }}' method='POST'>
+    {{ govukTextarea({
+      name: "groupDescription",
+      id: "groupDescription",
+      label: {
+        text: "Description",
+        classes: "govuk-label--s"
+      },
+      value: data.groupDescription | default(measure.groupDescription)
+    }) }}
+
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-label--s">
+        <label class="govuk-label govuk-label--s">
+          Group RAYG values
+        </label>
+      </legend>
+      <div class="govuk-date-input">
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="redThreshold">
+              Red
+            </label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="redThreshold" name="redThreshold" type="text" autocomplete="red" pattern="[0-9]*" inputmode="numeric" value="{{ data.redThreshold | default(measure.redThreshold) }}"></div>
+        </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="aYThreshold">
+              Amber
+            </label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="aYThreshold" name="aYThreshold" type="text" autocomplete="bday-month" pattern="[0-9]*" inputmode="numeric" value="{{ data.aYThreshold | default(measure.aYThreshold) }}"></div>
+        </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="greenThreshold">
+              Green
+            </label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="greenThreshold" name="greenThreshold" type="text" autocomplete="bday-year" pattern="[0-9]*" inputmode="numeric" value="{{ data.greenThreshold | default(measure.greenThreshold) }}"></div>
+        </div>
+      </div>
+    </fieldset>
+
+    {{ govukInput({
+      label: {
+        text: "Group total value",
+        classes: "govuk-label--s"
+      },
+      classes: "govuk-input--width-2",
+      id: "value",
+      name: "value",
+      value: "" + data.value | default(measure.value)
+    }) }}
+
+    {{ govukCheckboxes({
+      idPrefix: "commentsOnly",
+      name: "commentsOnly",
+      items: [
+        {
+          value: "Yes",
+          text: "Comment only group",
+          checked: true if data.commentsOnly or measure.commentsOnly
+        }
+      ]
+    }) }}
+
+    {{ govukButton({
+    text: "Save",
+    name: "save",
+    value: "save",
+    type: "submit",
+    preventDoubleClick: true
+    }) }}
+  </form>
+{% endif %}

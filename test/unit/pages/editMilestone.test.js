@@ -129,11 +129,9 @@ describe('pages/edit-milestone/EditMilestone', () => {
   describe('#saveFieldToDatabase', () => {
     it('saves data to database', async () => {
       page.next = sinon.stub();
-      const transaction = {
-        commit: sinon.stub(),
-        rollback: sinon.stub()
-      };
-      sequelize.transaction.returns(transaction);
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
 
       Milestone.import = sinon.stub();
       Milestone.fieldDefinitions = sinon.stub().returns('fields');
@@ -149,11 +147,9 @@ describe('pages/edit-milestone/EditMilestone', () => {
 
     it('redirects with error if problem', async () => {
       page.next = sinon.stub();
-      const transaction = {
-        commit: sinon.stub(),
-        rollback: sinon.stub()
-      };
-      sequelize.transaction.returns(transaction);
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
 
       Milestone.import = sinon.stub().throws(new Error('error'));
       Milestone.fieldDefinitions = sinon.stub().returns('fields');
