@@ -22,31 +22,31 @@
 
   <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
   <div class="data-entry">
-    <form action="{{ url }}/{{ metricId }}" method="post">
+    <form action="{{ url }}/{{ metricId }}/add" method="post">
       <input type="hidden" name="type" value="entries" />
 
       {{ govukDateInput({
         name: "field-date"
       }) }}
 
-    <table>
-      {% for key, value in formFields %}
-        <tr>
-        {% for measure in value %}
-        {% if measure.label %} <td class="measure-label"><p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p><td>{% endif %}
-        <td>
-          <div class="govuk-date-input__item">
-            <div class="govuk-form-group">
-              <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Value</label>
-              <input class="govuk-input govuk-input--width-2" type="number" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
+      <table>
+        {% for key, value in formFields %}
+          <tr>
+          {% for measure in value %}
+          {% if measure.label %} <td class="measure-label"><p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p><td>{% endif %}
+          <td>
+            <div class="govuk-date-input__item">
+              <div class="govuk-form-group">
+                <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Value</label>
+                <input class="govuk-input govuk-input--width-2" type="number" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
+              </div>
             </div>
-          </div>
-        </td> 
+          </td> 
+          {% endfor %}
+          </tr>
         {% endfor %}
-        </tr>
-      {% endfor %}
-    </table>
-    <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
+      </table>
+      <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     </form>
    </div> 
 

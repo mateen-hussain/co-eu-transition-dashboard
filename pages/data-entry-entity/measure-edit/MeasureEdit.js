@@ -399,7 +399,7 @@ class MeasureEdit extends Page {
     const URLHash = '#measure-information';
 
     if (formErrors && formErrors.length) {
-      this.req.flash(formErrors.join('<br>'));
+      this.req.flash(formErrors);
       return this.res.redirect(`${this.measureUrl}/${URLHash}`);
     }
 
@@ -455,7 +455,7 @@ class MeasureEdit extends Page {
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      this.req.flash(formValidationErrors.join('<br>'));
+      this.req.flash(formValidationErrors);
       return this.res.redirect(this.measureUrl);
     }
 

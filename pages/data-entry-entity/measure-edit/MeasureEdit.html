@@ -29,15 +29,6 @@
 
 {% block content %}
 
-  {% if flash %}
-    {{ govukErrorSummary({
-        titleText: "There was a problem saving your data",
-        errorList: [{
-            html: flash
-        }]
-    }) }}
-  {% endif %}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 

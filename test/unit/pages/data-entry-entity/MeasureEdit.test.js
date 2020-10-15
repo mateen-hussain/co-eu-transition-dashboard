@@ -709,7 +709,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       await page.updateMeasureInformation(formData);
 
       sinon.assert.calledWith(page.validateMeasureInformation, formData);
-      sinon.assert.calledWith(req.flash, "error");
+      sinon.assert.calledWith(req.flash, ["error"]);
     });
 
     it('should call saveMeasureData with updatedEntites data', async () => {
@@ -833,7 +833,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       await page.addMeasureEntityData(formData);
 
       sinon.assert.calledWith(page.validateFormData, formData);
-      sinon.assert.calledWith(req.flash, "error");
+      sinon.assert.calledWith(req.flash, ["error"]);
     });
 
     it('should call flash and redirect when validateEntities returns errors', async () => {
