@@ -37,7 +37,7 @@ class MeasureEdit extends Page {
   } 
 
   get pathToBind() {
-    return `${this.url}/:metricId/:type?/:successful(successful)?`;
+    return `${this.url}/:metricId/:type?`;
   }
 
   get addMeasure() {
@@ -49,7 +49,7 @@ class MeasureEdit extends Page {
   }
 
   get successfulMode() {
-    return this.req.params && this.req.params.successful;
+    return this.req.params && this.req.params.type == 'successful';
   }
 
   get middleware() {

@@ -69,7 +69,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#successfulMode', () => {
     it('returns true when in successful mode', () => {
-      page.req.params = { metricId: '123', successful: 'successful', type: "add" };
+      page.req.params = { metricId: '123', type: "successful" };
       expect(page.successfulMode).to.be.ok;
     });
 
