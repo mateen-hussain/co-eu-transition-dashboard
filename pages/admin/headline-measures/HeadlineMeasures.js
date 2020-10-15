@@ -9,6 +9,7 @@ const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const HeadlineMeasuresModel = require('models/headlineMeasures');
 const sequelize = require('services/sequelize');
+const compact = require('lodash/compact');
 
 class HeadlineMeasures extends Page {
   get url() {
@@ -49,7 +50,7 @@ class HeadlineMeasures extends Page {
     }
 
     const hasDuplicates = measures => {
-      const publicIds = measures.map(measure => measure.entityPublicId);
+      const publicIds = compact(measures.map(measure => measure.entityPublicId));
       return new Set(publicIds).size !== publicIds.length;
     };
 
