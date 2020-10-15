@@ -286,13 +286,14 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     it('Should create label with filtervalue and filtervalue2 when both filter and filter2 exist', async () => {
       const measures = [{ filter: 'filter1', filterValue: 'value1', filter2: 'filter2', filterValue2: 'value2' }];
       page.applyLabelToEntities(measures);
-      expect(measures[0].label).to.eql('value1 - value2');
+      expect(measures[0].label).to.eql('filter1 : value1');
+      expect(measures[0].label2).to.eql('filter2 : value2');
     });
 
     it('Should create label with filtervalue if only filter exists', async () => {
       const measures = [{ filter: 'filter1', filterValue: 'value1' }];
       page.applyLabelToEntities(measures);
-      expect(measures[0].label).to.eql('value1');
+      expect(measures[0].label).to.eql('filter1 : value1');
     });
 
     it('Should not create label when there are no filters', async () => {
@@ -393,18 +394,15 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     beforeEach(() => {
       sinon.stub(page, 'getMeasure').returns(measureEntities);
-      sinon.stub(page, 'groupEntitiesByDateAndFilter').returns({});
     });
 
     afterEach(() => {
       page.getMeasure.restore();
-      page.groupEntitiesByDateAndFilter.restore();
     });
 
-    it('getMeasureData should call getMeasure and groupEntitiesByDateAndFilter', async () => {
+    it('getMeasureData should call getMeasure', async () => {
       await page.getMeasureData();
       sinon.assert.calledOnce(page.getMeasure);
-      sinon.assert.calledWith(page.groupEntitiesByDateAndFilter, measureEntities);
     });
   });
 
