@@ -5,7 +5,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
-{% from "data-entry-content.njk" import dataEntriesContent %}
+{% from "data-entry-content.njk" import dataEntriesContent, UpdateMetricData %}
 
 {% block beforeContent %}
   {% include "navigation.njk" %}
@@ -32,7 +32,7 @@
     {{ govukErrorSummary({
         titleText: "There was a problem saving your data",
         errorList: [{
-            text: flash
+            html: flash
         }]
     }) }}
   {% endif %}
@@ -53,7 +53,7 @@
         </thead>
         <tbody class="govuk-table__body">
           <tr class="govuk-table__row">
-            <td class="govuk-table__cell">{{ latestMeasure.publicId }}</td>
+            <td class="govuk-table__cell">{{ latestMeasure.metricID }}</td>
             <td class="govuk-table__cell">{{ latestMeasure.theme }}</td>
             <td class="govuk-table__cell "><span class="measure-rayg {{ latestMeasure.colour }}"></span></td>
             <td class="govuk-table__cell">{{ latestMeasure.date }}</td>
@@ -74,7 +74,7 @@
             label: "Measure information",
             id: "measure-information",
             panel: {
-              html: "<p class='govuk-body'>Dummy content</p>"
+              html: UpdateMetricData(latestMeasure, url, req.params.metricId, data)
             }
           }
         ]

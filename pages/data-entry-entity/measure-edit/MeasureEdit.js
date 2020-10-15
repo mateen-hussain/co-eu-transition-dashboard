@@ -37,7 +37,15 @@ class MeasureEdit extends Page {
   } 
 
   get pathToBind() {
-    return `${this.url}/:metricId/:successful(successful)?`;
+    return `${this.url}/:metricId/:type?/:successful(successful)?`;
+  }
+
+  get addMeasure() {
+    return this.req.params && this.req.params.type == 'add';
+  }
+
+  get editMeasure() {
+    return this.req.params && this.req.params.type == 'edit';
   }
 
   get successfulMode() {
@@ -55,6 +63,10 @@ class MeasureEdit extends Page {
   async getRequest(req, res) {
     if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    }
+
+    if (this.successfulMode) {
+      this.clearData();
     }
 
     super.getRequest(req, res);
@@ -318,11 +330,11 @@ class MeasureEdit extends Page {
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
-      errors.push({ error: 'Invalid date' });
+      errors.push("Invalid date");
     }
 
     if (!formData.entities) {
-      errors.push({ error: 'Mssing entity values' });
+      errors.push("Missing entity values");
     }
     
     if (formData.entities) {
@@ -331,13 +343,13 @@ class MeasureEdit extends Page {
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
      
       if (!haveAllEntitesBeenSubmitted) {
-        errors.push({ error: 'Mssing entity values' });
+        errors.push("Missing entity values");
       }
       
       submittedEntityId.forEach(entityId => {
         const entityValue = formData.entities[entityId]
         if (entityValue.length === 0 || isNaN(entityValue)) {
-          errors.push({ error: 'Invalid field value' });
+          errors.push("Invalid field value");
         }
       })
     }  
@@ -368,19 +380,81 @@ class MeasureEdit extends Page {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
-    if (req.body.type === 'entries') {
+    if (this.addMeasure) {
       this.saveData(removeNulls(req.body));
       return await this.addMeasureEntityData(req.body)
+    }
+
+    if (this.editMeasure) {
+      this.saveData(removeNulls(req.body));
+      return await this.updateMeasureInformation(req.body)   
     }
 
     return res.redirect(this.measureUrl);
   }
 
+  async updateMeasureInformation(formData) {
+    const formErrors = this.validateMeasureInformation(formData);
+    const URLHash = '#measure-information';
+
+    if (formErrors && formErrors.length) {
+      this.req.flash(formErrors.join('<br>'));
+      return this.res.redirect(`${this.measureUrl}/${URLHash}`);
+    }
+
+    const updatedEntites = await this.updateMeasureEntities(formData);
+ 
+    return await this.saveMeasureData(updatedEntites, URLHash, { ignoreParents: true });   
+  }
+
+  async updateMeasureEntities(data) {
+    const measuresEntities = await this.getMeasure();
+    return measuresEntities.map(entity => {
+      return {
+        publicId: entity.publicId,
+        description: data.description,
+        additionalComment: data.additionalComment || '',
+        redThreshold: data.redThreshold,
+        aYThreshold: data.aYThreshold,
+        greenThreshold: data.greenThreshold
+      }
+    });
+  }
+
+  validateMeasureInformation(formData) {
+    const errors = [];
+
+    if (!formData.description || !formData.description.trim().length) {
+      errors.push("You must enter a description");
+    }
+
+    if (!formData.redThreshold || isNaN(formData.redThreshold)) {
+      errors.push("Red threshold must be a number");
+    }
+
+    if (!formData.aYThreshold || isNaN(formData.aYThreshold)) {
+      errors.push("Amber/Yellow threshold must be a number");
+    }
+
+    if(!formData.greenThreshold || isNaN(formData.greenThreshold)) {
+      errors.push("Green threshold must be a number");
+    }
+
+    if (!isNaN(formData.redThreshold) && !isNaN(formData.aYThreshold) && formData.redThreshold > formData.aYThreshold) {
+      errors.push("The red threshold must be lower than the amber/yellow threshold");
+    }
+
+    if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && formData.aYThreshold > formData.greenThreshold) {
+      errors.push("The Amber/Yellow threshold must be lower than the green threshold");
+    }
+    
+    return errors;
+  }
+
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      // this.req.flash('Missing / invalid form data');
-      this.req.flash(formValidationErrors.map(error => `${error.error}`));
+      this.req.flash(formValidationErrors.join('<br>'));
       return this.res.redirect(this.measureUrl);
     }
 
@@ -392,31 +466,31 @@ class MeasureEdit extends Page {
       this.req.flash('Error in entity data');
       return this.res.redirect(this.measureUrl); 
     }
- 
-    return await this.saveMeasureData(parsedEntities);  
+    const URLHash = `#data-entries`;
+    return await this.saveMeasureData(parsedEntities, URLHash);  
   }
 
-  async saveMeasureData(entities) {
+  async saveMeasureData(entities, URLHash, options = {}) {
     const categoryName = 'Measure'
     const category = await Category.findOne({
       where: { name: categoryName }
     });
     const categoryFields = await Category.fieldDefinitions(categoryName);
     const transaction = await sequelize.transaction();
-    let redirectUrl = this.measureUrl;
+    let redirectURL = this.measureUrl;
 
     try {
       for(const entity of entities) {
-        await Entity.import(entity, category, categoryFields, { transaction });
+        await Entity.import(entity, category, categoryFields, { transaction, ...options });
       }
       await transaction.commit();
       this.clearData();
-      redirectUrl += '/successful';
+      redirectURL += '/successful';
     } catch (error) {
       this.req.flash('Error saving measure data');
       await transaction.rollback();
     }
-    return this.res.redirect(redirectUrl);
+    return this.res.redirect(`${redirectURL}${URLHash}`);
   }
 }
 
