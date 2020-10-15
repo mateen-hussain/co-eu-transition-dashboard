@@ -62,7 +62,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(page.editMeasure).to.be.ok;
     });
 
-    it('returns false when type does not equal add', () => {
+    it('returns false when type does not equal edit', () => {
       expect(page.editMeasure).to.be.not.ok;
     });
   });

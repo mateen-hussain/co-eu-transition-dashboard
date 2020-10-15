@@ -477,7 +477,7 @@ class MeasureEdit extends Page {
     });
     const categoryFields = await Category.fieldDefinitions(categoryName);
     const transaction = await sequelize.transaction();
-    let redirectURL = this.measureUrl;
+    let redirectUrl = this.measureUrl;
 
     try {
       for(const entity of entities) {
@@ -485,12 +485,12 @@ class MeasureEdit extends Page {
       }
       await transaction.commit();
       this.clearData();
-      redirectURL += '/successful';
+      redirectUrl += '/successful';
     } catch (error) {
       this.req.flash('Error saving measure data');
       await transaction.rollback();
     }
-    return this.res.redirect(`${redirectURL}${URLHash}`);
+    return this.res.redirect(`${redirectUrl}${URLHash}`);
   }
 }
 
