@@ -10,6 +10,8 @@
 {% endblock %}
 
 {% block head %}
+  <meta name="viewport" content="width=1024">
+
   {% if config.services.googleAnalytics.id %}
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ config.services.googleAnalytics.id }}"></script>
