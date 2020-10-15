@@ -340,6 +340,7 @@ class MeasureEdit extends Page {
     if (formData.entities) {
       // Check the number of submitted entities matches the expected number
       const submittedEntityId = Object.keys(formData.entities);
+
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
      
       if (!haveAllEntitesBeenSubmitted) {
