@@ -322,16 +322,17 @@ class MeasureEdit extends Page {
     }
 
     if (!formData.entities) {
-      errors.push({ error: 'Mssing entity values' });
+      errors.push({ error: 'Missing entity values' });
     }
     
     if (formData.entities) {
       // Check the number of submitted entities matches the expected number
       const submittedEntityId = Object.keys(formData.entities);
+
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
      
       if (!haveAllEntitesBeenSubmitted) {
-        errors.push({ error: 'Mssing entity values' });
+        errors.push({ error: 'Missing entity values' });
       }
       
       submittedEntityId.forEach(entityId => {

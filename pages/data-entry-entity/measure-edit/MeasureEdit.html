@@ -5,7 +5,9 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/tabs/macro.njk" import govukTabs %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "data-entry-content.njk" import dataEntriesContent %}
+{% from "measure-information.njk" import measureInformation %}
 
 {% block beforeContent %}
   {% include "navigation.njk" %}
@@ -28,19 +30,27 @@
 
 {% block content %}
 
-  {% if flash %}
-    {{ govukErrorSummary({
-        titleText: "There was a problem saving your data",
-        errorList: [{
-            text: flash
-        }]
-    }) }}
-  {% endif %}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-      <h1 class="govuk-heading-xl">{{ latestMeasure.name }}</h1>
+    <h1 class="govuk-heading-l">{{ latestMeasure.name }}</h1>
+    
+    {% if flash %}
+      <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+        <h2 class="govuk-error-summary__title" id="error-summary-title">
+          There is a problem
+        </h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+          {% for error in flash %}
+            <li>
+              <a href="#data-entries">{{ error }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+    {% endif %}
 
       <table class="govuk-table measures-table">
         <thead class="govuk-table__head">
@@ -48,7 +58,7 @@
             <th scope="col" class="govuk-table__header">Measure UID</th>
             <th scope="col" class="govuk-table__header">Theme</th>
             <th scope="col" class="govuk-table__header">Status</th>
-            <th scope="col" class="govuk-table__header">Last update</th>
+            <th scope="col" class="govuk-table__header">Last updated</th>
           </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -74,7 +84,7 @@
             label: "Measure information",
             id: "measure-information",
             panel: {
-              html: "<p class='govuk-body'>Dummy content</p>"
+              html: measureInformation(latestMeasure, url, req.params.metricId, data)
             }
           }
         ]

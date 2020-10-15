@@ -534,7 +534,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Mssing entity values' });
+      expect(response[0]).to.eql({ error: 'Missing entity values' });
     });
 
     it('should return an error when entities data is missing ids', async () => {
@@ -544,7 +544,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Mssing entity values' });
+      expect(response[0]).to.eql({ error: 'Missing entity values' });
     });
 
     it('should return an error when entities data is empty', async () => {
