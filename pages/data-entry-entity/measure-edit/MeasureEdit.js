@@ -190,10 +190,12 @@ class MeasureEdit extends Page {
 
   applyLabelToEntities(entities) {
     entities.forEach(entity => {
-      if (entity.filter && entity.filter2) {
-        entity.label = `${entity.filterValue} - ${entity.filterValue2}`
-      } else if (entity.filter) {
-        entity.label = entity.filterValue
+      if (entity.filter && entity.filterValue) {
+        entity.label = `${entity.filter} : ${entity.filterValue}`
+      }
+
+      if (entity.filter2 && entity.filterValue2) {
+        entity.label2 = `${entity.filter2} : ${entity.filterValue2}`
       }
     })
   }
@@ -238,24 +240,16 @@ class MeasureEdit extends Page {
     );
   }
 
-  groupAndOrderUiInputs (uiInputs) {
-    const groupedInputs = groupBy(uiInputs, measure => measure.filterValue || measure.metricID);
-    const groupedAndSortedEntityData = this.sortGroupedEntityData(groupedInputs);
-    return groupedAndSortedEntityData;
-  }
-
   async getMeasureData() {
     const measuresEntities = await this.getMeasure();
     this.applyLabelToEntities(measuresEntities)
-    const groupedMeasureEntities = this.groupEntitiesByDateAndFilter(measuresEntities)
-    
+    const groupedMeasureEntities = groupBy(measuresEntities, measure => measure.date);
     const uiInputs = this.calculateUiInputs(measuresEntities)
-    const measureFields = this.groupAndOrderUiInputs(uiInputs)
 
     return {
       latest: measuresEntities[measuresEntities.length - 1],
       grouped: groupedMeasureEntities,
-      fields: measureFields
+      fields: uiInputs
     }
   }
 

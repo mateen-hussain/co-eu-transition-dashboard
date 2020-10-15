@@ -11,7 +11,9 @@
       "name": "Transition Taskforce Dashboard"
     },
     "googleAnalytics": {},
-    "tableau": {}
+    "tableau": {
+      "prependUrl": ""
+    }
   },
   "bcrypt": {
     "saltRounds": 10

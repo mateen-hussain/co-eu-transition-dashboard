@@ -166,14 +166,7 @@ class TableauExport extends Page {
       }
     });
 
-    let data = await this.getEntitiesFlatStructure(measuresCategory);
-
-    data = data.filter(d => {
-      if (d.Filter && d.Filter.value === 'RAYG') {
-        return false;
-      }
-      return true;
-    });
+    const data = await this.getEntitiesFlatStructure(measuresCategory);
 
     return this.exportSchema ? res.json(data[0]) : res.json(data);
   }
