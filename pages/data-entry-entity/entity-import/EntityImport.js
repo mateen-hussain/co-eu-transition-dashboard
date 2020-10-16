@@ -27,7 +27,7 @@ class EntityImport extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader']),
+      ...authentication.protect(['admin']),
       fileUpload({ safeFileNames: true }),
       flash,
       entityUserPermissions.assignEntityIdsUserCanAccessToLocals
