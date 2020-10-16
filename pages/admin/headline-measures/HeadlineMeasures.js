@@ -87,7 +87,7 @@ class HeadlineMeasures extends Page {
 
   async getMeasures() {
     const category = await this.getCategory('measure');
-    const themeCategory = await this.getCategory('Theme');
+    const themeCategory = await this.getCategory('theme');
 
     let measures = await Entity.findAll({
       where: {

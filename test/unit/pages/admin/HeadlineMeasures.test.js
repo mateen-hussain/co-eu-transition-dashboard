@@ -185,7 +185,7 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
       const measuresMapped = await page.getMeasures();
 
       sinon.assert.calledWith(page.getCategory, 'measure');
-      sinon.assert.calledWith(page.getCategory, 'Theme');
+      sinon.assert.calledWith(page.getCategory, 'theme');
 
       sinon.assert.calledWith(Entity.findAll, {
         where: {
