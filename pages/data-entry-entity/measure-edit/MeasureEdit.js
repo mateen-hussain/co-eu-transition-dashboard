@@ -16,7 +16,7 @@ const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
 const validation = require('helpers/validation');
 const parse = require('helpers/parse');
-const { buildDateString, removeNulls } = require('helpers/utils');
+const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
 const uniqWith = require('lodash/uniqWith');
@@ -52,6 +52,10 @@ class MeasureEdit extends Page {
     return this.req.params && this.req.params.type == 'successful';
   }
 
+  get postData () {
+    return this.req.body;
+  }
+
   get middleware() {
     return [
       ...authentication.protect(['uploader']),
@@ -63,10 +67,6 @@ class MeasureEdit extends Page {
   async getRequest(req, res) {
     if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
-    }
-
-    if (this.successfulMode) {
-      this.clearData();
     }
 
     super.getRequest(req, res);
@@ -376,12 +376,10 @@ class MeasureEdit extends Page {
     }
 
     if (this.addMeasure) {
-      this.saveData(removeNulls(req.body));
       return await this.addMeasureEntityData(req.body)
     }
 
     if (this.editMeasure) {
-      this.saveData(removeNulls(req.body));
       return await this.updateMeasureInformation(req.body)   
     }
 
@@ -393,8 +391,7 @@ class MeasureEdit extends Page {
     const URLHash = '#measure-information';
 
     if (formErrors && formErrors.length) {
-      this.req.flash(formErrors);
-      return this.res.redirect(`${this.measureUrl}/${URLHash}`);
+      return this.renderRequest(this.res, { errors: formErrors });
     }
 
     const updatedEntites = await this.updateMeasureEntities(formData);
@@ -449,8 +446,7 @@ class MeasureEdit extends Page {
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      this.req.flash(formValidationErrors);
-      return this.res.redirect(this.measureUrl);
+      return this.renderRequest(this.res, { errors: formValidationErrors });  
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
@@ -458,9 +454,9 @@ class MeasureEdit extends Page {
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
     if (errors.length > 0) {
-      this.req.flash('Error in entity data');
-      return this.res.redirect(this.measureUrl); 
+      return this.renderRequest(this.res, { errors: ['Error in entity data'] });  
     }
+    
     const URLHash = `#data-entries`;
     return await this.saveMeasureData(parsedEntities, URLHash);  
   }
@@ -479,7 +475,6 @@ class MeasureEdit extends Page {
         await Entity.import(entity, category, categoryFields, { transaction, ...options });
       }
       await transaction.commit();
-      this.clearData();
       redirectUrl += '/successful';
     } catch (error) {
       this.req.flash('Error saving measure data');

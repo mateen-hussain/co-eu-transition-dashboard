@@ -26,6 +26,7 @@
 {% set latestMeasure = measure.latest %}
 {% set groupedMeasures = measure.grouped %}
 {% set formFields = measure.fields %}
+{% set errorMessages = errors if errors else flash %}
 
 {% block content %}
 
@@ -33,15 +34,15 @@
     <div class="govuk-grid-column-two-thirds">
 
     <h1 class="govuk-heading-l">{{ latestMeasure.name }}</h1>
-    
-    {% if flash %}
+
+    {% if errorMessages %}
       <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
         <h2 class="govuk-error-summary__title" id="error-summary-title">
           There is a problem
         </h2>
         <div class="govuk-error-summary__body">
           <ul class="govuk-list govuk-error-summary__list">
-          {% for error in flash %}
+          {% for error in errorMessages %}
             <li>
               <a href="#data-entries">{{ error }}</a>
             </li>
