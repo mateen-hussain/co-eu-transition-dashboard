@@ -124,7 +124,7 @@ class HeadlineMeasures extends Page {
 
     const measuresAsItems = measures.map(measure => {
       let measureName = measure.entityFieldEntries.find(entry => {
-        return entry.categoryField.name === 'name';
+        return entry.categoryField.name === 'groupDescription';
       });
 
       const theme = get(measure, 'parents[0].parents').find(parentEntity => {

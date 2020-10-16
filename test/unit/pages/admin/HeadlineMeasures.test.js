@@ -125,7 +125,37 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
     });
   });
 
+  describe('#getCategory', () => {
+    it('gets and returns category', async () => {
+      const category = { name: 'some-name' };
+      Category.findOne.resolves(category);
+
+      const response = await page.getCategory('some-name');
+
+      expect(response).to.eql(category);
+    });
+
+    it('gets and returns category', async () => {
+      Category.findOne.resolves();
+
+      let error = {};
+      try {
+        await page.getCategory('some-name');
+      } catch (err) {
+        error = err.message;
+      }
+
+      expect(error).to.eql('Category export, error finding some-name category');
+    });
+  });
+
   describe('#getMeasures', () => {
+    const category = { id: 1 };
+
+    beforeEach(() => {
+      sinon.stub(page, 'getCategory').returns(category);
+    });
+
     it('gets measures and maps into items for select in html', async () => {
       const measures = [{
         publicId: 1,
@@ -133,26 +163,29 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
           categoryField: {
             name: 'groupDescription'
           },
-          value: 'some name'
+          value: 'measure name'
         },{
           categoryField: {
             name: 'filter'
           },
           value: 'RAYG'
+        }], parents: [{
+          parents: [{
+            categoryId: 1,
+            entityFieldEntries: [{
+              categoryField: { name: 'name' },
+              value: 'theme name'
+            }]
+          }]
         }]
       }];
-      const category = { id: 1 };
 
-      Category.findOne.returns(category);
       Entity.findAll.returns(measures);
 
       const measuresMapped = await page.getMeasures();
 
-      sinon.assert.calledWith(Category.findOne, {
-        where: {
-          name: 'Measure'
-        }
-      });
+      sinon.assert.calledWith(page.getCategory, 'measure');
+      sinon.assert.calledWith(page.getCategory, 'Theme');
 
       sinon.assert.calledWith(Entity.findAll, {
         where: {
@@ -166,6 +199,18 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
             where: { isActive: true },
             required: true
           }
+        }, {
+          model: Entity,
+          as: 'parents',
+          include: [{
+            model: Entity,
+            as: 'parents',
+            include: [{
+              separate: true,
+              model: EntityFieldEntry,
+              include: CategoryField
+            }]
+          }]
         }]
       });
 
@@ -174,7 +219,7 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
           "text": "-- Select --"
         },
         {
-          "text": "some name",
+          "text": "theme name - measure name",
           "value": 1
         }
       ]);
