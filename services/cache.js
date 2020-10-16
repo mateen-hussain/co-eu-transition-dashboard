@@ -9,6 +9,15 @@ if(config.services.vcapServices && config.services.vcapServices.redis.length) {
   redisUrl = config.services.vcapServices.redis[0].credentials.uri;
 }
 
+if (!redisUrl) {
+  logger.error('Cache not active, no redis url supplied');
+  return module.exports = {
+    set: () => {},
+    get: () => {},
+    clear: () => {}
+  };
+}
+
 const client = redis.createClient({
   url: redisUrl
 });
