@@ -138,7 +138,7 @@ class HeadlineMeasures extends Page {
       if (!measureName || !themeName) return;
 
       return {
-        text:  themeName.value + " - " + measureName.value,
+        text: `${themeName.value} - ${measureName.value}`,
         value: measure.publicId
       };
     });
