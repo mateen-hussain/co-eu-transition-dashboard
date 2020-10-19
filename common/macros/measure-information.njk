@@ -1,39 +1,40 @@
 {% macro measureInformation(measure, url, metricId, data) %}
+  <form action="{{ url }}/{{ metricId }}/edit#measure-information" method="post">
 
-  <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Description</label>
-    <textarea class="govuk-textarea" id="entity-{{ measure.id }}" name="description" rows="5">{{ data.description | default(measure.description) }}</textarea>
-  </div>
-
-  <div class="govuk-form-group">
-    <label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Comment</label>
-    <textarea class="govuk-textarea" id="entity-{{ measure.id }}" name="comment" rows="5">{{ data.comment | default(measure.comment) }}</textarea>
-  </div>
-
-<label class="govuk-label govuk-!-font-weight-bold" for="entity-{{ measure.id }}">Measure RAYG Values</label>
-  <div class="govuk-date-input__item">
     <div class="govuk-form-group">
-      <label class="govuk-label" for="entity-{{ measure.id }}">Red</label>
-      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="red" value="{{ data.redThreshold | default(measure.redThreshold) }}" />
+      <label class="govuk-label govuk-!-font-weight-bold" for="entity-description">Description</label>
+      <textarea class="govuk-textarea" id="entity-description" name="description" rows="5">{{ data.description | default(measure.description) }}</textarea>
     </div>
-  </div>
 
-  <div class="govuk-date-input__item">
     <div class="govuk-form-group">
-      <label class="govuk-label" for="entity-{{ measure.id }}">Amber</label>
-      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="amber" value="{{ data.aYThreshold | default(measure.aYThreshold) }}" />
+      <label class="govuk-label govuk-!-font-weight-bold" for="entity-comment">Comment</label>
+      <textarea class="govuk-textarea" id="entity-comment" name="additionalComment" rows="5">{{ data.additionalComment | default(measure.additionalComment) }}</textarea>
     </div>
-  </div>
 
-  <div class="govuk-date-input__item">
-    <div class="govuk-form-group">
-      <label class="govuk-label" for="entity-{{ measure.id }}">Green</label>
-      <input class="govuk-input govuk-input--width-2" type="text" id="entity-{{ measure.id }}" name="green" value="{{ data.greenThreshold | default(measure.greenThreshold) }}" />
+  <label class="govuk-label govuk-!-font-weight-bold">Measure RAYG Values</label>
+    <div class="govuk-date-input__item">
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="entity-redThreshold">Red</label>
+        <input class="govuk-input govuk-input--width-2" type="text" id="entity-redThreshold" name="redThreshold" value="{{ data.redThreshold | default(measure.redThreshold) }}" />
+      </div>
     </div>
-  </div>
 
-  <br>
-  <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
+    <div class="govuk-date-input__item">
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="entity-aYThreshold">Amber</label>
+        <input class="govuk-input govuk-input--width-2" type="text" id="entity-aYThreshold" name="aYThreshold" value="{{ data.aYThreshold | default(measure.aYThreshold) }}" />
+      </div>
+    </div>
+
+    <div class="govuk-date-input__item">
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="entity-greenThreshold">Green</label>
+        <input class="govuk-input govuk-input--width-2" type="text" id="entity-greenThreshold" name="greenThreshold" value="{{ data.greenThreshold | default(measure.greenThreshold) }}" />
+      </div>
+    </div>
+
+    <br>
+    <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
 
   </form>
 

@@ -88,6 +88,10 @@ class Page {
     this.next();
   }
 
+  renderRequest(res, viewData = {}) {
+    res.render(this.template, Object.assign(this.locals, { config, ...viewData } ));
+  }
+
   async handler(req, res) {
     this.req = req;
     this.res = res;

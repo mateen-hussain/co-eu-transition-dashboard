@@ -37,7 +37,7 @@
 
   <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
   <div class="data-entry">
-    <form action="{{ url }}/{{ metricId }}" method="post">
+    <form action="{{ url }}/{{ metricId }}/add" method="post">
       <input type="hidden" name="type" value="entries" />
 
       {{ govukDateInput({

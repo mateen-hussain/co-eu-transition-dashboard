@@ -16,7 +16,7 @@ const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
 const validation = require('helpers/validation');
 const parse = require('helpers/parse');
-const { buildDateString, removeNulls } = require('helpers/utils');
+const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
 const uniqWith = require('lodash/uniqWith');
@@ -37,11 +37,23 @@ class MeasureEdit extends Page {
   } 
 
   get pathToBind() {
-    return `${this.url}/:metricId/:successful(successful)?`;
+    return `${this.url}/:metricId/:type?`;
+  }
+
+  get addMeasure() {
+    return this.req.params && this.req.params.type == 'add';
+  }
+
+  get editMeasure() {
+    return this.req.params && this.req.params.type == 'edit';
   }
 
   get successfulMode() {
-    return this.req.params && this.req.params.successful;
+    return this.req.params && this.req.params.type == 'successful';
+  }
+
+  get postData () {
+    return this.req.body;
   }
 
   get middleware() {
@@ -312,11 +324,11 @@ class MeasureEdit extends Page {
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
-      errors.push({ error: 'Invalid date' });
+      errors.push("Invalid date");
     }
 
     if (!formData.entities) {
-      errors.push({ error: 'Missing entity values' });
+      errors.push("Missing entity values");
     }
     
     if (formData.entities) {
@@ -326,13 +338,13 @@ class MeasureEdit extends Page {
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
      
       if (!haveAllEntitesBeenSubmitted) {
-        errors.push({ error: 'Missing entity values' });
+        errors.push("Missing entity values");
       }
       
       submittedEntityId.forEach(entityId => {
         const entityValue = formData.entities[entityId]
         if (entityValue.length === 0 || isNaN(entityValue)) {
-          errors.push({ error: 'Invalid field value' });
+          errors.push("Invalid field value");
         }
       })
     }  
@@ -363,20 +375,78 @@ class MeasureEdit extends Page {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
-    if (req.body.type === 'entries') {
-      this.saveData(removeNulls(req.body));
+    if (this.addMeasure) {
       return await this.addMeasureEntityData(req.body)
+    }
+
+    if (this.editMeasure) {
+      return await this.updateMeasureInformation(req.body)   
     }
 
     return res.redirect(this.measureUrl);
   }
 
+  async updateMeasureInformation(formData) {
+    const formErrors = this.validateMeasureInformation(formData);
+    const URLHash = '#measure-information';
+
+    if (formErrors && formErrors.length) {
+      return this.renderRequest(this.res, { errors: formErrors });
+    }
+
+    const updatedEntites = await this.updateMeasureEntities(formData);
+ 
+    return await this.saveMeasureData(updatedEntites, URLHash, { ignoreParents: true });   
+  }
+
+  async updateMeasureEntities(data) {
+    const measuresEntities = await this.getMeasure();
+    return measuresEntities.map(entity => {
+      return {
+        publicId: entity.publicId,
+        description: data.description,
+        additionalComment: data.additionalComment || '',
+        redThreshold: data.redThreshold,
+        aYThreshold: data.aYThreshold,
+        greenThreshold: data.greenThreshold
+      }
+    });
+  }
+
+  validateMeasureInformation(formData) {
+    const errors = [];
+
+    if (!formData.description || !formData.description.trim().length) {
+      errors.push("You must enter a description");
+    }
+
+    if (!formData.redThreshold || isNaN(formData.redThreshold)) {
+      errors.push("Red threshold must be a number");
+    }
+
+    if (!formData.aYThreshold || isNaN(formData.aYThreshold)) {
+      errors.push("Amber/Yellow threshold must be a number");
+    }
+
+    if(!formData.greenThreshold || isNaN(formData.greenThreshold)) {
+      errors.push("Green threshold must be a number");
+    }
+
+    if (!isNaN(formData.redThreshold) && !isNaN(formData.aYThreshold) && formData.redThreshold > formData.aYThreshold) {
+      errors.push("The red threshold must be lower than the amber/yellow threshold");
+    }
+
+    if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && formData.aYThreshold > formData.greenThreshold) {
+      errors.push("The Amber/Yellow threshold must be lower than the green threshold");
+    }
+    
+    return errors;
+  }
+
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      // this.req.flash('Missing / invalid form data');
-      this.req.flash(formValidationErrors.map(error => `${error.error}`));
-      return this.res.redirect(this.measureUrl);
+      return this.renderRequest(this.res, { errors: formValidationErrors });  
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
@@ -384,14 +454,14 @@ class MeasureEdit extends Page {
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
     if (errors.length > 0) {
-      this.req.flash('Error in entity data');
-      return this.res.redirect(this.measureUrl); 
+      return this.renderRequest(this.res, { errors: ['Error in entity data'] });  
     }
- 
-    return await this.saveMeasureData(parsedEntities);  
+    
+    const URLHash = `#data-entries`;
+    return await this.saveMeasureData(parsedEntities, URLHash);  
   }
 
-  async saveMeasureData(entities) {
+  async saveMeasureData(entities, URLHash, options = {}) {
     const categoryName = 'Measure'
     const category = await Category.findOne({
       where: { name: categoryName }
@@ -402,16 +472,15 @@ class MeasureEdit extends Page {
 
     try {
       for(const entity of entities) {
-        await Entity.import(entity, category, categoryFields, { transaction });
+        await Entity.import(entity, category, categoryFields, { transaction, ...options });
       }
       await transaction.commit();
-      this.clearData();
       redirectUrl += '/successful';
     } catch (error) {
       this.req.flash('Error saving measure data');
       await transaction.rollback();
     }
-    return this.res.redirect(redirectUrl);
+    return this.res.redirect(`${redirectUrl}${URLHash}`);
   }
 }
 
