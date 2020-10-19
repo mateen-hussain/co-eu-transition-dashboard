@@ -5,9 +5,11 @@
         <p class="overview-card--title">{{ item.name }}</p>
       </a>
       <p>{{ item.description }}</p>
+    {% if item.comment %}
       <div class="theme-comment">
-        <p class="govuk-body-s">{{ "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book." | truncate(80, false) }}</p>
+        <p class="govuk-body-s">{{ item.comment | truncate(75, false) }}</p>
       </div>
+    {% endif %}
     </div>
   </div>
 {% endmacro %}

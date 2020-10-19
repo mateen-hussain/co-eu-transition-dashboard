@@ -136,6 +136,7 @@
 
 .risk-col .overview-card p {
 	margin-top: 0;
+	margin-bottom: 10px;
 }
 
 .risk-col .overview-card.inactive,
@@ -157,11 +158,17 @@
 	margin-bottom: 10px;
 }
 
+.readiness-caption {
+	float: right;
+	margin-top: 15px;
+}
+
 .theme-comment {
 	background-color: #f3f2f1;
 	padding: 5px;
 }
 
 .theme-comment > p {
-	margin-bottom: 0;
+	margin-bottom: 0 !important;
+	font-style: italic;
 }
