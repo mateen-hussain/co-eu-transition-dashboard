@@ -20,7 +20,7 @@ class CategoryTemplate extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader']),
+      ...authentication.protect(['admin']),
       entityUserPermissions.assignEntityIdsUserCanAccessToLocals
     ];
   }

@@ -68,32 +68,8 @@ class MeasureGroup extends Page {
       errors.push("You must enter a group description");
     }
 
-    if(!group.redThreshold || isNaN(group.redThreshold)) {
-      errors.push("Red threshold must be a number");
-    }
-
-    if(!group.aYThreshold || isNaN(group.aYThreshold)) {
-      errors.push("Amber/Yellow threshold must be a number");
-    }
-
-    if(!group.greenThreshold || isNaN(group.greenThreshold)) {
-      errors.push("Green threshold must be a number");
-    }
-
-    if(!isNaN(group.redThreshold) && !isNaN(group.aYThreshold) && group.redThreshold > group.aYThreshold) {
-      errors.push("The red threshold must be lower than the amber/yellow threshold");
-    }
-
-    if(!isNaN(group.aYThreshold) && !isNaN(group.greenThreshold) && group.aYThreshold > group.greenThreshold) {
-      errors.push("The Amber/Yellow threshold must be lower than the green threshold");
-    }
-
     if(!group.value || isNaN(group.value)) {
       errors.push("Group total value must be a number");
-    }
-
-    if(group.commentsOnly && group.commentsOnly !== 'Yes') {
-      errors.push("Comments Only can only equal Yes");
     }
 
     return errors;
@@ -125,12 +101,8 @@ class MeasureGroup extends Page {
     }
 
     const measureToSave = Object.assign({}, measureEntity, {
-      redThreshold: data.redThreshold,
-      aYThreshold: data.aYThreshold,
-      greenThreshold: data.greenThreshold,
       groupDescription: data.groupDescription,
-      value: data.value,
-      commentsOnly: data.commentsOnly !== undefined
+      value: data.value
     });
 
     const transaction = await sequelize.transaction();

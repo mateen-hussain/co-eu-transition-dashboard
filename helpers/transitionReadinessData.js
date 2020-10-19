@@ -15,6 +15,7 @@ const moment = require('moment');
 const tableau = require('services/tableau');
 const cache = require('services/cache');
 const config = require('config');
+const uniq = require('lodash/uniq');
 
 const rags = ['red', 'amber', 'yellow', 'green'];
 
@@ -293,6 +294,30 @@ const sortById = (entity, property) => {
   }
 };
 
+// We can only append total value of the measure to the description if it is
+// the only measure in the group and there are no filter values. This is because
+//we cannot programatically decide which numbere to append if the measure is part
+// of a group or has multiple values by way of filters
+const canAppendValueToDescription = (allEntities, entity) => {
+  // only append the value to the description if the unit is none
+  const unitIsNone = entity.unit !== 'none';
+
+  // get all measures in group except RAYG rows
+  const measuresInGroup = allEntities.filter(allEntity => {
+    return allEntity.groupID == entity.groupID && allEntity.filter !== 'RAYG';
+  });
+
+  // do any of the measures in this group have a filter
+  const doesNotHaveFilter = !measuresInGroup.find(measure => !!measure.filter);
+
+  // ensure there is only one measure in the group
+  const metricIds = measuresInGroup.map(measure => measure.metricID);
+  const uniqMetricIds = uniq(metricIds);
+  const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
+
+  return unitIsNone && doesNotHaveFilter && isOnlyMeasureInGroup;
+};
+
 const mapEntityChildren = (allEntities, entity) => {
   const entityFieldMap = cloneDeep(entity.dataValues);
   delete entityFieldMap.children;
@@ -302,20 +327,6 @@ const mapEntityChildren = (allEntities, entity) => {
   entity.entityFieldEntries.forEach(entityFieldEntry => {
     entityFieldMap[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
   }, {});
-
-  // only append the value to the description if the group description is set
-  const hasGroupDescription = !!entityFieldMap.groupDescription;
-  // only append the value to the description if the unit is none
-  const shouldAppendValue = entityFieldMap.unit !== 'none';
-
-  if(hasGroupDescription && shouldAppendValue) {
-    // if the unit is a percentage append the value to the description as well as a percent symbol, otherwise just append value
-    if(entityFieldMap.unit === '%') {
-      entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}%`;
-    } else {
-      entityFieldMap.name = `${entityFieldMap.groupDescription}: ${entityFieldMap.value}`;
-    }
-  }
 
   if(entity.children.length) {
     entityFieldMap.children = [];
@@ -336,7 +347,22 @@ const mapEntityChildren = (allEntities, entity) => {
       if(!isMeasure) {
         return true;
       }
-      return entity.filter === 'RAYG'
+      return entity.filter === 'RAYG';
+    });
+
+    // append value to description if a measure and can append value
+    entityFieldMap.children = entityFieldMap.children.map(entity => {
+      const isMeasure = entity.category.name === "Measure";
+
+      if(isMeasure && canAppendValueToDescription(allEntities, entity)) {
+        // if the unit is a percentage append the value to the description as well as a percent symbol, otherwise just append value
+        if(entityFieldMap.unit === '%') {
+          entity.name = `${entity.groupDescription}: ${entity.value}%`;
+        } else {
+          entity.name = `${entity.groupDescription}: ${entity.value}`;
+        }
+      }
+      return entity;
     });
   }
 
@@ -394,6 +420,10 @@ const getAllEntities = async () => {
       });
     }
     finalEntity.dataValues.parents = finalEntity.parents;
+
+    entity.entityFieldEntries.forEach(entityFieldEntry => {
+      finalEntity[entityFieldEntry.categoryField.name] = entityFieldEntry.value;
+    }, {});
 
     allEntities.push(finalEntity);
   });
