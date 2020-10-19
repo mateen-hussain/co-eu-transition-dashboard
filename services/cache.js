@@ -11,39 +11,39 @@ if(config.services.vcapServices && config.services.vcapServices.redis.length) {
 
 if (!redisUrl) {
   logger.error('Cache not active, no redis url supplied');
-  return module.exports = {
+  module.exports = {
     set: () => {},
     get: () => {},
     clear: () => {}
   };
+} else {
+  const client = redis.createClient({
+    url: redisUrl
+  });
+
+  client.on("error", function(error) {
+    logger.error(error);
+  });
+
+  const set = async (key, value, momentDate) => {
+    client.set(key, value);
+    if(momentDate) {
+      client.expireat(key, momentDate.unix());
+    }
+  };
+
+  const get = async (key) => {
+    const getAsync = promisify(client.get).bind(client);
+    return await getAsync(key);
+  };
+
+  const clear = () => {
+    client.flushall();
+  };
+
+  module.exports = {
+    set,
+    get,
+    clear
+  };
 }
-
-const client = redis.createClient({
-  url: redisUrl
-});
-
-client.on("error", function(error) {
-  logger.error(error);
-});
-
-const set = async (key, value, momentDate) => {
-  client.set(key, value);
-  if(momentDate) {
-    client.expireat(key, momentDate.unix());
-  }
-};
-
-const get = async (key) => {
-  const getAsync = promisify(client.get).bind(client);
-  return await getAsync(key);
-};
-
-const clear = () => {
-  client.flushall();
-};
-
-module.exports = {
-  set,
-  get,
-  clear
-};
