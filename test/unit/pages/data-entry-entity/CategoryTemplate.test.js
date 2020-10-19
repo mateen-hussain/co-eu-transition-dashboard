@@ -31,13 +31,13 @@ describe('pages/data-entry-entity/category-template/CategoryTemplate', () => {
   });
 
   describe('#middleware', () => {
-    it('only uploaders are allowed to access this page', () => {
+    it('only admin are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader']),
+        ...authentication.protect(['admin']),
         entityUserPermissions.assignEntityIdsUserCanAccessToLocals
       ]);
 
-      sinon.assert.calledWith(authentication.protect, ['uploader']);
+      sinon.assert.calledWith(authentication.protect, ['admin']);
     });
   });
 
