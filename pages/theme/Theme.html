@@ -9,8 +9,18 @@
 
 <div class="govuk-grid-row left-spacing" id="readiness-theme-page" data-theme-id="{{ req.params.theme }}">
 <div class="govuk-grid-column-full">
-  <h1 class="govuk-heading-l theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
-  <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
+  <h1 class="govuk-heading-l theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}
+    <span class="govuk-caption-m readiness-caption">All data is UK wide unless otherwise specified</span></h1>
+
+<div class="theme-info-margin">
+  <p class="govuk-body-l theme-description">{{ data.theme.description }}</p>
+  {% if data.theme.comment %}
+    <div class="theme-comment theme-width">
+      <p class="govuk-body">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+    </div><br>
+  {% endif %}
+ </div>
+
   <p class="govuk-body-s"><a class="govuk-link" href="{{ config.paths.raygDefinitions }}">View RAYG definitions and how they are calculated</a></p>
 
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-statements">

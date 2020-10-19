@@ -197,7 +197,7 @@
 .theme-name {
     padding: 0px 26px;
     position: relative;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 
     &::before {
         content: "";
@@ -210,13 +210,20 @@
 }
 
 .theme-description {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.theme-name.theme-red::before,
+.theme-name.theme-amber::before,
+.theme-name.theme-green::before,
+.theme-name.theme-yellow::before {
+    top: 10px;
 }
 
 .theme-name.theme-red::before,
 .section-red .govuk-accordion__section-button::before,
 .outcome-measure__item.item-red::before {
-    background-color: #d4351c
+    background-color: #d4351c;
 }
 
 .theme-name.theme-amber::before,
@@ -268,4 +275,12 @@
 
 .overflow-scroll {
     overflow: scroll;
+}
+
+.theme-width {
+    width: 75%;
+}
+
+.theme-info-margin {
+    margin-left: 26px;
 }
