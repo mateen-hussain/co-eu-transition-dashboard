@@ -9,7 +9,9 @@ const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const HeadlineMeasuresModel = require('models/headlineMeasures');
 const sequelize = require('services/sequelize');
+const logger = require('services/logger');
 const compact = require('lodash/compact');
+const get = require('lodash/get');
 
 class HeadlineMeasures extends Page {
   get url() {
@@ -70,12 +72,22 @@ class HeadlineMeasures extends Page {
     return res.redirect(this.req.originalUrl);
   }
 
-  async getMeasures() {
+  async getCategory(name) {
     const category = await Category.findOne({
-      where: {
-        name: 'Measure'
-      }
+      where: { name }
     });
+
+    if(!category) {
+      logger.error(`Category export, error finding ${name} category`);
+      throw new Error(`Category export, error finding ${name} category`);
+    }
+
+    return category;
+  }
+
+  async getMeasures() {
+    const category = await this.getCategory('measure');
+    const themeCategory = await this.getCategory('theme');
 
     let measures = await Entity.findAll({
       where: {
@@ -88,7 +100,19 @@ class HeadlineMeasures extends Page {
           model: CategoryField,
           where: { isActive: true },
           required: true
-        }
+        } 
+      }, {
+        model: Entity,
+        as: 'parents',
+        include: [{
+          model: Entity,
+          as: 'parents',
+          include: [{
+            separate: true,
+            model: EntityFieldEntry,
+            include: CategoryField
+          }]
+        }]
       }]
     });
 
@@ -103,17 +127,25 @@ class HeadlineMeasures extends Page {
         return entry.categoryField.name === 'groupDescription';
       });
 
-      if(!measureName) return;
+      const theme = get(measure, 'parents[0].parents').find(parentEntity => {
+        return parentEntity.categoryId === themeCategory.id;
+      });
+
+      const themeName = theme.entityFieldEntries.find(fieldEntry => {
+        return fieldEntry.categoryField.name === 'name';
+      });
+
+      if (!measureName || !themeName) return;
 
       return {
-        text: measureName.value,
+        text: `${themeName.value} - ${measureName.value}`,
         value: measure.publicId
       };
     });
 
     const empty = { text: '-- Select --' };
 
-    return [empty, ...measuresAsItems];
+    return [empty, ...measuresAsItems.sort((a, b) => a.text.localeCompare(b.text))];
   }
 
   async getHeadlineMeasures() {
