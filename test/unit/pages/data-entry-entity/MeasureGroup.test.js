@@ -121,11 +121,7 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     beforeEach(() => {
       group = {
         groupDescription: 'some group description',
-        redThreshold: 1,
-        aYThreshold: 2,
-        greenThreshold: 3,
-        value: 3,
-        commentsOnly: 'Yes'
+        value: 3
       }
     });
 
@@ -137,92 +133,12 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
       expect(errors).to.eql(["You must enter a group description"]);
     });
 
-    it('returns error if no redThreshold', () => {
-      delete group.redThreshold;
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Red threshold must be a number"]);
-    });
-
-    it('returns error if no aYThreshold', () => {
-      delete group.aYThreshold;
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Amber/Yellow threshold must be a number"]);
-    });
-
-    it('returns error if no greenThreshold', () => {
-      delete group.greenThreshold;
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Green threshold must be a number"]);
-    });
-
-    it('returns error if no value', () => {
-      delete group.value;
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Group total value must be a number"]);
-    });
-
-    it('returns error if redThreshold is not a number', () => {
-      group.redThreshold = 's';
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Red threshold must be a number"]);
-    });
-
-    it('returns error if aYThreshold is not a number', () => {
-      group.aYThreshold = 's';
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Amber/Yellow threshold must be a number"]);
-    });
-
-    it('returns error if greenThreshold is not a number', () => {
-      group.greenThreshold = 's';
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Green threshold must be a number"]);
-    });
-
     it('returns error if value is not a number', () => {
       group.value = 's';
 
       const errors = page.validateGroup(group);
 
       expect(errors).to.eql(["Group total value must be a number"]);
-    });
-
-    it('returns error if redThreshold is more than aYThreshold', () => {
-      group.redThreshold = 3;
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["The red threshold must be lower than the amber/yellow threshold"]);
-    });
-
-    it('returns error if aYThreshold is more than greenThreshold', () => {
-      group.aYThreshold = 4;
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["The Amber/Yellow threshold must be lower than the green threshold"]);
-    });
-
-    it('returns error if commentsOnly is set and is not equal to Yes', () => {
-      group.commentsOnly = "Something";
-
-      const errors = page.validateGroup(group);
-
-      expect(errors).to.eql(["Comments Only can only equal Yes"]);
     });
   });
 
@@ -252,12 +168,8 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
 
   describe('#updateGroup', () => {
     const data = {
-      redThreshold: 1,
-      aYThreshold: 1,
-      greenThreshold: 1,
       groupDescription: 'some desc',
-      value: 1,
-      commentsOnly: true
+      value: 1
     };
     const entity = { id: 1 };
 
