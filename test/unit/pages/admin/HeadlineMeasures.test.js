@@ -198,8 +198,7 @@ describe('pages/admin/headline-measures/headlineMeasures', () => {
             model: CategoryField,
             where: { isActive: true },
             required: true
-          }
-        }, {
+          } }, {
           model: Entity,
           as: 'parents',
           include: [{
