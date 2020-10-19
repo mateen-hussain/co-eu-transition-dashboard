@@ -26,6 +26,8 @@
 {% set latestMeasure = measure.latest %}
 {% set groupedMeasures = measure.grouped %}
 {% set formFields = measure.fields %}
+{% set uniqMetricIds = measure.uniqMetricIds %}
+{% set raygValue = measure.raygValue %}
 {% set errorMessages = errors if errors else flash %}
 
 {% block content %}
