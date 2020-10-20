@@ -23,8 +23,8 @@ let req = {};
 describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   beforeEach(() => {
 
-    res = { cookies: sinon.stub(), redirect: sinon.stub(),  sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
-    req = { body: {}, cookies: [], params: { metricId: 'measure-1' }, user: { roles: [] }, flash: sinon.stub() };
+    res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub(),   sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
+    req = { body: {}, cookies: [], params: { metricId: 'measure-1', type: 'add' }, user: { roles: [] }, flash: sinon.stub() };
     res.status.returns(res);
 
     page = new MeasureEdit('edit-measure', req, res);
@@ -44,9 +44,32 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
+  describe('#addMeasure', () => {
+    it('returns true when type equals add', () => {
+      page.req.params = { metricId: '123', successful: 'successful', type: "add" };
+      expect(page.addMeasure).to.be.ok;
+    });
+
+    it('returns false when type does not equal add', () => {
+      page.req.params = { metricId: '123', successful: 'successful', type: "other" };
+      expect(page.addMeasure).to.be.not.ok;
+    });
+  });
+
+  describe('#editMeasure', () => {
+    it('returns true when type equals edit', () => {
+      page.req.params = { metricId: '123', successful: 'successful', type: "edit" };
+      expect(page.editMeasure).to.be.ok;
+    });
+
+    it('returns false when type does not equal edit', () => {
+      expect(page.editMeasure).to.be.not.ok;
+    });
+  });
+
   describe('#successfulMode', () => {
     it('returns true when in successful mode', () => {
-      page.req.params = { metricId: '123', successful: 'successful' };
+      page.req.params = { metricId: '123', type: "successful" };
       expect(page.successfulMode).to.be.ok;
     });
 
@@ -522,7 +545,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Invalid date' });
+      expect(response[0]).to.eql("Invalid date");
     });
 
     it('should return an error when no entities data is present', async () => {
@@ -532,7 +555,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Missing entity values' });
+      expect(response[0]).to.eql("Missing entity values");
     });
 
     it('should return an error when entities data is missing ids', async () => {
@@ -542,7 +565,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Missing entity values' });
+      expect(response[0]).to.eql("Missing entity values");
     });
 
     it('should return an error when entities data is empty', async () => {
@@ -552,7 +575,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Invalid field value' });
+      expect(response[0]).to.eql("Invalid field value");
     });
 
     it('should return an error when entities data is NaN', async () => {
@@ -562,7 +585,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql({ error: 'Invalid field value' });
+      expect(response[0]).to.eql("Invalid field value");
     });
 
     it('should return an empty array when data is valid', async () => {
@@ -613,13 +636,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#postRequest', () => {
     beforeEach(() => {
-      sinon.stub(page, 'saveData')
       sinon.stub(page, 'addMeasureEntityData').returns([])
+      sinon.stub(page, 'updateMeasureInformation').returns([])
     });
 
     afterEach(() => {
-      page.saveData.restore();
       page.addMeasureEntityData.restore();
+      page.updateMeasureInformation.restore();
     });
 
     it('should return method not allowed when no admin and entitiesUserCanAccess is empty', async () => {
@@ -632,24 +655,153 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
     });
 
-    it('should call addMeasureEntityData when type is entries', async () => {
-      req.body = { type: 'entries' }
+    it('should call addMeasureEntityData when type is add', async () => {
+      page.req.params = { metricId: '123', successful: 'successful', type: "add" };
       req.user = { isAdmin: true }
 
       await page.postRequest(req, res);
 
-      sinon.assert.calledOnce(page.saveData);
       sinon.assert.calledWith(page.addMeasureEntityData, req.body);
     });
 
-    it('should call redirect if no error and no post data', async () => {
+    it('should call addMeasureEntityData when type is edit', async () => {
+      page.req.params = { metricId: '123', successful: 'successful', type: "edit" };
       req.user = { isAdmin: true }
+
+      await page.postRequest(req, res);
+
+      sinon.assert.calledWith(page.updateMeasureInformation, req.body);
+    });
+
+    it('should call redirect if no error and not add or Edit Measure', async () => {
+      req.user = { isAdmin: true }
+      page.req.params = { metricId: '123', type: "other" };
 
       await page.postRequest(req, res);
 
       sinon.assert.calledOnce(res.redirect);
     });
   });
+
+  describe('#updateMeasureInformation', () => {
+    const UpdatedEntities = [{ id: 1, value: 'hello again' }];
+
+    beforeEach(() => {
+      sinon.stub(page, 'saveMeasureData').returns({})
+      sinon.stub(page, 'updateMeasureEntities').returns(UpdatedEntities)
+      sinon.stub(page, 'renderRequest').returns({})
+    });
+
+    afterEach(() => {
+      page.saveMeasureData.restore();
+      page.updateMeasureEntities.restore();
+      page.renderRequest.restore();
+    });
+
+    it('should return an error when validateMeasureInformation an error', async () => {
+      const formData = { description: 'test' };
+      sinon.stub(page, 'validateMeasureInformation').returns(["error"])
+
+      await page.updateMeasureInformation(formData);
+
+      sinon.assert.calledWith(page.validateMeasureInformation, formData);
+      sinon.assert.calledWith(page.renderRequest, res, { errors: ["error"] })
+    });
+
+    it('should call saveMeasureData with updatedEntites data', async () => {
+      const formData = { description: 'test' };
+      sinon.stub(page, 'validateMeasureInformation').returns([])
+
+      await page.updateMeasureInformation(formData);
+
+      sinon.assert.calledWith(page.saveMeasureData, UpdatedEntities, '#measure-information', { ignoreParents: true });
+    });
+  });
+
+  describe('#updateMeasureEntities', () => {
+    const entities = [{ publicId: 'id-test' }];
+
+    beforeEach(() => {
+      sinon.stub(page, 'getMeasure').returns(entities)
+    });
+
+    afterEach(() => {
+      page.getMeasure.restore();
+    });
+
+    it('should return a new object combined with form data', async () => {
+      const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3  };
+      const response = await page.updateMeasureEntities(formData);
+      expect(response).to.eql([{ publicId: 'id-test', ...formData }]);
+    });
+  });
+
+  describe('#validateMeasureInformation', () => {
+    let fields = {};
+    beforeEach(() => {
+      fields = {
+        description: 'some description',
+        redThreshold: 1,
+        aYThreshold: 2,
+        greenThreshold: 3,
+      }
+    });
+  
+    it('returns error if no group description', () => {
+      delete fields.description;
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["You must enter a description"]);
+    });
+
+    it('returns error if no redThreshold', () => {
+      delete fields.redThreshold;
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Red threshold must be a number"]);
+    });
+
+    it('returns error if no aYThreshold', () => {
+      delete fields.aYThreshold;
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Amber/Yellow threshold must be a number"]);
+    });
+
+    it('returns error if no greenThreshold', () => {
+      delete fields.greenThreshold;
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Green threshold must be a number"]);
+    });
+
+    it('returns error if redThreshold is not a number', () => {
+      fields.redThreshold = 's';
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Red threshold must be a number"]);
+    });
+
+    it('returns error if aYThreshold is not a number', () => {
+      fields.aYThreshold = 's';
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Amber/Yellow threshold must be a number"]);
+    });
+
+    it('returns error if greenThreshold is not a number', () => {
+      fields.greenThreshold = 's';
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Green threshold must be a number"]);
+    });
+
+    it('returns error if redThreshold is more than aYThreshold', () => {
+      fields.redThreshold = 3;
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["The red threshold must be lower than the amber/yellow threshold"]);
+    });
+
+    it('returns error if aYThreshold is more than greenThreshold', () => {
+      fields.aYThreshold = 4;
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["The Amber/Yellow threshold must be lower than the green threshold"]);
+    });
+  });
+
 
   describe('#addMeasureEntityData', () => {
     const clonedEntities = [{ id: 1, value: 'hello' }];
@@ -661,6 +813,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.stub(page, 'getEntitiesToBeCloned').returns(clonedEntities)
       sinon.stub(page, 'createEntitiesFromClonedData').returns(newEntities)
       sinon.stub(page, 'saveMeasureData').returns({})
+      sinon.stub(page, 'renderRequest').returns()
     });
 
     afterEach(() => {
@@ -668,27 +821,27 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       page.getEntitiesToBeCloned.restore();
       page.createEntitiesFromClonedData.restore();
       page.saveMeasureData.restore();
+      page.renderRequest.restore();
     });
 
-    it('should call flash and redirect when missing form data', async () => {
+    it('should return errors when validateFormData return errors', async () => {
       const formData = { day: 1,  year: 2020, type: 'entries', entities: { 123: 100 } };
-      sinon.stub(page, 'validateFormData').returns([{ error: 'error' }])
+      sinon.stub(page, 'validateFormData').returns(["error"])
 
       await page.addMeasureEntityData(formData);
 
       sinon.assert.calledWith(page.validateFormData, formData);
-      sinon.assert.calledWith(req.flash, ["error"]);
+      sinon.assert.calledWith(page.renderRequest, res, { errors: ["error"] })
     });
 
-    it('should call flash and redirect when validateEntities returns errors', async () => {
+    it('should return errors when validateEntities returns errors', async () => {
       sinon.stub(page, 'validateFormData').returns([])
       sinon.stub(page, 'validateEntities').returns({ errors, parsedEntities })
       const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
 
       await page.addMeasureEntityData(formData);
 
-      sinon.assert.calledWith(req.flash, 'Error in entity data');
-      sinon.assert.calledOnce(res.redirect);
+      sinon.assert.calledWith(page.renderRequest, res, { errors: ["Error in entity data"] })
     });
 
     it('should call saveMeasureData with parsedEntities data', async () => {
@@ -709,6 +862,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const categoryFields = [{ id: 1 }];
     const category = { name: 'Measure' };
     const entities  = [{ id: 1, value: 'some-value' }];
+    const URLHash = '#hash'
 
     beforeEach(() => {
       sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
@@ -726,14 +880,12 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const transaction = sequelize.transaction();
       transaction.commit.reset();
       transaction.rollback.reset();
-      page.clearData = sinon.stub();
 
-      await page.saveMeasureData(entities);
+      await page.saveMeasureData(entities, URLHash);
 
       sinon.assert.calledWith(Entity.import, entities[0], category, categoryFields, { transaction });
       sinon.assert.calledOnce(transaction.commit);
-      sinon.assert.calledOnce(page.clearData);
-      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}/successful`);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}/successful${URLHash}`);
     });
 
     it('rollback transaction on error', async () => {
@@ -743,9 +895,9 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       Entity.import.throws(new Error('error'));
 
-      await page.saveMeasureData(entities);
+      await page.saveMeasureData(entities, URLHash);
 
-      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}`);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}${URLHash}`);
       sinon.assert.calledOnce(transaction.rollback);
     });
   });

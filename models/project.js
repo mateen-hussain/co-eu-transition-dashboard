@@ -11,20 +11,25 @@ const sprintf = require('sprintf-js').sprintf;
 class Project extends Model {
   static async fieldDefinitions(user) {
     let validDepartments = [];
+    let validProjects = [];
     if (user) {
       validDepartments = await user.getDepartments({ raw: true });
+      validProjects = await user.getProjects();
     }
 
     const projectFields = [{
       name: 'uid',
-      type: 'string',
+      type: 'group',
       isUnique: true,
       importColumnName: 'UID',
       group: 'Department and Project Information',
       order: 1,
       description: 'Project UID. Please leave this column blank. CO will assign a permanent UID for each project.',
       displayName: 'UID',
-      isActive: true
+      isActive: true,
+      config: {
+        options: validProjects.map(project => project.uid)
+      }
     },{
       name: 'departmentName',
       type: 'group',
