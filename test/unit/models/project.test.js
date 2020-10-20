@@ -51,14 +51,17 @@ describe('models/project', () => {
     expect(definitions).to.eql([
       {
         name: 'uid',
-        type: 'string',
+        type: 'group',
         isUnique: true,
         importColumnName: 'UID',
         group: 'Department and Project Information',
         order: 1,
         description: 'Project UID. Please leave this column blank. CO will assign a permanent UID for each project.',
         displayName: 'UID',
-        isActive: true
+        isActive: true,
+        config: {
+          options: []
+        }
       },{
         name: 'departmentName',
         type: 'group',
