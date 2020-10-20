@@ -171,4 +171,9 @@
 .theme-comment > p {
 	margin-bottom: 0 !important;
 	font-style: italic;
+	display: flex;
+	&:before {
+		content: url('/assets/images/comment.png');
+		padding: 0 5px 5px 5px;
+	}
 }
