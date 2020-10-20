@@ -24,7 +24,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   beforeEach(() => {
 
     res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub(),   sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
-    req = { body: {}, cookies: [], params: { metricId: 'measure-1', type: 'add' }, user: { roles: [] }, flash: sinon.stub() };
+    req = { body: {}, cookies: [], params: { groupId: 'group-1', metricId: 'measure-1', type: 'add' }, user: { roles: [] }, flash: sinon.stub() };
     res.status.returns(res);
 
     page = new MeasureEdit('edit-measure', req, res);
@@ -41,6 +41,18 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#url', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(paths.dataEntryEntity.measureEdit);
+    });
+  });
+
+  describe('#addUrl', () => {
+    it('returns url for add measure', () => {
+      expect(page.addUrl).to.eql(`${page.url}/${req.params.metricId}/${req.params.groupId}/add`);
+    });
+  });
+
+  describe('#editUrl', () => {
+    it('returns url for edit measure', () => {
+      expect(page.editUrl).to.eql(`${page.url}/${req.params.metricId}/${req.params.groupId}/edit`);
     });
   });
 
@@ -77,6 +89,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(page.successfulMode).to.be.not.ok;
     });
   });
+  
 
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {
@@ -149,7 +162,20 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
-  describe('#getMeasureEntities', () => {
+  describe('#getMeasureEntitiesFromGroup', () => {
+    
+    it('should return filter data which only contains the same metric, sorted by date', async () => {
+      const measure1 = { name: 'test1', metricID: 'measure-1', date: '05/10/2020' }
+      const measure2 = { name: 'test2', metricID: 'measure-2', date: '05/10/2020' }
+      const measure3 = { name: 'test3', metricID: 'measure-1', date: '04/10/2020' }
+      const groupEntities = [measure1, measure2, measure3];
+      const response = await page.getMeasureEntitiesFromGroup(groupEntities);
+
+      expect(response).to.eql([ measure3, measure1 ]);
+    });
+  });
+  
+  describe('#getGroupEntities', () => {
     const entities = {
       id: 'some-id',
       publicId: 'some-public-id-1',
@@ -185,24 +211,24 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     it('gets entities for a given category if admin', async () => {
       req.user = { isAdmin: true }
 
-      const response = await page.getMeasureEntities(category, theme);
+      const response = await page.getGroupEntities(category, theme);
 
-      expect(response).to.eql([{
+      expect(response).to.eql({ groupEntities: [{
         id: 'some-id',
         publicId: 'some-public-id-1',
         colour: 'green',
         theme: 'borders',
         test: 'new value',
-      }]);
+      }] });
 
       sinon.assert.calledWith(Entity.findAll, {
         where: { categoryId: category.id },
         include: [{
           model: EntityFieldEntry,
-          where: { value: req.params.metricId },
+          where: { value: req.params.groupId },
           include: {
             model: CategoryField,
-            where: { name: 'metricId' },
+            where: { name: 'groupId' },
           }
         },{
           model: Entity,
@@ -229,14 +255,14 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         id: 10
       }];
 
-      const response = await page.getMeasureEntities(category, theme);
-      expect(response).to.eql([{
+      const response = await page.getGroupEntities(category, theme);
+      expect(response).to.eql({ groupEntities: [{
         id: 'some-id',
         publicId: 'some-public-id-1',
         colour: 'green',
         theme: 'borders',
         test: 'new value',
-      }]);
+      }] });
 
       sinon.assert.calledWith(Entity.findAll, {
         where: {
@@ -247,10 +273,10 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         },
         include: [{
           model: EntityFieldEntry,
-          where: { value: req.params.metricId },
+          where: { value: req.params.groupId },
           include: {
             model: CategoryField,
-            where: { name: 'metricId' },
+            where: { name: 'groupId' },
           }
         },{
           model: Entity,
@@ -275,32 +301,46 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#getMeasure', () => {
     const measureCategory = { id: 'some-category' };
-    const measureEntities = [{ id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }];
+    const measureEntities = { 
+      groupEntities : [{ metricID: 'measure-1', id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }],
+      raygEntity: { publicId: 'rayg1', filter: 'RAYG' } 
+    };
 
     beforeEach(() => {
       sinon.stub(page, 'getCategory').returns(measureCategory);
+      sinon.stub(page, 'getMeasureEntitiesFromGroup');
+      sinon.stub(page, 'getGroupEntities').returns(measureEntities);
     });
 
     afterEach(() => {
       page.getCategory.restore();
-      page.getMeasureEntities.restore();
+      page.getMeasureEntitiesFromGroup.restore();
+      page.getGroupEntities.restore();
     });
 
-    it('Get measures and applying rayg', async () => {
-      sinon.stub(page, 'getMeasureEntities').returns(measureEntities);
+    it('Get measures data', async () => {
+      page.getMeasureEntitiesFromGroup.returns(measureEntities.groupEntities);
 
-      await page.getMeasure();
+      const response = await page.getMeasure();
 
       sinon.assert.calledTwice(page.getCategory);
-      sinon.assert.calledOnce(page.getMeasureEntities);
+      sinon.assert.calledOnce(page.getGroupEntities);
+      sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
+
+      expect(response).to.eql({ 
+        measuresEntities: measureEntities.groupEntities,
+        raygEntity: measureEntities.raygEntity,
+        uniqMetricIds: ['measure-1']
+      });
     });
 
     it('redirects to list if no entity data', async () => {
-      sinon.stub(page, 'getMeasureEntities').returns([]);
+      page.getMeasureEntitiesFromGroup.returns([]);
       await page.getMeasure();
 
       sinon.assert.calledTwice(page.getCategory);
-      sinon.assert.calledOnce(page.getMeasureEntities);
+      sinon.assert.calledOnce(page.getGroupEntities);
+      sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
       sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
     });
   });
@@ -413,7 +453,11 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
   describe('#getMeasureData', () => {
-    const measureEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { metricID: 'metric1', date: '04/10/2020', value: 1 }];
+    const measureEntities = { 
+      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { metricID: 'metric1', date: '04/10/2020', value: 1 }], 
+      raygEntity: { value: 1 },
+      uniqMetricIds: ['metric1']
+    };
 
     beforeEach(() => {
       sinon.stub(page, 'getMeasure').returns(measureEntities);
@@ -719,7 +763,11 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
   describe('#updateMeasureEntities', () => {
-    const entities = [{ publicId: 'id-test' }];
+    const entities = { 
+      measuresEntities: [{ publicId: 'id-test', metricId: 'met1' },],
+      raygEntity: { publicId: 'id-number-2' },
+      uniqMetricIds: ['met1']
+    }
 
     beforeEach(() => {
       sinon.stub(page, 'getMeasure').returns(entities)
@@ -733,6 +781,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3  };
       const response = await page.updateMeasureEntities(formData);
       expect(response).to.eql([{ publicId: 'id-test', ...formData }]);
+    });
+
+    it('should add RAGY to data when uniqMetricIds is equal to 1 and groupValue is in data', async () => {
+      const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
+      const response = await page.updateMeasureEntities(formData);
+      const { groupValue, ...formNoGroupData } = formData;
+      expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue }]);
     });
   });
 
@@ -799,6 +854,12 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       fields.aYThreshold = 4;
       const errors = page.validateMeasureInformation(fields);
       expect(errors).to.eql(["The Amber/Yellow threshold must be lower than the green threshold"]);
+    });
+
+    it('returns error if groupValue is set but not a number', () => {
+      fields.groupValue = 'test';
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql(["Overall RAYG value must be a number"]);
     });
   });
 
@@ -885,7 +946,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledWith(Entity.import, entities[0], category, categoryFields, { transaction });
       sinon.assert.calledOnce(transaction.commit);
-      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}/successful${URLHash}`);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}/${req.params.groupId}/successful${URLHash}`);
     });
 
     it('rollback transaction on error', async () => {
@@ -897,7 +958,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       await page.saveMeasureData(entities, URLHash);
 
-      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}${URLHash}`);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${req.params.metricId}/${req.params.groupId}${URLHash}`);
       sinon.assert.calledOnce(transaction.rollback);
     });
   });
