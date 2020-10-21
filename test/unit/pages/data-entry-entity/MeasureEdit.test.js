@@ -825,10 +825,10 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         uniqMetricIds: ['met1']
       }
       page.getMeasure.returns(entities)
-      const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
+      const formDataNoGroup = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3,  };
+      const formData = { ...formDataNoGroup, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
-      const { groupValue, ...formNoGroupData } = formData;
-      expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3  }]);
+      expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3  }]);
     });
   });
 
