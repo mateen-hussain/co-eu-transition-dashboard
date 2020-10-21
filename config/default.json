@@ -72,7 +72,8 @@
       "categoryTemplate": "/category-template",
       "measureList": "/measures/list",
       "measureEdit": "/measures/edit-measure",
-      "measureGroup": "/measures/edit-group"
+      "measureGroup": "/measures/edit-group",
+      "measureValue": "/measures/edit-value"
     },
     "editMilestone": "/edit-milestone",
     "reportingOverview": "/reporting-overview",
