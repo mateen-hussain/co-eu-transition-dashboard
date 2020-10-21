@@ -20,6 +20,7 @@ const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
 const uniqWith = require('lodash/uniqWith');
+const uniq = require('lodash/uniq');
 
 const moment = require('moment');
 
@@ -33,11 +34,19 @@ class MeasureEdit extends Page {
   }
 
   get measureUrl() {
-    return `${this.url}/${this.req.params.metricId}`
-  } 
+    return `${this.url}/${this.req.params.metricId}/${this.req.params.groupId}`
+  }
+
+  get addUrl() {
+    return `${this.measureUrl}/add`
+  }
+
+  get editUrl() {
+    return `${this.measureUrl}/edit`
+  }
 
   get pathToBind() {
-    return `${this.url}/:metricId/:type?`;
+    return `${this.url}/:metricId/:groupId/:type?`;
   }
 
   get addMeasure() {
@@ -72,7 +81,7 @@ class MeasureEdit extends Page {
     super.getRequest(req, res);
   }
 
-  async getMeasureEntities(measureCategory, themeCategory) {
+  async getGroupEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
     const userIsAdmin = this.req.user.isAdmin;
 
@@ -85,10 +94,10 @@ class MeasureEdit extends Page {
       where,
       include: [{
         model: EntityFieldEntry,
-        where: { value: this.req.params.metricId },
+        where: { value: this.req.params.groupId },
         include: {
           model: CategoryField,
-          where: { name: 'metricId' },
+          where: { name: 'groupId' },
         }
       },{
         // get direct parent of measure i.e. outcome statement
@@ -117,9 +126,14 @@ class MeasureEdit extends Page {
 
     const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
 
-    return measureEntitiesMapped.filter(measure => {
-      return measure.filter !== 'RAYG';
-    });
+    return measureEntitiesMapped.reduce((data, entity) => {
+      if(entity.filter === 'RAYG') {
+        data.raygEntity = entity
+      } else {
+        data.groupEntities.push(entity)
+      }
+      return data;
+    }, { groupEntities: [] });
   }
 
   async getEntityFields(entityId) {
@@ -175,17 +189,30 @@ class MeasureEdit extends Page {
     });
   }
 
+  async getMeasureEntitiesFromGroup(groupEntities) {
+    const measureEntities = groupEntities.filter(entity => entity.metricID === this.req.params.metricId)
+    const sortedEntities = measureEntities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+    return sortedEntities;
+  }
+
   async getMeasure() {
     const measureCategory = await this.getCategory('Measure');
     const themeCategory = await this.getCategory('Theme');
-    const entities = await this.getMeasureEntities(measureCategory, themeCategory);
+    const { groupEntities, raygEntity }  = await this.getGroupEntities(measureCategory, themeCategory);
 
-    if (entities.length === 0) {
+    const measuresEntities = await this.getMeasureEntitiesFromGroup(groupEntities);
+
+    if (measuresEntities.length === 0) {
       return this.res.redirect(paths.dataEntryEntity.measureList);
     }
 
-    const sortedEntities = entities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
-    return sortedEntities;
+    const uniqMetricIds = uniq(groupEntities.map(measure => measure.metricID));
+
+    return {
+      measuresEntities,
+      raygEntity,
+      uniqMetricIds
+    }
   }
 
   applyLabelToEntities(entities) {
@@ -241,15 +268,18 @@ class MeasureEdit extends Page {
   }
 
   async getMeasureData() {
-    const measuresEntities = await this.getMeasure();
+    const { measuresEntities, raygEntity, uniqMetricIds }  = await this.getMeasure();
     this.applyLabelToEntities(measuresEntities)
     const groupedMeasureEntities = groupBy(measuresEntities, measure => measure.date);
-    const uiInputs = this.calculateUiInputs(measuresEntities)
+    const uiInputs = this.calculateUiInputs(measuresEntities);
 
     return {
       latest: measuresEntities[measuresEntities.length - 1],
       grouped: groupedMeasureEntities,
-      fields: uiInputs
+      fields: uiInputs,
+      raygEntity: raygEntity,
+      raygValue: raygEntity.value,
+      uniqMetricIds
     }
   }
 
@@ -266,7 +296,7 @@ class MeasureEdit extends Page {
         throw new Error(`Permissions error, user does not have access to all entities`);
       }
     }
-    
+
     const entities = await Entity.findAll({
       where,
       include: [{
@@ -288,7 +318,7 @@ class MeasureEdit extends Page {
     const statementCategory = await this.getCategory('Statement');
 
     return entities.map(entity => {
-      
+
       const statementEntity = entity.parents.find(parent => {
         return parent.categoryId === statementCategory.id;
       });
@@ -309,9 +339,9 @@ class MeasureEdit extends Page {
   createEntitiesFromClonedData(merticEntities, formData) {
     const { entities } = formData;
     return merticEntities.map(entity => {
-      const { id, ...entityNoId } = entity; 
-      return { 
-        ...entityNoId, 
+      const { id, ...entityNoId } = entity;
+      return {
+        ...entityNoId,
         value: entities[id],
         date: buildDateString(formData)
       }
@@ -319,8 +349,8 @@ class MeasureEdit extends Page {
   }
 
   async validateFormData(formData) {
-    const measuresEntities = await this.getMeasure();
-    const uiInputs = this.calculateUiInputs(measuresEntities) 
+    const { measuresEntities } = await this.getMeasure();
+    const uiInputs = this.calculateUiInputs(measuresEntities)
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
@@ -330,24 +360,24 @@ class MeasureEdit extends Page {
     if (!formData.entities) {
       errors.push("Missing entity values");
     }
-    
+
     if (formData.entities) {
       // Check the number of submitted entities matches the expected number
       const submittedEntityId = Object.keys(formData.entities);
 
       const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
-     
+
       if (!haveAllEntitesBeenSubmitted) {
         errors.push("Missing entity values");
       }
-      
+
       submittedEntityId.forEach(entityId => {
         const entityValue = formData.entities[entityId]
         if (entityValue.length === 0 || isNaN(entityValue)) {
           errors.push("Invalid field value");
         }
       })
-    }  
+    }
 
     return errors;
   }
@@ -380,7 +410,7 @@ class MeasureEdit extends Page {
     }
 
     if (this.editMeasure) {
-      return await this.updateMeasureInformation(req.body)   
+      return await this.updateMeasureInformation(req.body)
     }
 
     return res.redirect(this.measureUrl);
@@ -395,13 +425,12 @@ class MeasureEdit extends Page {
     }
 
     const updatedEntites = await this.updateMeasureEntities(formData);
- 
-    return await this.saveMeasureData(updatedEntites, URLHash, { ignoreParents: true });   
+    return await this.saveMeasureData(updatedEntites, URLHash, { ignoreParents: true });
   }
 
   async updateMeasureEntities(data) {
-    const measuresEntities = await this.getMeasure();
-    return measuresEntities.map(entity => {
+    const { measuresEntities, raygEntity, uniqMetricIds } = await this.getMeasure();
+    const updateMeasures = measuresEntities.map(entity => {
       return {
         publicId: entity.publicId,
         description: data.description,
@@ -411,6 +440,15 @@ class MeasureEdit extends Page {
         greenThreshold: data.greenThreshold
       }
     });
+
+    if (data.groupValue && uniqMetricIds.length === 1) {
+      updateMeasures.push({
+        publicId: raygEntity.publicId,
+        value: data.groupValue
+      })
+    }
+
+    return updateMeasures
   }
 
   validateMeasureInformation(formData) {
@@ -439,14 +477,18 @@ class MeasureEdit extends Page {
     if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && formData.aYThreshold > formData.greenThreshold) {
       errors.push("The Amber/Yellow threshold must be lower than the green threshold");
     }
-    
+
+    if (formData.groupValue && isNaN(formData.groupValue)) {
+      errors.push("Overall RAYG value must be a number");
+    }
+
     return errors;
   }
 
   async addMeasureEntityData (formData) {
     const formValidationErrors = await this.validateFormData(formData);
     if (formValidationErrors.length > 0) {
-      return this.renderRequest(this.res, { errors: formValidationErrors });  
+      return this.renderRequest(this.res, { errors: formValidationErrors });
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
@@ -454,11 +496,11 @@ class MeasureEdit extends Page {
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
     if (errors.length > 0) {
-      return this.renderRequest(this.res, { errors: ['Error in entity data'] });  
+      return this.renderRequest(this.res, { errors: ['Error in entity data'] });
     }
-    
+
     const URLHash = `#data-entries`;
-    return await this.saveMeasureData(parsedEntities, URLHash);  
+    return await this.saveMeasureData(parsedEntities, URLHash);
   }
 
   async saveMeasureData(entities, URLHash, options = {}) {
@@ -477,7 +519,7 @@ class MeasureEdit extends Page {
       await transaction.commit();
       redirectUrl += '/successful';
     } catch (error) {
-      this.req.flash('Error saving measure data');
+      this.req.flash(['Error saving measure data']);
       await transaction.rollback();
     }
     return this.res.redirect(`${redirectUrl}${URLHash}`);

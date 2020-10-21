@@ -1,5 +1,5 @@
-{% macro measureInformation(measure, url, metricId, data) %}
-  <form action="{{ url }}/{{ metricId }}/edit#measure-information" method="post">
+{% macro measureInformation(measure, url, data, uniqMetricIds, raygValue) %}
+  <form action="{{ url }}#measure-information" method="post">
 
     <div class="govuk-form-group">
       <label class="govuk-label govuk-!-font-weight-bold" for="entity-description">Description</label>
@@ -32,6 +32,19 @@
         <input class="govuk-input govuk-input--width-2" type="text" id="entity-greenThreshold" name="greenThreshold" value="{{ data.greenThreshold | default(measure.greenThreshold) }}" />
       </div>
     </div>
+
+    {% if uniqMetricIds | length === 1 %}
+      {% set groupValue = data.groupValue | default(raygValue) %}
+      <div class="govuk-form-group">
+        <label class="govuk-label" for="groupValue">Overall RAYG value</label>
+        <select class="govuk-select" id="groupValue" name="groupValue">
+          <option value="1" {{ "selected" if groupValue == 1 }} >Red</option>
+          <option value="2" {{ "selected" if groupValue == 2 }} >Amber</option>
+          <option value="3" {{ "selected" if groupValue == 3 }} >Yellow</option>
+          <option value="4" {{ "selected" if groupValue == 4 }} >Green</option>
+        </select>
+      </div>
+    {% endif %}
 
     <br>
     <button class="govuk-button" data-module="govuk-button" type="submit">Save</button>
