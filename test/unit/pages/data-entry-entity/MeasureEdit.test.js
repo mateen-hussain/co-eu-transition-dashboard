@@ -454,7 +454,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#getMeasureData', () => {
     const measureEntities = { 
-      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { metricID: 'metric1', date: '04/10/2020', value: 1 }], 
+      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }], 
       raygEntity: { value: 1 },
       uniqMetricIds: ['metric1']
     };
@@ -468,6 +468,11 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('getMeasureData should call getMeasure', async () => {
+      await page.getMeasureData();
+      sinon.assert.calledOnce(page.getMeasure);
+    });
+
+    it('displayOverallRaygDropdown should be true when only item in a group and filter is set', async () => {
       await page.getMeasureData();
       sinon.assert.calledOnce(page.getMeasure);
     });
@@ -762,9 +767,32 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
+  describe('#updateRaygRowForSingleMeasureWithNoFilter', () => {
+    const entities = [{ id: 1, value: 'hello again', parentStatementPublicId: 'state-1' }];
+
+    const measureEntities = { 
+      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }], 
+      raygEntity: { value: 1, publicId: 'pub-1' },
+      uniqMetricIds: ['metric1']
+    };
+
+    beforeEach(() => {
+      sinon.stub(page, 'getMeasure').returns(measureEntities);
+    });
+
+    afterEach(() => {
+      page.getMeasure.restore();
+    });
+
+    it('should return an array when measure is the only item in the group and that has not filter values set', async () => {
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities);
+      expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: "hello again", }]);
+    });
+  });
+
   describe('#updateMeasureEntities', () => {
     const entities = { 
-      measuresEntities: [{ publicId: 'id-test', metricId: 'met1' },],
+      measuresEntities: [{ publicId: 'id-test', metricId: 'met1', filter: 'test' }],
       raygEntity: { publicId: 'id-number-2' },
       uniqMetricIds: ['met1']
     }
@@ -783,11 +811,24 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(response).to.eql([{ publicId: 'id-test', ...formData }]);
     });
 
-    it('should add RAGY to data when uniqMetricIds is equal to 1 and groupValue is in data', async () => {
+    it('should add RAGY to data when isOnlyMeasureInGroup and groupValue is in data', async () => {
       const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, ...formNoGroupData } = formData;
       expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue }]);
+    });
+
+    it('should add RAGY to data when isOnlyMeasureInGroup && doesNotHaveFilter', async () => {
+      const entities = { 
+        measuresEntities: [{ publicId: 'id-test', metricId: 'met1' }],
+        raygEntity: { publicId: 'id-number-2' },
+        uniqMetricIds: ['met1']
+      }
+      page.getMeasure.returns(entities)
+      const formDataNoGroup = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3,  };
+      const formData = { ...formDataNoGroup, groupValue: 2  };
+      const response = await page.updateMeasureEntities(formData);
+      expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3  }]);
     });
   });
 
@@ -875,6 +916,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.stub(page, 'createEntitiesFromClonedData').returns(newEntities)
       sinon.stub(page, 'saveMeasureData').returns({})
       sinon.stub(page, 'renderRequest').returns()
+      sinon.stub(page, 'updateRaygRowForSingleMeasureWithNoFilter').returns()
     });
 
     afterEach(() => {
@@ -883,6 +925,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       page.createEntitiesFromClonedData.restore();
       page.saveMeasureData.restore();
       page.renderRequest.restore();
+      page.updateRaygRowForSingleMeasureWithNoFilter.restore();
     });
 
     it('should return errors when validateFormData return errors', async () => {
@@ -908,6 +951,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     it('should call saveMeasureData with parsedEntities data', async () => {
       sinon.stub(page, 'validateFormData').returns([])
       sinon.stub(page, 'validateEntities').returns({ errors: [], parsedEntities })
+      page.updateRaygRowForSingleMeasureWithNoFilter.returns(parsedEntities);
       const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
 
       await page.addMeasureEntityData(formData);
