@@ -126,6 +126,8 @@ class MeasureEdit extends Page {
 
     const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
 
+    // In certain case when a measure is the only item in the group, we need to up allow users to update the 
+    // overall value which is stored in the RAYG row. 
     return measureEntitiesMapped.reduce((data, entity) => {
       if(entity.filter === 'RAYG') {
         data.raygEntity = entity
@@ -273,12 +275,16 @@ class MeasureEdit extends Page {
     const groupedMeasureEntities = groupBy(measuresEntities, measure => measure.date);
     const uiInputs = this.calculateUiInputs(measuresEntities)
 
+    const doesHaveFilter = measuresEntities.find(measure => !!measure.filter);
+    const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
+    const displayOverallRaygDropdown = doesHaveFilter && isOnlyMeasureInGroup
+
     return {
       latest: measuresEntities[measuresEntities.length - 1],
       grouped: groupedMeasureEntities,
       fields: uiInputs,
       raygValue: raygEntity.value,
-      uniqMetricIds
+      displayOverallRaygDropdown
     }
   }
 
@@ -429,6 +435,8 @@ class MeasureEdit extends Page {
 
   async updateMeasureEntities(data) {
     const { measuresEntities, raygEntity, uniqMetricIds } = await this.getMeasure();
+    const doesNotHaveFilter = !measuresEntities.find(measure => !!measure.filter);
+    const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
     const updateMeasures = measuresEntities.map(entity => {
       return {
         publicId: entity.publicId,
@@ -440,11 +448,20 @@ class MeasureEdit extends Page {
       }
     });
 
-    if (data.groupValue && uniqMetricIds.length === 1) {
+    // if a measure has NO filter values and is the only measure within a group, we want to update the threshold values
+    if (isOnlyMeasureInGroup && doesNotHaveFilter) {
+      updateMeasures.push({
+        publicId: raygEntity.publicId,
+        redThreshold: data.redThreshold,
+        aYThreshold: data.aYThreshold,
+        greenThreshold: data.greenThreshold
+      })
+    } else if (data.groupValue && isOnlyMeasureInGroup) {
+    // We want to update the RAYG value when an item is the only measure within a group which HAS filter values
       updateMeasures.push({
         publicId: raygEntity.publicId,
         value: data.groupValue
-      })
+      }) 
     }
 
     return updateMeasures
@@ -469,11 +486,11 @@ class MeasureEdit extends Page {
       errors.push("Green threshold must be a number");
     }
 
-    if (!isNaN(formData.redThreshold) && !isNaN(formData.aYThreshold) && formData.redThreshold > formData.aYThreshold) {
+    if (!isNaN(formData.redThreshold) && !isNaN(formData.aYThreshold) && parseInt(formData.redThreshold) > parseInt(formData.aYThreshold)) {
       errors.push("The red threshold must be lower than the amber/yellow threshold");
     }
 
-    if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && formData.aYThreshold > formData.greenThreshold) {
+    if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && parseInt(formData.aYThreshold) > parseInt(formData.greenThreshold)) {
       errors.push("The Amber/Yellow threshold must be lower than the green threshold");
     }
 
@@ -482,6 +499,26 @@ class MeasureEdit extends Page {
     }
     
     return errors;
+  }
+
+  // If adding a new value for a measure which is the only measure within a group and which also has no filter, 
+  // update the rayg row value as well
+  async updateRaygRowForSingleMeasureWithNoFilter(newEntities = []) {
+    const { measuresEntities, raygEntity, uniqMetricIds } = await this.getMeasure();
+    const doesNotHaveFilter = !measuresEntities.find(measure => !!measure.filter);
+    const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
+
+    if (isOnlyMeasureInGroup && doesNotHaveFilter) {
+      const { parentStatementPublicId, value } = newEntities[0];
+      // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
+      newEntities.push({
+        publicId: raygEntity.publicId,
+        parentStatementPublicId,
+        value
+      })
+    }
+
+    return newEntities
   }
 
   async addMeasureEntityData (formData) {
@@ -494,12 +531,14 @@ class MeasureEdit extends Page {
     const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
+    const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities)
+
     if (errors.length > 0) {
       return this.renderRequest(this.res, { errors: ['Error in entity data'] });  
     }
     
     const URLHash = `#data-entries`;
-    return await this.saveMeasureData(parsedEntities, URLHash);  
+    return await this.saveMeasureData(entitiesToBeSaved, URLHash);  
   }
 
   async saveMeasureData(entities, URLHash, options = {}) {
