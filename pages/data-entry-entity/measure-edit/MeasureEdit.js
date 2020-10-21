@@ -284,7 +284,6 @@ class MeasureEdit extends Page {
       grouped: groupedMeasureEntities,
       fields: uiInputs,
       raygEntity: raygEntity,
-      raygValue: raygEntity.value,
       displayOverallRaygDropdown
     }
   }
