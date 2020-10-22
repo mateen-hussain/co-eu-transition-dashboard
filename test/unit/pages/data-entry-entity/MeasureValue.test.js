@@ -4,7 +4,6 @@ const MeasureValue = require('pages/data-entry-entity/measure-value/MeasureValue
 const authentication = require('services/authentication');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
-const flash = require('middleware/flash');
 
 let page = {};
 let res = {};
