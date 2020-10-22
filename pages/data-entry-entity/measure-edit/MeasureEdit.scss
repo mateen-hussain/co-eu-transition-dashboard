@@ -1,7 +1,8 @@
 .measures-table {
+  width: 50%;
   .govuk-table__header,
   .govuk-table__cell {
-    text-align: center;
+    border: none;
   }
 }
 
@@ -28,6 +29,47 @@
   }
 }
 
-.flex {
-  display: flex;
+.grey-bg {
+  background-color: #f3f2f1;
+  width: 100%;
+}
+
+.current-value {
+  padding: 10px 10px 5px 5px;
+  margin-bottom: 20px;
+  width: 100%;
+  table,
+  tr {
+    width: 100%;
+  }
+  td {
+    vertical-align: initial;
+  }
+  p {
+    margin-bottom: 5px;
+  }
+
+  .govuk-form-group {
+    margin-bottom: 10px;
+  }
+}
+
+.sub-table-fixed {
+  table-layout: fixed;
+}
+
+
+.data-entry {
+  border: 1px solid #b1b4b6;
+  padding: 20px 20px 0 20px;
+  margin-top: -20px;
+}
+
+.measure-label {
+  vertical-align: inherit;
+  max-width: 90px;
+  text-align: left;
+  &:not(:first-of-type) {
+    padding-left: 30px;
+  }
 }

@@ -1,42 +1,83 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
-{% macro dataEntriesContent(groupMeasures, url, metricId, data, formFields) %}
-  <div>
-    {% for date, measureByFilter in groupMeasures %}
-      <div class="flex">
-        {{ date }} 
-        {% for filter, measures in measureByFilter %}
-          <div>
-            {% for measure in measures %}
-              {{ measure.label + " - " + measure.value if measure.label else measure.value }}<br>
-            {% endfor %}
-          </div>
-        {% endfor %}
-      </div>
-    {% endfor %}
+{% macro dataEntriesContent(groupMeasures, url, data, formFields, editValueUrl) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
 
-    <form action="{{ url }}/{{ metricId }}" method="post">
+    <p class="govuk-body govuk-!-font-weight-bold">Current Value</p>
+    <div class="grey-bg">
+      <table class="current-value">
+        {% for date, measureByFilter in groupMeasures %}
+            <tr>
+            <td><p class="govuk-body">{{ date }}</p></td>
+            <td>
+              <table class="sub-table-fixed">
+                {% for measure in measureByFilter %}
+                  <tr>
+                    {% if measure.label %}
+                      <td>
+                        <p class="govuk-body">{{ measure.label }}</p>
+                      </td>
+                    {% endif %}
+                    {% if measure.label2 %}
+                      <td><p class="govuk-body">{{ measure.label2 }}</p>
+                      </td>
+                    {% endif %}
+                    <td>
+                      <p class="govuk-body">{{ measure.unit }} : {{ measure.value }}</p>
+                    </td>
+                    <td>
+                    <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ editValueUrl }}/{{ measure.id }}">
+                      Edit
+                    </a>                    
+                  </td>
+                  </tr>
+                {% endfor %}
+              </table>
+            </td>
+            </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+  <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
+  <div class="data-entry">
+    <form action="{{ url }}" method="post">
       <input type="hidden" name="type" value="entries" />
 
       {{ govukDateInput({
         name: "field-date"
       }) }}
 
-      
-
-      {% for key, value in formFields %}
-          <div class="flex">
-            <div>
-              {% for measure in value %}
-                <br>
-                <label for="entity-{{ measure.id }}">{{ measure.label }}</label>
-                <input type="text" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
-              {% endfor %}
+    <table class="current-value">
+      {% for measure in formFields %}
+        <tr>
+         {% if measure.label %}
+          <td class="measure-label">
+            <p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p>
+          </td>
+        {% endif %}
+        {% if measure.label2 %}
+          <td class="measure-label">
+            <p class="govuk-body govuk-!-font-weight-bold">{{ measure.label2 }}</p>
+          </td>
+        {% endif %}
+        <td>
+          {{ measure.unit }} :
+          <div class="govuk-date-input__item">
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Value</label>
+              <input class="govuk-input govuk-input--width-2" type="number" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
             </div>
           </div>
+        </td> 
+        </tr>
       {% endfor %}
-
-       <input type="submit" value="Submit">
+    </table>
+    <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     </form>
-  </div>
+   </div> 
+
+</div>
+</div>
 {% endmacro %}

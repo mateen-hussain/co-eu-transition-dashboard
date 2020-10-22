@@ -88,6 +88,10 @@ class Page {
     this.next();
   }
 
+  renderRequest(res, viewData = {}) {
+    res.render(this.template, Object.assign(this.locals, { config, ...viewData } ));
+  }
+
   async handler(req, res) {
     this.req = req;
     this.res = res;
@@ -147,7 +151,7 @@ class Page {
       hour = minute * 60,
       day = hour * 24;
 
-    const finalTransitionDate = new Date('Jan 01, 2021 00:00:00').getTime();
+    const finalTransitionDate = new Date('Jan 01, 2021 23:59:59').getTime();
     const distance = finalTransitionDate - new Date().getTime();
 
     let daysToDate = Math.floor(distance / day);

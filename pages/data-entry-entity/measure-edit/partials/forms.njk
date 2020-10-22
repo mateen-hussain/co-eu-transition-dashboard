@@ -1,0 +1,71 @@
+{% set isPartOfGroup = uniqMetricIds | length > 1 %}
+{% set editValueUrl = config.paths.dataEntryEntity.measureValue %}
+
+{% if isPartOfGroup %}
+  <table class="govuk-table">
+    <tbody class="govuk-table__body">
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Group Description</th>
+        <td class="govuk-table__cell">{{ raygEntity.groupDescription }}</td>
+      </tr>
+      <tr class="govuk-table__row">
+        <th scope="row" class="govuk-table__header">Group Status</th>
+        <td class="govuk-table__cell"><span class="measure-rayg {{ raygEntity.colour }}"></span></td>
+      </tr>
+      <tr class="govuk-table__row">
+        <td class="govuk-table__cell" colspan="2">
+          <a class="govuk-link" href="{{ config.paths.dataEntryEntity.measureGroup }}/{{ raygEntity.publicId }}">
+            Edit group
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+{% endif %}
+
+<table class="govuk-table measures-table">
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Measure UID</th>
+      <th scope="col" class="govuk-table__header">Theme</th>
+      {% if not isPartOfGroup %}
+        <th scope="col" class="govuk-table__header">Status</th>
+      {% endif %}
+      <th scope="col" class="govuk-table__header">Last updated</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">{{ latestMeasure.metricID }}</td>
+      <td class="govuk-table__cell">{{ latestMeasure.theme }}</td>
+      {% if not isPartOfGroup %}
+        <td class="govuk-table__cell "><span class="measure-rayg {{ raygEntity.colour }}"></span></td>
+      {% endif %}
+      <td class="govuk-table__cell">{{ latestMeasure.date }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{% set items = [] %}
+
+{% if not latestMeasure.commentsOnly %}
+  {% set items = (items.push({
+      label: "Data entries",
+      id: "data-entries",
+      panel: {
+        html: dataEntriesContent(groupedMeasures, addUrl, data, formFields, editValueUrl)
+      }
+    }), items) %}
+{% endif %}
+
+{% set items = (items.push({
+  label: "Measure information",
+  id: "measure-information",
+  panel: {
+    html: measureInformation(latestMeasure, editUrl, postData, displayOverallRaygDropdown, raygEntity.value)
+  }
+}), items) %}
+
+{{ govukTabs({
+  items: items
+}) }}

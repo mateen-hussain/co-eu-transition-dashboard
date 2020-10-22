@@ -162,20 +162,6 @@ describe('pages/tableau-export/TableauExport', () => {
       sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
       sinon.assert.calledWith(res.json, resp);
     });
-
-    it('filters items with filter=RAYG out', async () => {
-      const resp = [{ test: { value: 'test' } }, { Filter: { value: 'RAYG' } }];
-      sinon.stub(page, 'getEntitiesFlatStructure').resolves(resp);
-
-      Category.findOne.resolves({
-        id: 1
-      });
-
-      await page.exportMeasures(req, res);
-
-      sinon.assert.calledWith(page.getEntitiesFlatStructure, { id: 1 });
-      sinon.assert.calledWith(res.json, [{ test: { value: 'test' } }]);
-    });
   });
 
   describe('#exportCommunications', () => {
