@@ -22,6 +22,10 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
+    {% if successfulMode %}
+      {% include "data-entry-entity/measure-edit/partials/success.njk" %}
+    {% else %}
+
     <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Edit measure value</h1>
     <h3 class="govuk-heading-m">Measure name</h3>
 
@@ -30,9 +34,11 @@
         {{ measureValue(url, formFields) }}
     </div> 
 
+    {% endif  %}
+
     <hr class="govuk-section-break govuk-section-break--m">
 
-    <button class="govuk-button govuk-button--secondary back-measure-button" data-module="govuk-button" href="">
+    <button class="govuk-button govuk-button--secondary back-measure-button" data-module="govuk-button" href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}/{{ measure.groupID }}">
         Back to Measure
     </button>
 
