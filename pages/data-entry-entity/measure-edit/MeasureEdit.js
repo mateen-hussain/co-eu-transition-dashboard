@@ -126,8 +126,8 @@ class MeasureEdit extends Page {
 
     const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
 
-    // In certain case when a measure is the only item in the group, we need to up allow users to update the 
-    // overall value which is stored in the RAYG row. 
+    // In certain case when a measure is the only item in the group, we need to up allow users to update the
+    // overall value which is stored in the RAYG row.
     return measureEntitiesMapped.reduce((data, entity) => {
       if(entity.filter === 'RAYG') {
         data.raygEntity = entity
@@ -277,7 +277,8 @@ class MeasureEdit extends Page {
 
     const doesHaveFilter = measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
-    const displayOverallRaygDropdown = doesHaveFilter && isOnlyMeasureInGroup
+    const isCommentsOnlyMeasure = measuresEntities[measuresEntities.length - 1].commentsOnly;
+    const displayOverallRaygDropdown = isCommentsOnlyMeasure || (doesHaveFilter && isOnlyMeasureInGroup);
 
     return {
       latest: measuresEntities[measuresEntities.length - 1],
@@ -437,19 +438,35 @@ class MeasureEdit extends Page {
     const { measuresEntities, raygEntity, uniqMetricIds } = await this.getMeasure();
     const doesNotHaveFilter = !measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
+    const isCommentsOnlyMeasure = data.commentsOnly === 'Yes';
+
     const updateMeasures = measuresEntities.map(entity => {
-      return {
+      const dataToUpdate = {
         publicId: entity.publicId,
-        description: data.description,
+        name: data.name,
         additionalComment: data.additionalComment || '',
-        redThreshold: data.redThreshold,
-        aYThreshold: data.aYThreshold,
-        greenThreshold: data.greenThreshold
+      };
+
+      // if comments only, do not update the thresholds, but do update the value. This means that both the metric row and RAYG row have the same value
+      if(isCommentsOnlyMeasure) {
+        dataToUpdate.value = data.groupValue;
+      } else {
+        dataToUpdate.redThreshold = data.redThreshold;
+        dataToUpdate.aYThreshold = data.aYThreshold;
+        dataToUpdate.greenThreshold = data.greenThreshold;
       }
+
+      return dataToUpdate;
     });
 
+    if(isCommentsOnlyMeasure) {
+    // if comment only measure, make sure we update the overall rayg value
+      updateMeasures.push({
+        publicId: raygEntity.publicId,
+        value: data.groupValue
+      });
+    } else if (isOnlyMeasureInGroup && doesNotHaveFilter) {
     // if a measure has NO filter values and is the only measure within a group, we want to update the threshold values
-    if (isOnlyMeasureInGroup && doesNotHaveFilter) {
       updateMeasures.push({
         publicId: raygEntity.publicId,
         redThreshold: data.redThreshold,
@@ -461,37 +478,40 @@ class MeasureEdit extends Page {
       updateMeasures.push({
         publicId: raygEntity.publicId,
         value: data.groupValue
-      }) 
+      })
     }
 
     return updateMeasures
   }
 
   validateMeasureInformation(formData) {
+    const isCommentsOnlyMeasure = formData.commentsOnly === 'Yes';
     const errors = [];
 
-    if (!formData.description || !formData.description.trim().length) {
-      errors.push("You must enter a description");
+    if (!formData.name || !formData.name.trim().length) {
+      errors.push("You must enter a name");
     }
 
-    if (!formData.redThreshold || isNaN(formData.redThreshold)) {
-      errors.push("Red threshold must be a number");
-    }
+    if(!isCommentsOnlyMeasure) {
+      if (!formData.redThreshold || isNaN(formData.redThreshold)) {
+        errors.push("Red threshold must be a number");
+      }
 
-    if (!formData.aYThreshold || isNaN(formData.aYThreshold)) {
-      errors.push("Amber/Yellow threshold must be a number");
-    }
+      if (!formData.aYThreshold || isNaN(formData.aYThreshold)) {
+        errors.push("Amber/Yellow threshold must be a number");
+      }
 
-    if(!formData.greenThreshold || isNaN(formData.greenThreshold)) {
-      errors.push("Green threshold must be a number");
-    }
+      if(!formData.greenThreshold || isNaN(formData.greenThreshold)) {
+        errors.push("Green threshold must be a number");
+      }
 
-    if (!isNaN(formData.redThreshold) && !isNaN(formData.aYThreshold) && parseInt(formData.redThreshold) > parseInt(formData.aYThreshold)) {
-      errors.push("The red threshold must be lower than the amber/yellow threshold");
-    }
+      if (!isNaN(formData.redThreshold) && !isNaN(formData.aYThreshold) && parseInt(formData.redThreshold) > parseInt(formData.aYThreshold)) {
+        errors.push("The red threshold must be lower than the amber/yellow threshold");
+      }
 
-    if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && parseInt(formData.aYThreshold) > parseInt(formData.greenThreshold)) {
-      errors.push("The Amber/Yellow threshold must be lower than the green threshold");
+      if (!isNaN(formData.aYThreshold) && !isNaN(formData.greenThreshold) && parseInt(formData.aYThreshold) > parseInt(formData.greenThreshold)) {
+        errors.push("The Amber/Yellow threshold must be lower than the green threshold");
+      }
     }
 
     if (formData.groupValue && isNaN(formData.groupValue)) {
@@ -501,7 +521,7 @@ class MeasureEdit extends Page {
     return errors;
   }
 
-  // If adding a new value for a measure which is the only measure within a group and which also has no filter, 
+  // If adding a new value for a measure which is the only measure within a group and which also has no filter,
   // update the rayg row value as well
   async updateRaygRowForSingleMeasureWithNoFilter(newEntities = []) {
     const { measuresEntities, raygEntity, uniqMetricIds } = await this.getMeasure();
@@ -557,6 +577,7 @@ class MeasureEdit extends Page {
       await transaction.commit();
       redirectUrl += '/successful';
     } catch (error) {
+      logger.error(error);
       this.req.flash(['Error saving measure data']);
       await transaction.rollback();
     }

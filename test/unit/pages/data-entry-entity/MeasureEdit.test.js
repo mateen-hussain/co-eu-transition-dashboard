@@ -89,7 +89,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(page.successfulMode).to.be.not.ok;
     });
   });
-  
+
 
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {
@@ -163,7 +163,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
   describe('#getMeasureEntitiesFromGroup', () => {
-    
+
     it('should return filter data which only contains the same metric, sorted by date', async () => {
       const measure1 = { name: 'test1', metricID: 'measure-1', date: '05/10/2020' }
       const measure2 = { name: 'test2', metricID: 'measure-2', date: '05/10/2020' }
@@ -174,7 +174,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(response).to.eql([ measure3, measure1 ]);
     });
   });
-  
+
   describe('#getGroupEntities', () => {
     const entities = {
       id: 'some-id',
@@ -301,9 +301,9 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#getMeasure', () => {
     const measureCategory = { id: 'some-category' };
-    const measureEntities = { 
+    const measureEntities = {
       groupEntities : [{ metricID: 'measure-1', id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }],
-      raygEntity: { publicId: 'rayg1', filter: 'RAYG' } 
+      raygEntity: { publicId: 'rayg1', filter: 'RAYG' }
     };
 
     beforeEach(() => {
@@ -327,7 +327,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.assert.calledOnce(page.getGroupEntities);
       sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
 
-      expect(response).to.eql({ 
+      expect(response).to.eql({
         measuresEntities: measureEntities.groupEntities,
         raygEntity: measureEntities.raygEntity,
         uniqMetricIds: ['measure-1']
@@ -453,8 +453,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
   describe('#getMeasureData', () => {
-    const measureEntities = { 
-      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }], 
+    const measureEntities = {
+      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }],
       raygEntity: { value: 1 },
       uniqMetricIds: ['metric1']
     };
@@ -748,7 +748,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('should return an error when validateMeasureInformation an error', async () => {
-      const formData = { description: 'test' };
+      const formData = { name: 'test' };
       sinon.stub(page, 'validateMeasureInformation').returns(["error"])
 
       await page.updateMeasureInformation(formData);
@@ -758,7 +758,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('should call saveMeasureData with updatedEntites data', async () => {
-      const formData = { description: 'test' };
+      const formData = { name: 'test' };
       sinon.stub(page, 'validateMeasureInformation').returns([])
 
       await page.updateMeasureInformation(formData);
@@ -770,8 +770,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#updateRaygRowForSingleMeasureWithNoFilter', () => {
     const entities = [{ id: 1, value: 'hello again', parentStatementPublicId: 'state-1' }];
 
-    const measureEntities = { 
-      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }], 
+    const measureEntities = {
+      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }],
       raygEntity: { value: 1, publicId: 'pub-1' },
       uniqMetricIds: ['metric1']
     };
@@ -791,7 +791,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
   describe('#updateMeasureEntities', () => {
-    const entities = { 
+    const entities = {
       measuresEntities: [{ publicId: 'id-test', metricId: 'met1', filter: 'test' }],
       raygEntity: { publicId: 'id-number-2' },
       uniqMetricIds: ['met1']
@@ -806,26 +806,33 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('should return a new object combined with form data', async () => {
-      const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3  };
+      const formData = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3  };
       const response = await page.updateMeasureEntities(formData);
       expect(response).to.eql([{ publicId: 'id-test', ...formData }]);
     });
 
+    it('should add RAGY to data when measure is comments only', async () => {
+      const formData = { name: 'test', additionalComment: 'comment', groupValue: 2, commentsOnly: "Yes"  };
+      const response = await page.updateMeasureEntities(formData);
+      const { groupValue, additionalComment, name } = formData;
+      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue  }]);
+    });
+
     it('should add RAGY to data when isOnlyMeasureInGroup and groupValue is in data', async () => {
-      const formData = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
+      const formData = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, ...formNoGroupData } = formData;
       expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue }]);
     });
 
     it('should add RAGY to data when isOnlyMeasureInGroup && doesNotHaveFilter', async () => {
-      const entities = { 
+      const entities = {
         measuresEntities: [{ publicId: 'id-test', metricId: 'met1' }],
         raygEntity: { publicId: 'id-number-2' },
         uniqMetricIds: ['met1']
       }
       page.getMeasure.returns(entities)
-      const formDataNoGroup = { description: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3,  };
+      const formDataNoGroup = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3,  };
       const formData = { ...formDataNoGroup, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
       expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3  }]);
@@ -836,17 +843,17 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     let fields = {};
     beforeEach(() => {
       fields = {
-        description: 'some description',
+        name: 'some description',
         redThreshold: 1,
         aYThreshold: 2,
         greenThreshold: 3,
       }
     });
-  
-    it('returns error if no group description', () => {
-      delete fields.description;
+
+    it('returns error if no group name', () => {
+      delete fields.name;
       const errors = page.validateMeasureInformation(fields);
-      expect(errors).to.eql(["You must enter a description"]);
+      expect(errors).to.eql(["You must enter a name"]);
     });
 
     it('returns error if no redThreshold', () => {
@@ -901,6 +908,15 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       fields.groupValue = 'test';
       const errors = page.validateMeasureInformation(fields);
       expect(errors).to.eql(["Overall RAYG value must be a number"]);
+    });
+
+    it('dont validate thresholds if comment only measure', () => {
+      fields.greenThreshold = 's';
+      fields.redThreshold = 's';
+      fields.aYThreshold = 's';
+      fields.commentsOnly = "Yes";
+      const errors = page.validateMeasureInformation(fields);
+      expect(errors).to.eql([]);
     });
   });
 

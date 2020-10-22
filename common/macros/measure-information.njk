@@ -2,8 +2,8 @@
   <form action="{{ url }}#measure-information" method="post">
 
     <div class="govuk-form-group">
-      <label class="govuk-label govuk-!-font-weight-bold" for="entity-description">Description</label>
-      <textarea class="govuk-textarea" id="entity-description" name="description" rows="5">{{ data.description | default(measure.description) }}</textarea>
+      <label class="govuk-label govuk-!-font-weight-bold" for="entity-name">Name</label>
+      <textarea class="govuk-textarea" id="entity-name" name="name" rows="5">{{ data.name | default(measure.name) }}</textarea>
     </div>
 
     <div class="govuk-form-group">
@@ -11,27 +11,30 @@
       <textarea class="govuk-textarea" id="entity-comment" name="additionalComment" rows="5">{{ data.additionalComment | default(measure.additionalComment) }}</textarea>
     </div>
 
-  <label class="govuk-label govuk-!-font-weight-bold">Graph RAYG Values</label>
-    <div class="govuk-date-input__item">
-      <div class="govuk-form-group">
-        <label class="govuk-label" for="entity-redThreshold">Red</label>
-        <input class="govuk-input govuk-input--width-2" type="text" id="entity-redThreshold" name="redThreshold" value="{{ data.redThreshold | default(measure.redThreshold) }}" />
-      </div>
-    </div>
+    {% if measure.commentsOnly %}
+      <input type="hidden" name="commentsOnly" value="Yes" />
+    {% else %}
+      <label class="govuk-label govuk-!-font-weight-bold">Graph RAYG Values</label>
+      <div class="govuk-date-input__item">
+        <div class="govuk-form-group">
+          <label class="govuk-label" for="entity-redThreshold">Red</label>
+          <input class="govuk-input govuk-input--width-2" type="text" id="entity-redThreshold" name="redThreshold" value="{{ data.redThreshold | default(measure.redThreshold) }}" />
+        </div>
 
-    <div class="govuk-date-input__item">
-      <div class="govuk-form-group">
-        <label class="govuk-label" for="entity-aYThreshold">Amber</label>
-        <input class="govuk-input govuk-input--width-2" type="text" id="entity-aYThreshold" name="aYThreshold" value="{{ data.aYThreshold | default(measure.aYThreshold) }}" />
-      </div>
-    </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="entity-aYThreshold">Amber</label>
+            <input class="govuk-input govuk-input--width-2" type="text" id="entity-aYThreshold" name="aYThreshold" value="{{ data.aYThreshold | default(measure.aYThreshold) }}" />
+          </div>
+        </div>
 
-    <div class="govuk-date-input__item">
-      <div class="govuk-form-group">
-        <label class="govuk-label" for="entity-greenThreshold">Green</label>
-        <input class="govuk-input govuk-input--width-2" type="text" id="entity-greenThreshold" name="greenThreshold" value="{{ data.greenThreshold | default(measure.greenThreshold) }}" />
-      </div>
-    </div>
+        <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label" for="entity-greenThreshold">Green</label>
+            <input class="govuk-input govuk-input--width-2" type="text" id="entity-greenThreshold" name="greenThreshold" value="{{ data.greenThreshold | default(measure.greenThreshold) }}" />
+          </div>
+        </div>
+    {% endif %}
 
     {% if displayOverallRaygDropdown %}
       {% set groupValue = data.groupValue | default(raygValue) %}

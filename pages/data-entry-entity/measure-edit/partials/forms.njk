@@ -45,21 +45,26 @@
   </tbody>
 </table>
 
-{{ govukTabs({
-  items: [
-    {
+{% set items = [] %}
+
+{% if not latestMeasure.commentsOnly %}
+  {% set items = (items.push({
       label: "Data entries",
       id: "data-entries",
       panel: {
         html: dataEntriesContent(groupedMeasures, addUrl, data, formFields)
       }
-    },
-    {
-      label: "Measure information",
-      id: "measure-information",
-      panel: {
-        html: measureInformation(latestMeasure, editUrl, postData, displayOverallRaygDropdown, raygEntity.value)
-      }
-    }
-  ]
+    }), items) %}
+{% endif %}
+
+{% set items = (items.push({
+  label: "Measure information",
+  id: "measure-information",
+  panel: {
+    html: measureInformation(latestMeasure, editUrl, postData, displayOverallRaygDropdown, raygEntity.value)
+  }
+}), items) %}
+
+{{ govukTabs({
+  items: items
 }) }}
