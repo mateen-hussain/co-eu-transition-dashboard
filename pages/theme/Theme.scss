@@ -214,6 +214,13 @@
 }
 
 .theme-name.theme-red::before,
+.theme-name.theme-amber::before,
+.theme-name.theme-green::before,
+.theme-name.theme-yellow::before {
+    top: 10px;
+}
+
+.theme-name.theme-red::before,
 .section-red .govuk-accordion__section-button::before,
 .outcome-measure__item.item-red::before {
     background-color: #d4351c
