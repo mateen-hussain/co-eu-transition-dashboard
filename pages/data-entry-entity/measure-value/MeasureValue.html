@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "measure-value.njk" import measureValue %}
 
 {% block beforeContent %}
@@ -38,9 +39,12 @@
 
     <hr class="govuk-section-break govuk-section-break--m">
 
-    <button class="govuk-button govuk-button--secondary back-measure-button" data-module="govuk-button" href="{{ config.paths.dataEntryEntity.measureEdit }}/{{ measure.metricID }}/{{ measure.groupID }}">
-        Back to Measure
-    </button>
+      {{ govukButton({
+        text: "Back to Measure",
+        href: '#',
+        preventDoubleClick: true,
+        classes: "govuk-button--secondary govuk-button govuk-button--secondary back-measure-button"
+      }) }}
 
     </div>
   </div>
