@@ -1,6 +1,6 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
-{% macro dataEntriesContent(groupMeasures, url, data, formFields) %}
+{% macro dataEntriesContent(groupMeasures, url, data, formFields, editMeasureValue) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
@@ -27,7 +27,7 @@
                       <p class="govuk-body">{{ measure.unit }} : {{ measure.value }}</p>
                     </td>
                     <td>
-                    <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ config.paths.dataEntryEntity.measureValue }}/{{ measure.id }}">
+                    <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ editMeasureValue }}/{{ measure.id }}">
                       Edit
                     </a>                    
                   </td>
