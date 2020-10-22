@@ -1,5 +1,5 @@
 {% set isPartOfGroup = uniqMetricIds | length > 1 %}
-{% set editMeasureValue = config.paths.dataEntryEntity.measureValue %}
+{% set editValueUrl = config.paths.dataEntryEntity.measureValue %}
 
 {% if isPartOfGroup %}
   <table class="govuk-table">
@@ -53,7 +53,7 @@
       label: "Data entries",
       id: "data-entries",
       panel: {
-        html: dataEntriesContent(groupedMeasures, addUrl, data, formFields, editMeasureValue)
+        html: dataEntriesContent(groupedMeasures, addUrl, data, formFields, editValueUrl)
       }
     }), items) %}
 {% endif %}
