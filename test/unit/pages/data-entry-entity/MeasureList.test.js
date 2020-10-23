@@ -273,6 +273,6 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
       });
 
       expect(MeasureList.isEnabled).to.not.be.ok;
-    })
-  })
+    });
+  });
 });
