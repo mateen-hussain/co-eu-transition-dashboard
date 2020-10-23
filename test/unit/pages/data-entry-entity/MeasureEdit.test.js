@@ -213,13 +213,16 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.getGroupEntities(category, theme);
 
-      expect(response).to.eql({ groupEntities: [{
-        id: 'some-id',
-        publicId: 'some-public-id-1',
-        colour: 'green',
-        theme: 'borders',
-        test: 'new value',
-      }] });
+      expect(response).to.eql({ 
+        groupEntities: [{
+          id: 'some-id',
+          publicId: 'some-public-id-1',
+          colour: 'green',
+          theme: 'borders',
+          test: 'new value',
+        }],
+        raygEntities: []
+      });
 
       sinon.assert.calledWith(Entity.findAll, {
         where: { categoryId: category.id },
@@ -256,13 +259,16 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       }];
 
       const response = await page.getGroupEntities(category, theme);
-      expect(response).to.eql({ groupEntities: [{
-        id: 'some-id',
-        publicId: 'some-public-id-1',
-        colour: 'green',
-        theme: 'borders',
-        test: 'new value',
-      }] });
+      expect(response).to.eql({ 
+        groupEntities: [{
+          id: 'some-id',
+          publicId: 'some-public-id-1',
+          colour: 'green',
+          theme: 'borders',
+          test: 'new value',
+        }],
+        raygEntities: []
+      });
 
       sinon.assert.calledWith(Entity.findAll, {
         where: {
@@ -303,7 +309,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const measureCategory = { id: 'some-category' };
     const measureEntities = {
       groupEntities : [{ metricID: 'measure-1', id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }],
-      raygEntity: { publicId: 'rayg1', filter: 'RAYG' }
+      raygEntities: [{ publicId: 'rayg1', filter: 'RAYG' }]
     };
 
     beforeEach(() => {
@@ -329,7 +335,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       expect(response).to.eql({
         measuresEntities: measureEntities.groupEntities,
-        raygEntity: measureEntities.raygEntity,
+        raygEntities: measureEntities.raygEntities,
         uniqMetricIds: ['measure-1']
       });
     });
@@ -455,7 +461,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#getMeasureData', () => {
     const measureEntities = {
       measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }],
-      raygEntity: { value: 1 },
+      raygEntities: [{ value: 1 }],
       uniqMetricIds: ['metric1']
     };
 
@@ -772,7 +778,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     const measureEntities = {
       measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }],
-      raygEntity: { value: 1, publicId: 'pub-1' },
+      raygEntities: [{ value: 1, publicId: 'pub-1' }],
       uniqMetricIds: ['metric1']
     };
 
@@ -793,7 +799,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   describe('#updateMeasureEntities', () => {
     const entities = {
       measuresEntities: [{ publicId: 'id-test', metricId: 'met1', filter: 'test' }],
-      raygEntity: { publicId: 'id-number-2' },
+      raygEntities: [{ publicId: 'id-number-2' }],
       uniqMetricIds: ['met1']
     }
 
@@ -815,27 +821,27 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const formData = { name: 'test', additionalComment: 'comment', groupValue: 2, commentsOnly: "Yes"  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, additionalComment, name } = formData;
-      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue  }]);
+      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue, additionalComment, name  }]);
     });
 
     it('should add RAGY to data when isOnlyMeasureInGroup and groupValue is in data', async () => {
       const formData = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, ...formNoGroupData } = formData;
-      expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue }]);
+      expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue, name: 'test', additionalComment: 'comment' }]);
     });
 
     it('should add RAGY to data when isOnlyMeasureInGroup && doesNotHaveFilter', async () => {
       const entities = {
         measuresEntities: [{ publicId: 'id-test', metricId: 'met1' }],
-        raygEntity: { publicId: 'id-number-2' },
+        raygEntities: [{ publicId: 'id-number-2' }],
         uniqMetricIds: ['met1']
       }
       page.getMeasure.returns(entities)
       const formDataNoGroup = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3,  };
       const formData = { ...formDataNoGroup, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
-      expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3  }]);
+      expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3, name: 'test', additionalComment: 'comment',   }]);
     });
   });
 
