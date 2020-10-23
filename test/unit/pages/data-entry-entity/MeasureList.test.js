@@ -3,12 +3,10 @@ const { paths } = require('config');
 const config = require('config');
 const MeasureList = require('pages/data-entry-entity/measure-list/MeasureList');
 const authentication = require('services/authentication');
-const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const CategoryField = require('models/categoryField');
-const { Op } = require('sequelize');
 
 let page = {};
 let res = {};

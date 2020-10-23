@@ -1,7 +1,6 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const authentication = require('services/authentication');
-const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
@@ -18,7 +17,7 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     const MeasureGroup = require('pages/data-entry-entity/measure-group/MeasureGroup');
 
     res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {}, render: sinon.stub(), redirect: sinon.stub() };
-    req = { cookies: [], query: { category: 'category' }, user: { roles: [] }, params: {}, flash: sinon.stub(), params: {} };
+    req = { cookies: [], query: { category: 'category' }, user: { roles: [] }, params: {}, flash: sinon.stub() };
     res.status.returns(res);
 
     page = new MeasureGroup('some path', req, res);
