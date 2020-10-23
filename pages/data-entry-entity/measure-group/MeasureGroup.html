@@ -1,6 +1,6 @@
 {% extends "template.njk" %}
 
-{% set measure = getMeasure() | await %}
+{% set measure = getGroup() | await %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
