@@ -1,7 +1,6 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const authentication = require('services/authentication');
-const entityUserPermissions = require('middleware/entityUserPermissions');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
@@ -19,18 +18,16 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     const MeasureGroup = require('pages/data-entry-entity/measure-group/MeasureGroup');
 
     res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {}, render: sinon.stub(), redirect: sinon.stub() };
-    req = { cookies: [], query: { category: 'category' }, user: { roles: [] }, params: {}, flash: sinon.stub() };
+    req = { cookies: [], query: { category: 'category' }, user: { roles: [] }, params: {}, flash: sinon.stub(), params: {} };
     res.status.returns(res);
 
     page = new MeasureGroup('some path', req, res);
 
     sinon.stub(authentication, 'protect').returns([]);
-    sinon.stub(entityUserPermissions, 'assignEntityIdsUserCanAccessToLocals');
   });
 
   afterEach(() => {
     authentication.protect.restore();
-    entityUserPermissions.assignEntityIdsUserCanAccessToLocals.restore();
   });
 
   describe('#url', () => {
@@ -43,7 +40,6 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
         ...authentication.protect(['uploader']),
-        entityUserPermissions.assignEntityIdsUserCanAccessToLocals,
         flash
       ]);
 
@@ -60,52 +56,20 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
 
   describe('#editUrl', () => {
     it('get edit url', () => {
-      page.req.params.entityPublicId = 'some-id';
-      expect(page.editUrl).to.eql(`${paths.dataEntryEntity.measureGroup}/${page.req.params.entityPublicId}`);
+      page.req.params.groupId = 'some-id';
+      expect(page.editUrl).to.eql(`${paths.dataEntryEntity.measureGroup}/${page.req.params.groupId}`);
     });
   });
 
   describe('#getSuccessUrl', () => {
     it('get gsuccess url', () => {
-      page.req.params.entityPublicId = 'some-id';
-      expect(page.getSuccessUrl).to.eql(`${paths.dataEntryEntity.measureGroup}/${page.req.params.entityPublicId}/successful`);
-    });
-  });
-
-  describe('#handler', () => {
-    it('responeds with method not allowed if not admin and no entitiesUserCanAccess', async () => {
-      page.res.locals.entitiesUserCanAccess = [];
-
-      await page.handler(req, res);
-
-      sinon.assert.calledWith(res.status, METHOD_NOT_ALLOWED);
-      sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
-    });
-
-    it('responeds with method not allowed if not admin and no access to this entity public id', async () => {
-      req.params.entityPublicId = 'some-id';
-      page.res.locals.entitiesUserCanAccess = [{ publicId: 'some-other-id' }];
-
-      await page.handler(req, res);
-
-      sinon.assert.calledWith(res.status, METHOD_NOT_ALLOWED);
-      sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
-    });
-
-    it('allows user access', async () => {
-      req.params.entityPublicId = 'some-id';
-      page.res.locals.entitiesUserCanAccess = [{ publicId: 'some-id' }];
-
-      await page.handler(req, res);
-
-      sinon.assert.neverCalledWith(res.status, METHOD_NOT_ALLOWED);
-      sinon.assert.neverCalledWith(res.send, 'You do not have permisson to access this resource.');
+      page.req.params.groupId = 'some-id';
+      expect(page.getSuccessUrl).to.eql(`${paths.dataEntryEntity.measureGroup}/${page.req.params.groupId}/successful`);
     });
   });
 
   describe('#getRequest', () => {
     it('clears data if in successfulMode', async () => {
-      page.res.locals.entitiesUserCanAccess = [1,2,3];
       page.req.params.successful = 'successful';
 
       sinon.stub(page, 'clearData');
@@ -175,13 +139,13 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
 
     const category = { id: 1 };
     const categoryFields = [{ id: 1 }];
-    const measureEntity = {};
+    const groupEntities = [{}];
 
     const transaction = sequelize.transaction();
 
     beforeEach(() => {
       sinon.stub(page, 'getCategory').returns(category);
-      sinon.stub(page, 'getMeasure').returns(measureEntity);
+      sinon.stub(page, 'getGroupEntities').returns(groupEntities);
       sinon.stub(Entity, 'import').returns(entity);
       sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
 
@@ -239,62 +203,54 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
 
     it('redirects if save works', async () => {
       page.req.params = { uid: 'someid' };
-      page.req.params.entityPublicId = 'some-id';
+      page.req.params.groupId = 'some-id';
 
       await page.postRequest(req, res);
 
       sinon.assert.calledOnce(page.saveData);
       sinon.assert.notCalled(page.req.flash);
       sinon.assert.calledOnce(page.updateGroup);
-      sinon.assert.calledWith(page.res.redirect, `${paths.dataEntryEntity.measureGroup}/${page.req.params.entityPublicId}/successful`);
+      sinon.assert.calledWith(page.res.redirect, `${paths.dataEntryEntity.measureGroup}/${page.req.params.groupId}/successful`);
     });
   });
 
-  describe('#getMeasure', () => {
-    const entity = {
+  describe('#getGroupEntities', () => {
+    const entites = [{
       id: 'some-id',
       publicId: 'some-public-id-2',
       entityFieldEntries: [{
-        categoryField: { name: 'name' },
+        categoryField: { name: 'groupId' },
         value: 'some name'
       },{
         categoryField: { name: 'filter' },
         value: 'RAYG'
       }]
-    };
+    }];
 
     beforeEach(() => {
-      Entity.findOne.returns(entity);
-      req.params.entityPublicId = 'some-id';
+      Entity.findAll.returns(entites);
+      EntityFieldEntry.findAll.returns(entites[0].entityFieldEntries);
+      page.req.params.groupId = 'some-id';
     });
 
     it('gets the measure entity and maps the field entries', async () => {
-      const response = await page.getMeasure();
-      expect(response).to.eql({
+      const response = await page.getGroupEntities();
+      expect(response).to.eql([{
         filter: "RAYG",
         id: "some-id",
-        name: "some name",
+        groupId: "some name",
         publicId: "some-public-id-2"
-      });
+      }]);
 
-      sinon.assert.calledWith(Entity.findOne, {
-        where: {
-          publicId: req.params.entityPublicId
-        },
+      sinon.assert.calledWith(Entity.findAll, {
         include: [{
-          separate: true,
           model: EntityFieldEntry,
-          include: CategoryField
+          where: { value: page.req.params.groupId },
+          include: {
+            model: CategoryField,
+            where: { name: 'groupId' },
+          }
         }]
-      });
-    });
-
-    it('returns error not a RAYG row', async () => {
-      entity.entityFieldEntries[1].value = '';
-
-      const response = await page.getMeasure();
-      expect(response).to.eql({
-        error: 'This is not a group'
       });
     });
   });
