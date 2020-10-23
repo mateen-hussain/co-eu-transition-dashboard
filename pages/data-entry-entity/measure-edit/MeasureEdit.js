@@ -358,13 +358,18 @@ class MeasureEdit extends Page {
     });
   }
 
-  async validateFormData(formData) {
-    const { measuresEntities } = await this.getMeasure();
+  async validateFormData(formData, measuresEntities = []) {
     const uiInputs = this.calculateUiInputs(measuresEntities)
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
       errors.push("Invalid date");
+    }
+
+    const isDateDuplicated = measuresEntities.some(entity => moment(buildDateString(formData), 'YYYY-MM-DD').isSame(moment(entity.date, 'DD/MM/YYYY')))
+
+    if (isDateDuplicated) {
+      errors.push("Date already exists");
     }
 
     if (!formData.entities) {
@@ -535,8 +540,7 @@ class MeasureEdit extends Page {
 
   // If adding a new value for a measure which is the only measure within a group and which also has no filter,
   // update the rayg row value as well
-  async updateRaygRowForSingleMeasureWithNoFilter(newEntities = [], formData) {
-    const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
+  async updateRaygRowForSingleMeasureWithNoFilter(newEntities = [], formData, measuresEntities, raygEntities, uniqMetricIds) {
     const doesNotHaveFilter = !measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
     
@@ -563,7 +567,9 @@ class MeasureEdit extends Page {
   }
 
   async addMeasureEntityData (formData) {
-    const formValidationErrors = await this.validateFormData(formData);
+    const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
+    
+    const formValidationErrors = await this.validateFormData(formData, measuresEntities);
     if (formValidationErrors.length > 0) {
       return this.renderRequest(this.res, { errors: formValidationErrors });
     }
@@ -572,7 +578,7 @@ class MeasureEdit extends Page {
     const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
-    const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities, formData)
+    const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities, formData, measuresEntities, raygEntities, uniqMetricIds)
 
     if (errors.length > 0) {
       return this.renderRequest(this.res, { errors: ['Error in entity data'] });
