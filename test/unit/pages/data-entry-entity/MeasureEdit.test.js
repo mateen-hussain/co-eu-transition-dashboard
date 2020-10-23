@@ -181,6 +181,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       publicId: 'some-public-id-1',
       parents: [
         {
+          publicId: 'parent-1',
           parents: [ {
             categoryId: 1,
             entityFieldEntries: [{
@@ -216,6 +217,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(response).to.eql({ 
         groupEntities: [{
           id: 'some-id',
+          parentPublicId: 'parent-1',
           publicId: 'some-public-id-1',
           colour: 'green',
           theme: 'borders',
@@ -262,6 +264,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       expect(response).to.eql({ 
         groupEntities: [{
           id: 'some-id',
+          parentPublicId: 'parent-1',
           publicId: 'some-public-id-1',
           colour: 'green',
           theme: 'borders',
@@ -584,12 +587,10 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#validateFormData', () => {
     beforeEach(() => {
-      sinon.stub(page, 'getMeasure').returns([]);
       sinon.stub(page, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);
     });
 
     afterEach(() => {
-      page.getMeasure.restore();
       page.calculateUiInputs.restore();
     });
 
@@ -598,9 +599,18 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.validateFormData(formData);
 
-      sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Invalid date");
+    });
+
+    it('should return an error when date already exists', async () => {
+      const formData = { day: '05', month: '10', year: '2020', entities:{} };
+      const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }];
+
+      const response = await page.validateFormData(formData, measuresEntities);
+
+      sinon.assert.calledOnce(page.calculateUiInputs);
+      expect(response[0]).to.eql("Date already exists");
     });
 
     it('should return an error when no entities data is present', async () => {
@@ -608,7 +618,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.validateFormData(formData);
 
-      sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Missing entity values");
     });
@@ -618,7 +627,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.validateFormData(formData);
 
-      sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Missing entity values");
     });
@@ -628,7 +636,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.validateFormData(formData);
 
-      sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Invalid field value");
     });
@@ -638,7 +645,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.validateFormData(formData);
 
-      sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Invalid field value");
     });
@@ -648,7 +654,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.validateFormData(formData);
 
-      sinon.assert.calledOnce(page.getMeasure);
       sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response.length).to.eql(0);
     });
@@ -774,25 +779,21 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
   describe('#updateRaygRowForSingleMeasureWithNoFilter', () => {
-    const entities = [{ id: 1, value: 'hello again', parentStatementPublicId: 'state-1' }];
-
-    const measureEntities = {
-      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }],
-      raygEntities: [{ value: 1, publicId: 'pub-1' }],
-      uniqMetricIds: ['metric1']
-    };
-
-    beforeEach(() => {
-      sinon.stub(page, 'getMeasure').returns(measureEntities);
-    });
-
-    afterEach(() => {
-      page.getMeasure.restore();
-    });
+    const entities = [{ id: 1, value: 'hello again', parentStatementPublicId: 'state-1'  }];
+    const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }];
+    const raygEntities = [{ value: 1, publicId: 'pub-1', parentPublicId: 'state-1' }];
+    const uniqMetricIds = ['metric1'];
 
     it('should return an array when measure is the only item in the group and that has not filter values set', async () => {
-      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities);
-      expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: "hello again", }]);
+      const formData = { day: 6, month: 10, year: 2020 };
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
+      expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: "hello again", date: "2020-10-06" }]);
+    });
+
+    it('should return input date when date is older than latest measure date', async () => {
+      const formData = { day: 5, month: 10, year: 2020 };
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
+      expect(response).to.eql(entities);
     });
   });
 
@@ -933,12 +934,19 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const errors = [{ error: 'error' }]
     const parsedEntities = [{ id: 1, value: 'parsed again' }];
 
+    const getMeasureData = {
+      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }],
+      raygEntities: [{ value: 1, publicId: 'pub-1', parentPublicId: 'state-1' }],
+      uniqMetricIds: ['metric1']
+    };
+
     beforeEach(() => {
       sinon.stub(page, 'getEntitiesToBeCloned').returns(clonedEntities)
       sinon.stub(page, 'createEntitiesFromClonedData').returns(newEntities)
       sinon.stub(page, 'saveMeasureData').returns({})
       sinon.stub(page, 'renderRequest').returns()
       sinon.stub(page, 'updateRaygRowForSingleMeasureWithNoFilter').returns()
+      sinon.stub(page, 'getMeasure').returns(getMeasureData);
     });
 
     afterEach(() => {
@@ -948,6 +956,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       page.saveMeasureData.restore();
       page.renderRequest.restore();
       page.updateRaygRowForSingleMeasureWithNoFilter.restore();
+      page.getMeasure.restore();
     });
 
     it('should return errors when validateFormData return errors', async () => {

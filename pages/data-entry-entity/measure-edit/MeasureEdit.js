@@ -175,10 +175,13 @@ class MeasureEdit extends Page {
         return fieldEntry.categoryField.name === 'name';
       });
 
+      const parentPublicId = get(entity, 'parents[0].publicId')
+
       const entityMapped = {
         id: entity.id,
         publicId: entity.publicId,
-        theme: themeName.value
+        theme: themeName.value,
+        parentPublicId
       };
 
       entity.entityFieldEntries.map(entityfieldEntry => {
@@ -355,13 +358,18 @@ class MeasureEdit extends Page {
     });
   }
 
-  async validateFormData(formData) {
-    const { measuresEntities } = await this.getMeasure();
+  async validateFormData(formData, measuresEntities = []) {
     const uiInputs = this.calculateUiInputs(measuresEntities)
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
       errors.push("Invalid date");
+    }
+
+    const isDateDuplicated = measuresEntities.some(entity => moment(buildDateString(formData), 'YYYY-MM-DD').isSame(moment(entity.date, 'DD/MM/YYYY')))
+
+    if (isDateDuplicated) {
+      errors.push("Date already exists");
     }
 
     if (!formData.entities) {
@@ -532,18 +540,24 @@ class MeasureEdit extends Page {
 
   // If adding a new value for a measure which is the only measure within a group and which also has no filter,
   // update the rayg row value as well
-  async updateRaygRowForSingleMeasureWithNoFilter(newEntities = []) {
-    const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
+  async updateRaygRowForSingleMeasureWithNoFilter(newEntities = [], formData, measuresEntities, raygEntities, uniqMetricIds) {
     const doesNotHaveFilter = !measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
+    
+    // We only want to update the the RAYG row when the date is newer than the current entires
+    // measuresEntities is already sorted by date so we know the last entry in the array will contain the latest date
+    const latestDate = measuresEntities[measuresEntities.length -1].date;
+    const newDate = buildDateString(formData)
+    const isDateNewer =  moment(newDate, 'YYYY-MM-DD').isAfter(moment(latestDate, 'DD/MM/YYYY'));
 
-    if (isOnlyMeasureInGroup && doesNotHaveFilter) {
-      const { parentStatementPublicId, value } = newEntities[0];
+    if (isOnlyMeasureInGroup && doesNotHaveFilter && isDateNewer) {
+      const { value } = newEntities[0];
       // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
       raygEntities.forEach(raygEntity => {
         newEntities.push({
           publicId: raygEntity.publicId,
-          parentStatementPublicId,
+          parentStatementPublicId: raygEntity.parentPublicId,
+          date: newDate,
           value
         })
       })
@@ -553,7 +567,9 @@ class MeasureEdit extends Page {
   }
 
   async addMeasureEntityData (formData) {
-    const formValidationErrors = await this.validateFormData(formData);
+    const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
+    
+    const formValidationErrors = await this.validateFormData(formData, measuresEntities);
     if (formValidationErrors.length > 0) {
       return this.renderRequest(this.res, { errors: formValidationErrors });
     }
@@ -562,7 +578,7 @@ class MeasureEdit extends Page {
     const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
     const { errors, parsedEntities } = await this.validateEntities(newEntities);
 
-    const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities)
+    const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities, formData, measuresEntities, raygEntities, uniqMetricIds)
 
     if (errors.length > 0) {
       return this.renderRequest(this.res, { errors: ['Error in entity data'] });
