@@ -43,7 +43,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     it('returns url for edit measure value', () => {
       expect(page.editUrl).to.eql(`${page.url}/${req.params.measureId}`);
     });
-  });  
+  });
 
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {

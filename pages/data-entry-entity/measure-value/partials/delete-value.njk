@@ -1,0 +1,12 @@
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{{ govukPanel({
+  titleText: "Are you sure you want to delete this value?",
+  html: "18/11/2020 20",
+  classes: 'red-panel'
+}) }}
+
+<hr class="govuk-section-break govuk-section-break--m">
+
+<button class="govuk-button govuk-button--secondary delete-screen-button" data-module="govuk-button" type="submit">Go back and edit</button>
+<button class="govuk-button delete-screen-button" data-module="govuk-button" type="submit">Delete value</button>

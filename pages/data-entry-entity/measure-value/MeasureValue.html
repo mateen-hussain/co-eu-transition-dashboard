@@ -24,23 +24,29 @@
 
     {% if successfulMode %}
       {% include "data-entry-entity/measure-edit/partials/success.njk" %}
+    {% elseif deleteSuccessMode %}
+      {% include "data-entry-entity/measure-value/partials/delete-success.njk" %}
+    {% elseif deleteValueMode %}
+      {% include "data-entry-entity/measure-value/partials/delete-value.njk" %}
     {% else %}
 
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Edit measure value</h1>
-    <h3 class="govuk-heading-m">Measure name</h3>
+      <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Edit measure value</h1>
+      <h3 class="govuk-heading-m">Measure name</h3>
 
-    <p class="govuk-body govuk-!-font-weight-bold">Edit current value<p>
-    <div class="data-entry">
-        {{ measureValue(url, formFields) }}
-    </div> 
+      <p class="govuk-body govuk-!-font-weight-bold">Edit current value<p>
+      <div class="data-entry">
+          {{ measureValue(url, formFields) }}
+      </div> 
 
     {% endif  %}
 
-    <hr class="govuk-section-break govuk-section-break--m">
+    {% if not deleteValueMode %}
+      <hr class="govuk-section-break govuk-section-break--m">
 
-    <button class="govuk-button govuk-button--secondary back-measure-button" data-module="govuk-button" href="">
-        Back to Measure
-    </button>
+      <button class="govuk-button govuk-button--secondary back-measure-button" data-module="govuk-button" href="">
+          Back to Measure
+      </button>
+    {% endif  %}
 
     </div>
   </div>

@@ -22,6 +22,14 @@ class MeasureValue extends Page {
     return this.req.params && this.req.params.successful;
   }
 
+  get deleteSuccessMode() {
+    return this.req.params && this.req.params.success;
+  }
+
+  get deleteValueMode() {
+    return this.req.params && this.req.params.delete;
+  }
+
   get middleware() {
     return [
       ...authentication.protect(['uploader']),
