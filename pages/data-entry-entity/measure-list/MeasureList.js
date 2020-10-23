@@ -3,14 +3,11 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const config = require('config');
 const authentication = require('services/authentication');
-const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
 const CategoryField = require('models/categoryField');
-const { Op } = require('sequelize');
-const entityUserPermissions = require('middleware/entityUserPermissions');
 const groupBy = require('lodash/groupBy');
 const get = require('lodash/get');
 const moment = require('moment');
@@ -27,17 +24,8 @@ class MeasureList extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader']),
-      entityUserPermissions.assignEntityIdsUserCanAccessToLocals
+      ...authentication.protect(['uploader'])
     ];
-  }
-
-  async getRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
-      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
-    }
-
-    super.getRequest(req, res);
   }
 
   async getCategory(name) {
@@ -55,13 +43,6 @@ class MeasureList extends Page {
 
   async getMeasureEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
-
-    const userIsAdmin = this.req.user.roles.map(role => role.name).includes('admin');
-
-    if(!userIsAdmin) {
-      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
-      where.id = { [Op.in]: entityIdsUserCanAccess };
-    }
 
     const measureEntities = await Entity.findAll({
       where,
