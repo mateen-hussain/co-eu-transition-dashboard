@@ -12,11 +12,7 @@ const filterMetrics = async (user,metrics) => {
         }
       });
 
-      if (fieldEntry && metricMap[fieldEntry.value]) {
-        return true;
-      }
-
-      return false;
+      return (fieldEntry && metricMap[fieldEntry.value]);
     });
   }
 
