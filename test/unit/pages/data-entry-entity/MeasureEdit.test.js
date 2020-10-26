@@ -4,6 +4,7 @@ const config = require('config');
 const MeasureEdit = require('pages/data-entry-entity/measure-edit/MeasureEdit');
 const authentication = require('services/authentication');
 const rayg = require('helpers/rayg');
+const filterMetricsHelper = require('helpers/filterMetrics');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
@@ -24,7 +25,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   beforeEach(() => {
 
     res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub(),   sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
-    req = { body: {}, cookies: [], params: { groupId: 'group-1', metricId: 'measure-1', type: 'add' }, user: { roles: [] }, flash: sinon.stub() };
+    req = { body: {}, cookies: [], params: { groupId: 'group-1', metricId: 'measure-1', type: 'add' }, user: { roles: [], getPermittedMetricMap: sinon.stub().returns({}) }, flash: sinon.stub() };
     res.status.returns(res);
 
     page = new MeasureEdit('edit-measure', req, res);
@@ -200,16 +201,21 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     beforeEach(() => {
       sinon.stub(page, 'getEntityFields').returns(entityFieldEntries)
       Entity.findAll.returns([entities]);
-      sinon.stub(rayg, 'getRaygColour').returns('green')
+      sinon.stub(rayg, 'getRaygColour').returns('green');
+      sinon.stub(filterMetricsHelper,'filterMetrics').returnsArg(1);
     });
 
     afterEach(() => {
       page.getEntityFields.restore();
       rayg.getRaygColour.restore();
+      filterMetricsHelper.filterMetrics.restore();
     });
 
     it('gets entities for a given category if admin', async () => {
-      req.user = { isAdmin: true }
+      page.req.user = {
+        isAdmin: true,
+        getPermittedMetricMap: sinon.stub().returns({})
+      };
 
       const response = await page.getGroupEntities(category, theme);
 

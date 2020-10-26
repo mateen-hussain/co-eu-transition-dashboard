@@ -2,7 +2,7 @@
 
 const filterMetrics = async (user,metrics) => {
   let filteredMetrics = metrics;
-  if (true || !user.isAdmin) {
+  if (!user.isAdmin) {
     const metricMap = await user.getPermittedMetricMap();
 
     filteredMetrics = filteredMetrics.filter( entity => {

@@ -16,7 +16,7 @@ const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
 const validation = require('helpers/validation');
 const parse = require('helpers/parse');
-const { filterMetrics } = require('helpers/filterMetrics');
+const filterMetricsHelper = require('helpers/filterMetrics');
 const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
@@ -125,7 +125,7 @@ class MeasureEdit extends Page {
       entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
     }
 
-		entities = await filterMetrics(this.req.user,entities);
+		entities = await filterMetricsHelper.filterMetrics(this.req.user,entities);
 
 
     const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);

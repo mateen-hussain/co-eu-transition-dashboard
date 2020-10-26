@@ -7,6 +7,7 @@ const EntityFieldEntry = require('models/entityFieldEntry');
 const CategoryField = require('models/categoryField');
 const flash = require('middleware/flash');
 const sequelize = require('services/sequelize');
+const filterMetricsHelper = require('helpers/filterMetrics');
 
 let page = {};
 let res = {};
@@ -23,10 +24,12 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
     page = new MeasureGroup('some path', req, res);
 
     sinon.stub(authentication, 'protect').returns([]);
+    sinon.stub(filterMetricsHelper,'filterMetrics').returnsArg(1);
   });
 
   afterEach(() => {
     authentication.protect.restore();
+    filterMetricsHelper.filterMetrics.restore();
   });
 
   describe('#url', () => {
