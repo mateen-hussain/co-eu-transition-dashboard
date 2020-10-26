@@ -476,7 +476,7 @@ class MeasureEdit extends Page {
           value: data.groupValue,
           name: data.name,
           groupDescription: data.name,
-          additionalComment: data.additionalComment || '',
+          additionalComment: data.additionalComment || ''
         });
       } else if (isOnlyMeasureInGroup && doesNotHaveFilter) {
       // if a measure has NO filter values and is the only measure within a group, we want to update the threshold values
@@ -487,7 +487,7 @@ class MeasureEdit extends Page {
           greenThreshold: data.greenThreshold,
           name: data.name,
           groupDescription: data.name,
-          additionalComment: data.additionalComment || '',
+          additionalComment: data.additionalComment || ''
         })
       } else if (data.groupValue && isOnlyMeasureInGroup) {
       // We want to update the RAYG value when an item is the only measure within a group which HAS filter values
@@ -496,7 +496,7 @@ class MeasureEdit extends Page {
           value: data.groupValue,
           name: data.name,
           groupDescription: data.name,
-          additionalComment: data.additionalComment || '',
+          additionalComment: data.additionalComment || ''
         })
       }
     })
