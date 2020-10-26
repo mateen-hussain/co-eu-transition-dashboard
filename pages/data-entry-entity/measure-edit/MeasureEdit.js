@@ -285,7 +285,7 @@ class MeasureEdit extends Page {
 
     // measuresEntities are already sorted by date, so the last entry is the newest
     const latestDate = measuresEntities[measuresEntities.length -1].date;
-    const isLatestDateInTheFuture =  moment(latestDate, 'YYYY-MM-DD').isAfter(moment());
+    const isLatestDateInTheFuture =  moment(latestDate, 'DD/MM/YYYY').isAfter(moment());
     const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateInTheFuture
 
     return {
