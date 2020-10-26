@@ -12,6 +12,7 @@ const groupBy = require('lodash/groupBy');
 const get = require('lodash/get');
 const moment = require('moment');
 const rayg = require('helpers/rayg');
+const filterMetricsHelper = require('helpers/filterMetrics');
 
 class MeasureList extends Page {
   static get isEnabled() {
@@ -44,7 +45,7 @@ class MeasureList extends Page {
   async getMeasureEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
 
-    const measureEntities = await Entity.findAll({
+    let measureEntities = await Entity.findAll({
       where,
       include: [{
         separate: true,
@@ -70,6 +71,8 @@ class MeasureList extends Page {
         }]
       }]
     });
+
+    measureEntities = await filterMetricsHelper.filterMetrics(this.req.user,measureEntities);
 
     return measureEntities.map(entity => {
       const theme = get(entity, 'parents[0].parents').find(parentEntity => {

@@ -85,7 +85,7 @@
     "raygDefinitions": "/rayg-definitions"
   },
   "features": {
-    "twoFactorAuth": true,
+    "twoFactorAuth": false,
     "missedMilestones": false,
     "entityData": true,
     "transitionReadinessTheme": true,
