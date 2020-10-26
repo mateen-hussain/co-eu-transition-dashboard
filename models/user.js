@@ -42,7 +42,8 @@ class User extends Model {
 
   async getPermittedMetricMap() {
     const userMetrics = await this.getUserMetrics();
-    const result = userMetrics.reduce( (acc,userMetric) => {
+    const result = userMetrics.reduce(
+      (acc,userMetric) => {
         acc[userMetric.metricId] = true;
         return acc;
       },
