@@ -1,7 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 const Page = require('core/pages/page');
 const { paths } = require('config');
-const { Op } = require('sequelize');
 const config = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
@@ -11,7 +10,6 @@ const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
 const sequelize = require('services/sequelize');
-const entityUserPermissions = require('middleware/entityUserPermissions');
 const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
 const validation = require('helpers/validation');
@@ -69,13 +67,19 @@ class MeasureEdit extends Page {
   get middleware() {
     return [
       ...authentication.protect(['uploader']),
-      flash,
-      entityUserPermissions.assignEntityIdsUserCanAccessToLocals
+      flash
     ];
   }
 
+  async canUserAccessMetric() {
+    const metricsUserCanAccess = await this.req.user.getPermittedMetricMap();
+    return Object.keys(metricsUserCanAccess).includes(this.req.params.metricId)
+  }
+
   async getRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+    const canUserAccessMetric = await this.canUserAccessMetric();
+
+    if(!this.req.user.isAdmin && !canUserAccessMetric) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
@@ -84,12 +88,6 @@ class MeasureEdit extends Page {
 
   async getGroupEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
-    const userIsAdmin = this.req.user.isAdmin;
-
-    if(!userIsAdmin) {
-      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
-      where.id = { [Op.in]: entityIdsUserCanAccess };
-    }
 
     let entities = await Entity.findAll({
       where,
@@ -302,17 +300,6 @@ class MeasureEdit extends Page {
 
   async getEntitiesToBeCloned(entityIds) {
     const where = { id: entityIds }
-    const userIsAdmin = this.req.user.isAdmin;
-
-    if (!userIsAdmin) {
-      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
-      const cansUserAccessAllRequiredEntities = entityIds.every(id => entityIdsUserCanAccess.includes(id));
-
-      if (!cansUserAccessAllRequiredEntities) {
-        logger.error(`Permissions error , user does not have access to all entities`);
-        throw new Error(`Permissions error, user does not have access to all entities`);
-      }
-    }
 
     const entities = await Entity.findAll({
       where,
@@ -395,7 +382,7 @@ class MeasureEdit extends Page {
       if (Object.keys(formData.entities).length === 0) {
         errors.push("You must submit at least one value");
       }
-    } 
+    }
 
     return errors;
   }
@@ -419,7 +406,9 @@ class MeasureEdit extends Page {
   }
 
   async postRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+    const canUserAccessMetric = await this.canUserAccessMetric();
+
+    if(!this.req.user.isAdmin && !canUserAccessMetric) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
@@ -550,7 +539,7 @@ class MeasureEdit extends Page {
   async updateRaygRowForSingleMeasureWithNoFilter(newEntities = [], formData, measuresEntities, raygEntities, uniqMetricIds) {
     const doesNotHaveFilter = !measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
-    
+
     // We only want to update the the RAYG row when the date is newer than the current entires
     // measuresEntities is already sorted by date so we know the last entry in the array will contain the latest date
     const latestDate = measuresEntities[measuresEntities.length -1].date;
@@ -588,7 +577,7 @@ class MeasureEdit extends Page {
     const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
 
     formData.entities = this.removeBlankEntityInputValues(formData.entities);
-    
+
     const formValidationErrors = await this.validateFormData(formData, measuresEntities);
     if (formValidationErrors.length > 0) {
       return this.renderRequest(this.res, { errors: formValidationErrors });
