@@ -1,4 +1,4 @@
-const { Model, STRING, ENUM, DATE, INTEGER, BOOLEAN } = require('sequelize');
+const { Model, STRING, INTEGER } = require('sequelize');
 const sequelize = require('services/sequelize');
 
 class UserMetric extends Model {}
