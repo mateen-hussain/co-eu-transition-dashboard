@@ -828,14 +828,14 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const formData = { name: 'test', additionalComment: 'comment', groupValue: 2, commentsOnly: "Yes"  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, additionalComment, name } = formData;
-      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue, additionalComment, name  }]);
+      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue, additionalComment, name, groupDescription: name  }]);
     });
 
     it('should add RAGY to data when isOnlyMeasureInGroup and groupValue is in data', async () => {
       const formData = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, ...formNoGroupData } = formData;
-      expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue, name: 'test', additionalComment: 'comment' }]);
+      expect(response).to.eql([{ publicId: 'id-test', ...formNoGroupData }, { publicId: 'id-number-2', value: groupValue, name: 'test', groupDescription: 'test', additionalComment: 'comment' }]);
     });
 
     it('should add RAGY to data when isOnlyMeasureInGroup && doesNotHaveFilter', async () => {
@@ -848,7 +848,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const formDataNoGroup = { name: 'test', additionalComment: 'comment', redThreshold: 1, aYThreshold:2, greenThreshold: 3,  };
       const formData = { ...formDataNoGroup, groupValue: 2  };
       const response = await page.updateMeasureEntities(formData);
-      expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3, name: 'test', additionalComment: 'comment',   }]);
+      expect(response).to.eql([{ publicId: 'id-test', ...formDataNoGroup }, { publicId: 'id-number-2', redThreshold: 1, aYThreshold:2, greenThreshold: 3, name: 'test', groupDescription: 'test', additionalComment: 'comment',   }]);
     });
   });
 
