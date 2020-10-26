@@ -475,7 +475,6 @@ class MeasureEdit extends Page {
           publicId: raygEntity.publicId,
           value: data.groupValue,
           name: data.name,
-          groupDescription: data.name,
           additionalComment: data.additionalComment || ''
         });
       } else if (isOnlyMeasureInGroup && doesNotHaveFilter) {
