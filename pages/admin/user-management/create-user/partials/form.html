@@ -1,0 +1,75 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block content %}
+    <h1 class="govuk-heading-l">Create User</h1>
+    {% if flash %}
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: flash
+        }) }}
+    {% endif %}
+    <form action="{{ url }}" method="post">
+        {{
+            govukInput({
+                label: {
+                html: "<strong>Username</strong>"
+                },
+                hint: {
+                    text: "Username should be a valid email"
+                },
+                classes: "govuk-input--width-20",
+                id: "username",
+                name: "email",
+                autocomplete: "username"
+            })
+        }}
+        {{ 
+            govukCheckboxes({
+                idPrefix: "roles",
+                name: "roles",
+                classes: "govuk-checkboxes--small",
+                fieldset: {
+                    legend: {
+                        text: "Select your roles",
+                        isPageHeading: false,
+                        classes: "govuk-fieldset__legend--m"
+                    }
+                },
+                hint: {
+                    text: "Select all that apply."
+                },
+                items: roles
+            }) 
+        }}
+
+        {{ 
+            govukCheckboxes({
+                idPrefix: "departments",
+                name: "departments",
+                classes: "govuk-checkboxes--small",
+                fieldset: {
+                    legend: {
+                    text: "Select departments that you belong to",
+                    isPageHeading: false,
+                    classes: "govuk-fieldset__legend--m"
+                    }
+                },
+                hint: {
+                    text: "Select all that apply."
+                },
+                items: departments
+            }) 
+        }}
+
+        {{
+            govukButton({
+                text: "Create User",
+                type: "submit",
+                preventDoubleClick: true
+            })
+        }}
+    </form>
+{% endblock %}
