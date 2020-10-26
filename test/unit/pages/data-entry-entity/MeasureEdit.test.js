@@ -604,8 +604,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const formData = { day: '10', month: '14', year: '2020', entities:{} };
 
       const response = await page.validateFormData(formData);
-
-      sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Invalid date");
     });
 
@@ -614,54 +612,45 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }];
 
       const response = await page.validateFormData(formData, measuresEntities);
-
-      sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Date already exists");
     });
 
     it('should return an error when no entities data is present', async () => {
       const formData = { day: '10', month: '12', year: '2020' };
-
       const response = await page.validateFormData(formData);
-
-      sinon.assert.calledOnce(page.calculateUiInputs);
-      expect(response[0]).to.eql("Missing entity values");
-    });
-
-    it('should return an error when entities data is missing ids', async () => {
-      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 10 } };
-
-      const response = await page.validateFormData(formData);
-
-      sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Missing entity values");
     });
 
     it('should return an error when entities data is empty', async () => {
-      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: '', 456: 10 } };
-
+      const formData = { day: '10', month: '12', year: '2020', entities: {} };
       const response = await page.validateFormData(formData);
+      expect(response[0]).to.eql("You must submit at least one value");
+    });
 
-      sinon.assert.calledOnce(page.calculateUiInputs);
+    it('should return an error when entities data is empty', async () => {
+      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: '', 456: 10 } };
+      const response = await page.validateFormData(formData);
       expect(response[0]).to.eql("Invalid field value");
     });
 
     it('should return an error when entities data is NaN', async () => {
       const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 'hello', 456: 10 } };
-
       const response = await page.validateFormData(formData);
-
-      sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response[0]).to.eql("Invalid field value");
     });
 
     it('should return an empty array when data is valid', async () => {
       const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 5, 456: 10 } };
-
       const response = await page.validateFormData(formData);
-
-      sinon.assert.calledOnce(page.calculateUiInputs);
       expect(response.length).to.eql(0);
+    });
+  });
+
+  describe('#removeBlankEntityInputValues', () => {
+    it('should remove empty vales and return data', async () => {
+      const formData = { 123: '', 456: '12' };
+      const response = await page.removeBlankEntityInputValues(formData);
+      expect(response).to.eql({ 456: '12' });
     });
   });
 
