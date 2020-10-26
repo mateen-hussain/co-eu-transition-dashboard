@@ -4,6 +4,7 @@ const { paths } = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const entityUserPermissions = require('middleware/entityUserPermissions');
+const { Op } = require('sequelize');
 
 class MeasureValue extends Page {
   get url() {
@@ -11,19 +12,27 @@ class MeasureValue extends Page {
   }
 
   get pathToBind() {
-    return `${this.url}/:measureId`;
+    return `${this.url}/:measureId/:delete(delete)?/:deleteSuccess(delete-success)?/:editSuccess(success)?`;
+  }
+
+  get measureId() {
+    return this.req.params.measureId;
   }
 
   get editUrl() {
     return `${this.url}/${this.req.params.measureId}`;
   }
 
-  get successfulMode() {
-    return this.req.params && this.req.params.successful;
+  get editMode() {
+    return !this.editSuccessMode && !this.deleteSuccessMode && !this.deleteValueMode;
+  }
+
+  get editSuccessMode() {
+    return this.req.params && this.req.params.editSuccess;
   }
 
   get deleteSuccessMode() {
-    return this.req.params && this.req.params.success;
+    return this.req.params && this.req.params.deleteSuccess;
   }
 
   get deleteValueMode() {
@@ -35,6 +44,29 @@ class MeasureValue extends Page {
       ...authentication.protect(['uploader']),
       entityUserPermissions.assignEntityIdsUserCanAccessToLocals
     ];
+  }
+
+  async deleteValue() {
+    // const entities = [{ id: 1234 }, { id: 12345 }];
+    // const entityIds = entities.map(entity => entity.id);
+    //
+    // await Entity.destroy({
+    //   where: {
+    //     entityId: {
+    //       [Op.in]: entityIds
+    //     }
+    //   }
+    // }, options);
+
+    this.res.redirect(`${this.url}/${this.measureId}/delete-success`);
+  }
+
+  async postRequest(req, res) {
+    if(this.deleteValueMode) {
+      return this.deleteValue();
+    }
+
+    super.getRequest(req, res);
   }
 
   async getRequest(req, res) {

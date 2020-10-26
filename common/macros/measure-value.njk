@@ -29,7 +29,7 @@
                 <input class="govuk-input govuk-input--width-2" type="number" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
             </div>
             </div>
-        </td> 
+        </td>
         </tr>
         {% endfor %}
     </table>
@@ -38,7 +38,7 @@
     <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     {% else %}
     <button class="govuk-button value-button" data-module="govuk-button" type="submit">Save value</button>
-    <button class="govuk-button govuk-button--warning value-button" data-module="govuk-button" type="submit">Delete value</button>
+    <a href="{{ url }}/delete" class="govuk-button govuk-button--warning value-button">Delete value</a>
     {% endif %}
 
 </form>

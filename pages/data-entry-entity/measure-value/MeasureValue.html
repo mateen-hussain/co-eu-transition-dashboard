@@ -22,7 +22,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-    {% if successfulMode %}
+    {% if editSuccessMode %}
       {% include "data-entry-entity/measure-edit/partials/success.njk" %}
     {% elseif deleteSuccessMode %}
       {% include "data-entry-entity/measure-value/partials/delete-success.njk" %}
@@ -31,12 +31,12 @@
     {% else %}
 
       <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Edit measure value</h1>
-      <h3 class="govuk-heading-m">Measure name</h3>
+      <h3 class="govuk-heading-m">Measure name {{ measureId }}</h3>
 
       <p class="govuk-body govuk-!-font-weight-bold">Edit current value<p>
       <div class="data-entry">
-          {{ measureValue(url, formFields) }}
-      </div> 
+          {{ measureValue(url + "/" + measureId, formFields) }}
+      </div>
 
     {% endif  %}
 
