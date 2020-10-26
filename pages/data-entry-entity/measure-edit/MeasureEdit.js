@@ -469,33 +469,35 @@ class MeasureEdit extends Page {
     });
 
     raygEntities.forEach(raygEntity => {
+      const updatedRaygRow = {
+        publicId: raygEntity.publicId,
+        name: data.name,
+        additionalComment: data.additionalComment || ''
+      }
+
+      if (isOnlyMeasureInGroup) {
+        updatedRaygRow.groupDescription = data.name
+      }
+
       if(isCommentsOnlyMeasure) {
       // if comment only measure, make sure we update the overall rayg value
         updateMeasures.push({
-          publicId: raygEntity.publicId,
+          ...updatedRaygRow,
           value: data.groupValue,
-          name: data.name,
-          additionalComment: data.additionalComment || ''
         });
       } else if (isOnlyMeasureInGroup && doesNotHaveFilter) {
       // if a measure has NO filter values and is the only measure within a group, we want to update the threshold values
         updateMeasures.push({
-          publicId: raygEntity.publicId,
+          ...updatedRaygRow,
           redThreshold: data.redThreshold,
           aYThreshold: data.aYThreshold,
           greenThreshold: data.greenThreshold,
-          name: data.name,
-          groupDescription: data.name,
-          additionalComment: data.additionalComment || ''
         })
       } else if (data.groupValue && isOnlyMeasureInGroup) {
       // We want to update the RAYG value when an item is the only measure within a group which HAS filter values
         updateMeasures.push({
-          publicId: raygEntity.publicId,
+          ...updatedRaygRow,
           value: data.groupValue,
-          name: data.name,
-          groupDescription: data.name,
-          additionalComment: data.additionalComment || ''
         })
       }
     })

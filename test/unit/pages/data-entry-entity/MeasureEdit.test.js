@@ -822,7 +822,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       const formData = { name: 'test', additionalComment: 'comment', groupValue: 2, commentsOnly: "Yes"  };
       const response = await page.updateMeasureEntities(formData);
       const { groupValue, additionalComment, name } = formData;
-      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue, additionalComment, name }]);
+      expect(response).to.eql([{ publicId: 'id-test', value: groupValue, additionalComment, name }, { publicId: 'id-number-2', value: groupValue, additionalComment, name, groupDescription: name  }]);
     });
 
     it('should add RAGY to data when isOnlyMeasureInGroup and groupValue is in data', async () => {
