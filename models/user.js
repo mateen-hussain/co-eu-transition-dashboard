@@ -42,10 +42,12 @@ class User extends Model {
 
   async getPermittedMetricMap() {
     const userMetrics = await this.getUserMetrics();
-    let result = {};
-    userMetrics.forEach( userMetric => {
-      result[userMetric.metricId] = true;
-    });
+    const result = userMetrics.reduce( (acc,userMetric) => {
+        acc[userMetric.metricId] = true;
+        return acc;
+      },
+      {}
+    );
 
     return result;
   }
