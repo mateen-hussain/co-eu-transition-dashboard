@@ -125,7 +125,7 @@ class MeasureEdit extends Page {
       entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
     }
 
-		entities = await filterMetricsHelper.filterMetrics(this.req.user,entities);
+    entities = await filterMetricsHelper.filterMetrics(this.req.user,entities);
 
 
     const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
