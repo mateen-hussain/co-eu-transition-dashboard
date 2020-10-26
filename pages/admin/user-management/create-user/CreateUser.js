@@ -121,8 +121,13 @@ class CreateUser extends Page {
 
   async errorValidations({ email, roles, departments }) {
     let errors = []
-    // Check if user exists retun error
-    const userExists = await User.findOne({ where: { email } })
+    let userExists;
+    if (!email) {
+      errors.push({ text:'username cannot be empty', href: '#username' })
+    } else {
+      // Check if user exists
+      userExists = await User.findOne({ where: { email } })
+    }
     if (userExists) {
       errors.push({ text:'User name exists', href: '#username' })
     }
@@ -135,7 +140,6 @@ class CreateUser extends Page {
     return errors;
   }
 
-  //TODO: error validation
   //TODO: logger
   async postRequest(req, res) {
     const errors = await this.errorValidations({ ...req.body })
