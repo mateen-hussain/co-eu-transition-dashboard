@@ -17,6 +17,9 @@
 
 {% block pageTitle %}Edit Measure Value{% endblock %}
 
+{% set measure = getMeasureData() | await %}
+{% set latestMeasure = measure.latest %}
+
 {% block content %}
 
   <div class="govuk-grid-row">
