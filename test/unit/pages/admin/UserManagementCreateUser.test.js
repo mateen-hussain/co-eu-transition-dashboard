@@ -2,9 +2,10 @@ const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const authentication = require('services/authentication');
 const flash = require('middleware/flash');
+const Role = require('models/role');
+const Department = require('models/department');
 const config = require('config');
 const proxyquire = require('proxyquire');
-
 
 let page = {};
 
@@ -67,6 +68,57 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     });
   });
 
+  describe('#getRoles', ()=>{
+    const rolesDB= [{
+      dataValues:{
+        id:1, 
+        name: 't1'
+      } },{
+      dataValues:{
+        id:2, name: 't2'
+      } }];
+    const expectedRoles = [{
+      value:1,
+      text:'t1'
+    },{
+      value:2,
+      text: 't2'
+    }]
+    beforeEach(()=>{
+      Role.findAll = sinon.stub().returns(rolesDB);
+    })
+    it('return list of roles', async()=>{
+      const roles = await page.getRoles();
+      sinon.assert.called(Role.findAll)
+      expect(roles).to.deep.equal(expectedRoles)
+    })
+  })
+
+  describe('#getDepartments', ()=>{
+    const departmentsDb= [{
+      dataValues:{
+        name: 'd1'
+      } },{
+      dataValues:{
+        name: 'd2'
+      } }];
+    const expectedDepartments = [{
+      value:'d1',
+      text:'d1'
+    },{
+      value:'d2',
+      text: 'd2'
+    }]
+    beforeEach(()=>{
+      Department.findAll = sinon.stub().returns(departmentsDb);
+    })
+    it('return list of departments', async()=>{
+      const departments = await page.getDepartments();
+      sinon.assert.called(Department.findAll)
+      expect(departments).to.deep.equal(expectedDepartments)
+    })
+  })
+
   describe('#sendUserCreationEmailConfirmation', () => {
     const prevKey = config.notify.apiKey;
     beforeEach(() => {
@@ -119,7 +171,6 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
         expect(err.messages).to.deep.include.members([usernameEmptyError, rolesEmptyError, departmentsError])
 
       }
-      
     })
   })
 
