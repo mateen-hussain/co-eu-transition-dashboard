@@ -20,6 +20,8 @@
     }
   },
   "features": {
-    "missedMilestones": true
+    "twoFactorAuth": false,
+      "missedMilestones": true,
+      "transitionReadinessCache": false
   }
 }

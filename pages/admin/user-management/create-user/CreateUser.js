@@ -11,6 +11,8 @@ const User = require("models/user");
 const authentication = require('services/authentication');
 const NotifyClient = require('notifications-node-client').NotifyClient;
 
+const VALIDATION_ERROR_MESSSAGE = 'VALIDATION_ERROR'
+
 class CreateUser extends Page {
   get url() {
     return paths.admin.createUser
@@ -100,6 +102,7 @@ class CreateUser extends Page {
     }
   }
 
+  //TODO: Make this a service as similar method exists in UserManagementAuthentication
   async sendUserCreationEmailConfirmation(user, passphrase) {
     if (notify.apiKey) {
       const notifyClient = new NotifyClient(notify.apiKey);
@@ -120,37 +123,44 @@ class CreateUser extends Page {
   }
 
   async errorValidations({ email, roles, departments }) {
-    let errors = []
+    let error = new Error(VALIDATION_ERROR_MESSSAGE)
+    error.messages = [];
     let userExists;
     if (!email) {
-      errors.push({ text:'username cannot be empty', href: '#username' })
+      error.messages.push({ text:'username cannot be empty', href: '#username' })
     } else {
       // Check if user exists
       userExists = await User.findOne({ where: { email } })
     }
     if (userExists) {
-      errors.push({ text:'User name exists', href: '#username' })
+      error.messages.push({ text:'User name exists', href: '#username' })
     }
     if (!roles) {
-      errors.push({ text:'Roles cannot be empty', href: '#roles' })
+      error.messages.push({ text:'Roles cannot be empty', href: '#roles' })
     }
     if(!departments) {
-      errors.push({ text:'Departments cannot be empty', href: '#departments' })
+      error.messages.push({ text:'Departments cannot be empty', href: '#departments' })
     }
-    return errors;
+    if (error.messages.length > 0) {
+      throw error
+    } 
   }
 
   //TODO: logger
   async postRequest(req, res) {
-    const errors = await this.errorValidations({ ...req.body })
-    if (errors.length > 0) {
-      req.flash(errors)
-      return res.redirect(`${this.req.originalUrl}`);
+    try{
+      await this.errorValidations({ ...req.body })
+      const user = await this.createUser({ ...req.body })
+      await this.sendUserCreationEmailConfirmation(user.user, user.passphrase)
+      return res.redirect(`${this.req.originalUrl}/success`);
+    } catch (error) {
+      if (error.message && error.message === VALIDATION_ERROR_MESSSAGE) {
+        req.flash(error.messages)  
+      } else {
+        req.flash(error.message);
+      }
+      return res.redirect(this.req.originalUrl);
     }
-
-    const user = await this.createUser({ ...req.body })
-    await this.sendUserCreationEmailConfirmation(user.user, user.passphrase)
-    return res.redirect(`${this.req.originalUrl}/success`);
   }
 }
 
