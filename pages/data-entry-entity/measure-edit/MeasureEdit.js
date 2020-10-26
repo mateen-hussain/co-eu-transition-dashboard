@@ -283,12 +283,18 @@ class MeasureEdit extends Page {
     const isCommentsOnlyMeasure = measuresEntities[measuresEntities.length - 1].commentsOnly;
     const displayOverallRaygDropdown = isCommentsOnlyMeasure || (doesHaveFilter && isOnlyMeasureInGroup);
 
+    // measuresEntities are already sorted by date, so the last entry is the newest
+    const latestDate = measuresEntities[measuresEntities.length -1].date;
+    const isLatestDateInTheFuture =  moment(latestDate, 'YYYY-MM-DD').isAfter(moment());
+    const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateInTheFuture
+
     return {
       latest: measuresEntities[measuresEntities.length - 1],
       grouped: groupedMeasureEntities,
       fields: uiInputs,
       raygEntity: raygEntities[0],
       displayOverallRaygDropdown,
+      displayRaygValueCheckbox,
       uniqMetricIds
     }
   }
@@ -553,8 +559,9 @@ class MeasureEdit extends Page {
     const latestDate = measuresEntities[measuresEntities.length -1].date;
     const newDate = buildDateString(formData)
     const isDateNewer =  moment(newDate, 'YYYY-MM-DD').isAfter(moment(latestDate, 'DD/MM/YYYY'));
+    const { updateRAYG } = formData;
 
-    if (isOnlyMeasureInGroup && doesNotHaveFilter && isDateNewer) {
+    if (isOnlyMeasureInGroup && doesNotHaveFilter && (isDateNewer || updateRAYG == 'true')) {
       const { value } = newEntities[0];
       // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
       raygEntities.forEach(raygEntity => {
