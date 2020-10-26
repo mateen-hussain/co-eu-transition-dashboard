@@ -69,13 +69,19 @@ class MeasureEdit extends Page {
   get middleware() {
     return [
       ...authentication.protect(['uploader']),
-      flash,
-      entityUserPermissions.assignEntityIdsUserCanAccessToLocals
+      flash
     ];
   }
 
+  async canUserAccessMetric() {
+    const metricsUserCanAccess = await this.req.user.getPermittedMetricMap();
+    return Object.keys(metricsUserCanAccess).includes(this.req.params.metricId)
+  }
+
   async getRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+    const canUserAccessMetric = await this.canUserAccessMetric();
+
+    if(!this.req.user.isAdmin && !canUserAccessMetric) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
@@ -84,12 +90,6 @@ class MeasureEdit extends Page {
 
   async getGroupEntities(measureCategory, themeCategory) {
     const where = { categoryId: measureCategory.id };
-    const userIsAdmin = this.req.user.isAdmin;
-
-    if(!userIsAdmin) {
-      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
-      where.id = { [Op.in]: entityIdsUserCanAccess };
-    }
 
     let entities = await Entity.findAll({
       where,
@@ -305,17 +305,6 @@ class MeasureEdit extends Page {
 
   async getEntitiesToBeCloned(entityIds) {
     const where = { id: entityIds }
-    const userIsAdmin = this.req.user.isAdmin;
-
-    if (!userIsAdmin) {
-      const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
-      const cansUserAccessAllRequiredEntities = entityIds.every(id => entityIdsUserCanAccess.includes(id));
-
-      if (!cansUserAccessAllRequiredEntities) {
-        logger.error(`Permissions error , user does not have access to all entities`);
-        throw new Error(`Permissions error, user does not have access to all entities`);
-      }
-    }
 
     const entities = await Entity.findAll({
       where,
@@ -426,7 +415,9 @@ class MeasureEdit extends Page {
   }
 
   async postRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
+    const canUserAccessMetric = await this.canUserAccessMetric();
+
+    if(!this.req.user.isAdmin && !canUserAccessMetric) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 

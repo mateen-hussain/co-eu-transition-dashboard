@@ -11,7 +11,6 @@ const Category = require('models/category');
 const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
-const { Op } = require('sequelize');
 const flash = require('middleware/flash');
 const parse = require('helpers/parse');
 const validation = require('helpers/validation');
@@ -96,8 +95,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
         ...authentication.protect(['uploader']),
-        flash,
-        entityUserPermissions.assignEntityIdsUserCanAccessToLocals
+        flash
       ]);
 
       sinon.assert.calledWith(authentication.protect, ['uploader']);
@@ -234,58 +232,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledWith(Entity.findAll, {
         where: { categoryId: category.id },
-        include: [{
-          model: EntityFieldEntry,
-          where: { value: req.params.groupId },
-          include: {
-            model: CategoryField,
-            where: { name: 'groupId' },
-          }
-        },{
-          model: Entity,
-          as: 'parents',
-          include: [{
-            model: Category
-          }, {
-            model: Entity,
-            as: 'parents',
-            include: [{
-              separate: true,
-              model: EntityFieldEntry,
-              include: CategoryField
-            }, {
-              model: Category
-            }]
-          }]
-        }]
-      });
-    });
-
-    it('gets entities for a given category if not admin', async () => {
-      page.res.locals.entitiesUserCanAccess = [{
-        id: 10
-      }];
-
-      const response = await page.getGroupEntities(category, theme);
-      expect(response).to.eql({ 
-        groupEntities: [{
-          id: 'some-id',
-          parentPublicId: 'parent-1',
-          publicId: 'some-public-id-1',
-          colour: 'green',
-          theme: 'borders',
-          test: 'new value',
-        }],
-        raygEntities: []
-      });
-
-      sinon.assert.calledWith(Entity.findAll, {
-        where: {
-          categoryId: category.id,
-          id: {
-            [Op.in]: [10]
-          }
-        },
         include: [{
           model: EntityFieldEntry,
           where: { value: req.params.groupId },
@@ -556,20 +502,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         }]
       });
     });
-
-    it('throw error when non-admin doesnt have correct access to all entities', async () => {
-      page.res.locals.entitiesUserCanAccess = [{ id: 123 }];
-      const entityIds = [123, 456]
-
-      let error = {};
-      try {
-        await page.getEntitiesToBeCloned(entityIds);
-      } catch (err) {
-        error = err.message;
-      }
-
-      expect(error).to.eql('Permissions error, user does not have access to all entities');
-    });
   });
 
   describe('#createEntitiesFromClonedData', () => {
@@ -723,7 +655,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should call addMeasureEntityData when type is add', async () => {
       page.req.params = { metricId: '123', successful: 'successful', type: "add" };
-      req.user = { isAdmin: true }
+      req.user = { isAdmin: true, getPermittedMetricMap: sinon.stub().returns({}) }
 
       await page.postRequest(req, res);
 
@@ -732,7 +664,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should call addMeasureEntityData when type is edit', async () => {
       page.req.params = { metricId: '123', successful: 'successful', type: "edit" };
-      req.user = { isAdmin: true }
+      req.user = { isAdmin: true, getPermittedMetricMap: sinon.stub().returns({}) }
 
       await page.postRequest(req, res);
 
@@ -740,7 +672,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('should call redirect if no error and not add or Edit Measure', async () => {
-      req.user = { isAdmin: true }
+      req.user = { isAdmin: true, getPermittedMetricMap: sinon.stub().returns({}) }
       page.req.params = { metricId: '123', type: "other" };
 
       await page.postRequest(req, res);
