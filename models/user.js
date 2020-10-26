@@ -10,6 +10,7 @@ const Department = require('./department');
 const DepartmentUser = require('./departmentUser');
 const Role = require('./role');
 const UserRole = require('./userRole');
+const UserMetric = require('./userMetric');
 const moment = require('moment');
 const DAO = require('services/dao');
 const Entity = require('./entity');
@@ -37,6 +38,16 @@ class User extends Model {
     });
 
     return projects;
+  }
+
+  async getPermittedMetricMap() {
+    const userMetrics = await this.getUserMetrics();
+    let result = {};
+    userMetrics.forEach( userMetric => {
+      result[userMetric.metricId] = true;
+    });
+
+    return result;
   }
 
   async getDepartmentsWithProjects (search) {
@@ -193,5 +204,7 @@ User.belongsToMany(Role, { through: UserRole, foreignKey: 'userId' });
 
 User.belongsToMany(Entity, { through: EntityUser, foreignKey: 'userId' });
 Entity.belongsToMany(User, { through: EntityUser, foreignKey: 'entityId' });
+
+User.hasMany(UserMetric, { as: "userMetrics", foreignKey: 'userId' });
 
 module.exports = User;

@@ -9,6 +9,7 @@ const logger = require('services/logger');
 const CategoryField = require('models/categoryField');
 const flash = require('middleware/flash');
 const sequelize = require('services/sequelize');
+const { filterMetrics } = require('helpers/filterMetrics');
 
 class MeasureGroup extends Page {
   get url() {
@@ -158,6 +159,8 @@ class MeasureGroup extends Page {
     for (const entity of entities) {
       entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
     }
+
+    entities = await filterMetrics(this.req.user,entities);
 
     const measureEntitiesMapped = entities.map(entity => {
       const entityMapped = {

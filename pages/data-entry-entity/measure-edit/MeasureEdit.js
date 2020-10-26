@@ -16,6 +16,7 @@ const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
 const validation = require('helpers/validation');
 const parse = require('helpers/parse');
+const { filterMetrics } = require('helpers/filterMetrics');
 const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
@@ -90,7 +91,7 @@ class MeasureEdit extends Page {
       where.id = { [Op.in]: entityIdsUserCanAccess };
     }
 
-    const entities = await Entity.findAll({
+    let entities = await Entity.findAll({
       where,
       include: [{
         model: EntityFieldEntry,
@@ -123,6 +124,9 @@ class MeasureEdit extends Page {
     for (const entity of entities) {
       entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
     }
+
+		entities = await filterMetrics(this.req.user,entities);
+
 
     const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
 
