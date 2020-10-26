@@ -259,11 +259,8 @@ class MeasureEdit extends Page {
   }
 
   calculateUiInputs(measureEntities) {
-    const lastestEntitiyEntry = measureEntities[measureEntities.length - 1];
-    const filterdEntities = measureEntities.filter(measure => measure.date === lastestEntitiyEntry.date);
-
     return uniqWith(
-      filterdEntities,
+      measureEntities,
       (locationA, locationB) => {
         if (locationA.filter && locationA.filter2) {
           return locationA.filterValue === locationB.filterValue && locationA.filterValue2 === locationB.filterValue2
@@ -369,7 +366,6 @@ class MeasureEdit extends Page {
   }
 
   async validateFormData(formData, measuresEntities = []) {
-    const uiInputs = this.calculateUiInputs(measuresEntities)
     const errors = [];
 
     if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
@@ -387,14 +383,7 @@ class MeasureEdit extends Page {
     }
 
     if (formData.entities) {
-      // Check the number of submitted entities matches the expected number
       const submittedEntityId = Object.keys(formData.entities);
-
-      const haveAllEntitesBeenSubmitted = uiInputs.every(entity => submittedEntityId.includes(entity.id.toString()));
-
-      if (!haveAllEntitesBeenSubmitted) {
-        errors.push("Missing entity values");
-      }
 
       submittedEntityId.forEach(entityId => {
         const entityValue = formData.entities[entityId]
@@ -402,7 +391,11 @@ class MeasureEdit extends Page {
           errors.push("Invalid field value");
         }
       })
-    }
+
+      if (Object.keys(formData.entities).length === 0) {
+        errors.push("You must submit at least one value");
+      }
+    } 
 
     return errors;
   }
@@ -581,8 +574,20 @@ class MeasureEdit extends Page {
     return newEntities
   }
 
+  removeBlankEntityInputValues (entityInputs) {
+    return Object.keys(entityInputs).reduce((acc, entityId) => {
+      const value = entityInputs[entityId]
+      if (value && !isNaN(value)) {
+        acc[entityId] = value
+      }
+      return acc;
+    }, {} )
+  }
+
   async addMeasureEntityData (formData) {
     const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
+
+    formData.entities = this.removeBlankEntityInputValues(formData.entities);
     
     const formValidationErrors = await this.validateFormData(formData, measuresEntities);
     if (formValidationErrors.length > 0) {
