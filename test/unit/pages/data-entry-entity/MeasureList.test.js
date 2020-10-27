@@ -3,13 +3,11 @@ const { paths } = require('config');
 const config = require('config');
 const MeasureList = require('pages/data-entry-entity/measure-list/MeasureList');
 const authentication = require('services/authentication');
-const entityUserPermissions = require('middleware/entityUserPermissions');
-const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const CategoryField = require('models/categoryField');
-const { Op } = require('sequelize');
+const filterMetrics = require('helpers/filterMetrics');
 
 let page = {};
 let res = {};
@@ -19,18 +17,18 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
   beforeEach(() => {
 
     res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
-    req = { cookies: [], query: { category: 'category' }, user: { roles: [] } };
+    req = { cookies: [], query: { category: 'category' }, user: { roles: [], getPermittedMetricMap: sinon.stub().returns({}) } };
     res.status.returns(res);
 
     page = new MeasureList('some path', req, res);
 
     sinon.stub(authentication, 'protect').returns([]);
-    sinon.stub(entityUserPermissions, 'assignEntityIdsUserCanAccessToLocals');
+    sinon.stub(filterMetrics,'filterMetrics').returnsArg(1);
   });
 
   afterEach(() => {
     authentication.protect.restore();
-    entityUserPermissions.assignEntityIdsUserCanAccessToLocals.restore();
+    filterMetrics.filterMetrics.restore();
   });
 
   describe('#url', () => {
@@ -42,22 +40,10 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader']),
-        entityUserPermissions.assignEntityIdsUserCanAccessToLocals
+        ...authentication.protect(['uploader'])
       ]);
 
       sinon.assert.calledWith(authentication.protect, ['uploader']);
-    });
-  });
-
-  describe('#getRequest', () => {
-    it('responeds with metho not allowed if not admin and no entitiesUserCanAccess', async () => {
-      page.res.locals.entitiesUserCanAccess = [];
-
-      await page.getRequest(req, res);
-
-      sinon.assert.calledWith(res.status, METHOD_NOT_ALLOWED);
-      sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
     });
   });
 
@@ -130,6 +116,7 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
 
     it('gets entities for a given category if admin', async () => {
       page.req.user.roles.push({ name: 'admin' });
+      page.req.user.isAdmin = true;
 
       const response = await page.getMeasureEntities(category, category);
       expect(response).to.eql([{
@@ -147,56 +134,6 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
 
       sinon.assert.calledWith(Entity.findAll, {
         where: { categoryId: category.id },
-        include: [{
-          separate: true,
-          model: EntityFieldEntry,
-          include: CategoryField
-        },{
-          model: Entity,
-          as: 'parents',
-          include: [{
-            model: Category
-          }, {
-            model: Entity,
-            as: 'parents',
-            include: [{
-              separate: true,
-              model: EntityFieldEntry,
-              include: CategoryField
-            }, {
-              model: Category
-            }]
-          }]
-        }]
-      });
-    });
-
-    it('gets entities for a given category if not admin', async () => {
-      page.res.locals.entitiesUserCanAccess = [{
-        id: 10
-      }];
-
-      const response = await page.getMeasureEntities(category, category);
-      expect(response).to.eql([{
-        id: "some-id",
-        name: "some name",
-        publicId: "some-public-id-1",
-        theme: "theme name"
-      },{
-        filter: "RAYG",
-        id: "some-id",
-        name: "some name",
-        publicId: "some-public-id-2",
-        theme: "theme name"
-      }]);
-
-      sinon.assert.calledWith(Entity.findAll, {
-        where: {
-          categoryId: category.id,
-          id: {
-            [Op.in]: [10]
-          }
-        },
         include: [{
           separate: true,
           model: EntityFieldEntry,
@@ -340,6 +277,6 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
       });
 
       expect(MeasureList.isEnabled).to.not.be.ok;
-    })
-  })
+    });
+  });
 });

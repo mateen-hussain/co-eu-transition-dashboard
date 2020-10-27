@@ -1,6 +1,6 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 
-{% macro measureValue(url, formFields) %}
+{% macro measureValue(url, formFields, showRaygCheckbox) %}
 <form action="{{ url }}" method="post">
     <input type="hidden" name="type" value="entries" />
 
@@ -33,6 +33,20 @@
         </tr>
         {% endfor %}
     </table>
+
+    {% if showRaygCheckbox %}
+      {{ govukCheckboxes({
+        idPrefix: "updateRAYG",
+        name: "updateRAYG",
+        items: [
+          {
+            value: true,
+            text: "Measure contains date(s) in the future, select this checkbox to update the overall RAYG value",
+            checked: true if data.updateRAYG
+          }
+        ]
+      }) }}
+    {% endif %}
 
     {% if 'edit-measure' in url %}
     <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>

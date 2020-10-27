@@ -2,15 +2,14 @@
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const authentication = require('services/authentication');
-const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
 const CategoryField = require('models/categoryField');
-const entityUserPermissions = require('middleware/entityUserPermissions');
 const flash = require('middleware/flash');
 const sequelize = require('services/sequelize');
+const filterMetricsHelper = require('helpers/filterMetrics');
 
 class MeasureGroup extends Page {
   get url() {
@@ -18,13 +17,12 @@ class MeasureGroup extends Page {
   }
 
   get pathToBind() {
-    return `${this.url}/:entityPublicId/:successful(successful)?`;
+    return `${this.url}/:groupId/:successful(successful)?`;
   }
 
   get middleware() {
     return [
       ...authentication.protect(['uploader']),
-      entityUserPermissions.assignEntityIdsUserCanAccessToLocals,
       flash
     ];
   }
@@ -34,23 +32,11 @@ class MeasureGroup extends Page {
   }
 
   get editUrl() {
-    return `${this.url}/${this.req.params.entityPublicId}`;
+    return `${this.url}/${this.req.params.groupId}`;
   }
 
   get getSuccessUrl() {
-    return `${this.url}/${this.req.params.entityPublicId}/successful`;
-  }
-
-  async handler(req, res) {
-    const isAdmin = req.user.isAdmin;
-    const entityPublicIdsUserCanAccess = res.locals.entitiesUserCanAccess.map(entity => entity.publicId);
-    const canAccessEntity = entityPublicIdsUserCanAccess.includes(req.params.entityPublicId);
-
-    if(!isAdmin && !canAccessEntity) {
-      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
-    }
-
-    super.handler(req, res);
+    return `${this.url}/${this.req.params.groupId}/successful`;
   }
 
   async getRequest(req, res) {
@@ -88,30 +74,39 @@ class MeasureGroup extends Page {
     return category;
   }
 
-  async updateGroup(data) {
-    const measureCategory = await this.getCategory('Measure');
-    const categoryFields = await Category.fieldDefinitions('Measure');
-    const measureEntity = await this.getMeasure();
-    if(!measureEntity) {
+  async getGroup() {
+    const groups = await this.getGroupEntities();
+
+    if(!groups.length) {
       throw new Error('Could not find measure');
     }
 
-    if(measureEntity.error) {
-      throw new Error(measureEntity.error);
+    return groups[0];
+  }
+
+  async updateGroup(data) {
+    const measureCategory = await this.getCategory('Measure');
+    const categoryFields = await Category.fieldDefinitions('Measure');
+    const groups = await this.getGroupEntities();
+
+    if(!groups.length) {
+      throw new Error('Could not find group');
     }
 
-    const measureToSave = Object.assign({}, measureEntity, {
-      groupDescription: data.groupDescription,
-      value: data.value
-    });
+    for (const group of groups) {
+      const measureToSave = Object.assign({}, group, {
+        groupDescription: data.groupDescription,
+        value: data.value
+      });
 
-    const transaction = await sequelize.transaction();
-    try {
-      await Entity.import(measureToSave, measureCategory, categoryFields, { transaction, ignoreParents: true });
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
+      const transaction = await sequelize.transaction();
+      try {
+        await Entity.import(measureToSave, measureCategory, categoryFields, { transaction, ignoreParents: true });
+        await transaction.commit();
+      } catch (error) {
+        await transaction.rollback();
+        throw error;
+      }
     }
   }
 
@@ -149,41 +144,54 @@ class MeasureGroup extends Page {
     return entityMapped;
   }
 
-  async getMeasure() {
-    const measureEntity = await Entity.findOne({
-      where: {
-        publicId: this.req.params.entityPublicId
-      },
+  async getGroupEntities() {
+    let entities = await Entity.findAll({
       include: [{
-        separate: true,
         model: EntityFieldEntry,
-        include: CategoryField
+        where: { value: this.req.params.groupId },
+        include: {
+          model: CategoryField,
+          where: { name: 'groupId' },
+        }
       }]
     });
 
-    if(!measureEntity) {
-      return {
-        error: 'Could not find measure'
-      };
+    for (const entity of entities) {
+      entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
     }
 
-    const measureMapped = {
-      id: measureEntity.id,
-      publicId: measureEntity.publicId
-    };
+    entities = await filterMetricsHelper.filterMetrics(this.req.user,entities);
 
-    measureEntity.entityFieldEntries.map(entityfieldEntry => {
-      measureMapped[entityfieldEntry.categoryField.name] = entityfieldEntry.value;
+    const measureEntitiesMapped = entities.map(entity => {
+      const entityMapped = {
+        id: entity.id,
+        publicId: entity.publicId
+      };
+
+      entity.entityFieldEntries.map(entityfieldEntry => {
+        entityMapped[entityfieldEntry.categoryField.name] = entityfieldEntry.value;
+      });
+
+      return entityMapped;
     });
 
-    if(measureMapped.filter !== "RAYG") {
-      return {
-        error: 'This is not a group'
-      };
+    return measureEntitiesMapped.filter(entity => entity.filter === 'RAYG');
+  }
+
+  async getEntityFields(entityId) {
+    const entityFieldEntries = await EntityFieldEntry.findAll({
+      where: { entity_id: entityId },
+      include: CategoryField
+    });
+
+    if (!entityFieldEntries) {
+      logger.error(`EntityFieldEntry export, error finding entityFieldEntries`);
+      throw new Error(`EntityFieldEntry export, error finding entityFieldEntries`);
     }
 
-    return measureMapped;
+    return entityFieldEntries;
   }
+
 }
 
 module.exports = MeasureGroup;
