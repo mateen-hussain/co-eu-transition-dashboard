@@ -240,7 +240,7 @@ describe('pages/data-entry-entity/entity-import/EntityImport', () => {
 
       await page.finaliseImport();
 
-      sinon.assert.calledWith(page.req.flash, 'Failed to import data');
+      sinon.assert.calledWith(page.req.flash, 'Failed to import data: some error');
       sinon.assert.calledWith(page.res.redirect, config.paths.dataEntryEntity.import);
     });
 

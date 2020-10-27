@@ -39,13 +39,12 @@ class Entity extends Model {
     const parentPublicFields = entityFields.filter(field => field.isParentField);
 
     if(!options.ignoreParents) {
-      await EntityParent.destroy({
-        where: {
-          entityId: entity.id
-        }
+      let currentParents = await EntityParent.findAll({
+        where: { entityId: entity.id }
       }, options);
 
       for(const parentPublicField of parentPublicFields) {
+
         if(entity[parentPublicField.name]) {
           const parent = await this.findOne({
             where: {
@@ -53,17 +52,36 @@ class Entity extends Model {
             }
           }, options);
 
-          // currently no way to support multiple parents through excel import to remove previous parent
-          if (parent) {
+          if(!parent) {
+            // this should not happen as its validated in a previous step.
+            throw new Error(`Parent ${entity[parentPublicField.name]} was not found in the database for ${entity.publicId}`);
+          }
+
+          const currentParent = currentParents.find(currentParent => currentParent.parentEntityId === parent.id);
+          if (!currentParent) {
+            // currently no way to support multiple parents through excel import to remove previous parent
             await EntityParent.create({
               entityId: entity.id,
               parentEntityId: parent.id
             }, options);
+
           } else {
-            // this should not happen as its validated in a previous step.
-            throw new Error(`Parent ${entity[parentPublicField.name]} was not found in the database`);
+            // remove current parents from array
+            currentParents = currentParents.filter(currentParent => currentParent.parentEntityId !== parent.id);
           }
+        } else if (parentPublicField.isRequired) {
+          throw new Error(`No ${parentPublicField.displayName} found for ${entity.publicId}`);
         }
+      }
+
+      for (const currentParent of currentParents) {
+        // remove any parents that are not needed
+        await EntityParent.destroy({
+          where: {
+            entityId: currentParent.entityId,
+            parentEntityId: currentParent.parentEntityId
+          }
+        }, options);
       }
     }
 

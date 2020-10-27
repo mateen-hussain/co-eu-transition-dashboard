@@ -88,13 +88,23 @@ describe('models/entity', () => {
       const options = { someoption: 1 };
       const entityFields = [{ name: 'parentPublicId', isParentField: true }];
       const category = { id: 'some-category-id' };
+      const parents = [{
+        entityId: 1,
+        parentEntityId: 1
+      }];
 
+      EntityParent.findAll.returns(parents);
       Entity.create.returns({ id: 'some-id' });
       Entity.findOne.returns({ id: 'some-parent-id' });
 
       await Entity.import(entity, category, entityFields, options);
 
-      sinon.assert.calledWith(EntityParent.destroy, { where: { entityId: 'some-id' } }, options);
+      sinon.assert.calledWith(EntityParent.destroy, {
+        where: {
+          entityId: 1,
+          parentEntityId: 1
+        }
+      }, options);
       sinon.assert.calledWith(EntityParent.create, { entityId: 'some-id', parentEntityId: 'some-parent-id' }, options);
 
       sinon.assert.calledWith(Entity.importFieldEntries, { publicId: 'some-public-new-id', id: 'some-id', parentPublicId: 'some-parent-id' }, entityFields, options);
@@ -116,7 +126,7 @@ describe('models/entity', () => {
         error = err.message;
       }
 
-      expect(error).to.eql('Parent some-parent-id was not found in the database');
+      expect(error).to.eql('Parent some-parent-id was not found in the database for some-public-new-id');
     });
   });
 

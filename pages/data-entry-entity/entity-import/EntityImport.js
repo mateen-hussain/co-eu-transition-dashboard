@@ -15,6 +15,7 @@ const Category = require('models/category');
 const { Op } = require('sequelize');
 const moment = require('moment');
 const entityUserPermissions = require('middleware/entityUserPermissions');
+const get = require('lodash/get');
 
 class EntityImport extends Page {
   static get isEnabled() {
@@ -164,8 +165,9 @@ class EntityImport extends Page {
       await this.import(activeImport.category, entities);
       await this.removeTemporaryBulkImport(importId);
     } catch (error) {
+      console.log(error);
       logger.error(error);
-      this.req.flash('Failed to import data');
+      this.req.flash(`Failed to import data: ${ get(error, 'errors[0].message') || get(error, 'message') || error}`);
       return this.res.redirect(this.url);
     }
     return this.res.redirect(config.paths.dataEntryEntity.submissionSuccess);
