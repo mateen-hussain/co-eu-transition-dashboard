@@ -202,7 +202,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
       try{
         await page.errorValidations({ email:null, roles:null, departments:null })
       } catch (err) {
-        const usernameEmptyError = { text:'username cannot be empty', href: '#username' }
+        const usernameEmptyError = { text:'Email cannot be empty', href: '#username' }
         const rolesEmptyError = { text:'Roles cannot be empty', href: '#roles' }
         const departmentsError = { text:'Departments cannot be empty', href: '#departments' }
         expect(err.message).to.be.equal('VALIDATION_ERROR')
@@ -210,12 +210,12 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
 
       }
     })
-    it('throws username exists', async()=>{
+    it('throws email exists', async()=>{
       try{
         User.findOne = sinon.stub().returns({ id:1 })
         await page.errorValidations({ email:'some@email', roles:'1', departments:'BIS' })
       } catch (err) {
-        const userExistsError = { text:'Username exists', href: '#username' }
+        const userExistsError = { text:'Email exists', href: '#username' }
         expect(err.message).to.be.equal('VALIDATION_ERROR')
         expect(err.messages).to.deep.include.members([userExistsError])
       }
@@ -247,7 +247,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     });
     
     it('redirects to original url if error and sets error to flash', async () => {
-      const expectedErrors = [{ href: "#username", text: "username cannot be empty" }, { href: "#roles", text: "Roles cannot be empty" }, { href: "#departments", text: "Departments cannot be empty" }]
+      const expectedErrors = [{ href: "#username", text: "Email cannot be empty" }, { href: "#roles", text: "Roles cannot be empty" }, { href: "#departments", text: "Departments cannot be empty" }]
     
       await page.postRequest(page.req, page.res);
     

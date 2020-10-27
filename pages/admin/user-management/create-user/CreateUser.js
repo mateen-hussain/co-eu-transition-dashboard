@@ -74,8 +74,8 @@ class CreateUser extends Page {
         }))) : rolesToInsert.push({
         userId: user.id,
         roleId: roles
-      })
-      await UserRole.bulkCreate(rolesToInsert, { transaction: t })
+      });
+      await UserRole.bulkCreate(rolesToInsert, { transaction: t });
       
       //departments can be a string or array based on selection count
       Array.isArray(departments) ?(
@@ -87,10 +87,10 @@ class CreateUser extends Page {
         ))) : (departmentsToInsert.push({
         userId: user.id,
         departmentName: departments
-      }))
-      await DepartmentUser.bulkCreate(departmentsToInsert, { transaction: t })
+      }));
+      await DepartmentUser.bulkCreate(departmentsToInsert, { transaction: t });
 
-      await t.commit()
+      await t.commit();
       logger.info(`User ${user.email} created`);
 
       return {
@@ -132,34 +132,34 @@ class CreateUser extends Page {
     error.messages = [];
     let userExists;
     if (!email) {
-      error.messages.push({ text:'username cannot be empty', href: '#username' })
+      error.messages.push({ text:'Email cannot be empty', href: '#username' });
     } else {
       // Check if user exists
-      userExists = await User.findOne({ where: { email } })
+      userExists = await User.findOne({ where: { email } });
     }
     if (userExists) {
-      error.messages.push({ text:'Username exists', href: '#username' })
+      error.messages.push({ text:'Email exists', href: '#username' });
     }
     if (!roles) {
-      error.messages.push({ text:'Roles cannot be empty', href: '#roles' })
+      error.messages.push({ text:'Roles cannot be empty', href: '#roles' });
     }
     if(!departments) {
-      error.messages.push({ text:'Departments cannot be empty', href: '#departments' })
+      error.messages.push({ text:'Departments cannot be empty', href: '#departments' });
     }
     if (error.messages.length > 0) {
-      throw error
+      throw error;
     } 
   }
 
   async postRequest(req, res) {
     try{
-      await this.errorValidations({ ...req.body })
-      const user = await this.createUser({ ...req.body })
-      await this.sendUserCreationEmailConfirmation(user.user, user.passphrase)
+      await this.errorValidations({ ...req.body });
+      const user = await this.createUser({ ...req.body });
+      await this.sendUserCreationEmailConfirmation(user.user, user.passphrase);
       return res.redirect(`${this.req.originalUrl}/success`);
     } catch (error) {
       if (error.message && error.message === VALIDATION_ERROR_MESSSAGE) {
-        req.flash(error.messages)  
+        req.flash(error.messages);
       } else {
         req.flash(error.message);
       }

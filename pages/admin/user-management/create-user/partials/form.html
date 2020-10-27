@@ -4,7 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 
 {% block content %}
-    <h1 class="govuk-heading-l">Create User</h1>
+    <h1 class="govuk-heading-l">Create new user</h1>
     {% if flash %}
         {{ govukErrorSummary({
             titleText: "There is a problem",
@@ -15,10 +15,10 @@
         {{
             govukInput({
                 label: {
-                html: "<strong>Username</strong>"
+                    html: "<strong>Email</strong>"
                 },
                 hint: {
-                    text: "Username should be a valid email"
+                    text: "Use valid email address"
                 },
                 classes: "govuk-input--width-20",
                 id: "username",
@@ -33,9 +33,7 @@
                 classes: "govuk-checkboxes--small",
                 fieldset: {
                     legend: {
-                        text: "Select your roles",
-                        isPageHeading: false,
-                        classes: "govuk-fieldset__legend--m"
+                        html: "<strong>Select roles</strong>"
                     }
                 },
                 hint: {
@@ -52,9 +50,7 @@
                 classes: "govuk-checkboxes--small",
                 fieldset: {
                     legend: {
-                    text: "Select departments that you belong to",
-                    isPageHeading: false,
-                    classes: "govuk-fieldset__legend--m"
+                        html: "<strong>Select departments</strong>"
                     }
                 },
                 hint: {
