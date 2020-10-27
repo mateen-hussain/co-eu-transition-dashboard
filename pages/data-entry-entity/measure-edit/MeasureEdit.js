@@ -18,7 +18,7 @@ const filterMetricsHelper = require('helpers/filterMetrics');
 const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
-const uniqWith = require('lodash/uniqWith');
+
 const uniq = require('lodash/uniq');
 
 const measures = require('helpers/measures')
@@ -225,26 +225,13 @@ class MeasureEdit extends Page {
     return groupedEntityData;
   }
 
-  calculateUiInputs(measureEntities) {
-    return uniqWith(
-      measureEntities,
-      (locationA, locationB) => {
-        if (locationA.filter && locationA.filter2) {
-          return locationA.filterValue === locationB.filterValue && locationA.filterValue2 === locationB.filterValue2
-        } else if (locationA.filter) {
-          return locationA.filterValue === locationB.filterValue
-        } else {
-          return locationA.metricID
-        }
-      }
-    );
-  }
+  
 
   async getMeasureData() {
     const { measuresEntities, raygEntities, uniqMetricIds }  = await this.getMeasure();
-    this.applyLabelToEntities(measuresEntities)
+    measures.applyLabelToEntities(measuresEntities)
     const groupedMeasureEntities = groupBy(measuresEntities, measure => measure.date);
-    const uiInputs = this.calculateUiInputs(measuresEntities);
+    const uiInputs = measures.calculateUiInputs(measuresEntities);
 
     const doesHaveFilter = measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;

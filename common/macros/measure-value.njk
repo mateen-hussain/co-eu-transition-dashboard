@@ -1,11 +1,29 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
-{% macro measureValue(url, formFields, showRaygCheckbox) %}
+{% macro measureValue(url, formFields, data, showRaygCheckbox) %}
 <form action="{{ url }}" method="post">
     <input type="hidden" name="type" value="entries" />
 
     {{ govukDateInput({
-    name: "field-date"
+      name: "field-date",
+      items: [
+        {
+          classes: "govuk-input--width-2",
+          name: "day",
+          value: measureValues.date[0]
+        },
+        {
+          classes: "govuk-input--width-2",
+          name: "month",
+          value: measureValues.date[1]
+        },
+        {
+          classes: "govuk-input--width-4",
+          name: "year",
+          value: measureValues.date[2]
+        }
+      ]
     }) }}
 
     <table class="current-value">

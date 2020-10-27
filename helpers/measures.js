@@ -1,12 +1,9 @@
-const authentication = require('services/authentication');
-const { METHOD_NOT_ALLOWED } = require('http-status-codes');
-const entityUserPermissions = require('middleware/entityUserPermissions');
-const moment = require('moment');
+
 const Category = require('models/category');
-const Entity = require('models/entity');
 const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
+const uniqWith = require('lodash/uniqWith');
 
 const applyLabelToEntities = (entities) => {
   entities.forEach(entity => {
@@ -18,6 +15,21 @@ const applyLabelToEntities = (entities) => {
       entity.label2 = `${entity.filter2} : ${entity.filterValue2}`
     }
   })
+}
+
+const calculateUiInputs = (measureEntities) => {
+  return uniqWith(
+    measureEntities,
+    (locationA, locationB) => {
+      if (locationA.filter && locationA.filter2) {
+        return locationA.filterValue === locationB.filterValue && locationA.filterValue2 === locationB.filterValue2
+      } else if (locationA.filter) {
+        return locationA.filterValue === locationB.filterValue
+      } else {
+        return locationA.metricID
+      }
+    }
+  );
 }
 
 const getEntityFields = async (entityId) => {
@@ -49,6 +61,7 @@ const getCategory = async (name) => {
 
 module.exports = {
   applyLabelToEntities,
+  calculateUiInputs,
   getEntityFields,
   getCategory
 };

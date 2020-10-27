@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 {% from "measure-value.njk" import measureValue %}
-=======
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
->>>>>>> origin/master
 
 {% macro dataEntriesContent(groupMeasures, url, data, formFields, editValueUrl, showRaygCheckbox) %}
   <div class="govuk-grid-row">
@@ -47,7 +42,7 @@
 
   <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
   <div class="data-entry">
-    {{ measureValue(url, formFields, showRaygCheckbox) }}
+    {{ measureValue(url, formFields, data, showRaygCheckbox) }}
    </div> 
 
 </div>

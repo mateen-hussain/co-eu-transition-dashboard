@@ -3,20 +3,13 @@ const Page = require('core/pages/page');
 const { paths } = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
-const entityUserPermissions = require('middleware/entityUserPermissions');
 const moment = require('moment');
 const Category = require('models/category');
 const Entity = require('models/entity');
 const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
-const logger = require('services/logger');
-
-const get = require('lodash/get');
-const groupBy = require('lodash/groupBy');
-const uniqWith = require('lodash/uniqWith');
-const uniq = require('lodash/uniq');
-
 const measures = require('helpers/measures')
+const get = require('lodash/get');
 
 class MeasureValue extends Page {
   get url() {
@@ -37,25 +30,44 @@ class MeasureValue extends Page {
 
   get middleware() {
     return [
-      ...authentication.protect(['uploader']),
-      entityUserPermissions.assignEntityIdsUserCanAccessToLocals
+      ...authentication.protect(['uploader'])
     ];
   }
 
-  mapMeasureFieldsToEntity(measureEntities, themeCategory) {
-    return measureEntities.map(entity => {
-      const theme = get(entity, 'parents[0].parents').find(parentEntity => {
-        return parentEntity.categoryId === themeCategory.id;
-      });
+  async canUserAccessMetric() {
+    const metricsUserCanAccess = await this.req.user.getPermittedMetricMap();
+    return Object.keys(metricsUserCanAccess).includes(this.req.params.metricId)
+  }
 
-      const themeName = theme.entityFieldEntries.find(fieldEntry => {
-        return fieldEntry.categoryField.name === 'name';
-      });
+  async getRequest(req, res) {
+    const canUserAccessMetric = await this.canUserAccessMetric();
+
+    if(!req.user.isAdmin && !canUserAccessMetric) {
+      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    }
+
+    super.getRequest(req, res);
+  }
+
+  async postRequest(req, res) {
+    const canUserAccessMetric = await this.canUserAccessMetric();
+
+    if(!req.user.isAdmin && !canUserAccessMetric) {
+      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    }
+
+    return res.redirect(this.originalUrl);
+  }
+
+  mapMeasureFieldsToEntity(measureEntities) {
+    return measureEntities.map(entity => {
+
+      const parentPublicId = get(entity, 'parents[0].publicId')
 
       const entityMapped = {
         id: entity.id,
         publicId: entity.publicId,
-        theme: themeName.value
+        parentPublicId
       };
 
       entity.entityFieldEntries.map(entityfieldEntry => {
@@ -66,17 +78,10 @@ class MeasureValue extends Page {
     });
   }
 
-  async getMeasureEntities(measureCategory, themeCategory) {
-    const where = { categoryId: measureCategory.id };
-    const userIsAdmin = this.req.user.isAdmin;
-
-    if(!userIsAdmin) {
-      // const entityIdsUserCanAccess = this.res.locals.entitiesUserCanAccess.map(entity => entity.id);
-      // where.id = { [Op.in]: entityIdsUserCanAccess };
-    }
+  async getMeasureEntities(measureCategory) {
 
     const entities = await Entity.findAll({
-      where,
+      where: { categoryId: measureCategory.id },
       include: [{
         model: EntityFieldEntry,
         where: { value: this.req.params.metricId },
@@ -90,17 +95,6 @@ class MeasureValue extends Page {
         as: 'parents',
         include: [{
           model: Category
-        }, {
-          // get direct parents of outcome statement i.e. theme ( and possibly another outcome statement )
-          model: Entity,
-          as: 'parents',
-          include: [{
-            separate: true,
-            model: EntityFieldEntry,
-            include: CategoryField
-          }, {
-            model: Category
-          }]
         }]
       }]
     });
@@ -109,67 +103,82 @@ class MeasureValue extends Page {
       entity['entityFieldEntries'] = await measures.getEntityFields(entity.id)
     }
 
-    const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities, themeCategory);
+    const measureEntitiesMapped = this.mapMeasureFieldsToEntity(entities);
 
     // In certain case when a measure is the only item in the group, we need to up allow users to update the
     // overall value which is stored in the RAYG row.
     return measureEntitiesMapped.reduce((data, entity) => {
       if(entity.filter === 'RAYG') {
-        data.raygEntity = entity
+        data.raygEntities.push(entity)
       } else {
         data.measuresEntities.push(entity)
       }
       return data;
-    }, { measuresEntities: [] });
+    }, { measuresEntities: [], raygEntities: [] });
   }
 
 
   async getMeasure() {
     const measureCategory = await measures.getCategory('Measure');
-    const themeCategory = await measures.getCategory('Theme');
-    const { measuresEntities, raygEntity }  = await this.getMeasureEntities(measureCategory, themeCategory);
-    console.log('entities', measuresEntities)
-    // const measuresEntities = await this.getMeasureEntitiesFromGroup(groupEntities);
+    const { measuresEntities, raygEntities }  = await this.getMeasureEntities(measureCategory);
 
     if (measuresEntities.length === 0) {
       return this.res.redirect(paths.dataEntryEntity.measureList);
     }
 
-    // const uniqMetricIds = uniq(groupEntities.map(measure => measure.metricID));
-
     return {
       measuresEntities,
-      raygEntity,
+      raygEntities,
     }
+  }
+
+  generateInputValues(uiInputs, measureForSelectedDate, selecteDate) {
+    const measureValues = { 
+      entities: {},
+      date: selecteDate.split('/')
+    }
+
+    measureForSelectedDate.forEach(measure => {
+      uiInputs.forEach(uiInput => {
+        // label and label2 are generated from applyLabelToEntities using filter, filet2, filterValue, filterValue2
+        // we can use this to match the input to the value
+        if (measure.label && measure.label2 && uiInput.label && uiInput.label2) {
+          if (measure.label === uiInput.label && measure.label2 ===  uiInput.label2) {
+            measureValues.entities[uiInput.id] = measure.value
+          }
+        } else if (measure.label && uiInput.label) {
+          if (measure.label === uiInput.label) {
+            measureValues.entities[uiInput.id] = measure.value
+          }
+        } else {
+          measureValues.entities[uiInput.id] = measure.value
+        }
+      })
+    });
+    
+    return measureValues;
   }
 
   async getMeasureData() {
-    const { measuresEntities, raygEntity, uniqMetricIds }  = await this.getMeasure();
+    const { measuresEntities }  = await this.getMeasure();
     measures.applyLabelToEntities(measuresEntities)
+    const uiInputs = measures.calculateUiInputs(measuresEntities);
 
-    const measureForSelectedDate = measuresEntities.filter(measure => measure.date === this.req.params.date)
+    const measuresForSelectedDate = measuresEntities.filter(measure => measure.date === this.req.params.date)
 
-    if (!moment(this.req.params.date, 'DD/MM/YYYY').isValid() || measureForSelectedDate.length === 0) {
+    if (!moment(this.req.params.date, 'DD/MM/YYYY').isValid() || measuresForSelectedDate.length === 0) {
       return this.res.redirect(paths.dataEntryEntity.measureList);
     }
 
+    const measureValues = this.generateInputValues(uiInputs, measuresForSelectedDate, this.req.params.date)
+
     return {
       latest: measuresEntities[measuresEntities.length - 1],
-      raygEntity: raygEntity,
-      measureForSelectedDate,
-      selectedDate: this.req.params.date.split('/')
+      fields: uiInputs,
+      measureValues
     }
   }
 
-
-
-  async getRequest(req, res) {
-    if(!this.req.user.isAdmin && !this.res.locals.entitiesUserCanAccess.length) {
-      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
-    }
-
-    super.getRequest(req, res);
-  }
 }
 
 module.exports = MeasureValue;

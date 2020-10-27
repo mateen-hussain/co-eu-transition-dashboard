@@ -19,6 +19,8 @@
 
 {% set measure = getMeasureData() | await %}
 {% set latestMeasure = measure.latest %}
+{% set formFields = measure.fields %}
+{% set measureValues = measure.measureValues %}
 
 {% block content %}
 
@@ -30,11 +32,11 @@
     {% else %}
 
     <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Edit measure value</h1>
-    <h3 class="govuk-heading-m">Measure name</h3>
+    <h3 class="govuk-heading-m">{{ latestMeasure.name }}</h3>
 
     <p class="govuk-body govuk-!-font-weight-bold">Edit current value<p>
     <div class="data-entry">
-        {{ measureValue(url, formFields) }}
+        {{ measureValue(url, formFields, measureValues, showRaygCheckbox) }}
     </div> 
 
     {% endif  %}
