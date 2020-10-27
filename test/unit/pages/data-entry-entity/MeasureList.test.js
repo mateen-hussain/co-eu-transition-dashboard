@@ -7,6 +7,7 @@ const Category = require('models/category');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const CategoryField = require('models/categoryField');
+const filterMetrics = require('helpers/filterMetrics');
 
 let page = {};
 let res = {};
@@ -16,16 +17,18 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
   beforeEach(() => {
 
     res = { cookies: sinon.stub(), sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
-    req = { cookies: [], query: { category: 'category' }, user: { roles: [] } };
+    req = { cookies: [], query: { category: 'category' }, user: { roles: [], getPermittedMetricMap: sinon.stub().returns({}) } };
     res.status.returns(res);
 
     page = new MeasureList('some path', req, res);
 
     sinon.stub(authentication, 'protect').returns([]);
+    sinon.stub(filterMetrics,'filterMetrics').returnsArg(1);
   });
 
   afterEach(() => {
     authentication.protect.restore();
+    filterMetrics.filterMetrics.restore();
   });
 
   describe('#url', () => {
@@ -113,6 +116,7 @@ describe('pages/data-entry-entity/measure-list/MeasureList', () => {
 
     it('gets entities for a given category if admin', async () => {
       page.req.user.roles.push({ name: 'admin' });
+      page.req.user.isAdmin = true;
 
       const response = await page.getMeasureEntities(category, category);
       expect(response).to.eql([{
