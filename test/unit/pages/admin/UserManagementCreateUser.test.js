@@ -25,7 +25,7 @@ const notificationsNodeClientStub = {
 
 describe('pages/admin/user-management/create-user/CreateUser', ()=>{
   beforeEach(()=>{
-    const CreateUser = proxyquire('pages/admin/user-management/create-user/Createuser', {
+    const CreateUser = proxyquire('pages/admin/user-management/create-user/CreateUser', {
       'notifications-node-client': notificationsNodeClientStub,
     });
     const res = { cookies: sinon.stub(), redirect: sinon.stub() };
@@ -135,9 +135,9 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
       sequelize.transaction = sinon.stub().returns(t)
     })
     it('inserts user, roles and departments into tables', async ()=>{
-      User.create = sinon.stub().returns({id:1 })
+      User.create = sinon.stub().returns({ id:1 })
 
-      await page.createUser({email, roles, departments})
+      await page.createUser({ email, roles, departments })
       sinon.assert.calledWith(User.create)
       sinon.assert.called(UserRole.bulkCreate)
       sinon.assert.called(DepartmentUser.bulkCreate)
@@ -147,7 +147,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     it('rollbacks transactions on error', async ()=>{
       try{
         User.create = sinon.stub().throws(error)
-        await page.createUser({email, roles, departments})
+        await page.createUser({ email, roles, departments })
       } catch(error){
         expect(error.message).to.equal('test error')
       }
@@ -212,10 +212,9 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     })
     it('throws username exists', async()=>{
       try{
-        User.findOne = sinon.stub().returns({id:1})
+        User.findOne = sinon.stub().returns({ id:1 })
         await page.errorValidations({ email:'some@email', roles:'1', departments:'BIS' })
       } catch (err) {
-        console.log('**err', err)
         const userExistsError = { text:'Username exists', href: '#username' }
         expect(err.message).to.be.equal('VALIDATION_ERROR')
         expect(err.messages).to.deep.include.members([userExistsError])
