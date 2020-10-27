@@ -90,7 +90,8 @@
     "entityData": true,
     "transitionReadinessTheme": true,
     "transitionReadinessCache": true,
-    "measureUpload": true
+    "measureUpload": true,
+    "measureEdit": true
   },
   "notify": {
     "createTemplateKey": "ca1dcdac-7d98-4158-be9d-5190ceb62289",
