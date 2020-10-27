@@ -44,7 +44,6 @@ class Entity extends Model {
       }, options);
 
       for(const parentPublicField of parentPublicFields) {
-
         if(entity[parentPublicField.name]) {
           const parent = await this.findOne({
             where: {
