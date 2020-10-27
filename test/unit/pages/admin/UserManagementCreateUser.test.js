@@ -129,31 +129,69 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     const departments = 'DIT'
     const t = sequelize.transaction()
     const error = new Error('test error')
+   
+
     beforeEach(()=>{
-      UserRole.bulkCreate = sinon.stub().returns()
-      DepartmentUser.bulkCreate = sinon.stub().returns()
+      page.createRolesDB = sinon.stub().returns();
+      page.createDepartmentsDB = sinon.stub().returns();
       sequelize.transaction = sinon.stub().returns(t)
     })
+
     it('inserts user, roles and departments into tables', async ()=>{
-      User.create = sinon.stub().returns({ id:1 })
+      page.createUserDB = sinon.stub().returns({ id:1 });
 
       await page.createUser({ email, roles, departments })
-      sinon.assert.calledWith(User.create)
-      sinon.assert.called(UserRole.bulkCreate)
-      sinon.assert.called(DepartmentUser.bulkCreate)
+
+      sinon.assert.calledWith(page.createUserDB, email, t)
+      sinon.assert.calledWith(page.createRolesDB, 1, roles, t)
+      sinon.assert.called(page.createDepartmentsDB)
       sinon.assert.called(t.commit)
     })
 
     it('rollbacks transactions on error', async ()=>{
       try{
-        User.create = sinon.stub().throws(error)
+        page.createUserDB = sinon.stub().throws(error)
         await page.createUser({ email, roles, departments })
       } catch(error){
         expect(error.message).to.equal('test error')
       }
       sinon.assert.called(t.rollback)
-      sinon.assert.notCalled(UserRole.bulkCreate)
-      sinon.assert.notCalled(DepartmentUser.bulkCreate)
+      sinon.assert.notCalled(page.createRolesDB)
+      sinon.assert.notCalled(page.createDepartmentsDB)
+    })
+  })
+
+  describe('#createUserDB', ()=>{
+    it('inserts user into table', async ()=>{
+      const t = await sequelize.transaction();
+      const email = 'some@email.com';
+      User.create = sinon.stub().returns({ id:1 })
+    
+      const user = await page.createUserDB(email, t);
+      sinon.assert.called(User.create);
+      expect(user.id).to.equal(1);
+    })
+  })
+
+  describe('#createRolesDB', ()=>{
+    it('inserts roles into table', async ()=>{
+      const t = await sequelize.transaction();
+      const userId = 1;
+      const roles = [1,2]
+    
+      await page.createRolesDB(userId, roles, t);
+      sinon.assert.called(UserRole.bulkCreate);
+    })
+  })
+
+  describe('#createDepartmentsDB', ()=>{
+    it('inserts departments into table', async ()=>{
+      const t = await sequelize.transaction();
+      const userId = 1;
+      const departments = 'DIT';
+    
+      await page.createDepartmentsDB(userId, departments, t);
+      sinon.assert.called(DepartmentUser.bulkCreate);
     })
   })
 

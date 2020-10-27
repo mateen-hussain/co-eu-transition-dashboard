@@ -50,53 +50,62 @@ class CreateUser extends Page {
     return departments
   }
 
-  async createUser({ email, roles, departments }) {
-    const t = await sequelize.transaction();
-    let rolesToInsert = []
-    let departmentsToInsert = []
+  async createUserDB(email, transaction) {
     const passphrase = randomString.generate({
       readable: true
     });
     const hashedPassphrase = await authentication.hashPassphrase(passphrase);
+    const user = await User.create({
+      role: "viewer",
+      email: email,
+      hashedPassphrase: hashedPassphrase
+    }, { transaction });
+    return user;
+  }
+
+  async createRolesDB(userId, roles, transaction) {
+    let rolesToInsert = []
+    //roles can be a string or array based on selection count
+    Array.isArray(roles) ? (
+      roles.forEach(role => rolesToInsert.push({
+        userId,
+        roleId: role
+      }))) : rolesToInsert.push({
+      userId,
+      roleId: roles
+    });
+    await UserRole.bulkCreate(rolesToInsert, { transaction });
+  }
+
+  async createDepartmentsDB(userId, departments, transaction) {
+    let departmentsToInsert = []
+
+    //departments can be a string or array based on selection count
+    Array.isArray(departments) ?(
+      departments.forEach(department => (
+        departmentsToInsert.push({
+          userId,
+          departmentName: department
+        })
+      ))) : (departmentsToInsert.push({
+      userId,
+      departmentName: departments
+    }));
+    await DepartmentUser.bulkCreate(departmentsToInsert, { transaction });
+  }
+
+  async createUser({ email, roles, departments }) {
+    const t = await sequelize.transaction();
 
     try {
-      const user = await User.create({
-        role: "viewer",
-        email: email,
-        hashedPassphrase: hashedPassphrase
-      }, { transaction: t });
-
-      //roles can be a string or array based on selection count
-      Array.isArray(roles) ? (
-        roles.forEach(role => rolesToInsert.push({
-          userId: user.id,
-          roleId: role
-        }))) : rolesToInsert.push({
-        userId: user.id,
-        roleId: roles
-      });
-      await UserRole.bulkCreate(rolesToInsert, { transaction: t });
+      const user = await this.createUserDB(email, t);
+      await this.createRolesDB(user.id,roles, t);
+      await this.createDepartmentsDB(user.id, departments, t);
       
-      //departments can be a string or array based on selection count
-      Array.isArray(departments) ?(
-        departments.forEach(department => (
-          departmentsToInsert.push({
-            userId: user.id,
-            departmentName: department
-          })
-        ))) : (departmentsToInsert.push({
-        userId: user.id,
-        departmentName: departments
-      }));
-      await DepartmentUser.bulkCreate(departmentsToInsert, { transaction: t });
-
       await t.commit();
       logger.info(`User ${user.email} created`);
 
-      return {
-        user,
-        passphrase: hashedPassphrase
-      }
+      return user;
     } catch(err) {
       logger.error(`User ${email} creation error ${err.message}`);
       if (t) {
@@ -155,7 +164,7 @@ class CreateUser extends Page {
     try{
       await this.errorValidations({ ...req.body });
       const user = await this.createUser({ ...req.body });
-      await this.sendUserCreationEmailConfirmation(user.user, user.passphrase);
+      await this.sendUserCreationEmailConfirmation(user.user, user.hashedPassphrase);
       return res.redirect(`${this.req.originalUrl}/success`);
     } catch (error) {
       if (error.message && error.message === VALIDATION_ERROR_MESSSAGE) {
