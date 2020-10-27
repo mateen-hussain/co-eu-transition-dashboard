@@ -3,9 +3,13 @@ const { paths } = require('config');
 const authentication = require('services/authentication');
 const flash = require('middleware/flash');
 const Role = require('models/role');
+const User = require("models/user");
+const UserRole = require("models/userRole");
 const Department = require('models/department');
+const DepartmentUser = require("models/departmentUser");
 const config = require('config');
 const proxyquire = require('proxyquire');
+const sequelize = require('services/sequelize');
 
 let page = {};
 
@@ -119,6 +123,40 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     })
   })
 
+  describe('#createUser', ()=>{
+    const email = 'some@email.com'
+    const roles = [1,2]
+    const departments = 'DIT'
+    const t = sequelize.transaction()
+    const error = new Error('test error')
+    beforeEach(()=>{
+      UserRole.bulkCreate = sinon.stub().returns()
+      DepartmentUser.bulkCreate = sinon.stub().returns()
+      sequelize.transaction = sinon.stub().returns(t)
+    })
+    it('inserts user, roles and departments into tables', async ()=>{
+      User.create = sinon.stub().returns({id:1 })
+
+      await page.createUser({email, roles, departments})
+      sinon.assert.calledWith(User.create)
+      sinon.assert.called(UserRole.bulkCreate)
+      sinon.assert.called(DepartmentUser.bulkCreate)
+      sinon.assert.called(t.commit)
+    })
+
+    it('rollbacks transactions on error', async ()=>{
+      try{
+        User.create = sinon.stub().throws(error)
+        await page.createUser({email, roles, departments})
+      } catch(error){
+        expect(error.message).to.equal('test error')
+      }
+      sinon.assert.called(t.rollback)
+      sinon.assert.notCalled(UserRole.bulkCreate)
+      sinon.assert.notCalled(DepartmentUser.bulkCreate)
+    })
+  })
+
   describe('#sendUserCreationEmailConfirmation', () => {
     const prevKey = config.notify.apiKey;
     beforeEach(() => {
@@ -172,6 +210,17 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
 
       }
     })
+    it('throws username exists', async()=>{
+      try{
+        User.findOne = sinon.stub().returns({id:1})
+        await page.errorValidations({ email:'some@email', roles:'1', departments:'BIS' })
+      } catch (err) {
+        console.log('**err', err)
+        const userExistsError = { text:'Username exists', href: '#username' }
+        expect(err.message).to.be.equal('VALIDATION_ERROR')
+        expect(err.messages).to.deep.include.members([userExistsError])
+      }
+    })
   })
 
   describe('#postRequest', () => {
@@ -179,7 +228,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     const departments = 'd1';
     const email = 'some@email.com';
     const tempPassword = 'some password';
-    const user = { user:email,passphrase:tempPassword }
+    const user = { user:email, passphrase:tempPassword }
     
     beforeEach(() => {
       page.createUser = sinon.stub().returns(user);

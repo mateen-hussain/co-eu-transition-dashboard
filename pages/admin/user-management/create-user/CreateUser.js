@@ -98,7 +98,7 @@ class CreateUser extends Page {
         passphrase: hashedPassphrase
       }
     } catch(err) {
-      logger.error(`User ${user.email} creation error ${err.message}`);
+      logger.error(`User ${email} creation error ${err.message}`);
       if (t) {
         await t.rollback();
       }
@@ -138,7 +138,7 @@ class CreateUser extends Page {
       userExists = await User.findOne({ where: { email } })
     }
     if (userExists) {
-      error.messages.push({ text:'User name exists', href: '#username' })
+      error.messages.push({ text:'Username exists', href: '#username' })
     }
     if (!roles) {
       error.messages.push({ text:'Roles cannot be empty', href: '#roles' })
@@ -151,7 +151,6 @@ class CreateUser extends Page {
     } 
   }
 
-  //TODO: logger
   async postRequest(req, res) {
     try{
       await this.errorValidations({ ...req.body })
