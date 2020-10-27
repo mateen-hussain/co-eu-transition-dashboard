@@ -10,6 +10,7 @@ const DepartmentUser = require("models/departmentUser");
 const User = require("models/user");
 const authentication = require('services/authentication');
 const NotifyClient = require('notifications-node-client').NotifyClient;
+const logger = require('services/logger');
 
 const VALIDATION_ERROR_MESSSAGE = 'VALIDATION_ERROR'
 
@@ -90,11 +91,14 @@ class CreateUser extends Page {
       await DepartmentUser.bulkCreate(departmentsToInsert, { transaction: t })
 
       await t.commit()
+      logger.info(`User ${user.email} created`);
+
       return {
         user,
         passphrase: hashedPassphrase
       }
     } catch(err) {
+      logger.error(`User ${user.email} creation error ${err.message}`);
       if (t) {
         await t.rollback();
       }
@@ -119,6 +123,7 @@ class CreateUser extends Page {
           reference: `${user.id}`
         },
       );
+      logger.info(`email with temporary password sent to ${user.email} `);
     }
   }
 
