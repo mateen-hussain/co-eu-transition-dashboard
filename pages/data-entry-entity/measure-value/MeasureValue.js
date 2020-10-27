@@ -7,7 +7,7 @@ const entityUserPermissions = require('middleware/entityUserPermissions');
 
 class MeasureValue extends Page {
   static get isEnabled() {
-    return config.features.measureEdit;
+    return config.features.measureValue;
   }
 
   get url() {
