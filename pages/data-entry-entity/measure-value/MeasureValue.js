@@ -1,13 +1,17 @@
 /* eslint-disable no-prototype-builtins */
 const Page = require('core/pages/page');
-const { paths } = require('config');
+const config = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const entityUserPermissions = require('middleware/entityUserPermissions');
 
 class MeasureValue extends Page {
+  static get isEnabled() {
+    return config.features.measureEdit;
+  }
+
   get url() {
-    return paths.dataEntryEntity.measureValue;
+    return config.paths.dataEntryEntity.measureValue;
   }
 
   get pathToBind() {

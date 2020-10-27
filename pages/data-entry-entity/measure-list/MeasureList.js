@@ -16,7 +16,7 @@ const filterMetricsHelper = require('helpers/filterMetrics');
 
 class MeasureList extends Page {
   static get isEnabled() {
-    return config.features.measureEdit;
+    return config.features.measureUpload;
   }
 
   get url() {
