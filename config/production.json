@@ -18,6 +18,6 @@
   },
   "features": {
     "missedMilestones": true,
-    "measureUpload": false
+    "measureValue": false
   }
 }
