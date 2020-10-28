@@ -7,27 +7,14 @@ const User = require("models/user");
 const UserRole = require("models/userRole");
 const Department = require('models/department');
 const DepartmentUser = require("models/departmentUser");
-const config = require('config');
-const proxyquire = require('proxyquire');
 const sequelize = require('services/sequelize');
+const notify = require('services/notify');
+const CreateUser = require('pages/admin/user-management/create-user/CreateUser');
 
 let page = {};
 
-let sendEmailStub = sinon.stub();
-
-const notificationsNodeClientStub = {
-  NotifyClient: function() {
-    return {
-      sendEmail: sendEmailStub
-    };
-  }
-};
-
 describe('pages/admin/user-management/create-user/CreateUser', ()=>{
   beforeEach(()=>{
-    const CreateUser = proxyquire('pages/admin/user-management/create-user/CreateUser', {
-      'notifications-node-client': notificationsNodeClientStub,
-    });
     const res = { cookies: sinon.stub(), redirect: sinon.stub() };
     const req = { cookies: [], params: {}, flash: sinon.stub(), originalUrl: 'some-url' };
     page = new CreateUser('some path', req, res);
@@ -129,22 +116,30 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     const departments = 'DIT'
     const t = sequelize.transaction()
     const error = new Error('test error')
-   
+    const hashedPassphrase = 'some password'
 
     beforeEach(()=>{
       page.createRolesDB = sinon.stub().returns();
       page.createDepartmentUserDB = sinon.stub().returns();
       sequelize.transaction = sinon.stub().returns(t)
+      sinon.stub(notify,'sendEmailWithTempPassword').returns();
+    })
+
+    afterEach(()=>{
+      notify.sendEmailWithTempPassword.restore()
     })
 
     it('inserts user, roles and departments into tables', async ()=>{
-      page.createUserDB = sinon.stub().returns({ id:1 });
+      page.createUserDB = sinon.stub().returns({ id:1, email,  hashedPassphrase });
 
       await page.createUser({ email, roles, departments })
 
       sinon.assert.calledWith(page.createUserDB, email, t)
       sinon.assert.calledWith(page.createRolesDB, 1, roles, t)
-      sinon.assert.called(page.createDepartmentUserDB)
+      sinon.assert.calledWith(page.createDepartmentUserDB, 1,  departments, t)
+      sinon.assert.calledWith(notify.sendEmailWithTempPassword, {
+        email, userId:1, password: hashedPassphrase
+      })
       sinon.assert.called(t.commit)
     })
 
@@ -195,46 +190,6 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     })
   })
 
-  describe('#sendUserCreationEmailConfirmation', () => {
-    const prevKey = config.notify.apiKey;
-    beforeEach(() => {
-      config.notify.apiKey = 'some-key';
-    });
-    
-    after(() => {
-      config.notify.apiKey = prevKey;
-    });
-    
-    beforeEach(() => {
-      sendEmailStub.resolves();
-    });
-    
-    
-    it('sends email successfully', async () => {
-      const user = {
-        id: 1,
-        email: 'email@email.com'
-      };
-      const temporaryPassword = 'some password'
-    
-      await page.sendUserCreationEmailConfirmation(user, temporaryPassword);
-    
-      sinon.assert.calledWith(sendEmailStub,
-        config.notify.createTemplateKey,
-        user.email,
-        {
-          personalisation: {
-            password: temporaryPassword,
-            email: user.email,
-            link: config.serviceUrl,
-            privacy_link: config.serviceUrl + "privacy-notice"
-          },
-          reference: `${user.id}`
-        },
-      );
-    });
-  });
-
   describe('#errorValidations',  () => {
     it('throws validation errors', async()=>{
       try{
@@ -269,7 +224,6 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     
     beforeEach(() => {
       page.createUser = sinon.stub().returns(user);
-      page.sendUserCreationEmailConfirmation = sinon.stub();
     });
     
     it('creates new user', async () => {
@@ -279,7 +233,6 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
         
       sinon.assert.calledWith(page.errorValidations, { email, departments, roles });
       sinon.assert.calledWith(page.createUser, { email, departments, roles });
-      sinon.assert.called(page.sendUserCreationEmailConfirmation);
     
       sinon.assert.calledWith(page.res.redirect, `${page.req.originalUrl}/success`);
     });

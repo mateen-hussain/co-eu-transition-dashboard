@@ -9,7 +9,7 @@ const Department = require("models/department");
 const DepartmentUser = require("models/departmentUser");
 const User = require("models/user");
 const authentication = require('services/authentication');
-const { sendEmailWithTempPassword } = require('services/notify');
+const notify = require('services/notify');
 const logger = require('services/logger');
 
 const VALIDATION_ERROR_MESSSAGE = 'VALIDATION_ERROR';
@@ -110,7 +110,7 @@ class CreateUser extends Page {
       const user = await this.createUserDB(email, t);
       const userRoles = await this.createRolesDB(user.id,roles, t);
       const departmentUser = await this.createDepartmentUserDB(user.id, departments, t);
-      await sendEmailWithTempPassword({ email: user.email, userId: user.id, password: user.hashedPassphrase } )
+      await notify.sendEmailWithTempPassword({ email: user.email, userId: user.id, password: user.hashedPassphrase } )
       
       await t.commit();
 
