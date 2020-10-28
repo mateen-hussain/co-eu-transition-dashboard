@@ -1,5 +1,5 @@
 const Page = require('core/pages/page');
-const { paths, notify, serviceUrl } = require('config');
+const { paths } = require('config');
 const randomString = require('randomstring');
 const flash = require('middleware/flash');
 const sequelize = require('services/sequelize');
@@ -9,14 +9,14 @@ const Department = require("models/department");
 const DepartmentUser = require("models/departmentUser");
 const User = require("models/user");
 const authentication = require('services/authentication');
-const NotifyClient = require('notifications-node-client').NotifyClient;
+const { sendEmailWithTempPassword } = require('services/notify');
 const logger = require('services/logger');
 
-const VALIDATION_ERROR_MESSSAGE = 'VALIDATION_ERROR'
+const VALIDATION_ERROR_MESSSAGE = 'VALIDATION_ERROR';
 
 class CreateUser extends Page {
   get url() {
-    return paths.admin.createUser
+    return paths.admin.createUser;
   }
 
   get pathToBind() {
@@ -46,8 +46,8 @@ class CreateUser extends Page {
     const departments = await Department.findAll().map(dept => ({
       value: dept.dataValues.name,
       text: dept.dataValues.name,
-    }))
-    return departments
+    }));
+    return departments;
   }
 
   async createUserDB(email, transaction) {
@@ -65,33 +65,42 @@ class CreateUser extends Page {
 
   async createRolesDB(userId, roles, transaction) {
     let rolesToInsert = []
+    
     //roles can be a string or array based on selection count
-    Array.isArray(roles) ? (
+    if (Array.isArray(roles)) {
       roles.forEach(role => rolesToInsert.push({
         userId,
         roleId: role
-      }))) : rolesToInsert.push({
-      userId,
-      roleId: roles
-    });
-    await UserRole.bulkCreate(rolesToInsert, { transaction });
+      }));
+    } else {
+      rolesToInsert.push({
+        userId,
+        roleId: roles
+      });
+    }
+    
+    return UserRole.bulkCreate(rolesToInsert, { transaction });
   }
 
-  async createDepartmentsDB(userId, departments, transaction) {
+  async createDepartmentUserDB(userId, departments, transaction) {
     let departmentsToInsert = []
 
     //departments can be a string or array based on selection count
-    Array.isArray(departments) ?(
+    if (Array.isArray(departments) ) {
       departments.forEach(department => (
         departmentsToInsert.push({
           userId,
           departmentName: department
         })
-      ))) : (departmentsToInsert.push({
-      userId,
-      departmentName: departments
-    }));
-    await DepartmentUser.bulkCreate(departmentsToInsert, { transaction });
+      ));
+    } else {
+      departmentsToInsert.push({
+        userId,
+        departmentName: departments
+      });
+    }
+
+    return DepartmentUser.bulkCreate(departmentsToInsert, { transaction });
   }
 
   async createUser({ email, roles, departments }) {
@@ -99,45 +108,29 @@ class CreateUser extends Page {
 
     try {
       const user = await this.createUserDB(email, t);
-      await this.createRolesDB(user.id,roles, t);
-      await this.createDepartmentsDB(user.id, departments, t);
+      const userRoles = await this.createRolesDB(user.id,roles, t);
+      const departmentUser = await this.createDepartmentUserDB(user.id, departments, t);
+      await sendEmailWithTempPassword({ email: user.email, userId: user.id, password: user.hashedPassphrase } )
       
       await t.commit();
+
       logger.info(`User ${user.email} created`);
+      logger.info(`Userroles ${userRoles} created`);
+      logger.info(`DepartmentUser ${departmentUser} created`);
 
       return user;
     } catch(err) {
       logger.error(`User ${email} creation error ${err.message}`);
       if (t) {
+        logger.info(`User ${email} creation rollback`);
         await t.rollback();
       }
       throw err;
     }
   }
 
-  //TODO: Make this a service as similar method exists in UserManagementAuthentication
-  async sendUserCreationEmailConfirmation(user, passphrase) {
-    if (notify.apiKey) {
-      const notifyClient = new NotifyClient(notify.apiKey);
-      notifyClient.sendEmail(
-        notify.createTemplateKey,
-        user.email,
-        {
-          personalisation: {
-            password: passphrase,
-            email: user.email,
-            link: serviceUrl,
-            privacy_link: serviceUrl + "privacy-notice"
-          },
-          reference: `${user.id}`
-        },
-      );
-      logger.info(`email with temporary password sent to ${user.email} `);
-    }
-  }
-
   async errorValidations({ email, roles, departments }) {
-    let error = new Error(VALIDATION_ERROR_MESSSAGE)
+    let error = new Error(VALIDATION_ERROR_MESSSAGE);
     error.messages = [];
     let userExists;
     if (!email) {
@@ -163,15 +156,18 @@ class CreateUser extends Page {
   async postRequest(req, res) {
     try{
       await this.errorValidations({ ...req.body });
-      const user = await this.createUser({ ...req.body });
-      await this.sendUserCreationEmailConfirmation(user.user, user.hashedPassphrase);
+      await this.createUser({ ...req.body });
       return res.redirect(`${this.req.originalUrl}/success`);
     } catch (error) {
+      let flashMessages ;
       if (error.message && error.message === VALIDATION_ERROR_MESSSAGE) {
-        req.flash(error.messages);
+        flashMessages= error.messages;
+      } else if (error.message) {
+        flashMessages = [{ text: error.message }]; 
       } else {
-        req.flash(error.message);
+        flashMessages =[{ text:"something went wrong" }];
       }
+      req.flash(flashMessages)
       return res.redirect(this.req.originalUrl);
     }
   }

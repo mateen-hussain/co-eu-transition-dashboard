@@ -1,13 +1,10 @@
-const config = require('config');
 const Page = require('core/pages/page');
 const { paths } = require('config');
 const authentication = require('services/authentication');
+const { sendEmailWithTempPassword } = require('services/notify');
 const flash = require('middleware/flash');
 const User = require('models/user');
 const randomString = require('randomstring');
-const NotifyClient = require('notifications-node-client').NotifyClient;
-const logger = require('services/logger');
-const get = require('lodash/get');
 
 class UserManagementAuthentication extends Page {
   get url() {
@@ -55,33 +52,33 @@ class UserManagementAuthentication extends Page {
     await user.save();
   }
 
-  async notifyUser(user, temporaryPassword) {
-    if (!config.notify.apiKey) {
-      throw new Error('No notify API key set');
-    }
+  // async notifyUser(user, temporaryPassword) {
+  //   if (!config.notify.apiKey) {
+  //     throw new Error('No notify API key set');
+  //   }
 
-    const notifyClient = new NotifyClient(config.notify.apiKey);
+  //   const notifyClient = new NotifyClient(config.notify.apiKey);
 
-    try {
-      await notifyClient.sendEmail(
-        config.notify.createTemplateKey,
-        user.email,
-        {
-          personalisation: {
-            password: temporaryPassword,
-            email: user.email,
-            link: config.serviceUrl,
-            privacy_link: config.serviceUrl + "privacy-notice"
-          },
-          reference: `${user.id}`
-        },
-      );
-    } catch (error) {
-      throw get(error, 'error.errors[0]') || { message: "Error sending email with GovNotify" };
-    }
+  //   try {
+  //     await notifyClient.sendEmail(
+  //       config.notify.createTemplateKey,
+  //       user.email,
+  //       {
+  //         personalisation: {
+  //           password: temporaryPassword,
+  //           email: user.email,
+  //           link: config.serviceUrl,
+  //           privacy_link: config.serviceUrl + "privacy-notice"
+  //         },
+  //         reference: `${user.id}`
+  //       },
+  //     );
+  //   } catch (error) {
+  //     throw get(error, 'error.errors[0]') || { message: "Error sending email with GovNotify" };
+  //   }
 
-    logger.info(`User ${user.email} reset and sent with password`);
-  }
+  //   logger.info(`User ${user.email} reset and sent with password`);
+  // }
 
   async postRequest(req, res) {
     const temporaryPassword = this.createTemporaryPassword();
@@ -89,7 +86,8 @@ class UserManagementAuthentication extends Page {
     try {
       const user = await this.getUser();
       await this.resetUserAuthentication(req, user, temporaryPassword);
-      await this.notifyUser(user, temporaryPassword);
+      await sendEmailWithTempPassword({ email: user.email, userId:user.id, password: temporaryPassword })
+      // await this.notifyUser(user, temporaryPassword);
     } catch (error) {
       req.flash(error.message);
       return res.redirect(this.req.originalUrl);

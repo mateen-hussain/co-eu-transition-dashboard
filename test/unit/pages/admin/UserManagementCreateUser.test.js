@@ -133,7 +133,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
 
     beforeEach(()=>{
       page.createRolesDB = sinon.stub().returns();
-      page.createDepartmentsDB = sinon.stub().returns();
+      page.createDepartmentUserDB = sinon.stub().returns();
       sequelize.transaction = sinon.stub().returns(t)
     })
 
@@ -144,7 +144,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
 
       sinon.assert.calledWith(page.createUserDB, email, t)
       sinon.assert.calledWith(page.createRolesDB, 1, roles, t)
-      sinon.assert.called(page.createDepartmentsDB)
+      sinon.assert.called(page.createDepartmentUserDB)
       sinon.assert.called(t.commit)
     })
 
@@ -157,7 +157,7 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
       }
       sinon.assert.called(t.rollback)
       sinon.assert.notCalled(page.createRolesDB)
-      sinon.assert.notCalled(page.createDepartmentsDB)
+      sinon.assert.notCalled(page.createDepartmentUserDB)
     })
   })
 
@@ -184,13 +184,13 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     })
   })
 
-  describe('#createDepartmentsDB', ()=>{
+  describe('#createDepartmentUserDB', ()=>{
     it('inserts departments into table', async ()=>{
       const t = await sequelize.transaction();
       const userId = 1;
       const departments = 'DIT';
     
-      await page.createDepartmentsDB(userId, departments, t);
+      await page.createDepartmentUserDB(userId, departments, t);
       sinon.assert.called(DepartmentUser.bulkCreate);
     })
   })
