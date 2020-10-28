@@ -1,0 +1,39 @@
+{% extends "template.njk" %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+  {% if not successMode %}
+    {{ 
+      govukBackLink({
+        text: "Back",
+        href: "#",
+        attributes: {
+          onclick: "history.go(-1);"
+        }
+    }) 
+    }}
+  {% endif %}
+{% endblock %}
+
+{% block pageTitle %}Create new user{% endblock %}
+{% set roles = getRoles() | await %}
+{% set departments = getDepartments() | await %}
+
+{% block content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {% if successMode %}
+      {% include "admin/user-management/create-user/partials/success.html" %}
+    {% else %}
+      {% include "admin/user-management/create-user/partials/form.html" %}
+    {% endif %}
+ </div>
+</div>
+
+{% endblock %}

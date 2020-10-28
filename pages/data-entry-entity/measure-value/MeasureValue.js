@@ -1,6 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 const Page = require('core/pages/page');
-const { paths } = require('config');
+const config = require('config');
 const authentication = require('services/authentication');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const moment = require('moment');
@@ -12,8 +12,12 @@ const measures = require('helpers/measures')
 const get = require('lodash/get');
 
 class MeasureValue extends Page {
+  static get isEnabled() {
+    return config.features.measureValue;
+  }
+
   get url() {
-    return paths.dataEntryEntity.measureValue;
+    return config.paths.dataEntryEntity.measureValue;
   }
 
   get pathToBind() {

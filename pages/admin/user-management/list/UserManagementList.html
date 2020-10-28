@@ -16,7 +16,13 @@
 <div class="govuk-grid-row" id="hide-filters">
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-xl">Manage Users</h1>
-
+      {{
+          govukButton({
+            text: "Add new user",
+            href: config.paths.admin.createUser,
+            preventDoubleClick: true
+          })
+      }}
     <table class="govuk-table">
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">

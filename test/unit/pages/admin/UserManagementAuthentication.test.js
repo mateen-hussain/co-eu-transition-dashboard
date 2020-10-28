@@ -1,29 +1,16 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const { paths } = require('config');
 const authentication = require('services/authentication');
+const notify = require('services/notify');
 const flash = require('middleware/flash');
 const User = require('models/user');
-const config = require('config');
-const proxyquire = require('proxyquire');
+const UserManagementAuthentication = require('pages/admin/user-management/authentication/UserManagementAuthentication');
 
 let page = {};
 
-let sendEmailStub = sinon.stub();
-
-const notificationsNodeClientStub = {
-  NotifyClient: function() {
-    return {
-      sendEmail: sendEmailStub
-    };
-  }
-};
 
 describe('pages/admin/user-management/authentication/UserManagementAuthentication', () => {
   beforeEach(() => {
-    const UserManagementAuthentication = proxyquire('pages/admin/user-management/authentication/UserManagementAuthentication', {
-      'notifications-node-client': notificationsNodeClientStub,
-    });
-
     const res = { cookies: sinon.stub(), redirect: sinon.stub() };
     const req = { cookies: [], params: {}, flash: sinon.stub(), originalUrl: 'some-url' };
 
@@ -129,94 +116,22 @@ describe('pages/admin/user-management/authentication/UserManagementAuthenticatio
     });
   });
 
-  describe('#notifyUser', () => {
-    const prevKey = config.notify.apiKey;
-    beforeEach(() => {
-      config.notify.apiKey = 'some-key';
-    });
-
-    after(() => {
-      config.notify.apiKey = prevKey;
-    });
-
-    beforeEach(() => {
-      sendEmailStub.resolves();
-    });
-
-    it('if no config.notify.apiKey throw error', async () => {
-      page.notifyUser();
-      delete config.notify.apiKey;
-
-      let message = '';
-      try{
-        await page.notifyUser();
-      } catch (thrownError) {
-        message = thrownError.message;
-      }
-      expect(message).to.eql('No notify API key set');
-    });
-
-    it('sends email successfully', async () => {
-      const user = {
-        id: 1,
-        email: 'email@email.com'
-      };
-      const temporaryPassword = page.createTemporaryPassword();
-
-      await page.notifyUser(user, temporaryPassword);
-
-      sinon.assert.calledWith(sendEmailStub,
-        config.notify.createTemplateKey,
-        user.email,
-        {
-          personalisation: {
-            password: temporaryPassword,
-            email: user.email,
-            link: config.serviceUrl,
-            privacy_link: config.serviceUrl + "privacy-notice"
-          },
-          reference: `${user.id}`
-        },
-      );
-    });
-
-    it('throws error if send email fails', async () => {
-      if(!config.notify.apiKey) {
-        config.notify.apiKey = 'some-key';
-      }
-      const user = {
-        id: 1,
-        email: 'email@email.com'
-      };
-      const temporaryPassword = page.createTemporaryPassword();
-      sendEmailStub.rejects({
-        error: {
-          errors: [{
-            message: 'some error'
-          }]
-        }
-      });
-
-      let message = '';
-      try{
-        await page.notifyUser(user, temporaryPassword);
-      } catch (thrownError) {
-        message = thrownError.message;
-      }
-      expect(message).to.eql('some error');
-    });
-  });
-
+  
   describe('#postRequest', () => {
     const password = 'password';
-    const user = { email: 'some@email.com' };
+    const user = { email: 'some@email.com', id: 1, hashedPassphrase: password };
 
     beforeEach(() => {
       page.getUser = sinon.stub().returns(user);
       page.resetUserAuthentication = sinon.stub();
       page.notifyUser = sinon.stub();
       page.createTemporaryPassword = sinon.stub().returns(password);
+      sinon.stub(notify,'sendEmailWithTempPassword').returns();
     });
+
+    afterEach(()=>{
+      notify.sendEmailWithTempPassword.restore()
+    })
 
     it('orchastrates reseting user authentication', async () => {
       await page.postRequest(page.req, page.res);
@@ -224,7 +139,11 @@ describe('pages/admin/user-management/authentication/UserManagementAuthenticatio
       sinon.assert.called(page.createTemporaryPassword);
       sinon.assert.called(page.getUser);
       sinon.assert.calledWith(page.resetUserAuthentication, page.req, user, password);
-      sinon.assert.calledWith(page.notifyUser, user, password);
+      sinon.assert.calledWith(notify.sendEmailWithTempPassword, {
+        email: user.email,
+        userId: user.id,
+        password: user.hashedPassphrase
+      });
 
       sinon.assert.calledWith(page.res.redirect, `${page.req.originalUrl}/success`);
     });
