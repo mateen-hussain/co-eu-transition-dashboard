@@ -1,6 +1,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
-{% macro dataEntriesContent(groupMeasures, url, data, formFields, editValueUrl) %}
+{% macro dataEntriesContent(groupMeasures, url, data, formFields, editValueUrl, showRaygCheckbox) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
@@ -26,10 +27,7 @@
                     <td>
                       <p class="govuk-body">{{ measure.unit }} : {{ measure.value }}</p>
                     </td>
-                    <td>
-                    <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ editValueUrl }}/{{ measure.id }}">
-                      Edit
-                    </a>                    
+                    <td>               
                   </td>
                   </tr>
                 {% endfor %}
@@ -74,6 +72,21 @@
         </tr>
       {% endfor %}
     </table>
+
+    {% if showRaygCheckbox %}
+      {{ govukCheckboxes({
+        idPrefix: "updateRAYG",
+        name: "updateRAYG",
+        items: [
+          {
+            value: true,
+            text: "Measure contains date(s) in the future, select this checkbox to update the overall RAYG value",
+            checked: true if data.updateRAYG
+          }
+        ]
+      }) }}
+    {% endif %}
+    
     <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
     </form>
    </div> 

@@ -14,7 +14,7 @@
       </tr>
       <tr class="govuk-table__row">
         <td class="govuk-table__cell" colspan="2">
-          <a class="govuk-link" href="{{ config.paths.dataEntryEntity.measureGroup }}/{{ raygEntity.publicId }}">
+          <a class="govuk-link" href="{{ config.paths.dataEntryEntity.measureGroup }}/{{ raygEntity.groupID }}">
             Edit group
           </a>
         </td>
@@ -53,7 +53,7 @@
       label: "Data entries",
       id: "data-entries",
       panel: {
-        html: dataEntriesContent(groupedMeasures, addUrl, data, formFields, editValueUrl)
+        html: dataEntriesContent(groupedMeasures, addUrl, postData, formFields, editValueUrl, displayRaygValueCheckbox)
       }
     }), items) %}
 {% endif %}
