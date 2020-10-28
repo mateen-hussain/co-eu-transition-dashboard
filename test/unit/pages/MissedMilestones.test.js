@@ -7,17 +7,6 @@ const config = require('config');
 const moment = require('moment');
 const authentication = require('services/authentication');
 
-const department = [{
-  dataValues: {
-    name: 'department',
-    projects: [ ['project1'], ['project2'] ],
-    departmentUser: ['departmentUser']
-  },
-  projects: [ ['project1'], ['project2'] ],
-  totalMilestones: 5,
-  totalMilestonesMissed: 3
-}]
-
 let page = {};
 let res = {};
 let req = {};
@@ -34,6 +23,12 @@ describe('pages/missed-milestones/MissedMilestones', () => {
 
   afterEach(() => {
     authentication.protect.restore();
+  });
+
+  describe('#url', () => {
+    it('returns correct url', () => {
+      expect(page.url).to.eql(paths.missedMilestones);
+    });
   });
 
   describe('#isEnabled', () => {
@@ -62,12 +57,6 @@ describe('pages/missed-milestones/MissedMilestones', () => {
       expect(MissedMilestones.isEnabled).to.not.be.ok;
     })
   })
-
-  describe('#url', () => {
-    it('returns correct url', () => {
-      expect(page.url).to.eql(paths.missedMilestones);
-    });
-  });
 
   it('only management are allowed to access this page', () => {
     expect(page.middleware).to.eql([
@@ -100,7 +89,7 @@ describe('pages/missed-milestones/MissedMilestones', () => {
       sinon.stub(page, 'totalMilestones').returns(5);
 
       req.user.getDepartmentsWithProjects.returns(departments);
-      departmentsWithMissedMilestones = await page.getDepartmentsWithMissedMilestones();
+      departmentsWithMissedMilestones = await page.getChartData();
     });
 
     it('calls #req.user.getDepartmentsWithProjects with correct parameters', () => {
@@ -127,8 +116,12 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
 
     it('sorts milestones based on due date', () => {
-      expect(departmentsWithMissedMilestones.milestones[0].id).to.eql(2);
-      expect(departmentsWithMissedMilestones.milestones[1].id).to.eql(1);
+      expect(departmentsWithMissedMilestones.departments[0].id).to.eql(2);
+      expect(departmentsWithMissedMilestones.departments[1].id).to.eql(1);
+    });
+
+    it('should return chart data when passed in department', () => {
+      expect(page.chartData(departments)).to.eql( { data: [6,4], labels: [undefined, undefined], meta: [ { totalMilestones: 5, totalMilestonesMissed: 6 }, { totalMilestones: 5, totalMilestonesMissed: 4 }] });
     });
   });
 
@@ -151,25 +144,15 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
   });
 
-  describe('#projectFields', () => {
-    it('should return an object of project id, title and impact', () => {
-      expect(page.project).to.eql({ 
-        uid: { id: 'uid' },
-        name: { title:'Project name', id: 'title' },
-        impact: { title:'Project impact', id: 'impact' }
-      });
+  describe('#formatDate', () => {
+    it('should format the date', () => {
+      expect(page.formatDate('01/01/2020')).to.eql('1st January 2020');
     });
   });
 
-  describe('#milestoneFields', () => {
-    it('should return an array of milestone id and title', () => {
-      expect(page.milestoneFields).to.eql([{ title:'Milestone UID', id: 'uid' }, { title:'Due Date', id: 'date' }, { title:'Milestone Description', id: 'description' }, { title:'Milestone Delivery Confidence', id: 'deliveryConfidence' }]);
-    });
-  });
-
-  describe('#chartData', () => {
-    it('should return chart data when passed in department', () => {
-      expect(page.chartData(department)).to.eql( { data: [3], labels: [undefined], meta: [ { totalMilestones: 5, totalMilestonesMissed: 3 }] });
+  describe('#filtersFields', () => {
+    it('should not return the filters list', () => {
+      expect(page.filtersFields).to.eql(['deliveryTheme']);
     });
   });
 });

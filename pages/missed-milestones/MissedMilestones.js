@@ -9,14 +9,16 @@ const { removeNulls } = require('helpers/utils');
 const cloneDeep = require('lodash/cloneDeep');
 
 class MissedMilestones extends Page {
+  static get isEnabled() {
+    return config.features.missedMilestones;
+  }
+
   get url() {
     return config.paths.missedMilestones;
   }
 
   get schema() {
-    return {
-      filters: {}
-    };
+    return { filters: {} };
   }
 
   get middleware() {
