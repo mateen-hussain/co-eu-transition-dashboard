@@ -69,6 +69,7 @@ describe('pages/missed-milestones/MissedMilestones', () => {
   describe('#getDepartmentsWithMissedMilestones', () => {
     const departments = [{
       id: 1,
+      name: 'Dept1',
       projects: [{
         milestones: [{ id: 1, date: '13-06-2020' },{ id: 2, date: '10-05-2020' },{ id: 3, date: '05-04-2020' }]
       },{
@@ -76,6 +77,7 @@ describe('pages/missed-milestones/MissedMilestones', () => {
       }]
     },{
       id: 2,
+      name: 'Dept2',
       projects: [{
         milestones: [{ id: 1, date: '13-06-2020' }, { id: 2, date: '15-04-2020' }, { id: 3, date: '01-01-2020' }]
       },{
@@ -83,13 +85,15 @@ describe('pages/missed-milestones/MissedMilestones', () => {
       }]
     }];
 
+    let chartData = {};
     let departmentsWithMissedMilestones = {};
 
     beforeEach(async () => {
       sinon.stub(page, 'totalMilestones').returns(5);
 
       req.user.getDepartmentsWithProjects.returns(departments);
-      departmentsWithMissedMilestones = await page.getChartData();
+      chartData = await page.getChartData();
+      departmentsWithMissedMilestones = await page.getDepartmentsWithMissedMilestones();
     });
 
     it('calls #req.user.getDepartmentsWithProjects with correct parameters', () => {
@@ -101,28 +105,36 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
 
     it('adds total milestones to each department', () => {
-      expect(departmentsWithMissedMilestones.departments[0].totalMilestones).to.eql(5);
-      expect(departmentsWithMissedMilestones.departments[1].totalMilestones).to.eql(5);
+      expect(chartData.departments[0].totalMilestones).to.eql(5);
+      expect(chartData.departments[1].totalMilestones).to.eql(5);
     });
 
     it('sorts departments based on total missed milestones', () => {
-      expect(departmentsWithMissedMilestones.departments[0].id).to.eql(2);
-      expect(departmentsWithMissedMilestones.departments[1].id).to.eql(1);
+      expect(chartData.departments[0].id).to.eql(2);
+      expect(chartData.departments[1].id).to.eql(1);
     });
 
     it('adds up total missed milestones', () => {
-      expect(departmentsWithMissedMilestones.departments[0].totalMilestonesMissed).to.eql(6);
-      expect(departmentsWithMissedMilestones.departments[1].totalMilestonesMissed).to.eql(4);
+      expect(chartData.departments[0].totalMilestonesMissed).to.eql(6);
+      expect(chartData.departments[1].totalMilestonesMissed).to.eql(4);
     });
 
     it('sorts milestones based on due date', () => {
-      expect(departmentsWithMissedMilestones.departments[0].id).to.eql(2);
-      expect(departmentsWithMissedMilestones.departments[1].id).to.eql(1);
+      expect(chartData.departments[0].id).to.eql(2);
+      expect(chartData.departments[1].id).to.eql(1);
     });
 
     it('should return chart data when passed in department', () => {
-      expect(page.chartData(departments)).to.eql( { data: [6,4], labels: [undefined, undefined], meta: [ { totalMilestones: 5, totalMilestonesMissed: 6 }, { totalMilestones: 5, totalMilestonesMissed: 4 }] });
+      expect(page.chartData(departments)).to.eql( { data: [6,4], labels: ['Dept2', 'Dept1'], meta: [ { totalMilestones: 5, totalMilestonesMissed: 6 }, { totalMilestones: 5, totalMilestonesMissed: 4 }] });
     });
+
+    it('should group milestones based on due date and department', () => {
+      expect(departmentsWithMissedMilestones[0].date).to.eql('01/01/2020');
+      expect(departmentsWithMissedMilestones[0].departments[0].name).to.eql('Dept2');
+      expect(departmentsWithMissedMilestones[0].departments[0].totalMilestonesMissed).to.eql(6);
+      expect(departmentsWithMissedMilestones[0].totalMilestones).to.eql(1);
+    });
+
   });
 
   describe('#totalMilestones', () => {
