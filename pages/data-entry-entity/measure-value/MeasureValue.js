@@ -58,7 +58,7 @@ class MeasureValue extends Page {
     const measuresForSelectedDate = measureEntities.filter(measure => measure.date === this.req.params.date)
 
     if (!moment(this.req.params.date, 'DD/MM/YYYY').isValid() || (measuresForSelectedDate.length === 0 && !this.successfulMode)) {
-      return this.res.redirect(paths.dataEntryEntity.measureList);
+      return this.res.redirect(config.paths.dataEntryEntity.measureList);
     }
 
     super.getRequest(req, res);
@@ -125,21 +125,21 @@ class MeasureValue extends Page {
     // measuresEntities is already sorted by date so we know the last entry in the array will contain the latest date
     const latestDate = measureEntities[measureEntities.length -1].date;
     const newDate = buildDateString(formData)
-    const isDateSameOrNewer =  moment(newDate, 'YYYY-MM-DD').isSameOrAfter(moment(latestDate, 'DD/MM/YYYY'));
+    const isDateLatestOrNewer =  moment(newDate, 'YYYY-MM-DD').isSameOrAfter(moment(latestDate, 'DD/MM/YYYY'));
     const { updateRAYG } = formData;
-    console.log('isDateSameOrNewer', isDateSameOrNewer)
-    // if (isOnlyMeasureInGroup && doesNotHaveFilter && (isDateNewer || updateRAYG == 'true')) {
-    //   const { value } = newEntities[0];
-    //   // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
-    //   raygEntities.forEach(raygEntity => {
-    //     newEntities.push({
-    //       publicId: raygEntity.publicId,
-    //       parentStatementPublicId: raygEntity.parentPublicId,
-    //       date: newDate,
-    //       value
-    //     })
-    //   })
-    // }
+
+    if (isOnlyMeasureInGroup && doesNotHaveFilter && (isDateLatestOrNewer || updateRAYG == 'true')) {
+      const { value } = newEntities[0];
+      // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
+      raygEntities.forEach(raygEntity => {
+        newEntities.push({
+          publicId: raygEntity.publicId,
+          parentStatementPublicId: raygEntity.parentStatementPublicId,
+          date: newDate,
+          value
+        })
+      })
+    }
 
     return newEntities
   }
@@ -147,7 +147,7 @@ class MeasureValue extends Page {
   async updateMeasureValues(formData) {
     const { measureEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
     measures.applyLabelToEntities(measureEntities);
-
+    
     const entitiesForSelectedDate = measureEntities.filter((measure) => measure.date === this.req.params.date);
     const entitiesExcludingCurrentDate = measureEntities.filter((measure) => measure.date !== this.req.params.date);
 
@@ -165,12 +165,12 @@ class MeasureValue extends Page {
     const { errors, parsedEntities } = await measures.validateEntities(newEntities);
 
     const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities, formData, measureEntities, raygEntities, uniqMetricIds)
-    console.log('entititit', entitiesToBeSaved)
+
     if (errors.length > 0) {
       return this.renderRequest(this.res, { errors: ["Error in entity data"] });
     }
 
-    // return await this.saveMeasureData(entitiesToBeSaved);
+    return await this.saveMeasureData(entitiesToBeSaved);
   }
 
   async saveMeasureData(entities, options = {}) {
@@ -262,7 +262,7 @@ class MeasureValue extends Page {
     const measureEntities = await measures.getMeasureEntitiesFromGroup(groupEntities, this.req.params.metricId);
 
     if (measureEntities.length === 0) {
-      return this.res.redirect(paths.dataEntryEntity.measureList);
+      return this.res.redirect(config.paths.dataEntryEntity.measureList);
     }
 
     const uniqMetricIds = uniq(groupEntities.map(measure => measure.metricID))
@@ -302,25 +302,31 @@ class MeasureValue extends Page {
   }
 
   async getMeasureData() {
-    const { measureEntities } = await this.getMeasure();
+    const { measureEntities, uniqMetricIds } = await this.getMeasure();
     measures.applyLabelToEntities(measureEntities);
     const uiInputs = measures.calculateUiInputs(measureEntities);
 
     const measuresForSelectedDate = measureEntities.filter((measure) => measure.date === this.req.params.date);
 
     if (!moment(this.req.params.date, "DD/MM/YYYY").isValid() || (measuresForSelectedDate.length === 0 && !this.successfulMode)) {
-      return this.res.redirect(paths.dataEntryEntity.measureList);
+      return this.res.redirect(config.paths.dataEntryEntity.measureList);
     }
 
     const measureValues = this.generateInputValues(uiInputs, measuresForSelectedDate, this.req.params.date);
+    // measuresEntities are already sorted by date, so the last entry is the newest
     const latestEntity = measureEntities[measureEntities.length - 1];
-    const backLink = `${paths.dataEntryEntity.measureEdit}/${latestEntity.metricID}/${latestEntity.groupID}`;
+    const backLink = `${config.paths.dataEntryEntity.measureEdit}/${latestEntity.metricID}/${latestEntity.groupID}`;
+    const doesHaveFilter = measureEntities.find(measure => !!measure.filter);
+    const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
+    const isLatestDateInTheFuture =  moment(latestEntity.date, 'DD/MM/YYYY').isAfter(moment());
+    const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateInTheFuture
 
     return {
       latest: latestEntity,
       fields: uiInputs,
       measureValues,
       backLink,
+      displayRaygValueCheckbox
     };
   }
 }
