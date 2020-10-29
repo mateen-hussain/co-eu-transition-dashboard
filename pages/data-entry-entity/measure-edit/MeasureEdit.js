@@ -18,8 +18,10 @@ const filterMetricsHelper = require('helpers/filterMetrics');
 const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
-const uniqWith = require('lodash/uniqWith');
+
 const uniq = require('lodash/uniq');
+
+const measures = require('helpers/measures')
 
 const moment = require('moment');
 
@@ -120,7 +122,7 @@ class MeasureEdit extends Page {
     });
 
     for (const entity of entities) {
-      entity['entityFieldEntries'] = await this.getEntityFields(entity.id)
+      entity['entityFieldEntries'] = await measures.getEntityFields(entity.id)
     }
 
     entities = await filterMetricsHelper.filterMetrics(this.req.user,entities);
@@ -140,32 +142,9 @@ class MeasureEdit extends Page {
     }, { groupEntities: [], raygEntities: [] });
   }
 
-  async getEntityFields(entityId) {
-    const entityFieldEntries = await EntityFieldEntry.findAll({
-      where: { entity_id: entityId },
-      include: CategoryField
-    });
 
-    if (!entityFieldEntries) {
-      logger.error(`EntityFieldEntry export, error finding entityFieldEntries`);
-      throw new Error(`EntityFieldEntry export, error finding entityFieldEntries`);
-    }
 
-    return entityFieldEntries;
-  }
 
-  async getCategory(name) {
-    const category = await Category.findOne({
-      where: { name }
-    });
-
-    if (!category) {
-      logger.error(`Category export, error finding Measure category`);
-      throw new Error(`Category export, error finding Measure category`);
-    }
-
-    return category;
-  }
 
   mapMeasureFieldsToEntity(measureEntities, themeCategory) {
     return measureEntities.map(entity => {
@@ -203,8 +182,8 @@ class MeasureEdit extends Page {
   }
 
   async getMeasure() {
-    const measureCategory = await this.getCategory('Measure');
-    const themeCategory = await this.getCategory('Theme');
+    const measureCategory = await measures.getCategory('Measure');
+    const themeCategory = await measures.getCategory('Theme');
     const { groupEntities, raygEntities }  = await this.getGroupEntities(measureCategory, themeCategory);
 
     const measuresEntities = await this.getMeasureEntitiesFromGroup(groupEntities);
@@ -222,17 +201,7 @@ class MeasureEdit extends Page {
     }
   }
 
-  applyLabelToEntities(entities) {
-    entities.forEach(entity => {
-      if (entity.filter && entity.filterValue) {
-        entity.label = `${entity.filter} : ${entity.filterValue}`
-      }
 
-      if (entity.filter2 && entity.filterValue2) {
-        entity.label2 = `${entity.filter2} : ${entity.filterValue2}`
-      }
-    })
-  }
 
   groupEntitiesByDateAndFilter(measures) {
     const measureByDate = groupBy(measures, measure => measure.date);
@@ -256,26 +225,13 @@ class MeasureEdit extends Page {
     return groupedEntityData;
   }
 
-  calculateUiInputs(measureEntities) {
-    return uniqWith(
-      measureEntities,
-      (locationA, locationB) => {
-        if (locationA.filter && locationA.filter2) {
-          return locationA.filterValue === locationB.filterValue && locationA.filterValue2 === locationB.filterValue2
-        } else if (locationA.filter) {
-          return locationA.filterValue === locationB.filterValue
-        } else {
-          return locationA.metricID
-        }
-      }
-    );
-  }
+  
 
   async getMeasureData() {
     const { measuresEntities, raygEntities, uniqMetricIds }  = await this.getMeasure();
-    this.applyLabelToEntities(measuresEntities)
+    measures.applyLabelToEntities(measuresEntities)
     const groupedMeasureEntities = groupBy(measuresEntities, measure => measure.date);
-    const uiInputs = this.calculateUiInputs(measuresEntities);
+    const uiInputs = measures.calculateUiInputs(measuresEntities);
 
     const doesHaveFilter = measuresEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
@@ -319,7 +275,7 @@ class MeasureEdit extends Page {
       }]
     });
 
-    const statementCategory = await this.getCategory('Statement');
+    const statementCategory = await measures.getCategory('Statement');
 
     return entities.map(entity => {
 
