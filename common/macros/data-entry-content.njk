@@ -27,7 +27,7 @@
                       <p class="govuk-body">{{ measure.unit }} : {{ measure.value }}</p>
                     </td>
                     <td>
-                    <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ editValueUrl }}/{{ measure.metricID }}/{{ measure.date | urlencode }}">
+                    <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ editValueUrl }}/{{ measure.metricID }}/{{ measure.groupID }}/{{ measure.date | urlencode }}">
                       Edit
                     </a>                    
                   </td>

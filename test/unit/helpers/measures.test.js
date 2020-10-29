@@ -1,7 +1,9 @@
-const { expect } = require('test/unit/util/chai');
+const { expect, sinon } = require('test/unit/util/chai');
 const Category = require('models/category');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const measures = require('helpers/measures')
+const parse = require('helpers/parse');
+const validation = require('helpers/validation');
 
 describe('helpers/measures', () => {
   describe('#applyLabelToEntities', () => {
@@ -100,6 +102,105 @@ describe('helpers/measures', () => {
       }
 
       expect(error).to.eql('Category export, error finding Measure category');
+    });
+  });
+
+  describe('#removeBlankEntityInputValues', () => {
+    it('should remove empty vales and return data', async () => {
+      const formData = { 123: '', 456: '12' };
+      const response = await measures.removeBlankEntityInputValues(formData);
+      expect(response).to.eql({ 456: '12' });
+    });
+  });
+
+  describe('#validateFormData', () => {
+    beforeEach(() => {
+      sinon.stub(measures, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);
+    });
+
+    afterEach(() => {
+      measures.calculateUiInputs.restore();
+    });
+
+    it('should return an error when date is not valid', async () => {
+      const formData = { day: '10', month: '14', year: '2020', entities:{} };
+
+      const response = await measures.validateFormData(formData);
+      expect(response[0]).to.eql("Invalid date");
+    });
+
+    it('should return an error when date already exists', async () => {
+      const formData = { day: '05', month: '10', year: '2020', entities:{} };
+      const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }];
+
+      const response = await measures.validateFormData(formData, measuresEntities);
+      expect(response[0]).to.eql("Date already exists");
+    });
+
+    it('should return an error when no entities data is present', async () => {
+      const formData = { day: '10', month: '12', year: '2020' };
+      const response = await measures.validateFormData(formData);
+      expect(response[0]).to.eql("Missing entity values");
+    });
+
+    it('should return an error when entities data is empty', async () => {
+      const formData = { day: '10', month: '12', year: '2020', entities: {} };
+      const response = await measures.validateFormData(formData);
+      expect(response[0]).to.eql("You must submit at least one value");
+    });
+
+    it('should return an error when entities data is empty', async () => {
+      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: '', 456: 10 } };
+      const response = await measures.validateFormData(formData);
+      expect(response[0]).to.eql("Invalid field value");
+    });
+
+    it('should return an error when entities data is NaN', async () => {
+      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 'hello', 456: 10 } };
+      const response = await measures.validateFormData(formData);
+      expect(response[0]).to.eql("Invalid field value");
+    });
+
+    it('should return an empty array when data is valid', async () => {
+      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 5, 456: 10 } };
+      const response = await measures.validateFormData(formData);
+      expect(response.length).to.eql(0);
+    });
+  });
+
+
+  describe('#validateEntities', () => {
+    const categoryFields = [{ id: 1 }];
+
+    beforeEach(() => {
+      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
+      sinon.stub(validation, 'validateItems');
+      sinon.stub(parse, 'parseItems')
+    });
+
+    afterEach(() => {
+      parse.parseItems.restore();
+      validation.validateItems.restore();
+      Category.fieldDefinitions.restore();
+    });
+
+    it('rejects if no entities found', async () => {
+      parse.parseItems.returns([]);
+      validation.validateItems.returns([])
+      const response = await measures.validateEntities();
+      expect(response.errors).to.eql([{ error: 'No entities found' }]);
+    });
+
+    it('validates each item parsed', async () => {
+      const items = [{ id: 1 }, { id: 2 }];
+      const parsedItems = [{ foo: 'bar' }];
+      parse.parseItems.returns(parsedItems);
+      validation.validateItems.returns([])
+
+      const response = await measures.validateEntities(items);
+
+      expect(response).to.eql({ errors: [], parsedEntities: [ { foo: 'bar' } ] });
+      sinon.assert.calledWith(validation.validateItems, parsedItems, categoryFields);
     });
   });
 
