@@ -105,6 +105,19 @@ describe('helpers/measures', () => {
     });
   });
 
+  describe('#getMeasureEntitiesFromGroup', () => {
+
+    it('should return filter data which only contains the same metric, sorted by date', async () => {
+      const measure1 = { name: 'test1', metricID: 'measure-1', date: '05/10/2020' }
+      const measure2 = { name: 'test2', metricID: 'measure-2', date: '05/10/2020' }
+      const measure3 = { name: 'test3', metricID: 'measure-1', date: '04/10/2020' }
+      const groupEntities = [measure1, measure2, measure3];
+      const response =  measures.getMeasureEntitiesFromGroup(groupEntities, 'measure-1');
+
+      expect(response).to.eql([ measure3, measure1 ]);
+    });
+  });
+
   describe('#removeBlankEntityInputValues', () => {
     it('should remove empty vales and return data', async () => {
       const formData = { 123: '', 456: '12' };

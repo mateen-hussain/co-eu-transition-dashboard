@@ -18,7 +18,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
   beforeEach(() => {
 
     res = { cookies: sinon.stub(), redirect: sinon.stub(), render: sinon.stub(),   sendStatus: sinon.stub(), send: sinon.stub(), status: sinon.stub(), locals: {} };
-    req = { body: {}, cookies: [], params: { metricId: 'measure-1', data: '12/10/2020' }, user: { roles: [], getPermittedMetricMap: sinon.stub().returns({}) }, flash: sinon.stub() };
+    req = { body: {}, cookies: [], params: { groupId: 'measure-1', metricId: 'measure-1', date: '12/10/2020' }, user: { roles: [], getPermittedMetricMap: sinon.stub().returns({}) }, flash: sinon.stub() };
     res.status.returns(res);
 
     page = new MeasureValue('edit-value', req, res);
@@ -40,13 +40,14 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
   describe('#pathToBind', () => {
     it('returns correct url', () => {
-      expect(page.pathToBind).to.eql(`${paths.dataEntryEntity.measureValue}/:metricId/:date`);
+      expect(page.pathToBind).to.eql(`${paths.dataEntryEntity.measureValue}/:metricId/:groupId/:date/:successful?`);
     });
   });
 
   describe('#editUrl', () => {
     it('returns url for edit measure value', () => {
-      expect(page.editUrl).to.eql(`${page.url}/${req.params.measureId}`);
+      const { metricId, groupId, date } = req.params;
+      expect(page.editUrl).to.eql(`${page.url}/${metricId}/${groupId}/${encodeURIComponent(date)}`);
     });
   });  
 
@@ -71,7 +72,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     });
   });
 
-  describe('#getMeasureEntities', () => {
+  describe('#getGroupEntities', () => {
     const entities = {
       id: 'some-id',
       publicId: 'some-public-id-1',
@@ -108,12 +109,12 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
         getPermittedMetricMap: sinon.stub().returns({})
       };
 
-      const response = await page.getMeasureEntities(category);
+      const response = await page.getGroupEntities(category);
 
       expect(response).to.eql({ 
-        measuresEntities: [{
+        groupEntities: [{
           id: 'some-id',
-          parentPublicId: 'parent-1',
+          parentStatementPublicId: 'parent-1',
           publicId: 'some-public-id-1',
           test: 'new value',
         }],
@@ -124,10 +125,10 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
         where: { categoryId: category.id },
         include: [{
           model: EntityFieldEntry,
-          where: { value: req.params.metricId },
+          where: { value: req.params.groupId },
           include: {
             model: CategoryField,
-            where: { name: 'metricId' },
+            where: { name: 'groupId' },
           }
         },{
           model: Entity,
@@ -143,31 +144,32 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
   describe('#getMeasure', () => {
     const measureCategory = { id: 'some-category' };
     const measureEntities = {
-      measuresEntities : [{ metricID: 'measure-1', id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }],
+      groupEntities : [{ metricID: 'measure-1', id: 'new-id', publicId: 'pubId', parents: [], entityFieldEntries: [{ categoryField: { name: 'test' }, value: 'new value' }] }],
       raygEntities: [{ publicId: 'rayg1', filter: 'RAYG' }]
     };
 
     beforeEach(() => {
       sinon.stub(measures, 'getCategory').returns(measureCategory);
-      sinon.stub(page, 'getMeasureEntities').returns({ measuresEntities: [], raygEntities: [] });
+      sinon.stub(page, 'getGroupEntities').returns({ groupEntities: [], raygEntities: [] });
     });
 
     afterEach(() => {
       measures.getCategory.restore();
-      page.getMeasureEntities.restore();
+      page.getGroupEntities.restore();
     });
 
     it('Get measures data', async () => {
-      page.getMeasureEntities.returns(measureEntities);
+      page.getGroupEntities.returns(measureEntities);
 
       const response = await page.getMeasure();
 
       sinon.assert.calledOnce(measures.getCategory);
-      sinon.assert.calledOnce(page.getMeasureEntities);
+      sinon.assert.calledOnce(page.getGroupEntities);
 
       expect(response).to.eql({
-        measuresEntities: measureEntities.measuresEntities,
-        raygEntities: measureEntities.raygEntities
+        measureEntities: measureEntities.groupEntities,
+        raygEntities: measureEntities.raygEntities,
+        uniqMetricIds: ['measure-1']
       });
     });
 
@@ -175,8 +177,77 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       await page.getMeasure();
 
       sinon.assert.calledOnce(measures.getCategory);
-      sinon.assert.calledOnce(page.getMeasureEntities);
+      sinon.assert.calledOnce(page.getGroupEntities);
       sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
+    });
+  });
+
+  describe('#getPublicIdFromExistingEntity', () => {
+    const measureEntities = [
+      { id: '123', value: 'value 1', label: 'test', label2: 'test2' }, 
+      { id: '456', value: 'value 2', label: 'test2' },
+      { id: '789', value: 'value 3' }
+    ];
+      
+    it('should return publicId for entitiy when label and label2 are set and match' , async () => {
+      const entitiesForSelectedDate = [{ id: '456', publicId: 'test-1',  label: 'test', label2: 'test2' }]
+      const response =  page.getPublicIdFromExistingEntity(measureEntities, entitiesForSelectedDate)
+
+      expect(response).to.eql('test-1');
+    });
+
+    it('should return publicId for entitiy when label are set and match and label2 is not' , async () => {
+      const entitiesForSelectedDate = [{ id: '678', publicId: 'test-2', label: 'test' }]
+      const response =  page.getPublicIdFromExistingEntity(measureEntities, entitiesForSelectedDate)
+
+      expect(response).to.eql('test-2');
+    });
+
+    it('should return publicId for entitiy when label is set and label2 is not' , async () => {
+      const entitiesForSelectedDate = [{ id: '890', publicId: 'test-3' }]
+      const response =  page.getPublicIdFromExistingEntity(measureEntities, entitiesForSelectedDate)
+
+      expect(response).to.eql('test-3');
+    });
+  });
+
+  describe('#createEntitiesFromClonedData', () => {
+    const entities = [{
+      id: 123,
+      publicId: 'some-public-id-1',
+      value: 10,
+    }];
+    const formData = { day: 1, month: 10, year: 2020, type: 'entries', entities: { 123: 100 } };
+    const entitiesForSelectedDate = [{ id: '890', publicId: 'test-3' }]
+
+    it('should return the correct data structure', async () => {
+      
+      const response = await page.createEntitiesFromClonedData(entities, formData, entitiesForSelectedDate);
+
+      expect(response).to.eql([{
+        publicId: 'test-3',
+        date: '2020-10-01',
+        value: 100
+      }]);
+    });
+  });
+
+  describe('#updateRaygRowForSingleMeasureWithNoFilter', () => {
+    const entities = [{ id: 1, value: 'hello again', parentStatementPublicId: 'state-1'  }];
+    const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }];
+    const raygEntities = [{ value: 1, publicId: 'pub-1', parentStatementPublicId: 'state-1' }];
+    const uniqMetricIds = ['metric1'];
+
+    it('should return an array when measure is the only item in the group and that has not filter values set', async () => {
+      const formData = { day: 6, month: 10, year: 2020 };
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
+      expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: "hello again", date: "2020-10-06" }]);
+    });
+
+    it('should return input date when date is older than latest measure date', async () => {
+      const formData = { day: 5, month: 10, year: 2020 };
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
+      expect(response).to.eql(entities);
     });
   });
 
@@ -219,7 +290,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
   describe('#getMeasureData', () => {
     const measureEntities = {
-      measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }],
+      measureEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }],
       raygEntities: [{ value: 1 }],
       uniqMetricIds: ['metric1']
     };
@@ -235,6 +306,71 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     it('getMeasureData should call getMeasure', async () => {
       await page.getMeasureData();
       sinon.assert.calledOnce(page.getMeasure);
+    });
+  });
+
+  describe('#addMeasureEntityData', () => {
+    const clonedEntities = [{ id: 1, value: 'hello' }];
+    const newEntities = [{ id: 1, value: 'hello again' }];
+    const errors = [{ error: 'error' }]
+    const parsedEntities = [{ id: 1, value: 'parsed again' }];
+
+    const getMeasureData = {
+      measureEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { metricID: 'metric1', date: '10/10/2020', value: 3 }],
+      raygEntities: [{ value: 1, publicId: 'pub-1', parentPublicId: 'state-1' }],
+      uniqMetricIds: ['metric1']
+    };
+
+    beforeEach(() => {
+      // sinon.stub(page, 'getEntitiesToBeCloned').returns(clonedEntities)
+      // sinon.stub(page, 'createEntitiesFromClonedData').returns(newEntities)
+      sinon.stub(page, 'saveMeasureData').returns({})
+      // sinon.stub(page, 'renderRequest').returns()
+      sinon.stub(page, 'updateRaygRowForSingleMeasureWithNoFilter').returns()
+      sinon.stub(measures, 'validateEntities').returns([]);
+      sinon.stub(page, 'getMeasure').returns(getMeasureData);
+      sinon.stub(page, 'renderRequest').returns();
+    });
+
+    afterEach(() => {
+      measures.validateFormData.restore();
+      measures.validateEntities.restore();
+      page.saveMeasureData.restore();
+      page.updateRaygRowForSingleMeasureWithNoFilter.restore();
+      page.getMeasure.restore();
+      page.renderRequest.restore();
+    });
+
+    it('should return errors when validateFormData return errors', async () => {
+      page.req.params.date = '10/10/2020'
+      const formData = { day: 1, month: '', year: 2020, type: 'entries', entities: { 123: 100 } };
+      sinon.stub(measures, 'validateFormData').returns(["error"])
+
+      await page.updateMeasureValues(formData);
+
+      sinon.assert.calledWith(measures.validateFormData, formData);
+      sinon.assert.calledWith(page.renderRequest, res, { errors: ["error"] })
+    });
+
+    it('should return errors when validateEntities returns errors', async () => {
+      sinon.stub(measures, 'validateFormData').returns([])
+      measures.validateEntities.returns({ errors, parsedEntities })
+      const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
+
+      await page.updateMeasureValues(formData);
+
+      sinon.assert.calledWith(page.renderRequest, res, { errors: ["Error in entity data"] })
+    });
+
+    it('should call saveMeasureData with parsedEntities data', async () => {
+      sinon.stub(measures, 'validateFormData').returns([])
+      measures.validateEntities.returns({ errors: [], parsedEntities })
+      page.updateRaygRowForSingleMeasureWithNoFilter.returns(parsedEntities);
+      const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
+
+      await page.updateMeasureValues(formData);
+
+      sinon.assert.calledWith(page.saveMeasureData, parsedEntities);
     });
   });
 

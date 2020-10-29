@@ -77,19 +77,19 @@ class MeasureValue extends Page {
   getPublicIdFromExistingEntity(clondedEntity, entitiesForSelectedDate) {
     let publicIdForClonedEntity;
 
-    entitiesForSelectedDate.forEach((uiInput) => {
+    entitiesForSelectedDate.forEach((entitiy) => {
       // label and label2 are generated from applyLabelToEntities using filter, filter2, filterValue, filterValue2
       // we can use this to match the data submitted to the entities for the selected day
-      if (clondedEntity.label && clondedEntity.label2 && uiInput.label && uiInput.label2) {
-        if (clondedEntity.label === uiInput.label && clondedEntity.label2 === uiInput.label2) {
-          publicIdForClonedEntity = uiInput.publicId;
+      if (clondedEntity.label && clondedEntity.label2 && entitiy.label && entitiy.label2) {
+        if (clondedEntity.label === entitiy.label && clondedEntity.label2 === entitiy.label2) {
+          publicIdForClonedEntity = entitiy.publicId;
         }
-      } else if (clondedEntity.label && uiInput.label) {
-        if (clondedEntity.label === uiInput.label) {
-          publicIdForClonedEntity = uiInput.publicId;
+      } else if (clondedEntity.label && entitiy.label) {
+        if (clondedEntity.label === entitiy.label) {
+          publicIdForClonedEntity = entitiy.publicId;
         }
       } else {
-        publicIdForClonedEntity = uiInput.publicId;
+        publicIdForClonedEntity = entitiy.publicId;
       }
     });
 
@@ -146,6 +146,7 @@ class MeasureValue extends Page {
 
   async updateMeasureValues(formData) {
     const { measureEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
+    
     measures.applyLabelToEntities(measureEntities);
     
     const entitiesForSelectedDate = measureEntities.filter((measure) => measure.date === this.req.params.date);
