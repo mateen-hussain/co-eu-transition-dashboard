@@ -127,7 +127,7 @@ class MeasureValue extends Page {
     const { measuresEntities, raygEntities }  = await this.getMeasureEntities(measureCategory);
 
     if (measuresEntities.length === 0) {
-      return this.res.redirect(paths.dataEntryEntity.measureList);
+      return this.res.redirect(config.paths.dataEntryEntity.measureList);
     }
 
     return {
@@ -171,7 +171,7 @@ class MeasureValue extends Page {
     const measuresForSelectedDate = measuresEntities.filter(measure => measure.date === this.req.params.date)
 
     if (!moment(this.req.params.date, 'DD/MM/YYYY').isValid() || measuresForSelectedDate.length === 0) {
-      return this.res.redirect(paths.dataEntryEntity.measureList);
+      return this.res.redirect(config.paths.dataEntryEntity.measureList);
     }
 
     const measureValues = this.generateInputValues(uiInputs, measuresForSelectedDate, this.req.params.date)
