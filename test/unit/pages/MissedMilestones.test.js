@@ -6,15 +6,42 @@ const Project = require('models/project');
 const config = require('config');
 const moment = require('moment');
 const authentication = require('services/authentication');
+const proxyquire = require('proxyquire');
 
 let page = {};
 let res = {};
 let req = {};
+let filtersStub = {};
+
+const departments = [{
+  id: 1,
+  name: 'Dept1',
+  projects: [{
+    milestones: [{ id: 1, date: '13-06-2020' },{ id: 2, date: '10-05-2020' },{ id: 3, date: '05-04-2020' }]
+  },{
+    milestones: [{ id: 1, date: '15-06-2020' }]
+  }]
+},{
+  id: 2,
+  name: 'Dept2',
+  projects: [{
+    milestones: [{ id: 1, date: '13-06-2020' }, { id: 2, date: '15-04-2020' }, { id: 3, date: '01-01-2020' }]
+  },{
+    milestones: [{ id: 1, date: '06-06-2020' }, { id: 2, date: '25-08-2020' }, { id: 3, date: '04-04-2020' }]
+  }]
+}];
 
 describe('pages/missed-milestones/MissedMilestones', () => {
   beforeEach(() => {
-    res = { cookies: sinon.stub() };
+    res = { cookies: sinon.stub(), redirect: sinon.stub() };
     req = { cookies: [], user: { getDepartmentsWithProjects: sinon.stub() } };
+    filtersStub = sinon.stub();
+
+    const MissedMilestones = proxyquire('pages/missed-milestones/MissedMilestones', {
+      'helpers/filters': {
+        getFilters: filtersStub
+      }
+    });
 
     page = new MissedMilestones('some path', req, res);
 
@@ -28,6 +55,12 @@ describe('pages/missed-milestones/MissedMilestones', () => {
   describe('#url', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(paths.missedMilestones);
+    });
+  });
+
+  describe('#schema', () => {
+    it('returns filters', () => {
+      expect(page.schema).to.eql({ filters: {} });
     });
   });
 
@@ -67,24 +100,6 @@ describe('pages/missed-milestones/MissedMilestones', () => {
   });
 
   describe('#getDepartmentsWithMissedMilestones', () => {
-    const departments = [{
-      id: 1,
-      name: 'Dept1',
-      projects: [{
-        milestones: [{ id: 1, date: '13-06-2020' },{ id: 2, date: '10-05-2020' },{ id: 3, date: '05-04-2020' }]
-      },{
-        milestones: [{ id: 1, date: '15-06-2020' }]
-      }]
-    },{
-      id: 2,
-      name: 'Dept2',
-      projects: [{
-        milestones: [{ id: 1, date: '13-06-2020' }, { id: 2, date: '15-04-2020' }, { id: 3, date: '01-01-2020' }]
-      },{
-        milestones: [{ id: 1, date: '06-06-2020' }, { id: 2, date: '25-08-2020' }, { id: 3, date: '04-04-2020' }]
-      }]
-    }];
-
     let chartData = {};
     let departmentsWithMissedMilestones = {};
 
@@ -156,6 +171,45 @@ describe('pages/missed-milestones/MissedMilestones', () => {
     });
   });
 
+  describe('#groupDataByDate', () => {
+    it('calls groupDataByDate with correct parameters and returns correct response', async () => {
+      const data = await page.groupDataByDate(departments);
+      expect(data[0].date).to.eql('01/01/2020');
+      expect(data[0].departments[0].name).to.eql('Dept2');
+      expect(data[0].departments[0].totalMilestones).to.eql(1);
+    });
+  });
+
+  describe('#milestoneDates', () => {
+    it('calls milestoneDates with correct parameters and returns correct response', async () => {
+      const data = await page.milestoneDates(departments);
+      expect(data).to.eql(['01-01-2020', '04-04-2020', '05-04-2020', '15-04-2020', '10-05-2020', '06-06-2020', '13-06-2020', '15-06-2020', '25-08-2020']);
+    });
+  });
+
+  describe('#departmentsWithProjectsWithMilestonesForDate', () => {
+    it('calls departmentsWithProjectsWithMilestonesForDate with correct parameters and returns correct response', async () => {
+      const data = await page.departmentsWithProjectsWithMilestonesForDate(departments, '01-01-2020');
+      expect(data[0].name).to.eql('Dept2');
+      expect(data[0].totalMilestonesMissed).to.eql(6);
+    });
+  });
+
+  describe('#projectsWithMilestonesForDate', () => {
+    it('calls projectsWithMilestonesForDate with correct parameters and returns correct response', async () => {
+      const data = await page.projectsWithMilestonesForDate(departments[0].projects, '13-06-2020');
+      expect(data[0].milestones[0].date).to.eql('13-06-2020');
+      expect(data[0].milestones[0].id).to.eql(1);
+    });
+  });
+
+  describe('#filters', () => {
+    it('should call the filters helper function', async () => {
+      await page.filters();
+      return sinon.assert.calledWith(filtersStub, {});
+    });
+  });
+
   describe('#formatDate', () => {
     it('should format the date', () => {
       expect(page.formatDate('01/01/2020')).to.eql('1st January 2020');
@@ -165,6 +219,15 @@ describe('pages/missed-milestones/MissedMilestones', () => {
   describe('#filtersFields', () => {
     it('should not return the filters list', () => {
       expect(page.filtersFields).to.eql(['deliveryTheme']);
+    });
+  });
+
+  describe('#postRequest', () => {
+    it('clears the filters if the user clicks clear', async () => {
+      sinon.stub(page, 'clearData').resolves();
+      page.req.body = { clear: 'clear' };
+      await page.postRequest(req, res);
+      sinon.assert.called(page.clearData);
     });
   });
 });
