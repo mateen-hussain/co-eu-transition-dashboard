@@ -12,8 +12,7 @@ const logger = require('services/logger');
 const sequelize = require('services/sequelize');
 const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
-const validation = require('helpers/validation');
-const parse = require('helpers/parse');
+
 const filterMetricsHelper = require('helpers/filterMetrics');
 const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
@@ -175,18 +174,13 @@ class MeasureEdit extends Page {
     });
   }
 
-  async getMeasureEntitiesFromGroup(groupEntities) {
-    const measureEntities = groupEntities.filter(entity => entity.metricID === this.req.params.metricId)
-    const sortedEntities = measureEntities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
-    return sortedEntities;
-  }
 
   async getMeasure() {
     const measureCategory = await measures.getCategory('Measure');
     const themeCategory = await measures.getCategory('Theme');
     const { groupEntities, raygEntities }  = await this.getGroupEntities(measureCategory, themeCategory);
 
-    const measuresEntities = await this.getMeasureEntitiesFromGroup(groupEntities);
+    const measuresEntities = await measures.getMeasureEntitiesFromGroup(groupEntities, this.req.params.metricId);
 
     if (measuresEntities.length === 0) {
       return this.res.redirect(paths.dataEntryEntity.measureList);
@@ -308,58 +302,7 @@ class MeasureEdit extends Page {
     });
   }
 
-  async validateFormData(formData, measuresEntities = []) {
-    const errors = [];
 
-    if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
-      errors.push("Invalid date");
-    }
-
-    const isDateDuplicated = measuresEntities.some(entity => moment(buildDateString(formData), 'YYYY-MM-DD').isSame(moment(entity.date, 'DD/MM/YYYY')))
-
-    if (isDateDuplicated) {
-      errors.push("Date already exists");
-    }
-
-    if (!formData.entities) {
-      errors.push("Missing entity values");
-    }
-
-    if (formData.entities) {
-      const submittedEntityId = Object.keys(formData.entities);
-
-      submittedEntityId.forEach(entityId => {
-        const entityValue = formData.entities[entityId]
-        if (entityValue.length === 0 || isNaN(entityValue)) {
-          errors.push("Invalid field value");
-        }
-      })
-
-      if (Object.keys(formData.entities).length === 0) {
-        errors.push("You must submit at least one value");
-      }
-    }
-
-    return errors;
-  }
-
-  async validateEntities(entities) {
-    const categoryFields = await Category.fieldDefinitions('Measure');
-    const parsedEntities = parse.parseItems(entities, categoryFields, true);
-
-    const errors = [];
-    if (!parsedEntities || !parsedEntities.length) {
-      errors.push({ error: 'No entities found' });
-    }
-
-    const entityErrors = validation.validateItems(parsedEntities, categoryFields);
-    errors.push(...entityErrors)
-
-    return {
-      errors,
-      parsedEntities
-    }
-  }
 
   async postRequest(req, res) {
     const canUserAccessMetric = await this.canUserAccessMetric();
@@ -519,29 +462,19 @@ class MeasureEdit extends Page {
     return newEntities
   }
 
-  removeBlankEntityInputValues (entityInputs) {
-    return Object.keys(entityInputs).reduce((acc, entityId) => {
-      const value = entityInputs[entityId]
-      if (value && !isNaN(value)) {
-        acc[entityId] = value
-      }
-      return acc;
-    }, {} )
-  }
-
   async addMeasureEntityData (formData) {
     const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
 
-    formData.entities = this.removeBlankEntityInputValues(formData.entities);
+    formData.entities = measures.removeBlankEntityInputValues(formData.entities);
 
-    const formValidationErrors = await this.validateFormData(formData, measuresEntities);
+    const formValidationErrors = await measures.validateFormData(formData, measuresEntities);
     if (formValidationErrors.length > 0) {
       return this.renderRequest(this.res, { errors: formValidationErrors });
     }
 
     const clonedEntities = await this.getEntitiesToBeCloned(Object.keys(formData.entities))
     const newEntities = await this.createEntitiesFromClonedData(clonedEntities, formData)
-    const { errors, parsedEntities } = await this.validateEntities(newEntities);
+    const { errors, parsedEntities } = await measures.validateEntities(newEntities);
 
     const entitiesToBeSaved = await this.updateRaygRowForSingleMeasureWithNoFilter(parsedEntities, formData, measuresEntities, raygEntities, uniqMetricIds)
 

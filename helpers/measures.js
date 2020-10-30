@@ -4,6 +4,10 @@ const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const logger = require('services/logger');
 const uniqWith = require('lodash/uniqWith');
+const { buildDateString } = require('helpers/utils');
+const moment = require('moment');
+const validation = require('helpers/validation');
+const parse = require('helpers/parse');
 
 const applyLabelToEntities = (entities) => {
   entities.forEach(entity => {
@@ -59,9 +63,82 @@ const getCategory = async (name) => {
   return category;
 }
 
+const getMeasureEntitiesFromGroup = (groupEntities, metricId) => {
+  const measureEntities = groupEntities.filter(entity => entity.metricID === metricId)
+  const sortedEntities = measureEntities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+  return sortedEntities;
+}
+
+const removeBlankEntityInputValues = (entityInputs) => {
+  return Object.keys(entityInputs).reduce((acc, entityId) => {
+    const value = entityInputs[entityId]
+    if (value && !isNaN(value)) {
+      acc[entityId] = value
+    }
+    return acc;
+  }, {} )
+}
+
+const validateFormData = (formData, measuresEntities = []) => {
+  const errors = [];
+
+  if (!moment(buildDateString(formData), 'YYYY-MM-DD').isValid()) {
+    errors.push("Invalid date");
+  }
+
+  const isDateDuplicated = measuresEntities.some(entity => moment(buildDateString(formData), 'YYYY-MM-DD').isSame(moment(entity.date, 'DD/MM/YYYY')))
+
+  if (isDateDuplicated) {
+    errors.push("Date already exists");
+  }
+
+  if (!formData.entities) {
+    errors.push("Missing entity values");
+  }
+
+  if (formData.entities) {
+    const submittedEntityId = Object.keys(formData.entities);
+
+    submittedEntityId.forEach(entityId => {
+      const entityValue = formData.entities[entityId]
+      if (entityValue.length === 0 || isNaN(entityValue)) {
+        errors.push("Invalid field value");
+      }
+    })
+
+    if (Object.keys(formData.entities).length === 0) {
+      errors.push("You must submit at least one value");
+    }
+  }
+
+  return errors;
+}
+
+const validateEntities = async (entities) => {
+  const categoryFields = await Category.fieldDefinitions('Measure');
+  const parsedEntities = parse.parseItems(entities, categoryFields, true);
+
+  const errors = [];
+  if (!parsedEntities || !parsedEntities.length) {
+    errors.push({ error: 'No entities found' });
+  }
+
+  const entityErrors = validation.validateItems(parsedEntities, categoryFields);
+  errors.push(...entityErrors)
+
+  return {
+    errors,
+    parsedEntities
+  }
+}
+
 module.exports = {
   applyLabelToEntities,
   calculateUiInputs,
   getEntityFields,
-  getCategory
+  getCategory,
+  getMeasureEntitiesFromGroup,
+  removeBlankEntityInputValues,
+  validateFormData,
+  validateEntities
 };
