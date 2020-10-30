@@ -9,6 +9,7 @@ const Category = require('models/category');
 const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
+const sequelize = require('services/sequelize');
 
 let page = {};
 let res = {};
@@ -79,35 +80,27 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       parents: [
         {
           publicId: 'parent-1',
-          parents: [ {
-            categoryId: 1,
-            entityFieldEntries: [{
-              categoryField: {
-                name: 'name',
-              },
-              value: 'borders'
-            }]
-          }]
+          categoryId: 1,
         }
       ]
     };
     const category = { id: 2 };
     const entityFieldEntries = [{ value: 'new value', categoryField: { name: 'test' } }];
+    const statementCategory = { id: 1 };
 
     beforeEach(() => {
+      sinon.stub(measures, 'getCategory').returns(statementCategory)
       sinon.stub(measures, 'getEntityFields').returns(entityFieldEntries)
       Entity.findAll.returns([entities]);
     });
 
     afterEach(() => {
       measures.getEntityFields.restore();
+      measures.getCategory.restore();
     });
 
     it('gets entities for a given category if admin', async () => {
-      page.req.user = {
-        isAdmin: true,
-        getPermittedMetricMap: sinon.stub().returns({})
-      };
+      req.user = { isAdmin: true, getPermittedMetricMap: sinon.stub().returns({}) }
 
       const response = await page.getGroupEntities(category);
 
@@ -310,8 +303,6 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
   });
 
   describe('#addMeasureEntityData', () => {
-    const clonedEntities = [{ id: 1, value: 'hello' }];
-    const newEntities = [{ id: 1, value: 'hello again' }];
     const errors = [{ error: 'error' }]
     const parsedEntities = [{ id: 1, value: 'parsed again' }];
 
@@ -322,10 +313,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     };
 
     beforeEach(() => {
-      // sinon.stub(page, 'getEntitiesToBeCloned').returns(clonedEntities)
-      // sinon.stub(page, 'createEntitiesFromClonedData').returns(newEntities)
       sinon.stub(page, 'saveMeasureData').returns({})
-      // sinon.stub(page, 'renderRequest').returns()
       sinon.stub(page, 'updateRaygRowForSingleMeasureWithNoFilter').returns()
       sinon.stub(measures, 'validateEntities').returns([]);
       sinon.stub(page, 'getMeasure').returns(getMeasureData);
@@ -374,4 +362,49 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     });
   });
 
+  describe('#saveMeasureData', () => {
+    const categoryFields = [{ id: 1 }];
+    const category = { name: 'Measure' };
+    const entities  = [{ id: 1, value: 'some-value' }];
+
+    beforeEach(() => {
+      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
+      Category.findOne.resolves(category);
+      sinon.stub(Entity, 'import');
+
+    });
+
+    afterEach(() => {
+      Entity.import.restore();
+      Category.fieldDefinitions.restore();
+    });
+
+    it('save entities to the database', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+
+      await page.saveMeasureData(entities);
+
+      sinon.assert.calledWith(Entity.import, entities[0], category, categoryFields, { transaction });
+      sinon.assert.calledOnce(transaction.commit);
+      const { metricId, groupId, date } = req.params;
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${metricId}/${groupId}/${encodeURIComponent(date)}/successful`);
+    });
+
+    it('rollback transaction on error', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+
+      Entity.import.throws(new Error('error'));
+
+      await page.saveMeasureData(entities);
+
+      const { metricId, groupId, date } = req.params
+
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/${metricId}/${groupId}/${encodeURIComponent(date)}`);
+      sinon.assert.calledOnce(transaction.rollback);
+    });
+  });
 });
