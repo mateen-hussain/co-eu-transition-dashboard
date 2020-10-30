@@ -115,7 +115,7 @@ class MeasureValue extends Page {
     return measureEntities.filter((entity) => formEntitiesIds.includes(entity.id));
   }
 
-  // If adding a new value for a measure which is the only measure within a group and which also has no filter,
+  // If updating a measure value which is the only measure within a group and which also has no filter,
   // update the rayg row value as well
   async updateRaygRowForSingleMeasureWithNoFilter(newEntities = [], formData, measureEntities, raygEntities, uniqMetricIds) {
     const doesNotHaveFilter = !measureEntities.find(measure => !!measure.filter);
