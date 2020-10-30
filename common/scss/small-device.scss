@@ -1,5 +1,21 @@
 @media only screen and (max-width:768px) {
+
+    // Readiness Overview
+
+    .top-statements {
+        height: auto;
+    }
+
     .risk-col {
-        display: block;
+        border-left: none;
+    }
+
+    .overview-link {
+        font-weight: normal;
+        display: inline !important;
+    }
+
+    #themes {
+        margin-top: 20px;
     }
 }
