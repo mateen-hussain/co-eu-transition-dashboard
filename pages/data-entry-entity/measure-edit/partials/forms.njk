@@ -23,28 +23,7 @@
   </table>
 {% endif %}
 
-<table class="govuk-table measures-table">
-  <thead class="govuk-table__head">
-    <tr class="govuk-table__row">
-      <th scope="col" class="govuk-table__header">Measure UID</th>
-      <th scope="col" class="govuk-table__header">Theme</th>
-      {% if not isPartOfGroup %}
-        <th scope="col" class="govuk-table__header">Status</th>
-      {% endif %}
-      <th scope="col" class="govuk-table__header">Last updated</th>
-    </tr>
-  </thead>
-  <tbody class="govuk-table__body">
-    <tr class="govuk-table__row">
-      <td class="govuk-table__cell">{{ latestMeasure.metricID }}</td>
-      <td class="govuk-table__cell">{{ latestMeasure.theme }}</td>
-      {% if not isPartOfGroup %}
-        <td class="govuk-table__cell "><span class="measure-rayg {{ raygEntity.colour }}"></span></td>
-      {% endif %}
-      <td class="govuk-table__cell">{{ latestMeasure.date }}</td>
-    </tr>
-  </tbody>
-</table>
+{{ measureHeading(latestMeasure, raygEntity, isPartOfGroup) }}
 
 {% set items = [] %}
 
