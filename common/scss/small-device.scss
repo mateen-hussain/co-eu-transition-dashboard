@@ -2,6 +2,15 @@
 
     // Readiness Overview
 
+    @media (min-width: 40.0625em) {
+        .readiness-overview {
+            .govuk-grid-column-one-quarter,
+            .govuk-grid-column-three-quarters {
+            width: 100%;
+          } 
+        }
+      }
+
     .top-statements {
         height: auto;
     }
