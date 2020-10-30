@@ -319,8 +319,8 @@ class MeasureValue extends Page {
     const backLink = `${config.paths.dataEntryEntity.measureEdit}/${latestEntity.metricID}/${latestEntity.groupID}`;
     const doesHaveFilter = measureEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
-    const isLatestDateInTheFuture =  moment(latestEntity.date, 'DD/MM/YYYY').isAfter(moment());
-    const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateInTheFuture
+    const isLatestDateOrInTheFuture =  moment(latestEntity.date, 'DD/MM/YYYY').isAfter(moment());
+    const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateOrInTheFuture
 
     return {
       latest: latestEntity,
