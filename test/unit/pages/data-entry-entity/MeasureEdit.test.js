@@ -15,6 +15,7 @@ const flash = require('middleware/flash');
 const parse = require('helpers/parse');
 const validation = require('helpers/validation');
 const sequelize = require('services/sequelize');
+const measures = require('helpers/measures')
 
 let page = {};
 let res = {};
@@ -113,53 +114,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
-  describe('#getEntityFields', () => {
-    it('gets entity fields', async () => {
-      const entityFieldEntries = [{ entityfieldEntry: { value: 'new value', categoryField: { name: 'test' } } }];
-      EntityFieldEntry.findAll.resolves(entityFieldEntries);
-
-      const response = await page.getEntityFields('measure-1');
-
-      expect(response).to.eql(entityFieldEntries);
-    });
-
-    it('returns error when no entity fields data ', async () => {
-      EntityFieldEntry.findAll.resolves();
-
-      let error = {};
-      try {
-        await page.getEntityFields('measure-1');
-      } catch (err) {
-        error = err.message;
-      }
-
-      expect(error).to.eql('EntityFieldEntry export, error finding entityFieldEntries');
-    });
-  });
-
-  describe('#getCategory', () => {
-    it('gets and returns category', async () => {
-      const category = { name: 'Theme' };
-      Category.findOne.resolves(category);
-
-      const response = await page.getCategory('Theme');
-
-      expect(response).to.eql(category);
-    });
-
-    it('gets and returns category', async () => {
-      Category.findOne.resolves();
-
-      let error = {};
-      try {
-        await page.getCategory();
-      } catch (err) {
-        error = err.message;
-      }
-
-      expect(error).to.eql('Category export, error finding Measure category');
-    });
-  });
 
   describe('#getMeasureEntitiesFromGroup', () => {
 
@@ -198,14 +152,14 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const entityFieldEntries = [{ value: 'new value', categoryField: { name: 'test' } }];
 
     beforeEach(() => {
-      sinon.stub(page, 'getEntityFields').returns(entityFieldEntries)
+      sinon.stub(measures, 'getEntityFields').returns(entityFieldEntries)
       Entity.findAll.returns([entities]);
       sinon.stub(rayg, 'getRaygColour').returns('green');
       sinon.stub(filterMetricsHelper,'filterMetrics').returnsArg(1);
     });
 
     afterEach(() => {
-      page.getEntityFields.restore();
+      measures.getEntityFields.restore();
       rayg.getRaygColour.restore();
       filterMetricsHelper.filterMetrics.restore();
     });
@@ -268,13 +222,13 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     };
 
     beforeEach(() => {
-      sinon.stub(page, 'getCategory').returns(measureCategory);
+      sinon.stub(measures, 'getCategory').returns(measureCategory);
       sinon.stub(page, 'getMeasureEntitiesFromGroup');
       sinon.stub(page, 'getGroupEntities').returns(measureEntities);
     });
 
     afterEach(() => {
-      page.getCategory.restore();
+      measures.getCategory.restore();
       page.getMeasureEntitiesFromGroup.restore();
       page.getGroupEntities.restore();
     });
@@ -284,7 +238,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       const response = await page.getMeasure();
 
-      sinon.assert.calledTwice(page.getCategory);
+      sinon.assert.calledTwice(measures.getCategory);
       sinon.assert.calledOnce(page.getGroupEntities);
       sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
 
@@ -299,31 +253,10 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       page.getMeasureEntitiesFromGroup.returns([]);
       await page.getMeasure();
 
-      sinon.assert.calledTwice(page.getCategory);
+      sinon.assert.calledTwice(measures.getCategory);
       sinon.assert.calledOnce(page.getGroupEntities);
       sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
       sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
-    });
-  });
-
-  describe('#applyLabelToEntities', () => {
-    it('Should create label with filtervalue and filtervalue2 when both filter and filter2 exist', async () => {
-      const measures = [{ filter: 'filter1', filterValue: 'value1', filter2: 'filter2', filterValue2: 'value2' }];
-      page.applyLabelToEntities(measures);
-      expect(measures[0].label).to.eql('filter1 : value1');
-      expect(measures[0].label2).to.eql('filter2 : value2');
-    });
-
-    it('Should create label with filtervalue if only filter exists', async () => {
-      const measures = [{ filter: 'filter1', filterValue: 'value1' }];
-      page.applyLabelToEntities(measures);
-      expect(measures[0].label).to.eql('filter1 : value1');
-    });
-
-    it('Should not create label when there are no filters', async () => {
-      const measures = [{ other: 'other values', }];
-      page.applyLabelToEntities(measures);
-      expect(measures[0].label).not.to.exist;
     });
   });
 
@@ -383,36 +316,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
   });
 
-  describe('#calculateUiInputs', () => {
-    it('should filter list of entities by date and return data for unique entities when filter and filter2 are set', async () => {
-      const measureEntities = [
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', filter2: 'area', filterValue2: 'north', value: 10 },
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', filter2: 'area', filterValue2: 'north', value: 5 },
-      ];
-
-      const response = await page.calculateUiInputs(measureEntities);
-      expect(response).to.eql([measureEntities[0]]);
-    });
-
-    it('should filter list of entities by date and return data for unique entities when only filter is set', async () => {
-      const measureEntities = [
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', value: 100 },
-        { metricID: 'metric1', date: '05/10/2020', filter: 'country', filterValue: 'england', value: 50 },
-      ];
-      const response = await page.calculateUiInputs(measureEntities);
-      expect(response).to.eql([measureEntities[0]]);
-    });
-
-    it('should filter list of entities by date and return data for unique entities when neither filter or filter2 is set', async () => {
-      const measureEntities = [
-        { metricID: 'metric1', date: '05/10/2020', value: 20 },
-        { metricID: 'metric1', date: '05/10/2020', value: 10 },
-      ];
-      const response = await page.calculateUiInputs(measureEntities);
-      expect(response).to.eql([measureEntities[0]]);
-    });
-  });
-
   describe('#getMeasureData', () => {
     const measureEntities = {
       measuresEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'metric1', date: '04/10/2020', value: 1, filter: 'test'  }],
@@ -466,12 +369,12 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     const entityIds = [123]
 
     beforeEach(() => {
-      sinon.stub(page, 'getCategory').returns(statementCategory)
+      sinon.stub(measures, 'getCategory').returns(statementCategory)
       Entity.findAll.returns([entities]);
     });
 
     afterEach(() => {
-      page.getCategory.restore();
+      measures.getCategory.restore();
     });
 
     it('gets entities to be cloned if admin', async () => {
@@ -525,11 +428,11 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
   describe('#validateFormData', () => {
     beforeEach(() => {
-      sinon.stub(page, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);
+      sinon.stub(measures, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);
     });
 
     afterEach(() => {
-      page.calculateUiInputs.restore();
+      measures.calculateUiInputs.restore();
     });
 
     it('should return an error when date is not valid', async () => {
@@ -701,7 +604,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       await page.updateMeasureInformation(formData);
 
-      sinon.assert.calledWith(page.saveMeasureData, UpdatedEntities, '#measure-information', { ignoreParents: true });
+      sinon.assert.calledWith(page.saveMeasureData, UpdatedEntities, '#measure-information', { ignoreParents: true, updatedAt: true });
     });
   });
 

@@ -164,7 +164,7 @@ describe('pages/data-entry-entity/measure-group/MeasureGroup', () => {
       await page.updateGroup(data);
 
       sinon.assert.called(transaction.commit);
-      sinon.assert.calledWith(Entity.import, data, category, categoryFields, { transaction, ignoreParents: true });
+      sinon.assert.calledWith(Entity.import, data, category, categoryFields, { transaction, ignoreParents: true, updatedAt: true });
     });
 
     it('rolls back if errors', async () => {

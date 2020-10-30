@@ -83,6 +83,22 @@ describe('models/entity', () => {
       sinon.assert.calledWith(Entity.importFieldEntries, { publicId: 'some-public-new-id', id: 'some-id' }, entityFields, options);
     });
 
+    it('call upsert when id exists and updatedAt is true', async () => {
+      const entity = { publicId: 'some-public-id' };
+      const options = { someoption: 1, updatedAt: true };
+      const entityFields = [];
+      const category = { id: 'some-category-id' };
+
+      Entity.findOne.returns({ id: 'some-id' });
+      Entity.upsert.returns({ id: 'some-id' });
+
+      await Entity.import(entity, category, entityFields, options);
+
+      sinon.assert.calledWith(Entity.findOne, { where: { publicId: entity.publicId } }, options);
+      sinon.assert.calledWith(Entity.upsert, { id: 'some-id' });
+      sinon.assert.calledWith(Entity.importFieldEntries, { publicId: 'some-public-id', id: 'some-id' }, entityFields, options);
+    });
+
     it('if parent publid id, destory old parent and create new', async () => {
       const entity = { parentPublicId: 'some-parent-id' };
       const options = { someoption: 1 };
