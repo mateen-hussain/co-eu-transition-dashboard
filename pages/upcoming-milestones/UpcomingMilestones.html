@@ -9,6 +9,8 @@
 
 {% set filters = filters() | await %}
 {% set dates = getDepartmentsWithUpcomingMilestones() | await  %}
+{% set projectDetails = config.paths.projectDetails %}
+{% set milestoneDetails = config.paths.milestoneDetails %}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
@@ -30,7 +32,7 @@
     <p class="govuk-body-s impact-def-title"><a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a></p>
     {% include "all-data/partials/filters/filter-summary.njk" %}
 
-    {{ milestonesTable(dates) }}
+    {{ milestonesTable(dates, projectDetails, milestoneDetails) }}
   
   </div>
 </div>
