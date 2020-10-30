@@ -11,6 +11,9 @@
 {% set dates = getDepartmentsWithMissedMilestones() | await %}
 {% set chart = getChartData() | await %}
 {% set chartData = chartData(chart.departments) %}
+{% set chart = getChartData() | await %}
+{% set projectDetails = config.paths.projectDetails %}
+{% set milestoneDetails = config.paths.milestoneDetails %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
 
@@ -44,7 +47,7 @@
   <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
   <br><br><br>
 
-  {{ milestonesTable(dates) }}
+  {{ milestonesTable(dates, projectDetails, milestoneDetails) }}
 
   </div>
 </div>

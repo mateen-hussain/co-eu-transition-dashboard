@@ -1,4 +1,4 @@
-{% macro milestonesTable(dates) %}
+{% macro milestonesTable(dates, projectDetails, milestoneDetails) %}
 
 {% set cellBlock = "cell-color-" %}
 
@@ -24,7 +24,7 @@
           </td>
         {% for department in date.departments %} {% for project in department.projects %} {% for milestone in project.milestones %}
           <td class="govuk-table__cell">
-            <p class="govuk-body"><a href="{{ config.paths.milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
+            <p class="govuk-body"><a href="{{ milestoneDetails | replace(':uid', milestone.uid | urlencode) }}" class="govuk-link">{{ milestone.uid }}</a></p>
           </td>
           <td class="govuk-table__cell">
             <p class="govuk-body govuk-!-font-weight-bold">{{ department.name }}</p>
@@ -33,7 +33,7 @@
             <span class="govuk-caption-m">{{ project.fields.get('deliveryTheme').value | default('N/A') }}</span></p>
           </td>
           <td class="govuk-table__cell">
-            <p class="govuk-body"><a href="{{ config.paths.projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a></p>
+            <p class="govuk-body"><a href="{{ projectDetails | replace(':uid', project.uid | urlencode) }}" class="govuk-link">{{ project.title }}</a></p>
           </td>
           <td class="govuk-table__cell number-cell">
             <span class="{{ cellBlock + milestone.fields.get('deliveryConfidence').value }}">{{ milestone.fields.get('deliveryConfidence').value | default('N/A') }}</span>
