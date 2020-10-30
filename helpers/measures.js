@@ -69,16 +69,6 @@ const getMeasureEntitiesFromGroup = (groupEntities, metricId) => {
   return sortedEntities;
 }
 
-const removeBlankEntityInputValues = (entityInputs) => {
-  return Object.keys(entityInputs).reduce((acc, entityId) => {
-    const value = entityInputs[entityId]
-    if (value && !isNaN(value)) {
-      acc[entityId] = value
-    }
-    return acc;
-  }, {} )
-}
-
 const validateFormData = (formData, measuresEntities = []) => {
   const errors = [];
 
@@ -138,7 +128,6 @@ module.exports = {
   getEntityFields,
   getCategory,
   getMeasureEntitiesFromGroup,
-  removeBlankEntityInputValues,
   validateFormData,
   validateEntities
 };
