@@ -493,7 +493,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       await page.updateMeasureInformation(formData);
 
-      sinon.assert.calledWith(page.saveMeasureData, UpdatedEntities, '#measure-information', { ignoreParents: true });
+      sinon.assert.calledWith(page.saveMeasureData, UpdatedEntities, '#measure-information', { ignoreParents: true, updatedAt: true });
     });
   });
 

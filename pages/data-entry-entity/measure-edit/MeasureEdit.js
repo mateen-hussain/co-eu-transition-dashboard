@@ -331,7 +331,7 @@ class MeasureEdit extends Page {
     }
 
     const updatedEntites = await this.updateMeasureEntities(formData);
-    return await this.saveMeasureData(updatedEntites, URLHash, { ignoreParents: true });
+    return await this.saveMeasureData(updatedEntites, URLHash, { ignoreParents: true, updatedAt: true });
   }
 
   async updateMeasureEntities(data) {
@@ -483,7 +483,7 @@ class MeasureEdit extends Page {
     }
 
     const URLHash = `#data-entries`;
-    return await this.saveMeasureData(entitiesToBeSaved, URLHash);
+    return await this.saveMeasureData(entitiesToBeSaved, URLHash, { updatedAt: true });
   }
 
   async saveMeasureData(entities, URLHash, options = {}) {
