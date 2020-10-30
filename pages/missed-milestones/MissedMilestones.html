@@ -1,26 +1,40 @@
 {% extends "template.njk" %}
-{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "milestones-table.njk" import milestonesTable %}
 
-{% set departmentsWithMissedMilestones = getDepartmentsWithMissedMilestones() | await %}
-{% set data = chartData(departmentsWithMissedMilestones.departments) %}
-{% set cellBlock = "cell-color-" %}
+{% set filters = filters() | await %}
+{% set dates = getDepartmentsWithMissedMilestones() | await %}
+{% set chart = getChartData() | await %}
+{% set chartData = chartData(chart.departments) %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
 
 {% block content %}
 
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="govuk-heading-l">Missed milestones</h1>
+  </div>
+</div>
 
-  <h1 class="govuk-heading-l">Missed Milestones</h1>
+<div class="govuk-grid-row">
+
+  <div class="govuk-grid-column-one-quarter">
+    {% include "all-data/partials/filters/filters.njk" %}
+  </div>
+
+  <div class="govuk-grid-column-three-quarters">
+    {% include "all-data/partials/filters/filter-summary.njk" %}
 
   {% if not req.user.isDepartmentalViewer %}
   <canvas id="missed-milestones" height="100" aria-label="This chart shows the total number of missed milestones for projects with a 0 to 1 impact rating." role="img">
-    {% for label in data.labels %}
-      {% set meta = data.meta[loop.index0] %}
+    {% for label in chartData.labels %}
+      {% set meta = chartData.meta[loop.index0] %}
       <p>Department {{ label }} has {{ meta.totalMilestonesMissed }} missed milestones from {{ meta.totalMilestones }} total milestones. {{ ((meta.totalMilestonesMissed / meta.totalMilestones) * 100) | round }}% missed from department portfolio.</p>
     {% endfor %}
   </canvas>
@@ -30,42 +44,7 @@
   <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
   <br><br><br>
 
-  <table class="govuk-table missed-milestones-table">
-    <thead class="govuk-table__head">
-      {% for milestoneField in milestoneFields %}
-        {% if (milestoneField.id == 'uid') %}
-        <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
-        <th scope="col" class="govuk-table__header">{{ project.name.title }}</th>
-        {% else %}
-        <th scope="col" class="govuk-table__header">{{ milestoneField.title }}</th>
-        {% endif %}
-      {% endfor %}
-        <th scope="col" class="govuk-table__header">{{ project.impact.title }}</th>
-    </thead>
-
-    <tbody class="govuk-table__body">
-      {% for milestone in departmentsWithMissedMilestones.milestones %}
-        <tr class="govuk-table__row">
-          {% for milestoneField in milestoneFields %}
-            {% set field = milestone.fields.get(milestoneField.id) %}
-            {% if (field.id == 'uid') %}
-              <td class="govuk-table__cell">
-                <a href="{{ config.paths.milestoneDetails | replace(':uid', field.value | urlencode) }}" class='govuk-link'>{{ field.value | escape }}</a>
-              </td>
-              <td class="govuk-table__cell">
-                <a href="{{ config.paths.projectDetails | replace(':uid', milestone.project.fields.get(project.uid.id).value | urlencode) }}" class='govuk-link'>{{ milestone.project.fields.get(project.name.id).value | escape }}</a>
-              </td>
-            {% elseif (field.id == 'date') %}
-              <td class="govuk-table__cell">{{ field.value | date("D MMM YYYY") }}</td>
-            {% else %}
-              <td class="govuk-table__cell"><span class="{{ cellBlock + field.value }}">{{ field.value | default('N/A') }}</span></td>
-            {% endif %}
-          {% endfor %}
-            <td class="govuk-table__cell"><span class="{{ cellBlock + milestone.project.fields.get(project.impact.id).value }}">{{ milestone.project.fields.get(project.impact.id).value | default('N/A') }}</span></td>
-          </tr>
-        {% endfor %}
-    </tbody>
-    </table>
+  {{ milestonesTable(dates) }}
 
   </div>
 </div>
@@ -73,10 +52,11 @@
 {% endblock %}
 
 {% block afterScript %}
-  {% if not req.user.isDepartmentalViewer %}
   <script>
-    var data = {{ data | dump | safe }};
-    TRANSITIONDELIVERYDASHBOARD.missedMilestonesChart('missed-milestones', data);
+    {% if not req.user.isDepartmentalViewer %}
+    var chartData = {{ chartData | dump | safe }};
+    TRANSITIONDELIVERYDASHBOARD.missedMilestonesChart('missed-milestones', chartData);
+    {% endif %}
+    TRANSITIONDELIVERYDASHBOARD.sortTable();
   </script>
-  {% endif %}
 {% endblock %}
