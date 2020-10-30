@@ -24,13 +24,27 @@ class MeasureValue extends Page {
   }
 
   get pathToBind() {
-    return `${this.url}/:metricId/:groupId/:date/:successful?`;
+    return `${this.url}/:type/:metricId/:groupId/:date/:successful(successful)?`;
   }
 
   get editUrl() {
     const { metricId, groupId, date } = this.req.params;
-    return `${this.url}/${metricId}/${groupId}/${encodeURIComponent(date)}`;
+    return `${this.url}/edit/${metricId}/${groupId}/${encodeURIComponent(date)}`;
   }
+
+  get deleteUrl() {
+    const { metricId, groupId, date } = this.req.params;
+    return `${this.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}`;
+  }
+
+  get deleteMeasure() {
+    return this.req.params && this.req.params.type == 'delete';
+  }
+
+  get editMeasure() {
+    return this.req.params && this.req.params.type == 'edit';
+  }
+
 
   get successfulMode() {
     return this.req.params && this.req.params.successful;
@@ -71,7 +85,16 @@ class MeasureValue extends Page {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
 
-    return await this.updateMeasureValues(req.body);
+    if (this.editMeasure) {
+      return await this.updateMeasureValues(req.body);
+    }
+
+    if (this.deleteMeasure) {
+      // return await this.updateMeasureValues(req.body);
+      console.log('deleeteeete')
+    }
+
+    
   }
 
   getPublicIdFromExistingEntity(clondedEntity, entitiesForSelectedDate) {
@@ -171,7 +194,7 @@ class MeasureValue extends Page {
       return this.renderRequest(this.res, { errors: ["Error in entity data"] });
     }
 
-    return await this.saveMeasureData(entitiesToBeSaved);
+    return await this.saveMeasureData(entitiesToBeSaved, { updatedAt: true });
   }
 
   async saveMeasureData(entities, options = {}) {
@@ -314,6 +337,9 @@ class MeasureValue extends Page {
     }
 
     const measureValues = this.generateInputValues(uiInputs, measuresForSelectedDate, this.req.params.date);
+    console.log('meauiInputssureValues', uiInputs)
+    console.log('measureValues', measureValues)
+    
     // measuresEntities are already sorted by date, so the last entry is the newest
     const latestEntity = measureEntities[measureEntities.length - 1];
     const backLink = `${config.paths.dataEntryEntity.measureEdit}/${latestEntity.metricID}/${latestEntity.groupID}`;
