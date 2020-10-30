@@ -237,6 +237,14 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: "hello again", date: "2020-10-06" }]);
     });
 
+    it('should set RAYG value to the next oldest entry when the date is changed for the latest entry', async () => {
+      const entities = [{  value: 'hello again', parentStatementPublicId: 'state-1', publicId: 'pub-2'  }];
+      const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { publicId: 'pub-2', metricID: 'metric1', date: '10/10/2020', value: 2 }];
+      const formData = { day: 3, month: 10, year: 2020 };
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
+      expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: 2, date: "2020-10-05" }]);
+    });
+
     it('should return input date when date is older than latest measure date', async () => {
       const formData = { day: 5, month: 10, year: 2020 };
       const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);

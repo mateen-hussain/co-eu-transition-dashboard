@@ -13,6 +13,7 @@ const { buildDateString } = require("helpers/utils");
 const sequelize = require("services/sequelize");
 const logger = require("services/logger");
 const uniq = require('lodash/uniq');
+const cloneDeep = require('lodash/cloneDeep');
 
 class MeasureValue extends Page {
   static get isEnabled() {
@@ -121,24 +122,49 @@ class MeasureValue extends Page {
     const doesNotHaveFilter = !measureEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
 
-    // We only want to update the the RAYG row when the date is newer than the current entires
+    // We want to update the the RAYG row when the date is newer than the current entires
     // measuresEntities is already sorted by date so we know the last entry in the array will contain the latest date
-    const latestDate = measureEntities[measureEntities.length -1].date;
-    const newDate = buildDateString(formData)
-    const isDateLatestOrNewer =  moment(newDate, 'YYYY-MM-DD').isSameOrAfter(moment(latestDate, 'DD/MM/YYYY'));
+    const latestEntry = measureEntities[measureEntities.length -1];
+    let newDate = buildDateString(formData);
+    const newDateMoment = moment(newDate, 'YYYY-MM-DD');
+    const isDateLatestOrNewer =  newDateMoment.isSameOrAfter(moment(latestEntry.date, 'DD/MM/YYYY'));
     const { updateRAYG } = formData;
 
-    if (isOnlyMeasureInGroup && doesNotHaveFilter && (isDateLatestOrNewer || updateRAYG == 'true')) {
-      const { value } = newEntities[0];
-      // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
-      raygEntities.forEach(raygEntity => {
-        newEntities.push({
-          publicId: raygEntity.publicId,
-          parentStatementPublicId: raygEntity.parentStatementPublicId,
-          date: newDate,
-          value
+    if (isOnlyMeasureInGroup && doesNotHaveFilter) {
+      let { value } = newEntities[0];
+      let LatestEntryUpdate = false;
+
+      // If the latest meausevalue was updated, the date could have been changed to a point in the past.
+      // To find the correct value for the RAYG row, we need to combined the submited form datawith the 
+      // current measure values and re-sort by date, this will give us the correct entry and value
+      if (latestEntry.publicId === newEntities[0].publicId) {
+        LatestEntryUpdate = true;
+
+        const measureEntitiesCloned = cloneDeep(measureEntities);
+        const clonedLatestEntry = measureEntitiesCloned[measureEntitiesCloned.length -1];
+        clonedLatestEntry.date = newDateMoment.format('DD/MM/YYYY');
+        clonedLatestEntry.value = newEntities[0].value;
+
+        //Re-sort the array and get the latest value 
+        measureEntitiesCloned.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
+      
+        const latestEntryAfterSorting = measureEntitiesCloned[measureEntitiesCloned.length -1];
+        value = latestEntryAfterSorting.value;
+        newDate = moment(latestEntryAfterSorting.date, 'DD/MM/YYYY').format('YYYY-MM-DD');
+      }
+
+      if (isDateLatestOrNewer || updateRAYG == 'true' || LatestEntryUpdate) {
+       
+        // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
+        raygEntities.forEach(raygEntity => {
+          newEntities.push({
+            publicId: raygEntity.publicId,
+            parentStatementPublicId: raygEntity.parentStatementPublicId,
+            date: newDate,
+            value
+          })
         })
-      })
+      }
     }
 
     return newEntities
