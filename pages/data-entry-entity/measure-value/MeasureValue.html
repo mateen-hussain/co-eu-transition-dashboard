@@ -1,6 +1,7 @@
 {% extends "template.njk" %}
 
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "measure-value.njk" import measureValue %}
 
 {% set measure = getMeasureData() | await %}
@@ -60,9 +61,11 @@
 
     <hr class="govuk-section-break govuk-section-break--m">
 
-    <button class="govuk-button govuk-button--secondary back-measure-button" data-module="govuk-button" href="">
-        Back to Measure
-    </button>
+    {{ govukButton({
+      text: "Back to Measure",
+      href: backLink,
+      classes: "govuk-button--secondary back-measure-button"
+    }) }}
 
     </div>
   </div>
