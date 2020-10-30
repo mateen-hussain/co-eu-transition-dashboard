@@ -132,13 +132,13 @@ class MeasureValue extends Page {
 
     if (isOnlyMeasureInGroup && doesNotHaveFilter) {
       let { value } = newEntities[0];
-      let LatestEntryUpdate = false;
+      let latestEntryUpdate = false;
 
       // If the latest meausevalue was updated, the date could have been changed to a point in the past.
       // To find the correct value for the RAYG row, we need to combined the submited form datawith the 
       // current measure values and re-sort by date, this will give us the correct entry and value
       if (latestEntry.publicId === newEntities[0].publicId) {
-        LatestEntryUpdate = true;
+        latestEntryUpdate = true;
 
         const measureEntitiesCloned = cloneDeep(measureEntities);
         const clonedLatestEntry = measureEntitiesCloned[measureEntitiesCloned.length -1];
@@ -153,7 +153,7 @@ class MeasureValue extends Page {
         newDate = moment(latestEntryAfterSorting.date, 'DD/MM/YYYY').format('YYYY-MM-DD');
       }
 
-      if (isDateLatestOrNewer || updateRAYG == 'true' || LatestEntryUpdate) {
+      if (isDateLatestOrNewer || updateRAYG == 'true' || latestEntryUpdate) {
        
         // We need to set the parentStatementPublicId as the import will remove and recreate the entitiy in the entityparents table
         raygEntities.forEach(raygEntity => {
