@@ -12,8 +12,6 @@ const CategoryField = require('models/categoryField');
 const Entity = require('models/entity');
 const EntityFieldEntry = require('models/entityFieldEntry');
 const flash = require('middleware/flash');
-const parse = require('helpers/parse');
-const validation = require('helpers/validation');
 const sequelize = require('services/sequelize');
 const measures = require('helpers/measures')
 
@@ -115,18 +113,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
   });
 
 
-  describe('#getMeasureEntitiesFromGroup', () => {
 
-    it('should return filter data which only contains the same metric, sorted by date', async () => {
-      const measure1 = { name: 'test1', metricID: 'measure-1', date: '05/10/2020' }
-      const measure2 = { name: 'test2', metricID: 'measure-2', date: '05/10/2020' }
-      const measure3 = { name: 'test3', metricID: 'measure-1', date: '04/10/2020' }
-      const groupEntities = [measure1, measure2, measure3];
-      const response = await page.getMeasureEntitiesFromGroup(groupEntities);
-
-      expect(response).to.eql([ measure3, measure1 ]);
-    });
-  });
 
   describe('#getGroupEntities', () => {
     const entities = {
@@ -223,24 +210,24 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     beforeEach(() => {
       sinon.stub(measures, 'getCategory').returns(measureCategory);
-      sinon.stub(page, 'getMeasureEntitiesFromGroup');
+      sinon.stub(measures, 'getMeasureEntitiesFromGroup');
       sinon.stub(page, 'getGroupEntities').returns(measureEntities);
     });
 
     afterEach(() => {
       measures.getCategory.restore();
-      page.getMeasureEntitiesFromGroup.restore();
+      measures.getMeasureEntitiesFromGroup.restore();
       page.getGroupEntities.restore();
     });
 
     it('Get measures data', async () => {
-      page.getMeasureEntitiesFromGroup.returns(measureEntities.groupEntities);
+      measures.getMeasureEntitiesFromGroup.returns(measureEntities.groupEntities);
 
       const response = await page.getMeasure();
 
       sinon.assert.calledTwice(measures.getCategory);
       sinon.assert.calledOnce(page.getGroupEntities);
-      sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
+      sinon.assert.calledOnce(measures.getMeasureEntitiesFromGroup);
 
       expect(response).to.eql({
         measuresEntities: measureEntities.groupEntities,
@@ -250,12 +237,12 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('redirects to list if no entity data', async () => {
-      page.getMeasureEntitiesFromGroup.returns([]);
+      measures.getMeasureEntitiesFromGroup.returns([]);
       await page.getMeasure();
 
       sinon.assert.calledTwice(measures.getCategory);
       sinon.assert.calledOnce(page.getGroupEntities);
-      sinon.assert.calledOnce(page.getMeasureEntitiesFromGroup);
+      sinon.assert.calledOnce(measures.getMeasureEntitiesFromGroup);
       sinon.assert.calledWith(res.redirect, paths.dataEntryEntity.measureList);
     });
   });
@@ -423,104 +410,6 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
         date: '2020-10-01',
         value: 100
       }]);
-    });
-  });
-
-  describe('#validateFormData', () => {
-    beforeEach(() => {
-      sinon.stub(measures, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);
-    });
-
-    afterEach(() => {
-      measures.calculateUiInputs.restore();
-    });
-
-    it('should return an error when date is not valid', async () => {
-      const formData = { day: '10', month: '14', year: '2020', entities:{} };
-
-      const response = await page.validateFormData(formData);
-      expect(response[0]).to.eql("Invalid date");
-    });
-
-    it('should return an error when date already exists', async () => {
-      const formData = { day: '05', month: '10', year: '2020', entities:{} };
-      const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }];
-
-      const response = await page.validateFormData(formData, measuresEntities);
-      expect(response[0]).to.eql("Date already exists");
-    });
-
-    it('should return an error when no entities data is present', async () => {
-      const formData = { day: '10', month: '12', year: '2020' };
-      const response = await page.validateFormData(formData);
-      expect(response[0]).to.eql("Missing entity values");
-    });
-
-    it('should return an error when entities data is empty', async () => {
-      const formData = { day: '10', month: '12', year: '2020', entities: {} };
-      const response = await page.validateFormData(formData);
-      expect(response[0]).to.eql("You must submit at least one value");
-    });
-
-    it('should return an error when entities data is empty', async () => {
-      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: '', 456: 10 } };
-      const response = await page.validateFormData(formData);
-      expect(response[0]).to.eql("Invalid field value");
-    });
-
-    it('should return an error when entities data is NaN', async () => {
-      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 'hello', 456: 10 } };
-      const response = await page.validateFormData(formData);
-      expect(response[0]).to.eql("Invalid field value");
-    });
-
-    it('should return an empty array when data is valid', async () => {
-      const formData = { day: '10', month: '12', year: '2020', entities:{ 123: 5, 456: 10 } };
-      const response = await page.validateFormData(formData);
-      expect(response.length).to.eql(0);
-    });
-  });
-
-  describe('#removeBlankEntityInputValues', () => {
-    it('should remove empty vales and return data', async () => {
-      const formData = { 123: '', 456: '12' };
-      const response = await page.removeBlankEntityInputValues(formData);
-      expect(response).to.eql({ 456: '12' });
-    });
-  });
-
-  describe('#validateEntities', () => {
-    const categoryFields = [{ id: 1 }];
-
-    beforeEach(() => {
-      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
-      sinon.stub(validation, 'validateItems');
-      sinon.stub(parse, 'parseItems')
-    });
-
-    afterEach(() => {
-      parse.parseItems.restore();
-      validation.validateItems.restore();
-      Category.fieldDefinitions.restore();
-    });
-
-    it('rejects if no entities found', async () => {
-      parse.parseItems.returns([]);
-      validation.validateItems.returns([])
-      const response = await page.validateEntities();
-      expect(response.errors).to.eql([{ error: 'No entities found' }]);
-    });
-
-    it('validates each item parsed', async () => {
-      const items = [{ id: 1 }, { id: 2 }];
-      const parsedItems = [{ foo: 'bar' }];
-      parse.parseItems.returns(parsedItems);
-      validation.validateItems.returns([])
-
-      const response = await page.validateEntities(items);
-
-      expect(response).to.eql({ errors: [], parsedEntities: [ { foo: 'bar' } ] });
-      sinon.assert.calledWith(validation.validateItems, parsedItems, categoryFields);
     });
   });
 
@@ -777,10 +666,12 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
       sinon.stub(page, 'renderRequest').returns()
       sinon.stub(page, 'updateRaygRowForSingleMeasureWithNoFilter').returns()
       sinon.stub(page, 'getMeasure').returns(getMeasureData);
+      sinon.stub(measures, 'validateEntities').returns([]);
     });
 
     afterEach(() => {
-      page.validateFormData.restore();
+      measures.validateFormData.restore();
+      measures.validateEntities.restore();
       page.getEntitiesToBeCloned.restore();
       page.createEntitiesFromClonedData.restore();
       page.saveMeasureData.restore();
@@ -791,17 +682,17 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
     it('should return errors when validateFormData return errors', async () => {
       const formData = { day: 1,  year: 2020, type: 'entries', entities: { 123: 100 } };
-      sinon.stub(page, 'validateFormData').returns(["error"])
+      sinon.stub(measures, 'validateFormData').returns(["error"])
 
       await page.addMeasureEntityData(formData);
 
-      sinon.assert.calledWith(page.validateFormData, formData);
+      sinon.assert.calledWith(measures.validateFormData, formData);
       sinon.assert.calledWith(page.renderRequest, res, { errors: ["error"] })
     });
 
     it('should return errors when validateEntities returns errors', async () => {
-      sinon.stub(page, 'validateFormData').returns([])
-      sinon.stub(page, 'validateEntities').returns({ errors, parsedEntities })
+      sinon.stub(measures, 'validateFormData').returns([])
+      measures.validateEntities.returns({ errors, parsedEntities })
       const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
 
       await page.addMeasureEntityData(formData);
@@ -810,8 +701,8 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
     });
 
     it('should call saveMeasureData with parsedEntities data', async () => {
-      sinon.stub(page, 'validateFormData').returns([])
-      sinon.stub(page, 'validateEntities').returns({ errors: [], parsedEntities })
+      sinon.stub(measures, 'validateFormData').returns([])
+      measures.validateEntities.returns({ errors: [], parsedEntities })
       page.updateRaygRowForSingleMeasureWithNoFilter.returns(parsedEntities);
       const formData = { day: 1, month: 2, year: 2020, type: 'entries', entities: { 123: 100 } };
 
@@ -819,7 +710,7 @@ describe('pages/data-entry-entity/measure-edit/MeasureEdit', () => {
 
       sinon.assert.calledWith(page.getEntitiesToBeCloned, ["123"]);
       sinon.assert.calledWith(page.createEntitiesFromClonedData, clonedEntities, formData);
-      sinon.assert.calledWith(page.validateEntities, newEntities);
+      sinon.assert.calledWith(measures.validateEntities, newEntities);
       sinon.assert.calledWith(page.saveMeasureData, parsedEntities);
     });
   });
