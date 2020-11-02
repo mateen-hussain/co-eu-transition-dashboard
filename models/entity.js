@@ -124,7 +124,7 @@ class Entity extends Model {
     return sprintf("%s%02d", category.publicIdFormat, newMaxId);
   }
 
-  static async deleteEntity(entityId, options) {
+  static async delete(entityId, options) {
     await this.destroy({
       where: {
         id: entityId

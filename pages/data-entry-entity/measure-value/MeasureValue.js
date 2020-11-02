@@ -112,7 +112,7 @@ class MeasureValue extends Page {
     }
 
     //If the latest value for a measure is deleted, which is the only item in the group and has no filter value, 
-    // we need to update the ragy row 
+    // we need to update the rayg row 
     const updatedRaygEntities = await this.onDeleteUpdateRaygRowForSingleMeasureWithNoFilter(measureEntities, raygEntities, uniqMetricIds);
 
     return await this.deleteAndUpdateMeasureData(entitiesForSelectedDate, updatedRaygEntities);
@@ -152,13 +152,13 @@ class MeasureValue extends Page {
     return updatedRaygEntites
   }
 
-  async deleteAndUpdateMeasureData(entitiesForSelectedDate, updatedRaygEntities) {
+  async deleteAndUpdateMeasureData(entitiesForSelectedDate, updatedRaygEntities = []) {
     const transaction = await sequelize.transaction();
     let redirectUrl = this.deleteUrl;
 
     try {
       for (const entity of entitiesForSelectedDate) {
-        await Entity.deleteEntity(entity.id, { transaction });
+        await Entity.delete(entity.id, { transaction });
       }
 
       if (updatedRaygEntities.length > 0) {
@@ -451,14 +451,17 @@ class MeasureValue extends Page {
     const doesHaveFilter = measureEntities.find(measure => !!measure.filter);
     const isOnlyMeasureInGroup = uniqMetricIds.length === 1;
     const isLatestDateOrInTheFuture =  moment(latestEntity.date, 'DD/MM/YYYY').isAfter(moment());
-    const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateOrInTheFuture
+    const displayRaygValueCheckbox =  !doesHaveFilter && isOnlyMeasureInGroup && isLatestDateOrInTheFuture;
+    // Dont show delete if there is only a single date for the measure
+    const showDeleteButton = Object.keys(groupBy(measureEntities, measure => measure.date)).length > 1;
 
     return {
       latest: latestEntity,
       fields: uiInputs,
       measureValues,
       backLink,
-      displayRaygValueCheckbox
+      displayRaygValueCheckbox,
+      showDeleteButton
     };
   }
 }

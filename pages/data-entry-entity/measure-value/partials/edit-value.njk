@@ -14,8 +14,10 @@
   classes: "govuk-button--secondary back-measure-button"
 }) }}
 
-{{ govukButton({
-  text: "Delete Value(s)",
-  href: deleteUrl,
-  classes: "back-measure-button"
-}) }}
+{% if showDeleteButton %}
+  {{ govukButton({
+    text: "Delete Value(s)",
+    href: deleteUrl,
+    classes: "back-measure-button"
+  }) }}
+{% endif %}
