@@ -5,6 +5,7 @@
     {% include "all-data/partials/filters/dates.njk" %}
     {% endset %}
 
+  {% if url !== config.paths.missedMilestones %}
      {% set items = (items.push ({
         heading: {
           text: "Milestone Due Dates"
@@ -14,6 +15,8 @@
         }
       }), items)
     %}
+  {% endif %}
+
 
   {% for tableFieldId in filtersFields %}
 
