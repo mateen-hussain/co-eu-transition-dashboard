@@ -12,17 +12,14 @@ const logger = require('services/logger');
 const sequelize = require('services/sequelize');
 const flash = require('middleware/flash');
 const rayg = require('helpers/rayg');
-
 const filterMetricsHelper = require('helpers/filterMetrics');
 const { buildDateString } = require('helpers/utils');
 const get = require('lodash/get');
 const groupBy = require('lodash/groupBy');
-
 const uniq = require('lodash/uniq');
-
 const measures = require('helpers/measures')
-
 const moment = require('moment');
+const utils = require('helpers/utils');
 
 class MeasureEdit extends Page {
   static get isEnabled() {
@@ -465,7 +462,7 @@ class MeasureEdit extends Page {
   async addMeasureEntityData (formData) {
     const { measuresEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
 
-    formData.entities = measures.removeBlankEntityInputValues(formData.entities);
+    formData.entities = utils.removeNulls(formData.entities)
 
     const formValidationErrors = await measures.validateFormData(formData, measuresEntities);
     if (formValidationErrors.length > 0) {
