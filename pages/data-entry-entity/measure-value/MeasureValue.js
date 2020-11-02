@@ -13,6 +13,7 @@ const { buildDateString } = require("helpers/utils");
 const sequelize = require("services/sequelize");
 const logger = require("services/logger");
 const uniq = require('lodash/uniq');
+const utils = require('helpers/utils');
 const cloneDeep = require('lodash/cloneDeep');
 
 class MeasureValue extends Page {
@@ -178,7 +179,7 @@ class MeasureValue extends Page {
     const entitiesForSelectedDate = measureEntities.filter((measure) => measure.date === this.req.params.date);
     const entitiesExcludingCurrentDate = measureEntities.filter((measure) => measure.date !== this.req.params.date);
 
-    formData.entities = measures.removeBlankEntityInputValues(formData.entities);
+    formData.entities = utils.removeNulls(formData.entities)
 
     const formValidationErrors = await measures.validateFormData(formData, entitiesExcludingCurrentDate);
 
