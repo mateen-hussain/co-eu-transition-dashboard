@@ -24,4 +24,14 @@
             margin-top: 20px;
         }
     }
+
+    // Themes
+
+    #readiness-theme-page {
+        .govuk-grid-column-one-quarter,
+        .govuk-grid-column-three-quarters,
+        .govuk-grid-column-one-half {
+        width: 100%;
+      } 
+    }
 }
