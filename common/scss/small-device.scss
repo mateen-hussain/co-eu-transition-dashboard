@@ -1,14 +1,14 @@
 @media only screen and (max-width:768px) {
 
+    .top-statements {
+        height: auto;
+    } 
+
     // Readiness Overview
     .readiness-overview {
         .govuk-grid-column-one-quarter,
         .govuk-grid-column-three-quarters {
         width: 100%;
-        }
-
-        .top-statements {
-            height: auto;
         }
     
         .risk-col {
@@ -26,27 +26,19 @@
     }
 
     // Themes
-
     #readiness-theme-page {
         .govuk-grid-column-one-quarter,
         .govuk-grid-column-three-quarters,
         .govuk-grid-column-one-half {
         width: 100%;
       } 
-    }
 
-    #column-sub-statements, #theme-tableu-placeholder {
+    #column-sub-statements, #theme-tableu-placeholder, .hide-statement {
         display: none;
     }
 
-    .show-statement {
-        display: block !important;
-        #column-statements {
-            display: none;
-        }
-    }
-
-    .show-measure {
+    .show-sub-statement, .show-measure, .overview-back-link {
         display: block !important;
     }
+  }
 }

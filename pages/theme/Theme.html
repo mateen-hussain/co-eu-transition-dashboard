@@ -9,11 +9,14 @@
 
 <div class="govuk-grid-row left-spacing" id="readiness-theme-page" data-theme-id="{{ req.params.theme }}">
 <div class="govuk-grid-column-full">
+
+  <a href="{{ config.paths.readinessOverview }}" class="govuk-back-link govuk-!-margin-top-0 overview-back-link" style="display: none;">Overview</a>
+
   <h1 class="govuk-heading-l theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
   <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
   <p class="govuk-body-s"><a class="govuk-link" href="{{ config.paths.raygDefinitions }}">View RAYG definitions and how they are calculated</a></p>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'hide-statement' if statementUrl }}" id="column-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
@@ -24,7 +27,10 @@
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'show-statement' if statementUrl }}" id="column-sub-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'show-sub-statement' if statementUrl and not publicIdUrl }}" id="column-sub-statements">
+    
+    <a href="{{ config.paths.theme }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-sub-statement' if statementUrl and not publicIdUrl }}" style="display: none;">Back to 1</a>
+
     {% if data.subOutcomeStatementsAndDatas | length > 0 %}
       <div class="readiness-accordion-wrapper" >
         {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1, req.params.statement) }}
@@ -34,6 +40,7 @@
     {% endif %}
   </div>
 
+  <a href="{{ config.paths.theme }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if publicIdUrl }}" style="display: none;">Back to 2</a>
   <div class="govuk-grid-column-one-half overflow-scroll {{ 'show-measure' if publicIdUrl }}" id="theme-tableu-placeholder">
   {% if not data.iframeUrl.error and not data.iframeUrl.url %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
