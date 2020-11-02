@@ -24,7 +24,7 @@
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements" id="column-sub-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'show-statement' if statementUrl }}" id="column-sub-statements">
     {% if data.subOutcomeStatementsAndDatas | length > 0 %}
       <div class="readiness-accordion-wrapper" >
         {{ buildOutcomeMeasures(data.subOutcomeStatementsAndDatas, 1, req.params.statement) }}
@@ -34,7 +34,7 @@
     {% endif %}
   </div>
 
-  <div class="govuk-grid-column-one-half overflow-scroll">
+  <div class="govuk-grid-column-one-half overflow-scroll {{ 'show-measure' if publicIdUrl }}" id="theme-tableu-placeholder">
   {% if not data.iframeUrl.error and not data.iframeUrl.url %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
   {% elseif data.iframeUrl.error %}

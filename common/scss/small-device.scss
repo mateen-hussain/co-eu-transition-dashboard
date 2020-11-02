@@ -34,4 +34,19 @@
         width: 100%;
       } 
     }
+
+    #column-sub-statements, #theme-tableu-placeholder {
+        display: none;
+    }
+
+    .show-statement {
+        display: block !important;
+        #column-statements {
+            display: none;
+        }
+    }
+
+    .show-measure {
+        display: block !important;
+    }
 }
