@@ -18,6 +18,10 @@ class Theme extends Page {
     return `${this.url}/:theme/:statement?/:selectedPublicId?`;
   }
 
+  get themeUrl() {
+    return `${this.url}/${this.req.params.theme}`;
+  }
+
   get statementUrl() {
     return this.req.params && this.req.params.statement;
   }
