@@ -15,7 +15,6 @@ const filterMetrics = async (user,metrics) => {
       return (fieldEntry && metricMap[fieldEntry.value]);
     });
   }
-
   return filteredMetrics;
 };
 

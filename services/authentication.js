@@ -35,7 +35,7 @@ const authenticateLogin = async (email, password, done) => {
     error.maximumLoginAttempts = true;
     return done(error);
   }
-
+  
   const passwordMatches = await bcrypt.compare(password, user.hashedPassphrase);
   if (!passwordMatches) {
     await user.increment("loginAttempts");
