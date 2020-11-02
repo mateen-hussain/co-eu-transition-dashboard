@@ -29,7 +29,12 @@
     <div class="govuk-grid-column-two-thirds">
 
     {% if successfulMode %}
-      {% include "data-entry-entity/measure-edit/partials/success.njk" %}
+      
+      {% if deleteMeasure %}
+        {% include "data-entry-entity/measure-value/partials/delete-success.njk" %}
+      {% else %}
+         {% include "data-entry-entity/measure-edit/partials/success.njk" %}
+      {% endif %}
     {% else %}
 
       {% if errorMessages %}

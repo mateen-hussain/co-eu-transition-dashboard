@@ -86,15 +86,42 @@ class MeasureValue extends Page {
     }
 
     if (this.editMeasure) {
+      console.log('editMeasureeditMeasureeditMeasure')
       return await this.updateMeasureValues(req.body);
     }
 
     if (this.deleteMeasure) {
-      // return await this.updateMeasureValues(req.body);
-      console.log('deleeteeete')
+      console.log('deleteMeasuredeleteMeasuredeleteMeasuredeleteMeasure')
+      return await this.deleteMeasureValues();
     }
+  }
 
+  async deleteMeasureValues() {
+    const { measureEntities, raygEntities, uniqMetricIds } = await this.getMeasure();
     
+    const entitiesForSelectedDate = measureEntities.filter((measure) => measure.date === this.req.params.date);
+
+    // If the only value for the measure we want to prevent delete
+
+
+    //If the latest value for an item which is the only item in the group and has no filter value, update the ragy row 
+
+    const transaction = await sequelize.transaction();
+    let redirectUrl = this.deleteUrl;
+  
+    try {
+      for (const entity of entitiesForSelectedDate) {
+        console.log('entity', entity)
+        await Entity.deleteEntity(entity.id, { transaction });
+      }
+      await transaction.commit();
+      redirectUrl += "/successful";
+    } catch (error) {
+      logger.error(error);
+      this.req.flash(["Error saving measure data"]);
+      await transaction.rollback();
+    }
+    return this.res.redirect(redirectUrl);
   }
 
   getPublicIdFromExistingEntity(clondedEntity, entitiesForSelectedDate) {
