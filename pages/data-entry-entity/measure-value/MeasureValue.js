@@ -115,7 +115,7 @@ class MeasureValue extends Page {
     // we need to update the rayg row 
     const updatedRaygEntities = await this.onDeleteUpdateRaygRowForSingleMeasureWithNoFilter(measureEntities, raygEntities, uniqMetricIds);
 
-    return await this.deleteAndUpdateMeasureData(entitiesForSelectedDate, updatedRaygEntities);
+    return await this.deleteAndUpdateRaygMeasureData(entitiesForSelectedDate, updatedRaygEntities);
   }
 
   async onDeleteUpdateRaygRowForSingleMeasureWithNoFilter(measureEntities, raygEntities, uniqMetricIds) {
@@ -152,7 +152,7 @@ class MeasureValue extends Page {
     return updatedRaygEntites
   }
 
-  async deleteAndUpdateMeasureData(entitiesForSelectedDate, updatedRaygEntities = []) {
+  async deleteAndUpdateRaygMeasureData(entitiesForSelectedDate, updatedRaygEntities = []) {
     const transaction = await sequelize.transaction();
     let redirectUrl = this.deleteUrl;
 

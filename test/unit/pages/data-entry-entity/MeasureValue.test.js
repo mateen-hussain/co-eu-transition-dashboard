@@ -495,7 +495,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     it('Should call flash and redirect when only single date point for a measure', async () => {
       req.params = { groupId: 'measure-1', metricId: 'measure-1', date: '05/10/2020', type: 'edit' }
       page.getMeasure.returns(measureData);
-      const deleteAndUpdateSpy = sinon.spy(page, 'deleteAndUpdateMeasureData');
+      const deleteAndUpdateSpy = sinon.spy(page, 'deleteAndUpdateRaygMeasureData');
 
       await page.deleteMeasureValues();
 
@@ -534,7 +534,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
     });
   });
 
-  describe('#deleteAndUpdateMeasureData', () => {
+  describe('#deleteAndUpdateRaygMeasureData', () => {
     const categoryFields = [{ id: 1 }];
     const category = { name: 'Measure' };
     const entities = [{ id: 'test1' }]
@@ -561,7 +561,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
       
 
-      await page.deleteAndUpdateMeasureData(entities);
+      await page.deleteAndUpdateRaygMeasureData(entities);
 
       sinon.assert.calledWith(Entity.delete, entities[0].id, { transaction });
       sinon.assert.notCalled(Entity.import)
@@ -575,7 +575,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       transaction.commit.reset();
       transaction.rollback.reset();
 
-      await page.deleteAndUpdateMeasureData(entities, raygEntities);
+      await page.deleteAndUpdateRaygMeasureData(entities, raygEntities);
 
       sinon.assert.calledWith(Entity.delete, entities[0].id, { transaction });
       sinon.assert.calledWith(Entity.import, raygEntities[0], category, categoryFields, { transaction, ignoreParents: true, updatedAt: true });
@@ -591,7 +591,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
       Entity.delete.throws(new Error('error'));
 
-      await page.deleteAndUpdateMeasureData(entities);
+      await page.deleteAndUpdateRaygMeasureData(entities);
 
       const { metricId, groupId, date } = req.params
       sinon.assert.calledWith(page.res.redirect, `${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}`);
@@ -605,7 +605,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
       Entity.import.throws(new Error('error'));
 
-      await page.deleteAndUpdateMeasureData(entities, raygEntities);
+      await page.deleteAndUpdateRaygMeasureData(entities, raygEntities);
 
       const { metricId, groupId, date } = req.params
       sinon.assert.calledWith(page.res.redirect, `${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}`);
