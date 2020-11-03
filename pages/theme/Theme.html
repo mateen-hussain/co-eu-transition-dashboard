@@ -2,6 +2,7 @@
 {% from "readiness-accordion.njk" import buildOutcomeMeasures %}
 
 {% set data = data() | await %}
+{% set activeStatement = '' %}
 
 {% block pageTitle %}Theme{% endblock %}
 
@@ -10,16 +11,17 @@
 <div class="govuk-grid-row left-spacing" id="readiness-theme-page" data-theme-id="{{ req.params.theme }}">
 <div class="govuk-grid-column-full">
 
-  <a href="{{ config.paths.readinessOverview }}" class="govuk-back-link govuk-!-margin-top-0 overview-back-link" style="display: none;">Overview</a>
+  <a href="{{ config.paths.readinessOverview }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-statement' if req.params.theme }}" style="display: none;">Overview</a>
 
   <h1 class="govuk-heading-l theme-{{ data.theme.color }} theme-name">{{ data.theme.name }}</h1>
   <span class="govuk-caption-l theme-description">{{ data.theme.description }}</span>
   <p class="govuk-body-s"><a class="govuk-link" href="{{ config.paths.raygDefinitions }}">View RAYG definitions and how they are calculated</a></p>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'hide-statement' if statementUrl }}" id="column-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'hide-statement' if req.params.statement }}" id="column-statements">
   {% for topOutcome in data.topLevelOutcomeStatements %}
   <a href="{{ topOutcome.link }}" class="statement-link">
     <div class="statement {{ topOutcome.color }} {{ 'active-statement' if topOutcome.active }}">
+    {% if topOutcome.active %} {% set activeStatement = topOutcome.name %} {% endif %}
         <h2 class="govuk-heading-s">{{ topOutcome.name }}</h2>
         <p class="govuk-body govuk-!-font-size-16">{{ topOutcome.description }}</p>
     </div>
@@ -27,9 +29,10 @@
   {% endfor %}
   </div>
 
-  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'show-sub-statement' if statementUrl and not publicIdUrl }}" id="column-sub-statements">
+  <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'show-statement' if req.params.statement and not req.params.selectedPublicId }}" id="column-sub-statements">
     
-    <a href="{{ themeUrl }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-sub-statement' if statementUrl and not publicIdUrl }}" style="display: none;">Back to 1</a>
+    <a href="{{ themeUrl }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-statement' if req.params.statement }}" style="display: none;">Back to outcome statements</a>
+    <h3 class="govuk-heading-m {{ 'show-statement' if req.params.statement }}">{{ activeStatement }}</h3>
 
     {% if data.subOutcomeStatementsAndDatas | length > 0 %}
       <div class="readiness-accordion-wrapper" >
@@ -40,9 +43,9 @@
     {% endif %}
   </div>
 
-  <a href="{{ themeUrl }}/{{ statementUrl }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if publicIdUrl }}" style="display: none;">Back to 2</a>
+  <a href="{{ themeUrl }}/{{ req.params.statement }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if req.params.selectedPublicId }}" style="display: none;">Back to {{ activeStatement }}</a>
 
-  <div class="govuk-grid-column-one-half overflow-scroll {{ 'show-measure' if publicIdUrl }}" id="theme-tableu-placeholder">
+  <div class="govuk-grid-column-one-half overflow-scroll {{ 'show-measure' if req.params.selectedPublicId }}" id="theme-tableu-placeholder">
   {% if not data.iframeUrl.error and not data.iframeUrl.url %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
   {% elseif data.iframeUrl.error %}

@@ -22,14 +22,6 @@ class Theme extends Page {
     return `${this.url}/${this.req.params.theme}`;
   }
 
-  get statementUrl() {
-    return this.req.params && this.req.params.statement;
-  }
-
-  get publicIdUrl() {
-    return this.req.params && this.req.params.selectedPublicId;
-  }
-
   get middleware() {
     return [
       ipWhiteList,
