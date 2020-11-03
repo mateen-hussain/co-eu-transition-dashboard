@@ -221,12 +221,8 @@ module.exports = {
   getEntityFields,
   getCategory,
   getMeasureEntitiesFromGroup,
-<<<<<<< HEAD
   getMeasureEntities,
   groupMeasures,
-  removeBlankEntityInputValues,
-=======
->>>>>>> master
   validateFormData,
   validateEntities
 };
