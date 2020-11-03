@@ -83,7 +83,7 @@ const getAuthedCookie = async (url) => {
   return get(response, 'headers["set-cookie"]');
 };
 
-const createTemporaryDirectory = dir => {
+const removeTemporaryDirectory = dir => {
   logger.info(`Creating temprary directory ${options.dir}`);
   return new Promise((resolve, reject) => {
     fs.rmdir(dir, { recursive: true }, (err) => {
@@ -96,7 +96,7 @@ const createTemporaryDirectory = dir => {
 };
 
 const exportStaticSite = async () => {
-  await createTemporaryDirectory(options.dir);
+  await removeTemporaryDirectory(options.dir);
   const cookie = await getAuthedCookie(options.loginUrl);
 
   // no strings to replace yet
