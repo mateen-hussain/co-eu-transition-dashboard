@@ -1,0 +1,43 @@
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% macro valuesList(formFields, measureValues) %}
+  <p class="govuk-body">
+      {{ formFields[0].date }} 
+    </p>
+  {% for measure in formFields %}
+    {% if measureValues.entities[measure.id] %}
+      <p class="govuk-body">
+        {% if measure.label %}
+          {{ measure.label }} -
+        {% endif %}
+        {% if measure.label2 %}
+          {{ measure.label2 }} - 
+        {% endif %}
+        {{ measure.unit }} : {{ measureValues.entities[measure.id] }}
+      </p>
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
+{{ govukPanel({
+  titleText: "Are you sure you want to delete this value(s)?",
+  html: valuesList(formFields, measureValues),
+  classes: 'red-panel'
+}) }}
+
+<hr class="govuk-section-break govuk-section-break--m">
+
+<form type="{{ deleteUrl }}" method="POST">
+
+  {{ govukButton({
+    text: "Go back and edit",
+    href: editUrl,
+    classes: "govuk-button--secondary back-measure-button"
+  }) }}
+
+  {{ govukButton({
+    text: "Confirm Delete",
+    classes: "back-measure-button"
+  }) }}
+</form>
+

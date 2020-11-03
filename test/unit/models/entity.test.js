@@ -216,4 +216,15 @@ describe('models/entity', () => {
       expect(newId).to.eql('someformat-02');
     });
   });
+
+  describe('#delete', () => {
+    it('delete should call destory', async () => {
+      const id ='some-id';
+      const options = { opt1: 1, opt2: 2 };
+
+      await Entity.delete(id, options);
+
+      sinon.assert.calledWith(Entity.destroy, { where: { id } }, options);
+    });
+  });
 });
