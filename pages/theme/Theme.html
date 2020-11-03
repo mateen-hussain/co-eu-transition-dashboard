@@ -32,7 +32,7 @@
   <div class="govuk-grid-column-one-quarter no-horizontal-padding top-statements {{ 'show-statement' if req.params.statement and not req.params.selectedPublicId }}" id="column-sub-statements">
     
     <a href="{{ themeUrl }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-statement' if req.params.statement }}" style="display: none;">Back to outcome statements</a>
-    <h3 class="govuk-heading-m {{ 'show-statement' if req.params.statement }}">{{ activeStatement }}</h3>
+    <h3 class="govuk-heading-m {{ 'show-statement' if req.params.statement }}" style="display: none;">{{ activeStatement }}</h3>
 
     {% if data.subOutcomeStatementsAndDatas | length > 0 %}
       <div class="readiness-accordion-wrapper" >
@@ -43,9 +43,10 @@
     {% endif %}
   </div>
 
-  <a href="{{ themeUrl }}/{{ req.params.statement }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if req.params.selectedPublicId }}" style="display: none;">Back to {{ activeStatement }}</a>
 
+  <a href="{{ themeUrl }}/{{ req.params.statement }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if req.params.selectedPublicId }}" style="display: none;">Back to {{ activeStatement }}</a>
   <div class="govuk-grid-column-one-half overflow-scroll {{ 'show-measure' if req.params.selectedPublicId }}" id="theme-tableu-placeholder">
+
   {% if not data.iframeUrl.error and not data.iframeUrl.url %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
   {% elseif data.iframeUrl.error %}
