@@ -14,8 +14,7 @@
     "release": "release-it --no-npm.publish --ci",
     "deploy-staging": "bash deploy.sh staging staging.yml",
     "deploy-research": "bash deploy.sh research research.yml",
-    "deploy-production": "bash deploy.sh production production.yml",
-    "generate-static": "NODE_PATH=. node services/staticGenerator.js"
+    "deploy-production": "bash deploy.sh production production.yml"
   },
   "nodemonConfig": {
     "ignore": [
