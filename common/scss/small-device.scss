@@ -40,5 +40,14 @@
     .show-statement, .show-measure {
         display: block !important;
     }
+
+    @media only screen and (max-width:640px) {
+        .theme-name.theme-red::before,
+        .theme-name.theme-amber::before,
+        .theme-name.theme-green::before,
+        .theme-name.theme-yellow::before {
+            top: 3px;
+        }
+    }
   }
 }
