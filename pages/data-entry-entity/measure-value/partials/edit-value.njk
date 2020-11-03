@@ -1,0 +1,23 @@
+ <h1 class="govuk-heading-l govuk-!-margin-bottom-1">Edit measure value</h1>
+<h3 class="govuk-heading-m">{{ latestMeasure.name }}</h3>
+
+<p class="govuk-body govuk-!-font-weight-bold">Edit current value<p>
+<div class="data-entry">
+    {{ measureValue(editUrl, formFields, measureValues, showRaygCheckbox) }}
+</div> 
+
+<hr class="govuk-section-break govuk-section-break--m">
+
+{{ govukButton({
+  text: "Back to Measure",
+  href: backLink,
+  classes: "govuk-button--secondary back-measure-button"
+}) }}
+
+{% if showDeleteButton %}
+  {{ govukButton({
+    text: "Delete Value(s)",
+    href: deleteUrl,
+    classes: "back-measure-button"
+  }) }}
+{% endif %}

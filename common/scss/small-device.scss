@@ -1,0 +1,27 @@
+@media only screen and (max-width:768px) {
+
+    // Readiness Overview
+    .readiness-overview {
+        .govuk-grid-column-one-quarter,
+        .govuk-grid-column-three-quarters {
+        width: 100%;
+        }
+
+        .top-statements {
+            height: auto;
+        }
+    
+        .risk-col {
+            border-left: none;
+        }
+    
+        .overview-link {
+            font-weight: normal;
+            display: inline !important;
+        }
+    
+        #themes {
+            margin-top: 20px;
+        }
+    }
+}
