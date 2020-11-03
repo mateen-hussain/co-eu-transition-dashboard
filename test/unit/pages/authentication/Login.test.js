@@ -4,6 +4,7 @@ const Login = require('pages/authentication/login/Login');
 const flash = require('middleware/flash');
 const jwt = require('services/jwt');
 const logger = require('services/logger');
+const { ipWhiteList } = require('middleware/ipWhitelist');
 
 let page = {};
 let req = {};
@@ -27,7 +28,10 @@ describe('pages/authentication/login/Login', () => {
 
   describe('#middleware', () => {
     it('loads correct middleware', () => {
-      expect(page.middleware).to.eql([ flash ]);
+      expect(page.middleware).to.eql([
+        ipWhiteList,
+        flash
+      ]);
     });
   });
 
@@ -36,6 +40,18 @@ describe('pages/authentication/login/Login', () => {
 
     afterEach(() => {
       config.features.twoFactorAuth = twoFASetting;
+    });
+
+    it('redirects if user has skip2FA role and on the whitelist', () => {
+      config.features.twoFactorAuth = true;
+      page.res.locals.ipWhiteList = true;
+      page.res.redirect = sinon.stub();
+
+      const user = { skip2FA: true };
+
+      page.next(user);
+
+      sinon.assert.calledWith(page.res.redirect, config.paths.start);
     });
 
     it('redirects if 2FA enabaled', () => {

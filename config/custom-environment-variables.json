@@ -23,5 +23,15 @@
   "notify": {
     "apiKey": "NOTIFY_API_KEY",
     "summaryNotificationEmail": "SUMMARY_NOTIFICATION_EMAIL"
+  },
+  "ipWhiteList": {
+    "__name": "USER_WHITELIST_IP_RANGE",
+    "__format": "json"
+  },
+  "credentials": {
+    "staticExportUser": {
+      "email": "STATIC_USER_EMAIL",
+      "password": "STATIC_USER_PASSWORD"
+    }
   }
 }

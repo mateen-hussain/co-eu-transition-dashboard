@@ -12,7 +12,7 @@ const Milestone = require('models/milestone');
 const moment = require('moment');
 const cloneDeep = require('lodash/cloneDeep');
 const authentication = require('services/authentication');
-const ipWhitelist = require('middleware/ipWhitelist');
+const { tableauIpWhiteList } = require('middleware/ipWhitelist');
 
 class TableauExport extends Page {
   get url() {
@@ -21,7 +21,7 @@ class TableauExport extends Page {
 
   get middleware() {
     return [
-      ipWhitelist,
+      tableauIpWhiteList,
       ...authentication.protect(['management'])
     ];
   }

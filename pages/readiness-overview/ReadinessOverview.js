@@ -4,6 +4,7 @@ const authentication = require('services/authentication');
 const groupBy = require('lodash/groupBy');
 const transitionReadinessData = require('helpers/transitionReadinessData');
 const HeadlineMeasures = require('models/headlineMeasures');
+const { ipWhiteList } = require('middleware/ipWhitelist');
 
 class ReadinessOverview extends Page {
   get url() {
@@ -12,8 +13,8 @@ class ReadinessOverview extends Page {
 
   get middleware() {
     return [
-      ...super.middleware,
-      ...authentication.protect(['viewer'])
+      ipWhiteList,
+      ...authentication.protect(['viewer', 'static'])
     ];
   }
 
