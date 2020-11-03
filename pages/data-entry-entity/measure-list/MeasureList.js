@@ -22,7 +22,9 @@ class MeasureList extends Page {
 
   async getMeasures() {
     const measureCategory = await measures.getCategory('Measure');
+    console.log('***measureCategory', measureCategory)
     const themeCategory = await measures.getCategory('Theme');
+    console.log('***themeCategory', themeCategory)
     const measureEntities = await measures.getMeasureEntities({
       measureCategory, 
       themeCategory, 

@@ -4,6 +4,8 @@ const EntityFieldEntry = require('models/entityFieldEntry');
 const measures = require('helpers/measures')
 const parse = require('helpers/parse');
 const validation = require('helpers/validation');
+const Entity = require('models/entity');
+const CategoryField = require('models/categoryField');
 
 describe('helpers/measures', () => {
   describe('#applyLabelToEntities', () => {
@@ -215,6 +217,153 @@ describe('helpers/measures', () => {
       expect(response).to.eql({ errors: [], parsedEntities: [ { foo: 'bar' } ] });
       sinon.assert.calledWith(validation.validateItems, parsedItems, categoryFields);
     });
+  });
+
+  describe('#getMeasureEntities', () => {
+    const entities = [{
+      id: 'some-id',
+      publicId: 'some-public-id-1',
+      entityFieldEntries: [{
+        categoryField: { name: 'name' },
+        value: 'some name'
+      }],
+      parents: [{
+        parents: [{
+          categoryId: 1,
+          entityFieldEntries: [{
+            categoryField: { name: 'name' },
+            value: 'theme name'
+          }]
+        }]
+      }]
+    },{
+      id: 'some-id',
+      publicId: 'some-public-id-2',
+      entityFieldEntries: [{
+        categoryField: { name: 'name' },
+        value: 'some name'
+      },{
+        categoryField: { name: 'filter' },
+        value: 'RAYG'
+      }],
+      parents: [{
+        parents: [{
+          categoryId: 1,
+          entityFieldEntries: [{
+            categoryField: { name: 'name' },
+            value: 'theme name'
+          }]
+        }]
+      }]
+    }];
+    const category = { id: 1 };
+
+    beforeEach(() => {
+      Entity.findAll = sinon.stub().returns(entities);
+    });
+
+    it('gets entities for a given category if admin', async () => {
+      const user = { roles:[{ name: 'admin' }], isAdmin: true };
+
+      const response = await measures.getMeasureEntities({
+        measureCategory:category, 
+        themeCategory:category,
+        user
+      });
+      expect(response).to.eql([{
+        id: "some-id",
+        name: "some name",
+        publicId: "some-public-id-1",
+        theme: "theme name"
+      },{
+        filter: "RAYG",
+        id: "some-id",
+        name: "some name",
+        publicId: "some-public-id-2",
+        theme: "theme name"
+      }]);
+
+      sinon.assert.calledWith(Entity.findAll, {
+        where: { categoryId: category.id },
+        include: [{
+          separate: true,
+          model: EntityFieldEntry,
+          include: CategoryField
+        },{
+          model: Entity,
+          as: 'parents',
+          include: [{
+            model: Category
+          }, {
+            model: Entity,
+            as: 'parents',
+            include: [{
+              separate: true,
+              model: EntityFieldEntry,
+              include: CategoryField
+            }, {
+              model: Category
+            }]
+          }]
+        }]
+      });
+    });
+  });
+
+  describe('#groupMeasures', () => {
+    const msrs = [{
+      id: "some-id",
+      name: "some name",
+      publicId: "some-public-id-1",
+      theme: "theme name",
+      groupID: 'Group 1',
+      redThreshold: 1,
+      aYThreshold: 2,
+      greenThreshold: 3,
+      value: 1
+    },{
+      filter: "RAYG",
+      id: "some-id",
+      name: "some name",
+      publicId: "some-public-id-2",
+      theme: "theme name",
+      groupID: 'Group 1',
+      redThreshold: 1,
+      aYThreshold: 2,
+      greenThreshold: 3,
+      value: 1
+    }];
+
+    it('groups measures by rayg row, sets rayg colour', () => {
+      const measureGroups = measures.groupMeasures(msrs);
+      expect(measureGroups).to.eql([{
+        aYThreshold: 2,
+        children: [
+          {
+            aYThreshold: 2,
+            colour: "red",
+            greenThreshold: 3,
+            groupID: "Group 1",
+            id: "some-id",
+            name: "some name",
+            publicId: "some-public-id-1",
+            redThreshold: 1,
+            theme: "theme name",
+            value: 1
+          }
+        ],
+        colour: "red",
+        filter: "RAYG",
+        greenThreshold: 3,
+        groupID: "Group 1",
+        id: "some-id",
+        name: "some name",
+        publicId: "some-public-id-2",
+        redThreshold: 1,
+        theme: "theme name",
+        value: 1
+      }]);
+    })
   });
 
 
