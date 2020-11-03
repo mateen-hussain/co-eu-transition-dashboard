@@ -10,6 +10,7 @@ const DepartmentUser = require("models/departmentUser");
 const sequelize = require('services/sequelize');
 const notify = require('services/notify');
 const CreateUser = require('pages/admin/user-management/create-user/CreateUser');
+const randomString = require('randomstring');
 
 let page = {};
 
@@ -116,29 +117,31 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     const departments = 'DIT'
     const t = sequelize.transaction()
     const error = new Error('test error')
-    const hashedPassphrase = 'some password'
+    const tempPassword = 'some password'
 
     beforeEach(()=>{
       page.createRolesDB = sinon.stub().returns();
       page.createDepartmentUserDB = sinon.stub().returns();
-      sequelize.transaction = sinon.stub().returns(t)
+      sequelize.transaction = sinon.stub().returns(t);
+      sinon.stub(randomString, 'generate').returns(tempPassword);
       sinon.stub(notify,'sendEmailWithTempPassword').returns();
     })
 
     afterEach(()=>{
-      notify.sendEmailWithTempPassword.restore()
+      notify.sendEmailWithTempPassword.restore();
+      randomString.generate.restore();
     })
 
     it('inserts user, roles and departments into tables', async ()=>{
-      page.createUserDB = sinon.stub().returns({ id:1, email,  hashedPassphrase });
+      page.createUserDB = sinon.stub().returns({ id:1, email });
 
       await page.createUser({ email, roles, departments })
 
-      sinon.assert.calledWith(page.createUserDB, email, t)
+      sinon.assert.calledWith(page.createUserDB, email, tempPassword, t)
       sinon.assert.calledWith(page.createRolesDB, 1, roles, t)
       sinon.assert.calledWith(page.createDepartmentUserDB, 1,  departments, t)
       sinon.assert.calledWith(notify.sendEmailWithTempPassword, {
-        email, userId:1, password: hashedPassphrase
+        email, userId:1, password: tempPassword
       })
       sinon.assert.called(t.commit)
     })
@@ -160,9 +163,10 @@ describe('pages/admin/user-management/create-user/CreateUser', ()=>{
     it('inserts user into table', async ()=>{
       const t = await sequelize.transaction();
       const email = 'some@email.com';
+      const tempPassword = 'some password';
       User.create = sinon.stub().returns({ id:1 })
     
-      const user = await page.createUserDB(email, t);
+      const user = await page.createUserDB(email, tempPassword, t);
       sinon.assert.called(User.create);
       expect(user.id).to.equal(1);
     })

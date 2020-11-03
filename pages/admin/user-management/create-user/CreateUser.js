@@ -50,11 +50,8 @@ class CreateUser extends Page {
     return departments;
   }
 
-  async createUserDB(email, transaction) {
-    const passphrase = randomString.generate({
-      readable: true
-    });
-    const hashedPassphrase = await authentication.hashPassphrase(passphrase);
+  async createUserDB(email, password, transaction) {
+    const hashedPassphrase = await authentication.hashPassphrase(password);
     const user = await User.create({
       role: "viewer",
       email: email,
@@ -64,7 +61,7 @@ class CreateUser extends Page {
   }
 
   async createRolesDB(userId, roles, transaction) {
-    let rolesToInsert = []
+    let rolesToInsert = [];
     
     //roles can be a string or array based on selection count
     if (Array.isArray(roles)) {
@@ -83,7 +80,7 @@ class CreateUser extends Page {
   }
 
   async createDepartmentUserDB(userId, departments, transaction) {
-    let departmentsToInsert = []
+    let departmentsToInsert = [];
 
     //departments can be a string or array based on selection count
     if (Array.isArray(departments) ) {
@@ -105,12 +102,15 @@ class CreateUser extends Page {
 
   async createUser({ email, roles, departments }) {
     const t = await sequelize.transaction();
+    const tempPassword = randomString.generate({
+      readable: true
+    });
 
     try {
-      const user = await this.createUserDB(email, t);
+      const user = await this.createUserDB(email, tempPassword, t);
       const userRoles = await this.createRolesDB(user.id,roles, t);
       const departmentUser = await this.createDepartmentUserDB(user.id, departments, t);
-      await notify.sendEmailWithTempPassword({ email: user.email, userId: user.id, password: user.hashedPassphrase } )
+      await notify.sendEmailWithTempPassword({ email: user.email, userId: user.id, password: tempPassword } )
       
       await t.commit();
 
