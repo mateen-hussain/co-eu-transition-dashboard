@@ -1,0 +1,84 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "measure-value.njk" import measureValue %}
+
+{% set measure = getMeasureData() | await %}
+{% set latestMeasure = measure.latest %}
+{% set backLink = measure.backLink %}
+
+{% set errorMessages = errors if errors else flash %}
+
+{% block beforeContent %}
+  {% include "navigation.njk" %}
+  {% include "feedback.njk" %}
+  {{ govukBackLink({
+    text: "Back",
+    href: backLink
+  }) }}
+{% endblock %}
+
+{% block pageTitle %}Edit Measure Value{% endblock %}
+
+{% block content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+    {% if successfulMode %}
+      {{ govukPanel({
+        titleText: "Measure deleted"
+      }) }}
+    {% else %}
+
+      {% if errorMessages %}
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+          <h2 class="govuk-error-summary__title" id="error-summary-title">
+            There is a problem
+          </h2>
+          <div class="govuk-error-summary__body">
+            <ul class="govuk-list govuk-error-summary__list">
+            {% for error in errorMessages %}
+              <li>
+                <a href="#data-entries">{{ error }}</a>
+              </li>
+            {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endif %}
+
+      {{ govukPanel({
+        titleText: "Are you sure you want to delete the following measure?",
+        html: latestMeasure.name,
+        classes: 'red-panel'
+      }) }}
+
+      <hr class="govuk-section-break govuk-section-break--m">
+
+      <form type="{{ deleteUrl }}" method="POST">
+
+        {{ govukButton({
+          text: "Go back and edit",
+          href: editUrl,
+          classes: "govuk-button--secondary back-measure-button"
+        }) }}
+
+        {{ govukButton({
+          text: "Confirm Delete",
+          classes: "back-measure-button"
+        }) }}
+      </form>
+
+    {% endif  %}
+
+    
+
+    
+
+    </div>
+  </div>
+
+{% endblock %}
