@@ -48,3 +48,11 @@
 {{ govukTabs({
   items: items
 }) }}
+
+{% if isUserAdmin %}
+  {{ govukButton({
+    text: "Delete Measure",
+    href: deleteMeasureUrl,
+    classes: "back-measure-button"
+  }) }}
+{% endif %}

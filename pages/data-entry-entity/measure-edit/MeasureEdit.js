@@ -54,12 +54,19 @@ class MeasureEdit extends Page {
     return this.req.params && this.req.params.type == 'edit';
   }
 
+  get deleteMeasureUrl() {
+    return `${paths.dataEntryEntity.measureDelete}/${this.req.params.metricId}/${this.req.params.groupId}`
+  }
+
   get successfulMode() {
     return this.req.params && this.req.params.type == 'successful';
   }
 
   get postData () {
     return this.req.body;
+  }
+  get isUserAdmin() {
+    return this.req.user.isAdmin
   }
 
   get middleware() {
