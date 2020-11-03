@@ -1,4 +1,3 @@
-
 const Category = require('models/category');
 const CategoryField = require('models/categoryField');
 const EntityFieldEntry = require('models/entityFieldEntry');
@@ -73,16 +72,6 @@ const getMeasureEntitiesFromGroup = (groupEntities, metricId) => {
   const measureEntities = groupEntities.filter(entity => entity.metricID === metricId)
   const sortedEntities = measureEntities.sort((a, b) => moment(a.date, 'DD/MM/YYYY').valueOf() - moment(b.date, 'DD/MM/YYYY').valueOf());
   return sortedEntities;
-}
-
-const removeBlankEntityInputValues = (entityInputs) => {
-  return Object.keys(entityInputs).reduce((acc, entityId) => {
-    const value = entityInputs[entityId]
-    if (value && !isNaN(value)) {
-      acc[entityId] = value
-    }
-    return acc;
-  }, {} )
 }
 
 const validateFormData = (formData, measuresEntities = []) => {
@@ -232,9 +221,12 @@ module.exports = {
   getEntityFields,
   getCategory,
   getMeasureEntitiesFromGroup,
+<<<<<<< HEAD
   getMeasureEntities,
   groupMeasures,
   removeBlankEntityInputValues,
+=======
+>>>>>>> master
   validateFormData,
   validateEntities
 };

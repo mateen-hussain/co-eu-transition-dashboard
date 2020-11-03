@@ -9,6 +9,8 @@
 
 {% set filters = filters() | await %}
 {% set dates = getDepartmentsWithUpcomingMilestones() | await  %}
+{% set projectDetails = config.paths.projectDetails %}
+{% set milestoneDetails = config.paths.milestoneDetails %}
 
 {% block pageTitle %}Upcoming Milestones{% endblock %}
 
@@ -20,17 +22,26 @@
   </div>
 </div>
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row" id="hide-filters">
 
-  <div class="govuk-grid-column-one-quarter">
+  <div class="govuk-grid-column-one-quarter" id="filterPanel">
     {% include "all-data/partials/filters/filters.njk" %}
   </div>
 
-  <div class="govuk-grid-column-three-quarters">
-    <p class="govuk-body-s impact-def-title"><a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a></p>
+  <div class="govuk-grid-column-full" id="dataTable">
+
+    <div id="showFiltersBtn">
+      {% include "all-data/partials/filters/show-filter-btn.njk" %}
+    </div>
+
+    <div id="hideFiltersBtn">
+      {% include "all-data/partials/filters/hide-filter-btn.njk" %}
+    </div>
+
+    <p class="govuk-body-s"><a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a></p>
     {% include "all-data/partials/filters/filter-summary.njk" %}
 
-    {{ milestonesTable(dates) }}
+    {{ milestonesTable(dates, projectDetails, milestoneDetails) }}
   
   </div>
 </div>

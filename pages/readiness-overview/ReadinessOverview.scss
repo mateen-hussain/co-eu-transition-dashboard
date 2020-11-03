@@ -1,7 +1,6 @@
 
 .risk-col {
 	border-left: 1px solid #979797;
-	height: 100vh;
 }
 
 .overview-card-holder {
@@ -9,11 +8,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-
-  
-  @include govuk-media-query('tablet') {
-    max-height: 100vw;
-  }
 }
 
 .overview-card {

@@ -120,14 +120,6 @@ describe('helpers/measures', () => {
     });
   });
 
-  describe('#removeBlankEntityInputValues', () => {
-    it('should remove empty vales and return data', async () => {
-      const formData = { 123: '', 456: '12' };
-      const response = await measures.removeBlankEntityInputValues(formData);
-      expect(response).to.eql({ 456: '12' });
-    });
-  });
-
   describe('#validateFormData', () => {
     beforeEach(() => {
       sinon.stub(measures, 'calculateUiInputs').returns([{ id: 123 }, { id: 456 }]);

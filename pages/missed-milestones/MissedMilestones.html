@@ -11,6 +11,9 @@
 {% set dates = getDepartmentsWithMissedMilestones() | await %}
 {% set chart = getChartData() | await %}
 {% set chartData = chartData(chart.departments) %}
+{% set chart = getChartData() | await %}
+{% set projectDetails = config.paths.projectDetails %}
+{% set milestoneDetails = config.paths.milestoneDetails %}
 
 {% block pageTitle %}Missed Milestones{% endblock %}
 
@@ -22,14 +25,23 @@
   </div>
 </div>
 
-<div class="govuk-grid-row">
+<div class="govuk-grid-row" id="hide-filters">
 
-  <div class="govuk-grid-column-one-quarter">
+  <div class="govuk-grid-column-one-quarter" id="filterPanel">
     {% include "all-data/partials/filters/filters.njk" %}
   </div>
 
-  <div class="govuk-grid-column-three-quarters">
-    {% include "all-data/partials/filters/filter-summary.njk" %}
+  <div class="govuk-grid-column-full" id="dataTable">
+
+  <div id="showFiltersBtn">
+    {% include "all-data/partials/filters/show-filter-btn.njk" %}
+  </div>
+
+  <div id="hideFiltersBtn">
+    {% include "all-data/partials/filters/hide-filter-btn.njk" %}
+  </div>
+
+  {% include "all-data/partials/filters/filter-summary.njk" %}
 
   {% if not req.user.isDepartmentalViewer %}
   <canvas id="missed-milestones" height="100" aria-label="This chart shows the total number of missed milestones for projects with a 0 to 1 impact rating." role="img">
@@ -44,7 +56,7 @@
   <a class="govuk-link" href="{{ config.paths.impactDefinitions }}">View impact and confidence definitions</a>
   <br><br><br>
 
-  {{ milestonesTable(dates) }}
+  {{ milestonesTable(dates, projectDetails, milestoneDetails) }}
 
   </div>
 </div>

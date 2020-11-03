@@ -3,6 +3,7 @@ const { paths } = require('config');
 const MeasureValue = require('pages/data-entry-entity/measure-value/MeasureValue');
 const authentication = require('services/authentication');
 const entityUserPermissions = require('middleware/entityUserPermissions');
+const flash = require('middleware/flash');
 const { METHOD_NOT_ALLOWED } = require('http-status-codes');
 const measures = require('helpers/measures')
 const Category = require('models/category');
@@ -41,21 +42,29 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
   describe('#pathToBind', () => {
     it('returns correct url', () => {
-      expect(page.pathToBind).to.eql(`${paths.dataEntryEntity.measureValue}/:metricId/:groupId/:date/:successful?`);
+      expect(page.pathToBind).to.eql(`${paths.dataEntryEntity.measureValue}/:type/:metricId/:groupId/:date/:successful(successful)?`);
     });
   });
 
   describe('#editUrl', () => {
     it('returns url for edit measure value', () => {
       const { metricId, groupId, date } = req.params;
-      expect(page.editUrl).to.eql(`${page.url}/${metricId}/${groupId}/${encodeURIComponent(date)}`);
+      expect(page.editUrl).to.eql(`${page.url}/edit/${metricId}/${groupId}/${encodeURIComponent(date)}`);
+    });
+  });  
+
+  describe('#deleteUrl', () => {
+    it('returns url for delete measure value', () => {
+      const { metricId, groupId, date } = req.params;
+      expect(page.deleteUrl).to.eql(`${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}`);
     });
   });  
 
   describe('#middleware', () => {
     it('only uploaders are allowed to access this page', () => {
       expect(page.middleware).to.eql([
-        ...authentication.protect(['uploader'])
+        ...authentication.protect(['uploader']),
+        flash
       ]);
 
       sinon.assert.calledWith(authentication.protect, ['uploader']);
@@ -237,6 +246,14 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: "hello again", date: "2020-10-06" }]);
     });
 
+    it('should set RAYG value to the next oldest entry when the date is changed for the latest entry', async () => {
+      const entities = [{  value: 'hello again', parentStatementPublicId: 'state-1', publicId: 'pub-2'  }];
+      const measuresEntities = [{ metricID: 'metric1', date: '05/10/2020', value: 2 }, { publicId: 'pub-2', metricID: 'metric1', date: '10/10/2020', value: 2 }];
+      const formData = { day: 3, month: 10, year: 2020 };
+      const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
+      expect(response).to.eql([entities[0], { publicId: 'pub-1', parentStatementPublicId: 'state-1', value: 2, date: "2020-10-05" }]);
+    });
+
     it('should return input date when date is older than latest measure date', async () => {
       const formData = { day: 5, month: 10, year: 2020 };
       const response = await page.updateRaygRowForSingleMeasureWithNoFilter(entities, formData, measuresEntities, raygEntities, uniqMetricIds);
@@ -371,7 +388,6 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
       Category.findOne.resolves(category);
       sinon.stub(Entity, 'import');
-
     });
 
     afterEach(() => {
@@ -389,7 +405,7 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
       sinon.assert.calledWith(Entity.import, entities[0], category, categoryFields, { transaction });
       sinon.assert.calledOnce(transaction.commit);
       const { metricId, groupId, date } = req.params;
-      sinon.assert.calledWith(page.res.redirect, `${page.url}/${metricId}/${groupId}/${encodeURIComponent(date)}/successful`);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/edit/${metricId}/${groupId}/${encodeURIComponent(date)}/successful`);
     });
 
     it('rollback transaction on error', async () => {
@@ -403,7 +419,196 @@ describe('pages/data-entry-entity/measure-value/MeasureValue', () => {
 
       const { metricId, groupId, date } = req.params
 
-      sinon.assert.calledWith(page.res.redirect, `${page.url}/${metricId}/${groupId}/${encodeURIComponent(date)}`);
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/edit/${metricId}/${groupId}/${encodeURIComponent(date)}`);
+      sinon.assert.calledOnce(transaction.rollback);
+    });
+  });
+
+  describe('#postRequest', () => {
+    beforeEach(() => {
+      sinon.stub(page, 'updateMeasureValues')
+      sinon.stub(page, 'deleteMeasureValues')
+    });
+
+    afterEach(() => {
+      page.updateMeasureValues.restore();
+      page.deleteMeasureValues.restore();
+    });
+
+    it('responds with method not allowed if not admin and no entitiesUserCanAccess', async () => {
+      page.res.locals.entitiesUserCanAccess = [];
+
+      await page.postRequest(req, res);
+
+      sinon.assert.calledWith(res.status, METHOD_NOT_ALLOWED);
+      sinon.assert.calledWith(res.send, 'You do not have permisson to access this resource.');
+    });
+
+    it('should call updateMeasureValues when editMeasure is true', async () => {
+      req.params = { groupId: 'measure-1', metricId: 'measure-1', date: '12/10/2020', type: 'edit' }
+      req.user = { isAdmin: true, getPermittedMetricMap: sinon.stub().returns({}) }
+
+      await page.postRequest(req, res);
+
+      sinon.assert.calledWith(page.updateMeasureValues, req.body);
+    });
+
+    it('should call updateMeasureValues when editMeasure is true', async () => {
+      req.params = { groupId: 'measure-1', metricId: 'measure-1', date: '12/10/2020', type: 'delete' }
+      req.user = { isAdmin: true, getPermittedMetricMap: sinon.stub().returns({}) }
+      
+      await page.postRequest(req, res);
+
+      sinon.assert.calledOnce(page.deleteMeasureValues);
+    });
+  });
+
+  describe('#deleteMeasureValues', () => {
+    const measureData = {
+      measureEntities: [{ metricID: 'measure-1', groupId: 'measure-1', date: '05/10/2020', value: 2, filter: 'test' }, { metricID: 'measure-2', groupId: 'measure-1', date: '04/10/2020', value: 1, filter: 'test'  }],
+      raygEntities: [{ value: 1 }],
+      uniqMetricIds: ['measure-1']
+    };
+
+    beforeEach(() => {
+      sinon.stub(page, 'getMeasure').returns(measureData);
+      sinon.stub(page, 'onDeleteUpdateRaygRowForSingleMeasureWithNoFilter').returns(measureData.raygEntities);
+    });
+
+    afterEach(() => {
+      page.getMeasure.restore();
+    });
+
+    it('Should call flash and redirect when only single date point for a measure', async () => {
+      const measureData = {
+        measureEntities: [{ metricID: 'metric1', date: '05/10/2020', value: 2, filter: 'test' }]
+      };
+
+      page.getMeasure.returns(measureData);
+
+      await page.deleteMeasureValues();
+
+      sinon.assert.calledWith(page.req.flash, ["Measure must contain at least one set of values"]);
+      sinon.assert.calledWith(page.res.redirect, page.deleteUrl);
+    });
+
+    it('Should call flash and redirect when only single date point for a measure', async () => {
+      req.params = { groupId: 'measure-1', metricId: 'measure-1', date: '05/10/2020', type: 'edit' }
+      page.getMeasure.returns(measureData);
+      const deleteAndUpdateSpy = sinon.spy(page, 'deleteAndUpdateRaygMeasureData');
+
+      await page.deleteMeasureValues();
+
+      sinon.assert.calledWith(page.onDeleteUpdateRaygRowForSingleMeasureWithNoFilter, measureData.measureEntities, measureData.raygEntities, measureData.uniqMetricIds);
+      sinon.assert.calledWith(deleteAndUpdateSpy, [measureData.measureEntities[0]], measureData.raygEntities);
+    });
+  });
+
+  describe('#onDeleteUpdateRaygRowForSingleMeasureWithNoFilter', () => {
+    it('Should return array containing updated RAYG data when not in a group and filter not set', async () => {
+      const measureEntities = [{ metricID: 'measure-1', groupId: 'measure-1', date: '05/10/2020', value: 123 }, { metricID: 'measure-2', groupId: 'measure-1', date: '04/10/2020', value: 456 }];
+      const raygEntities = [{ value: 123, publicId: 'pub-1', parentStatementPublicId: 'statement1' }];
+      const uniqMetricIds = ['measure-1']
+
+      req.params = { groupId: 'measure-1', metricId: 'measure-1', date: '05/10/2020', type: 'edit' }
+
+      const response = await page.onDeleteUpdateRaygRowForSingleMeasureWithNoFilter(measureEntities, raygEntities, uniqMetricIds);
+
+      expect(response).to.eql([{ 
+        value: 456, 
+        date: '2020-10-04',
+        publicId: 'pub-1', 
+        parentStatementPublicId: 'statement1' 
+      }]);
+    });
+
+    it('Should return an empty array when measure contains grouped data', async () => {
+      const measureEntities = [{ metricID: 'measure-1', groupId: 'measure-1', date: '05/10/2020', value: 123 }, { metricID: 'measure-2', groupId: 'measure-1', date: '04/10/2020', value: 456 }];
+      const raygEntities = [{ value: 123, publicId: 'pub-1', parentStatementPublicId: 'statement1' }];
+      const uniqMetricIds = ['measure-1', 'measure-2']
+      req.params = { groupId: 'measure-1', metricId: 'measure-1', date: '05/10/2020', type: 'edit' }
+
+      const response = await page.onDeleteUpdateRaygRowForSingleMeasureWithNoFilter(measureEntities, raygEntities, uniqMetricIds);
+
+      expect(response).to.eql([]);
+    });
+  });
+
+  describe('#deleteAndUpdateRaygMeasureData', () => {
+    const categoryFields = [{ id: 1 }];
+    const category = { name: 'Measure' };
+    const entities = [{ id: 'test1' }]
+    const raygEntities = [{ id: 'rayg1' }]
+
+    beforeEach(() => {
+      sinon.stub(Category, 'fieldDefinitions').returns(categoryFields);
+      Category.findOne.resolves(category);
+      sinon.stub(Entity, 'delete');
+      sinon.stub(Entity, 'import');
+    });
+
+    afterEach(() => {
+      Entity.delete.restore();
+      Entity.import.restore();
+      Category.fieldDefinitions.restore();
+    });
+
+
+    it('should call Entity.delete', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+
+      
+
+      await page.deleteAndUpdateRaygMeasureData(entities);
+
+      sinon.assert.calledWith(Entity.delete, entities[0].id, { transaction });
+      sinon.assert.notCalled(Entity.import)
+      sinon.assert.calledOnce(transaction.commit);
+      const { metricId, groupId, date } = req.params;
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}/successful`);
+    });
+
+    it('should call Entity.delete and Entity.import when RAYG fields need to be updatedhould call Entity.delete', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+
+      await page.deleteAndUpdateRaygMeasureData(entities, raygEntities);
+
+      sinon.assert.calledWith(Entity.delete, entities[0].id, { transaction });
+      sinon.assert.calledWith(Entity.import, raygEntities[0], category, categoryFields, { transaction, ignoreParents: true, updatedAt: true });
+      sinon.assert.calledOnce(transaction.commit);
+      const { metricId, groupId, date } = req.params;
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}/successful`);
+    });
+
+    it('rollback transaction on error from Entity.delete', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+
+      Entity.delete.throws(new Error('error'));
+
+      await page.deleteAndUpdateRaygMeasureData(entities);
+
+      const { metricId, groupId, date } = req.params
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}`);
+      sinon.assert.calledOnce(transaction.rollback);
+    });
+
+    it('rollback transaction on error from Entity.import', async () => {
+      const transaction = sequelize.transaction();
+      transaction.commit.reset();
+      transaction.rollback.reset();
+
+      Entity.import.throws(new Error('error'));
+
+      await page.deleteAndUpdateRaygMeasureData(entities, raygEntities);
+
+      const { metricId, groupId, date } = req.params
+      sinon.assert.calledWith(page.res.redirect, `${page.url}/delete/${metricId}/${groupId}/${encodeURIComponent(date)}`);
       sinon.assert.calledOnce(transaction.rollback);
     });
   });
