@@ -43,9 +43,8 @@
     {% endif %}
   </div>
 
-
-  <a href="{{ themeUrl }}/{{ req.params.statement }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if req.params.selectedPublicId }}" style="display: none;">Back to {{ activeStatement }}</a>
   <div class="govuk-grid-column-one-half overflow-scroll {{ 'show-measure' if req.params.selectedPublicId }}" id="theme-tableu-placeholder">
+  <a href="{{ themeUrl }}/{{ req.params.statement }}" class="govuk-back-link govuk-!-margin-top-0 {{ 'show-measure' if req.params.selectedPublicId }}" style="display: none;">Back to {{ activeStatement }}</a>
 
   {% if not data.iframeUrl.error and not data.iframeUrl.url %}
     <p class="govuk-body govuk-!-font-weight-bold tableu-message">To view data, select a metric or measure</p>
