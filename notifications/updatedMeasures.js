@@ -1,4 +1,4 @@
-const measures = require('helpers/measures.js');
+const measures = require('helpers/measures');
 const sequelize = require("sequelize");
 const { notify } = require('config');
 const { sendMeasuresUpdatedTodayEmail } =require('services/notify');

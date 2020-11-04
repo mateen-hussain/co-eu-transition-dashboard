@@ -2,17 +2,21 @@ const NotifyClient = require('notifications-node-client').NotifyClient;
 const logger = require('services/logger');
 const { notify, serviceUrl } = require('config');
 const get = require('lodash/get');
-const { v4 }= require('uuid');
+const uuid = require('uuid');
 
 
 const ERROR_SENDING_EMAIL_MESSAGE="ERROR_SENDING_EMAIL";
 const API_KEY_NOT_SET_MESSAGE = "No notify API key set";
 
-const sendEmailWithTempPassword = async ({ email, userId, password }) => {
+const assertNotifyApiKeyPresent = () =>{
   if (!notify.apiKey) {
     logger.error(API_KEY_NOT_SET_MESSAGE)
     throw new Error(ERROR_SENDING_EMAIL_MESSAGE);
   }
+}
+
+const sendEmailWithTempPassword = async ({ email, userId, password }) => {
+  assertNotifyApiKeyPresent();
 
   try {
     const notifyClient = new NotifyClient(notify.apiKey);
@@ -39,10 +43,7 @@ const sendEmailWithTempPassword = async ({ email, userId, password }) => {
 }
 
 const sendMeasuresUpdatedTodayEmail = async({ emails, measures }) => {
-  if (!notify.apiKey) {
-    logger.error(API_KEY_NOT_SET_MESSAGE)
-    throw new Error(ERROR_SENDING_EMAIL_MESSAGE);
-  }
+  assertNotifyApiKeyPresent();
 
   const notifyClient = new NotifyClient(notify.apiKey);
 
@@ -55,7 +56,7 @@ const sendMeasuresUpdatedTodayEmail = async({ emails, measures }) => {
           personalisation: {
             measures
           },
-          reference: `${v4()}`
+          reference: `${uuid.v4()}`
         }
       );
       logger.info(`Sent measures updated today email to ${email}`);
