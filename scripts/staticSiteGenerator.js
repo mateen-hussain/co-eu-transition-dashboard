@@ -84,7 +84,7 @@ const getAuthedCookie = async (url) => {
 };
 
 const removeTemporaryDirectory = dir => {
-  logger.info(`Creating temprary directory ${options.dir}`);
+  logger.info(`Creating temporary directory ${options.dir}`);
   return new Promise((resolve, reject) => {
     fs.rmdir(dir, { recursive: true }, (err) => {
       if (err) {
