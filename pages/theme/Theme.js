@@ -18,6 +18,10 @@ class Theme extends Page {
     return `${this.url}/:theme/:statement?/:selectedPublicId?`;
   }
 
+  get themeUrl() {
+    return `${this.url}/${this.req.params.theme}`;
+  }
+
   get middleware() {
     return [
       ipWhiteList,
