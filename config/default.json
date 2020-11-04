@@ -33,7 +33,8 @@
       "headlineMeasures": "/admin/headline-measures",
       "userManagementList": "/admin/manage-users-list",
       "userManagementAuthentication": "/admin/manage-users-authentication",
-      "clearCache": "/admin/clear-cache"
+      "clearCache": "/admin/clear-cache",
+      "createUser": "/admin/create-user"
     },
     "allData": "/all-data",
     "filterExample": "/filter-example",
@@ -101,5 +102,9 @@
   },
   "locks": {
     "upcomingMilestonesNotifications": "upcoming milestones notifications"
+  },
+  "ipWhiteList": {},
+  "credentials": {
+    "staticExportUser": {}
   }
 }

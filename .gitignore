@@ -7,6 +7,7 @@ mocks
 coverage
 config/local*.json
 dist
+.cache
 
 ############
 # Defaults #

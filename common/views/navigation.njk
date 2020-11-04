@@ -28,7 +28,8 @@
 {% set addMeasuresUrls = [
     config.paths.dataEntryEntity.measureList,
     config.paths.dataEntryEntity.measureEdit,
-    config.paths.dataEntryEntity.measureGroup
+    config.paths.dataEntryEntity.measureGroup,
+    config.paths.dataEntryEntity.measureValue
     ]
 %}
 
@@ -40,13 +41,15 @@
     config.paths.admin.categoryList,
     config.paths.admin.headlineMeasures,
     config.paths.admin.userManagementList,
-    config.paths.admin.userManagementAuthentication
+    config.paths.admin.userManagementAuthentication,
+    config.paths.admin.createUser
     ]
 %}
 
 {% set adminUserManagementUrls = [
     config.paths.admin.userManagementList,
-    config.paths.admin.userManagementAuthentication
+    config.paths.admin.userManagementAuthentication,
+    config.paths.admin.createUser
     ]
 %}
 
@@ -58,7 +61,7 @@
 
 <nav class="navigation">
     <ul id="navigation" class="govuk-header__navigation" aria-label="Top Level Navigation">
-    {% if req.user.roles | includes(['viewer']) %}
+    {% if req.user.roles | includes(['viewer', 'static']) %}
     <li class="govuk-header__navigation-item {{ 'govuk-header__navigation-item--active' if url in transitionReadinessUrls }}">
         <a class="govuk-header__link nav" href="{{ config.paths.readinessOverview }}">Transition readiness</a>
     </li>
@@ -82,6 +85,9 @@
         </a>
     </li>
     {% endif %}
+    <li class="govuk-header__navigation-item pull-right">
+        <p class="govuk-body-s govuk-!-font-weight-bold timer">Days to go:  <span id="countdown">{{ countDownTime }}</span></p>
+    </li>
     </ul>
 </nav>
 

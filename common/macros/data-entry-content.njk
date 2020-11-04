@@ -1,5 +1,4 @@
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "measure-value.njk" import measureValue %}
 
 {% macro dataEntriesContent(groupMeasures, url, data, formFields, editValueUrl, showRaygCheckbox) %}
   <div class="govuk-grid-row">
@@ -27,8 +26,13 @@
                     <td>
                       <p class="govuk-body">{{ measure.unit }} : {{ measure.value }}</p>
                     </td>
-                    <td>               
-                  </td>
+                    <td>
+                      {% if loop.first %}
+                        <a class="govuk-link govuk-!-font-size-19 edit-link" href="{{ editValueUrl }}/edit/{{ measure.metricID }}/{{ measure.groupID }}/{{ measure.date | urlencode }}">
+                          Edit
+                        </a>
+                      {% endif %}                    
+                    </td>
                   </tr>
                 {% endfor %}
               </table>
@@ -40,55 +44,7 @@
 
   <p class="govuk-body govuk-!-font-weight-bold">Add a new value<p>
   <div class="data-entry">
-    <form action="{{ url }}" method="post">
-      <input type="hidden" name="type" value="entries" />
-
-      {{ govukDateInput({
-        name: "field-date"
-      }) }}
-
-    <table class="current-value">
-      {% for measure in formFields %}
-        <tr>
-         {% if measure.label %}
-          <td class="measure-label">
-            <p class="govuk-body govuk-!-font-weight-bold">{{ measure.label }}</p>
-          </td>
-        {% endif %}
-        {% if measure.label2 %}
-          <td class="measure-label">
-            <p class="govuk-body govuk-!-font-weight-bold">{{ measure.label2 }}</p>
-          </td>
-        {% endif %}
-        <td>
-          {{ measure.unit }} :
-          <div class="govuk-date-input__item">
-            <div class="govuk-form-group">
-              <label class="govuk-label" for="entity-{{ latestMeasure.id }}">Value</label>
-              <input class="govuk-input govuk-input--width-2" type="number" id="entity-{{ measure.id }}" name="entities[{{ measure.id }}]" value="{{ data.entities[measure.id] }}" />
-            </div>
-          </div>
-        </td> 
-        </tr>
-      {% endfor %}
-    </table>
-
-    {% if showRaygCheckbox %}
-      {{ govukCheckboxes({
-        idPrefix: "updateRAYG",
-        name: "updateRAYG",
-        items: [
-          {
-            value: true,
-            text: "Measure contains date(s) in the future, select this checkbox to update the overall RAYG value",
-            checked: true if data.updateRAYG
-          }
-        ]
-      }) }}
-    {% endif %}
-    
-    <button class="govuk-button" data-module="govuk-button" type="submit">Add and save value</button>
-    </form>
+    {{ measureValue(url, formFields, data, showRaygCheckbox) }}
    </div> 
 
 </div>

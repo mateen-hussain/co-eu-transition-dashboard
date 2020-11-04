@@ -34,6 +34,11 @@ class Entity extends Model {
     if(!entity.id) {
       const entityModel = await this.create(entityToUpsert, options);
       entity.id = entityModel.id;
+    } else {
+      if (options.updatedAt) {
+        // Ensure we update the updated_at column when any data is entered via the admin panel
+        await this.upsert({ id: entity.id }, options);
+      }  
     }
 
     const parentPublicFields = entityFields.filter(field => field.isParentField);
@@ -135,6 +140,14 @@ class Entity extends Model {
 
     return sprintf("%s%02d", category.publicIdFormat, newMaxId);
   }
+
+  static async delete(entityId, options) {
+    await this.destroy({
+      where: {
+        id: entityId
+      }
+    }, options);
+  }
 }
 
 Entity.init({
@@ -153,7 +166,7 @@ Entity.init({
     allowNull: false,
     field: "category_id"
   }
-}, { sequelize, modelName: 'entity', tableName: 'entity', createdAt: 'created_at', updatedAt: false });
+}, { sequelize, modelName: 'entity', tableName: 'entity', createdAt: 'created_at',  updatedAt: 'updated_at' });
 
 Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'parentEntityId', as: 'children', otherKey: 'entityId' });
 Entity.belongsToMany(Entity, { through: EntityParent, foreignKey: 'entityId', as: 'parents', otherKey: 'parentEntityId' });

@@ -14,18 +14,22 @@ let passportJWTStrategyStub = {};
 let passportStub = {};
 let authentication = {};
 
-const user = {
-  email: 'email',
-  password: 'password',
-  hashedPassphrase: 'password',
-  role: 'viewer',
-  id: 1,
-  increment: sinon.stub().resolves(),
-  update: sinon.stub().resolves()
-};
+let user = {};
 
 describe('services/authentication', () => {
   beforeEach(() => {
+    user = {
+      email: 'email',
+      password: 'password',
+      hashedPassphrase: 'password',
+      role: 'viewer',
+      id: 1,
+      increment: sinon.stub().resolves(),
+      update: sinon.stub().resolves(),
+      roles: [],
+      skip2FA: false
+    };
+
     passportLocalStrategyStub = sinon.stub().returns(0);
     passportJWTStrategyStub = sinon.stub().returns(0);
     passportStub = {
@@ -103,7 +107,8 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            where: { email: user.email }
+            where: { email: user.email },
+            include: Role
           });
         });
 
@@ -134,7 +139,8 @@ describe('services/authentication', () => {
 
         it('correctly searches database', () => {
           sinon.assert.calledWith(User.findOne, {
-            where: { email: user.email }
+            where: { email: user.email },
+            include: Role
           });
         });
 
@@ -187,7 +193,7 @@ describe('services/authentication', () => {
           include: [{
             model: Department
           },{
-            model: Role 
+            model: Role
           }]
         });
 
@@ -206,7 +212,7 @@ describe('services/authentication', () => {
           include: [{
             model: Department
           },{
-            model: Role 
+            model: Role
           }]
         });
 
@@ -248,7 +254,7 @@ describe('services/authentication', () => {
 
       it('redirects to login if no user assigned to req', () => {
         const middleware = authentication.protect(['viewer']);
-        const req = { };
+        const req = { user };
         const res = { redirect: sinon.stub() };
         const next = sinon.stub();
 
@@ -279,10 +285,10 @@ describe('services/authentication', () => {
         sinon.assert.called(next);
       });
 
-      it('calls next when ipWhitelisted is true', () => {
+      it('calls next when tableauIpWhiteList is true', () => {
         const middleware = authentication.protect([]);
         const req = {};
-        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+        const res = { redirect: sinon.stub(), locals: { tableauIpWhiteList: true } };
         const next = sinon.stub();
 
         middleware[2](req, res, next);
@@ -292,20 +298,20 @@ describe('services/authentication', () => {
     });
 
     describe('check auth', () => {
-      it('next is called when ipWhitelisted is true', () => {
+      it('next is called when tableauIpWhiteList is true', () => {
         const middleware = authentication.protect(['viewer']);
         const req = {};
-        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+        const res = { redirect: sinon.stub(), locals: { tableauIpWhiteList: true } };
         const next = sinon.stub();
         middleware[0](req, res, next);
 
-        sinon.assert.called(next);       
+        sinon.assert.called(next);
       });
 
-      it('authenticate is called when ipWhitelisted is false', () => {
+      it('authenticate is called when tableauIpWhiteList is false', () => {
         const middleware = authentication.protect(['viewer']);
         const req = {};
-        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: false } };
+        const res = { redirect: sinon.stub(), locals: { tableauIpWhiteList: false } };
         const next = sinon.stub();
         middleware[0](req, res, next);
 
@@ -322,12 +328,38 @@ describe('services/authentication', () => {
         jwt.restoreData.restore();
       });
 
+      describe('skips 2fa', () => {
+        it('if user has skip2FA role and is on the whitelist', () => {
+          user.skip2FA = true;
+
+          const middleware = authentication.protect(['viewer']);
+          const req = { user };
+          const res = { redirect: sinon.stub(), locals: { ipWhiteList: true } };
+          const next = sinon.stub();
+
+          middleware[1](req, res, next);
+
+          sinon.assert.called(next);
+        });
+
+        it('if ip coming from tableau', () => {
+          const middleware = authentication.protect(['viewer']);
+          const req = { user: {} };
+          const res = { redirect: sinon.stub(), locals: { tableauIpWhiteList: true } };
+          const next = sinon.stub();
+
+          middleware[1](req, res, next);
+
+          sinon.assert.called(next);
+        });
+      });
+
       it('allow if 2fa passed', () => {
         jwt.restoreData.returns({ tfa: true });
 
         const middleware = authentication.protect(['viewer']);
         const req = { user: { roles: [{ name: 'viewer' }] } };
-        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+        const res = { redirect: sinon.stub(), locals: {} };
         const next = sinon.stub();
 
         middleware[1](req, res, next);
@@ -335,12 +367,12 @@ describe('services/authentication', () => {
         sinon.assert.called(next);
       });
 
-      it('redirects if no tfa ', () => {
+      it('redirects if no tfa', () => {
         jwt.restoreData.returns({ tfa: false });
 
         const middleware = authentication.protect(['viewer']);
         const req = { user: { roles: [{ name: 'viewer' }] } };
-        const res = { redirect: sinon.stub(), locals: { ipWhitelisted: false } };
+        const res = { redirect: sinon.stub(), locals: {} };
         const next = sinon.stub();
 
         middleware[1](req, res, next);
@@ -350,12 +382,12 @@ describe('services/authentication', () => {
       });
     });
 
-    it('dont update cookie expiration when ipWhitelisted is true', () => {
+    it('dont update cookie expiration when tableauIpWhiteList is true', () => {
       sinon.stub(jwt, 'saveData');
 
       const middleware = authentication.protect(['viewer']);
       const req = { user: { roles: [{ name: 'viewer' }] } };
-      const res = { redirect: sinon.stub(), locals: { ipWhitelisted: true } };
+      const res = { redirect: sinon.stub(), locals: { tableauIpWhiteList: true } };
       const next = sinon.stub();
 
       middleware[3](req, res, next);

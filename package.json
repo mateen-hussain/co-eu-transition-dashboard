@@ -18,7 +18,10 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "common/*"
+      "common/*",
+      "dist/*",
+      "scripts/*",
+      ".cache/*"
     ]
   },
   "npm": {
@@ -31,6 +34,7 @@
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "chart.js": "^2.9.3",
+    "command-line-args": "^5.1.1",
     "config": "^3.3.1",
     "cookie-parser": "^1.4.5",
     "copy-webpack-plugin": "^5.1.1",
@@ -42,6 +46,7 @@
     "express-fileupload": "^1.1.10",
     "express-nunjucks": "^2.2.5",
     "express-winston": "^4.0.5",
+    "file-system-cache": "^1.0.5",
     "fs": "0.0.1-security",
     "getopts": "^2.2.5",
     "glob": "^7.1.6",
@@ -56,7 +61,6 @@
     "mini-css-extract-plugin": "^0.9.0",
     "moment": "^2.27.0",
     "mysql2": "^2.1.0",
-    "node-cache": "^5.1.2",
     "node-cron": "^2.0.3",
     "node-sass": "^4.14.1",
     "notifications-node-client": "^4.8.0",
@@ -81,6 +85,7 @@
     "uuid": "^7.0.3",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
+    "website-scraper": "^4.0.1",
     "winston": "^3.3.3",
     "xlsx": "^0.15.6"
   },

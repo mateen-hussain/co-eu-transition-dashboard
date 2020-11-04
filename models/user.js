@@ -17,6 +17,14 @@ const Entity = require('./entity');
 const EntityUser = require('./entityUser');
 
 class User extends Model {
+  get isStatic () {
+    return this.roles.map(role => role.name).includes('static');
+  }
+
+  get skip2FA () {
+    return this.roles.map(role => role.name).includes('skip_2fa');
+  }
+
   get isAdmin () {
     return this.roles.map(role => role.name).includes('admin');
   }

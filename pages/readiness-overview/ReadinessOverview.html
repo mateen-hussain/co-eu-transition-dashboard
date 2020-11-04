@@ -11,14 +11,15 @@
 {% endblock %}
 
 {% block content %}
-<div class="govuk-grid-row">
+<div class="govuk-grid-row readiness-overview">
   <div class="govuk-grid-column-full">
     <h1 class="govuk-heading-l">Transition Readiness Overview</h1>
     <p class="govuk-body-s"><a class="govuk-link" href="{{ config.paths.raygDefinitions }}">View RAYG definitions and how they are calculated</a></p>
     <div class="govuk-grid-row">
 
       <div class="govuk-grid-column-one-quarter no-padding-right">
-        <h3 class="govuk-heading-m">Headline figures</h3>
+        <h3 class="govuk-heading-m" id="headline-figures">Headline figures<a class="govuk-link govuk-!-margin-left-6 overview-link" style="display:none" href="#themes">Themes</a></h3>
+
         <div class="overview-card-holder headline-figure top-statements">
           {% for item in data.headlineMeasures %}
             <a href="{{ item.link }}">
@@ -35,7 +36,7 @@
       </div>
 
       <div class="govuk-grid-column-three-quarters">
-        <h3 class="govuk-heading-m">Themes</h3>
+        <h3 class="govuk-heading-m" id="themes"><a class="govuk-link govuk-!-margin-right-6 overview-link" style="display:none" href="#headline-figures">Headline figures</a>Themes</h3>
 
         <div class="govuk-grid-row">
 
