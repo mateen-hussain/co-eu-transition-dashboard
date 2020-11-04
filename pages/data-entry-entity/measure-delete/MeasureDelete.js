@@ -17,6 +17,7 @@ const uniq = require('lodash/uniq');
 const utils = require('helpers/utils');
 const cloneDeep = require('lodash/cloneDeep');
 const groupBy = require('lodash/groupBy');
+const { lte } = require('lodash');
 
 class MeasureDelete extends Page {
   get url() {
@@ -27,13 +28,16 @@ class MeasureDelete extends Page {
     return `${this.url}/:metricId/:groupId/:successful(successful)?`;
   }
 
-  get deleteUrl() {
-    const { metricId, groupId } = this.req.params;
-    return `${this.url}/${metricId}/${groupId}`;
-  }
-
   get successfulMode() {
     return this.req.params && this.req.params.successful;
+  }
+
+  get backUrl() {
+    let url = `${config.paths.dataEntryEntity.measureEdit}/${this.req.params.metricId}/${this.req.params.groupId}`;
+    if (this.successfulMode) {
+      url = config.paths.dataEntryEntity.measureList
+    }
+    return url
   }
 
   get middleware() {
@@ -43,50 +47,51 @@ class MeasureDelete extends Page {
     ];
   }
 
-  async canUserAccessMetric() {
-    const metricsUserCanAccess = await this.req.user.getPermittedMetricMap();
-    return Object.keys(metricsUserCanAccess).includes(this.req.params.metricId)
-  }
-
-  async getRequest(req, res) {
-    const canUserAccessMetric = await this.canUserAccessMetric();
-
-    if(!req.user.isAdmin && !canUserAccessMetric) {
+  async handler(req, res) {
+    if(!req.user.isAdmin) {
       return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
     }
-
-    // const { measureEntities }  = await this.getMeasure();
-    // const measuresForSelectedDate = measureEntities.filter(measure => measure.date === this.req.params.date)
-
-    // if (!moment(this.req.params.date, 'DD/MM/YYYY').isValid() || (measuresForSelectedDate.length === 0 && !this.successfulMode)) {
-    //   return this.res.redirect(config.paths.dataEntryEntity.measureList);
-    // }
-
-    super.getRequest(req, res);
+   
+    return super.handler(req, res);
   }
 
   async postRequest(req, res) {
-    const canUserAccessMetric = await this.canUserAccessMetric();
-
-    if(!req.user.isAdmin && !canUserAccessMetric) {
-      return res.status(METHOD_NOT_ALLOWED).send('You do not have permisson to access this resource.');
+    try {
+      await this.deleteMeasure();
+    } catch (error) {
+      logger.error(error);
+      req.flash(["An error occoured when deleting the measure."]);
+      return res.redirect(this.req.originalUrl);
     }
-    
+
+    return res.redirect(`${this.req.originalUrl}/successful`);
   }
 
+  async deleteMeasure() {
+    return true;
+    const transaction = await sequelize.transaction();
+
+    const { measureEntities, uniqMetricIds, raygEntities } = await this.getMeasure();
+
+    try {
+      for (const entity of entitiesForSelectedDate) {
+        await Entity.delete(entity.id, { transaction });
+      }
+
+      await transaction.commit();
+    } catch (error) {
+      logger.error(error);
+      await transaction.rollback();
+      throw error;
+    }
+  }
 
   async mapMeasureFieldsToEntity(measureEntities) {
-    const statementCategory = await measures.getCategory("Statement");
-
     return measureEntities.map((entity) => {
-      const statementEntity = entity.parents.find((parent) => {
-        return parent.categoryId === statementCategory.id;
-      });
 
       const entityMapped = {
         id: entity.id,
         publicId: entity.publicId,
-        parentStatementPublicId: statementEntity.publicId,
       };
 
       entity.entityFieldEntries.map(entityfieldEntry => {
@@ -155,16 +160,12 @@ class MeasureDelete extends Page {
   }
 
   async getMeasureData() {
-    const { measureEntities, uniqMetricIds } = await this.getMeasure();
+    const { measureEntities } = await this.getMeasure();
 
     // measuresEntities are already sorted by date, so the last entry is the newest
     const latestEntity = measureEntities[measureEntities.length - 1];
-    const backLink = `${config.paths.dataEntryEntity.measureEdit}/${latestEntity.metricID}/${latestEntity.groupID}`;
-
-    return {
-      latest: latestEntity,
-      backLink,
-    };
+  
+    return latestEntity
   }
 }
 
