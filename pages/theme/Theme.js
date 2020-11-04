@@ -3,6 +3,7 @@ const { paths } = require('config');
 const authentication = require('services/authentication');
 const config = require('config');
 const transitionReadinessData = require('helpers/transitionReadinessData');
+const { ipWhiteList } = require('middleware/ipWhitelist');
 
 class Theme extends Page {
   static get isEnabled() {
@@ -17,9 +18,14 @@ class Theme extends Page {
     return `${this.url}/:theme/:statement?/:selectedPublicId?`;
   }
 
+  get themeUrl() {
+    return `${this.url}/${this.req.params.theme}`;
+  }
+
   get middleware() {
     return [
-      ...authentication.protect(['viewer'])
+      ipWhiteList,
+      ...authentication.protect(['viewer', 'static'])
     ];
   }
 

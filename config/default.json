@@ -106,5 +106,9 @@
   },
   "locks": {
     "upcomingMilestonesNotifications": "upcoming milestones notifications"
+  },
+  "ipWhiteList": {},
+  "credentials": {
+    "staticExportUser": {}
   }
 }

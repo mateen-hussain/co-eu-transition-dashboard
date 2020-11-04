@@ -3,6 +3,7 @@ const { paths } = require('config');
 const Theme = require('pages/theme/Theme');
 const authentication = require('services/authentication');
 const config = require('config');
+const { ipWhiteList } = require('middleware/ipWhitelist');
 
 let page = {};
 
@@ -49,12 +50,28 @@ describe('pages/theme/Theme', () => {
     });
   });
 
-  it('only management are allowed to access this page', () => {
-    expect(page.middleware).to.eql([
-      ...authentication.protect(['viewer'])
-    ]);
+  describe('#middleware', () => {
+    it('only viewer and static roles can access this page', () => {
+      expect(page.middleware).to.eql([
+        ipWhiteList,
+        ...authentication.protect(['viewer', 'static'])
+      ]);
 
-    sinon.assert.calledWith(authentication.protect, ['viewer']);
+      sinon.assert.calledWith(authentication.protect, ['viewer', 'static']);
+    });
+  });
+
+  describe('#pathToBind', () => {
+    it('returns correct url with params', () => {
+      expect(page.pathToBind).to.eql(`${paths.transitionReadinessThemeDetail}/:theme/:statement?/:selectedPublicId?`);
+    });
+  });
+
+  describe('#themeUrl', () => {
+    it('returns theme url', () => {
+      page.req.params = { theme: 'borders' };
+      expect(page.themeUrl).to.eql(`${paths.transitionReadinessThemeDetail}/borders`);
+    });
   });
 
 });

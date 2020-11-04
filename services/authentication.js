@@ -22,7 +22,8 @@ const hashPassphrase = passphrase => {
 
 const authenticateLogin = async (email, password, done) => {
   const user = await User.findOne({
-    where: { email }
+    where: { email },
+    include: Role
   });
 
   if(!user) {
@@ -66,7 +67,7 @@ const authenticateUser = (jwtPayload = {}, cb) => {
     include: [{
       model: Department
     },{
-      model: Role 
+      model: Role
     }]
   })
     .then(user => {
@@ -82,7 +83,7 @@ passport.use(jwtStrategy);
 
 const protect = (roles = []) => {
   const auth = (req, res, next) => {
-    if (get(res, 'locals.ipWhitelisted', false)){
+    if (get(res, 'locals.tableauIpWhiteList', false)){
       return next()
     }
     return passport.authenticate('jwt', {
@@ -92,24 +93,30 @@ const protect = (roles = []) => {
   };
 
   const check2fa = (req, res, next) => {
-    const ipWhitelisted = get(res, 'locals.ipWhitelisted', false)
+    if(!config.features.twoFactorAuth) {
+      return next();
+    }
+
     const data = jwt.restoreData(req, res) || {};
-    if(!data.tfa && config.features.twoFactorAuth && !ipWhitelisted) {
+    const tableauSkip2FA = get(res, 'locals.tableauIpWhiteList', false);
+    const userSkip2FA = req.user.skip2FA && get(res, 'locals.ipWhiteList', false);
+
+    if(!data.tfa && !tableauSkip2FA && !userSkip2FA) {
       return res.redirect(config.paths.authentication.login);
     }
     return next();
   };
 
   const checkRole = (req, res, next) => {
-    if (get(res, 'locals.ipWhitelisted', false)) {
-      return next()
+    if (get(res, 'locals.tableauIpWhiteList', false) || (req.user.skip2FA && get(res, 'locals.ipWhiteList', false))) {
+      return next();
     }
 
     if(!req.user) {
       return res.redirect(config.paths.authentication.login);
     }
 
-    if ((req.user && roles.length == 0) || (req.user.roles.filter(role => 
+    if ((req.user && roles.length == 0) || (req.user.roles.filter(role =>
       roles.includes(role.name)).length > 0)) {
       return next();
     }
@@ -118,8 +125,8 @@ const protect = (roles = []) => {
   };
 
   const updateCookieExpiration = (req, res, next) => {
-    const ipWhitelisted = get(res, 'locals.ipWhitelisted', false)
-    if (!ipWhitelisted) {
+    const tableauIpWhiteList = get(res, 'locals.tableauIpWhiteList', false)
+    if (!tableauIpWhiteList) {
       jwt.saveData(req, res);
     }
     next();

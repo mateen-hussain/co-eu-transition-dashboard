@@ -3,6 +3,7 @@ const config = require('config');
 const logger = require('services/logger');
 const moment = require('moment');
 const { promisify } = require("util");
+const nodeCache = require( "file-system-cache" );
 
 let redisUrl = config.services.redis.url;
 
@@ -10,21 +11,11 @@ if(config.services.vcapServices && config.services.vcapServices.redis.length) {
   redisUrl = config.services.vcapServices.redis[0].credentials.uri;
 }
 
-if (!redisUrl) {
-  logger.error('Cache not active, no redis url supplied');
-  module.exports = {
-    set: () => {},
-    get: () => {},
-    clear: () => {}
-  };
-} else {
+if (redisUrl) {
   const client = redis.createClient({
     url: redisUrl
   });
-
-  client.on("error", function(error) {
-    logger.error(error);
-  });
+  client.on("error", logger.error);
 
   const set = async (key, value) => {
     // set cache to expire at 5PM of that day, when called before 5PM, else set to 5PM of next day
@@ -38,13 +29,20 @@ if (!redisUrl) {
     return await getAsync(key);
   };
 
-  const clear = () => {
-    client.flushall();
-  };
+  const clear = () => client.flushall();
 
   module.exports = {
     set,
     get,
     clear
   };
+} else {
+  logger.error('Redis not active, reverting to local cache');
+
+  const myCache = nodeCache.default({ basePath: "./.cache" });
+  const set = (key, value) => myCache.set(key, value);
+  const get = async (key) => await myCache.get(key);
+  const clear = () => myCache.clear();
+
+  module.exports = { set, get, clear };
 }

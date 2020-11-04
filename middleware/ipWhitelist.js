@@ -1,12 +1,23 @@
 const config = require('config');
 const ipRangeCheck = require("ip-range-check");
 
-const ipWhitelist = (req, res, next) => {
+const tableauIpWhiteList = (req, res, next) => {
   if (ipRangeCheck(req.ip, config.services.tableau.whiteListedIpRange)) {
     res.locals = res.locals || {};
-    res.locals.ipWhitelisted = true;
+    res.locals.tableauIpWhiteList = true;
   }
-  return next()
+  return next();
 }
 
-module.exports = ipWhitelist
+const ipWhiteList = (req, res, next) => {
+  if (ipRangeCheck(req.ip, config.ipWhiteList)) {
+    res.locals = res.locals || {};
+    res.locals.ipWhiteList = true;
+  }
+  return next();
+}
+
+module.exports = {
+  tableauIpWhiteList,
+  ipWhiteList
+}
