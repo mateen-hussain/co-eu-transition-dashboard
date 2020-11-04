@@ -12,7 +12,7 @@ describe('middleware/helmet', () => {
   describe('#attach', () => {
     it('adds core helmet to app middleware', () => {
       helmet.attach(app);
-      expect(app.use.firstCall.args.toString()).to.eql(helmetModule().toString());
+      expect(app.use.firstCall.args.toString()).to.deep.eql(helmetModule().toString());
     });
 
     it('adds contentSecurityPolicy helmet to app middleware', () => {
