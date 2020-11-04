@@ -6,6 +6,8 @@ const config = require('config');
 const logger = require('services/logger');
 const jwt = require('services/jwt');
 const startPage = require('helpers/startPage');
+const { ipWhiteList } = require('middleware/ipWhitelist');
+const get = require('lodash/get');
 
 class Login extends Page {
   get url() {
@@ -13,11 +15,13 @@ class Login extends Page {
   }
 
   get middleware() {
-    return [ flash ];
+    return [ ipWhiteList, flash ];
   }
 
   next(user) {
-    if(config.features.twoFactorAuth) {
+    const userSkip2FA = user.skip2FA && get(this.res, 'locals.ipWhiteList', false);
+
+    if(config.features.twoFactorAuth && !userSkip2FA) {
       this.res.redirect(config.paths.authentication.twoFactorAuthentication);
     } else if(user.mustChangePassword) {
       this.res.redirect(config.paths.authentication.passwordReset);

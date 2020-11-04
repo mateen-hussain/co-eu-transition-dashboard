@@ -1,6 +1,7 @@
 const { expect, sinon } = require('test/unit/util/chai');
 const config = require('config');
 const Start = require('pages/start/Start');
+const { ipWhiteList } = require('middleware/ipWhitelist');
 
 let page = {};
 let res = {};
@@ -17,6 +18,12 @@ describe('pages/start/Start', () => {
   describe('#url', () => {
     it('returns correct url', () => {
       expect(page.url).to.eql(config.paths.start);
+    });
+  });
+
+  describe('#middleware', () => {
+    it('can view if authenticated and are in the ipwhitelist', () => {
+      expect(page.middleware).to.include(ipWhiteList);
     });
   });
 
