@@ -61,9 +61,6 @@ describe('pages/theme/Theme', () => {
     });
   });
 
-<<<<<<< HEAD
-});
-=======
   describe('#pathToBind', () => {
     it('returns correct url with params', () => {
       expect(page.pathToBind).to.eql(`${paths.transitionReadinessThemeDetail}/:theme/:statement?/:selectedPublicId?`);
@@ -78,4 +75,3 @@ describe('pages/theme/Theme', () => {
   });
 
 });
->>>>>>> unit tests
