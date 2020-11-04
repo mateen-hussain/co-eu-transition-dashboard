@@ -1,6 +1,7 @@
 const redis = require("redis");
 const config = require('config');
 const logger = require('services/logger');
+const moment = require('moment');
 const { promisify } = require("util");
 
 let redisUrl = config.services.redis.url;
@@ -25,11 +26,11 @@ if (!redisUrl) {
     logger.error(error);
   });
 
-  const set = async (key, value, momentDate) => {
+  const set = async (key, value) => {
+    // set cache to expire at 5PM of that day, when called before 5PM, else set to 5PM of next day
+    const expiresAt = (moment().hour() > 17)? moment().add(1, 'd').set('h', 17).set('m', 0) : moment().set('h', 17).set('m', 0);
     client.set(key, value);
-    if(momentDate) {
-      client.expireat(key, momentDate.unix());
-    }
+    client.expireat(key, expiresAt.unix());
   };
 
   const get = async (key) => {

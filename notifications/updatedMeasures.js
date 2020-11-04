@@ -2,6 +2,7 @@ const measures = require('helpers/measures');
 const sequelize = require("sequelize");
 const { notify } = require('config');
 const notifyServices =require('services/notify');
+const cache = require('services/cache');
 const Op = sequelize.Op;
 
 
@@ -33,6 +34,7 @@ const formatMeasures = (measureEntities) => {
 
 
 const notifyUpdatedMeasures = async() => {
+  cache.clear();
   const measureEntities = await getMeasuresUpdatedToday();
   const emails = getEmails();
   const formattedMsrs = formatMeasures(measureEntities);

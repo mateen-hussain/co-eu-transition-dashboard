@@ -456,7 +456,7 @@ const createEntityHierarchy = async (category) => {
     entitesInHierarchy.push(entitesMapped)
   }
 
-  await cache.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy), moment().endOf('day'));
+  await cache.set(`cache-transition-overview`, JSON.stringify(entitesInHierarchy));
 
   return entitesInHierarchy;
 }
@@ -482,7 +482,7 @@ const createEntityHierarchyForTheme = async (topLevelEntityPublicId) => {
   const topLevelEntityMapped = mapEntityChildren(allEntities, topLevelEntity);
   await mapProjectsToEntities(topLevelEntityMapped);
 
-  await cache.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped), moment().endOf('day'));
+  await cache.set(`cache-transition-${topLevelEntityPublicId}`, JSON.stringify(topLevelEntityMapped));
 
   return topLevelEntityMapped;
 }
